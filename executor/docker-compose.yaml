@@ -1,20 +1,4 @@
-# DNAT Executor Stack (runs on VM)
-#
-# This docker-compose runs:
-# - Hardhat (local blockchain)
-# - IPFS node (stores encrypted data)
-# - LAS (SCONE Local Attestation Service)
-# - Enclave image (built for execution)
-#
-# The Executor API runs outside Docker (./run-api.sh) to spawn enclave containers.
-#
-# Access from local machine via SSH tunnel:
-#   ssh -L 8080:localhost:8080 -L 5001:localhost:5001 -L 8081:localhost:8081 -L 8545:localhost:8545 user@vm
-
-services:
-  # ===========================================
-  # Hardhat - Local Blockchain
-  # ===========================================
+﻿services:
   hardhat:
     image: node:20.19.5
     container_name: dnat-hardhat
@@ -25,44 +9,17 @@ services:
       - "8545:8545"
     command: ["sh", "-c", "npm install && npx hardhat node --hostname 0.0.0.0"]
 
-  # ===========================================
-  # IPFS - Stores encrypted datasets and apps
-  # ===========================================
   ipfs:
     image: ipfs/kubo:latest
     container_name: dnat-ipfs
     ports:
-      - "4001:4001"      # Swarm (P2P)
-      - "5001:5001"      # API
-      - "8080:8080"      # Gateway
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
     volumes:
       - ipfs_data:/data/ipfs
     environment:
       - IPFS_PROFILE=server
 
-  # ===========================================
-  # SCONE LAS - Local Attestation Service
-  # ===========================================
-  las:
-    image: registry.scontain.com/sconecuratedimages/las
-    container_name: dnat-las
-    user: root
-    devices:
-      - "/dev/sgx_enclave:/dev/sgx_enclave"
-      - "/dev/sgx_provision:/dev/sgx_provision"
-    ports:
-      - "18766:18766"
-
-  # ===========================================
-  # Enclave - SGX execution environment
-  # ===========================================
-  enclave:
-    build: ./enclave
-    image: dnat-enclave
-    container_name: dnat-enclave-build
-    command: echo "Enclave image built"
-    # This service just builds the image; actual execution is via docker run
-
 volumes:
   ipfs_data:
-

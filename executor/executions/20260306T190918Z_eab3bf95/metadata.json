@@ -1,0 +1,14 @@
+{
+  "executionId": "20260306T190918Z_eab3bf95",
+  "status": "success",
+  "returnCode": 0,
+  "datasetCid": "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH",
+  "scriptCid": "QmSkPDBzJeNKh37M1di7mY7JkuQWJ4v3kAmranEoJR53tV",
+  "ipfsApiUrl": "http://localhost:5001",
+  "datasetPath": "C:\\Users\\steyl\\Documents\\Github\\dnat-identity-validator\\executor\\executions\\20260306T190918Z_eab3bf95\\dataset.csv",
+  "scriptPath": "C:\\Users\\steyl\\Documents\\Github\\dnat-identity-validator\\executor\\executions\\20260306T190918Z_eab3bf95\\application.py",
+  "resultPath": "C:\\Users\\steyl\\Documents\\Github\\dnat-identity-validator\\executor\\executions\\20260306T190918Z_eab3bf95\\result.json",
+  "stdoutPath": "C:\\Users\\steyl\\Documents\\Github\\dnat-identity-validator\\executor\\executions\\20260306T190918Z_eab3bf95\\stdout.txt",
+  "stderrPath": "C:\\Users\\steyl\\Documents\\Github\\dnat-identity-validator\\executor\\executions\\20260306T190918Z_eab3bf95\\stderr.txt",
+  "createdAtUtc": "2026-03-06T19:09:18.422082Z"
+}

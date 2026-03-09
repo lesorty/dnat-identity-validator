@@ -1,0 +1,9 @@
+{
+  "executionId": "20260306T182747Z_06a2a720",
+  "status": "download_failed",
+  "error": "HTTP Error 405: Method Not Allowed",
+  "datasetCid": "4",
+  "scriptCid": "5",
+  "ipfsApiUrl": "http://localhost:5001",
+  "createdAtUtc": "2026-03-06T18:27:48.145457Z"
+}

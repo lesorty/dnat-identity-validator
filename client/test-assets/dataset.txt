@@ -1,6 +1,0 @@
-Name,Age,Salary
-Alice,30,50000
-Bob,25,45000
-Charlie,35,60000
-Diana,28,52000
-
