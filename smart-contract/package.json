@@ -1,23 +1,28 @@
 {
-  "name": "dnat-smart-contract",
-  "version": "1.0.0",
-  "description": "DNAT Marketplace Smart Contract",
-  "main": "index.js",
-  "scripts": {
-    "compile": "hardhat compile",
-    "node": "hardhat node",
-    "deploy:localhost": "hardhat run scripts/deploy.js --network localhost",
-    "deploy:hardhat": "hardhat run scripts/deploy.js --network hardhat"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.19.0"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1"
-  }
-}
+    "name":  "dnat-smart-contract",
+    "version":  "1.0.0",
+    "description":  "DNAT Marketplace Smart Contract",
+    "main":  "index.js",
+    "scripts":  {
+                    "compile":  "hardhat compile",
+                    "node":  "hardhat node",
+                    "deploy:localhost":  "hardhat run scripts/deploy.js --network localhost",
+                    "deploy:hardhat":  "hardhat run scripts/deploy.js --network hardhat",
+                    "cli":  "node scripts/cli.js",
+                    "web":  "node scripts/api-server.js"
+                },
+    "keywords":  [
 
+                 ],
+    "author":  "",
+    "license":  "MIT",
+    "devDependencies":  {
+                            "@nomicfoundation/hardhat-toolbox":  "^4.0.0",
+                            "hardhat":  "^2.19.0"
+                        },
+    "dependencies":  {
+                         "cors":  "^2.8.5",
+                         "dotenv":  "^16.3.1",
+                         "express":  "^4.21.2"
+                     }
+}

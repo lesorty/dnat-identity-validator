@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DNAT Web CLI</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      :root {
+        --bg-0: #071827;
+        --bg-1: #12304a;
+        --bg-2: #0d4a5f;
+        --surface: rgba(247, 251, 255, 0.96);
+        --line: #c7d7e3;
+        --ink: #122a3d;
+        --muted: #557085;
+        --accent: #0a9396;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 14% 18%, rgba(245, 158, 11, 0.18), transparent 30%),
+          radial-gradient(circle at 86% 10%, rgba(10, 147, 150, 0.2), transparent 28%),
+          linear-gradient(160deg, var(--bg-0), var(--bg-1) 58%, var(--bg-2));
+      }
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: rgba(3, 20, 33, 0.64);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 12px 16px;
+        display: flex;
+        gap: 14px;
+      }
+      .nav a { color: #d7eef7; text-decoration: none; font-weight: 700; }
+      .nav a.active { color: #ffffff; text-decoration: underline; }
+      .wrap { max-width: 1040px; margin: 0 auto; padding: 26px 16px 30px; }
+      .top { margin-bottom: 14px; color: #eff9ff; }
+      .top p { margin: 6px 0 0; color: #bfdae8; }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+      }
+      .grid { display: grid; gap: 10px; }
+      textarea, select, button {
+        font: inherit;
+        padding: 10px;
+        border-radius: 9px;
+        border: 1px solid #bdd0db;
+      }
+      textarea { min-height: 210px; font-family: Consolas, "Courier New", monospace; font-size: 13px; }
+      button {
+        background: linear-gradient(120deg, #0a9396, #007b83);
+        color: #fff;
+        cursor: pointer;
+        border: none;
+        font-weight: 700;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #edf5fb;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #cfdee8;
+      }
+      .muted { color: var(--muted); font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <a href="/" class="active">CLI</a>
+      <a href="/assets.html">Assets</a>
+      <a href="/executions.html">Executions</a>
+    </div>
+    <div id="root"></div>
+    <script type="text/babel">
+      const actions = [
+        { key: "register-dataset", label: "1) Register Dataset", method: "POST", body: { filePath: "", priceWei: "0", bloomFilter: "0x", manifest: { name: "Dataset Title", description: "Dataset description", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+        { key: "register-application", label: "2) Register Application", method: "POST", body: { filePath: "", priceWei: "0", manifest: { name: "Application Title", description: "Application description", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+        { key: "get-asset", label: "3) Get Asset", method: "POST", body: { assetId: "" } },
+        { key: "purchase-access", label: "4) Purchase Access", method: "POST", body: { datasetId: "", applicationId: "" } },
+        { key: "check-access-by-ids", label: "5) Check Access (by IDs)", method: "POST", body: { user: "", datasetId: "", applicationId: "" } },
+        { key: "check-access-by-uris", label: "6) Check Access (by URIs)", method: "POST", body: { user: "", datasetUri: "", applicationUri: "" } },
+        { key: "update-asset", label: "7) Update Asset", method: "POST", body: { assetId: "", newPriceWei: "0", newActive: true } },
+        { key: "revoke-asset", label: "8) Revoke Asset", method: "POST", body: { assetId: "" } },
+        { key: "list-my-purchases", label: "9) List My AccessPurchased Events", method: "GET" },
+        { key: "run-from-cids", label: "10) Run From CIDs", method: "POST", body: { datasetCid: "", scriptCid: "", pythonBin: "python", ipfsApiUrl: "http://localhost:5001" } },
+        { key: "contract-info", label: "11) Show Contract Info", method: "GET" },
+        { key: "add-file-to-ipfs", label: "12) Add File To IPFS", method: "POST", body: { filePath: "", manifest: { name: "", description: "", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+      ];
+
+      function App() {
+        const [actionKey, setActionKey] = React.useState(actions[0].key);
+        const selected = actions.find((a) => a.key === actionKey);
+        const [payloadText, setPayloadText] = React.useState(JSON.stringify(selected.body || {}, null, 2));
+        const [result, setResult] = React.useState("{}");
+        const [loading, setLoading] = React.useState(false);
+
+        React.useEffect(() => {
+          setPayloadText(JSON.stringify(selected.body || {}, null, 2));
+        }, [actionKey]);
+
+        async function executeAction() {
+          setLoading(true);
+          try {
+            const response = selected.method === "GET"
+              ? await fetch(`/api/${selected.key}`)
+              : await fetch(`/api/${selected.key}`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payloadText.trim() ? JSON.parse(payloadText) : {}),
+                });
+
+            const data = await response.json();
+            setResult(JSON.stringify(data, null, 2));
+          } catch (error) {
+            setResult(JSON.stringify({ error: error.message }, null, 2));
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        return (
+          <div className="wrap">
+            <div className="top">
+              <h1 style={{ margin: 0 }}>DNAT Web CLI</h1>
+              <p>Run contract operations and register assets with title/description metadata.</p>
+            </div>
+
+            <div className="card grid">
+              <label>Action</label>
+              <select value={actionKey} onChange={(e) => setActionKey(e.target.value)}>
+                {actions.map((a) => (
+                  <option key={a.key} value={a.key}>{a.label}</option>
+                ))}
+              </select>
+
+              <label>Request JSON</label>
+              <textarea value={payloadText} onChange={(e) => setPayloadText(e.target.value)} disabled={selected.method === "GET"} />
+              <div className="muted">For GET actions, request body is ignored.</div>
+              <button onClick={executeAction} disabled={loading}>{loading ? "Running..." : "Execute"}</button>
+            </div>
+
+            <div className="card" style={{ marginTop: 14 }}>
+              <strong>Response</strong>
+              <pre>{result}</pre>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

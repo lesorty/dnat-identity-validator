@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DNAT Executions</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      :root { --bg0: #071827; --bg1: #12304a; --bg2: #0d4a5f; --surface: rgba(247, 251, 255, 0.96); --line: #c8d6e2; --ink: #122a3d; --muted: #557085; --accent: #f59e0b; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.16), transparent 30%),
+          radial-gradient(circle at 82% 12%, rgba(10, 147, 150, 0.22), transparent 30%),
+          linear-gradient(160deg, var(--bg0), var(--bg1) 58%, var(--bg2));
+      }
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: rgba(3, 20, 33, 0.64);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 12px 16px;
+        display: flex;
+        gap: 14px;
+      }
+      .nav a { color: #d7eef7; text-decoration: none; font-weight: 700; }
+      .nav a.active { color: #ffffff; text-decoration: underline; }
+      .wrap { max-width: 1140px; margin: 0 auto; padding: 26px 16px 30px; }
+      .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: #eff9ff; }
+      .layout { display: grid; grid-template-columns: 340px 1fr; gap: 14px; }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+      }
+      button {
+        font: inherit;
+        font-weight: 700;
+        padding: 8px 11px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(120deg, #f59e0b, #d97706);
+        color: white;
+        cursor: pointer;
+      }
+      ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+      li {
+        border: 1px solid #cbdae5;
+        border-radius: 10px;
+        padding: 9px;
+        cursor: pointer;
+        background: #f8fbff;
+      }
+      li:hover { border-color: #85aec3; }
+      pre { white-space: pre-wrap; word-break: break-word; background: #edf5fb; border-radius: 10px; padding: 10px; border: 1px solid #d0dee8; }
+      @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <a href="/">CLI</a>
+      <a href="/assets.html">Assets</a>
+      <a href="/executions.html" class="active">Executions</a>
+    </div>
+    <div id="root"></div>
+    <script type="text/babel">
+      function App() {
+        const [list, setList] = React.useState([]);
+        const [selectedId, setSelectedId] = React.useState(null);
+        const [details, setDetails] = React.useState(null);
+
+        async function loadList() {
+          const res = await fetch('/api/executions');
+          const data = await res.json();
+          setList(data);
+          if (!selectedId && data.length > 0) {
+            openExecution(data[0].executionId);
+          }
+        }
+
+        async function openExecution(id) {
+          setSelectedId(id);
+          const res = await fetch(`/api/executions/${id}`);
+          const data = await res.json();
+          setDetails(data);
+        }
+
+        React.useEffect(() => { loadList(); }, []);
+
+        return (
+          <div className="wrap">
+            <div className="top">
+              <h1 style={{ margin: 0 }}>Execution Results</h1>
+              <button onClick={loadList}>Refresh</button>
+            </div>
+
+            <div className="layout">
+              <div className="card">
+                <strong>Executions</strong>
+                <ul style={{ marginTop: 10 }}>
+                  {list.map((item) => (
+                    <li key={item.executionId} onClick={() => openExecution(item.executionId)} style={{ background: selectedId === item.executionId ? '#faf3e9' : 'transparent' }}>
+                      <div><strong>{item.executionId}</strong></div>
+                      <div>Status: {item.status}</div>
+                      <div>Code: {String(item.returnCode)}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="card">
+                {!details && <div>No execution selected.</div>}
+                {details && (
+                  <>
+                    <h3 style={{ marginTop: 0 }}>{details.executionId}</h3>
+                    <strong>Metadata</strong>
+                    <pre>{JSON.stringify(details.metadata, null, 2)}</pre>
+                    <strong>Stdout</strong>
+                    <pre>{details.stdout || '(empty)'}</pre>
+                    <strong>Stderr</strong>
+                    <pre>{details.stderr || '(empty)'}</pre>
+                    <strong>Result JSON</strong>
+                    <pre>{JSON.stringify(details.result, null, 2)}</pre>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>

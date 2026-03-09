@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DNAT Assets</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      :root {
+        --bg-0: #061826;
+        --bg-1: #0f2c3f;
+        --bg-2: #13465f;
+        --surface: rgba(246, 250, 253, 0.95);
+        --surface-strong: #ffffff;
+        --line: #c5d4dd;
+        --ink: #102231;
+        --muted: #587081;
+        --teal: #0a9396;
+        --amber: #f59e0b;
+        --danger: #dc2626;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.16), transparent 32%),
+          radial-gradient(circle at 85% 8%, rgba(10, 147, 150, 0.25), transparent 30%),
+          linear-gradient(155deg, var(--bg-0), var(--bg-1) 55%, var(--bg-2));
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        background: rgba(3, 19, 31, 0.62);
+      }
+      .nav a {
+        color: #d7f1f7;
+        text-decoration: none;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .nav a.active { color: #ffffff; text-decoration: underline; }
+
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 26px 18px 34px;
+      }
+
+      .hero {
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(235, 248, 255, 0.9));
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: 16px;
+        padding: 18px 20px;
+        margin-bottom: 14px;
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .hero h1 { margin: 0; font-size: 29px; }
+      .hero p { margin: 4px 0 0; color: var(--muted); }
+      .pill {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(10, 147, 150, 0.16);
+        color: #0f5f62;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 14px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+        padding: 14px;
+      }
+
+      .list-title { margin: 0 0 10px; font-size: 17px; }
+      .asset-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .asset-item {
+        border: 1px solid #c8d8e0;
+        background: #f8fcff;
+        border-radius: 10px;
+        padding: 10px;
+        cursor: pointer;
+        transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+      }
+      .asset-item:hover {
+        transform: translateY(-1px);
+        border-color: #7cb5cf;
+        box-shadow: 0 8px 18px rgba(24, 80, 105, 0.14);
+      }
+      .asset-item.active {
+        border-color: #0a9396;
+        background: linear-gradient(120deg, #ecfeff, #f0fdfa);
+      }
+
+      .asset-name {
+        font-weight: 800;
+        line-height: 1.25;
+        margin-bottom: 4px;
+      }
+      .asset-snippet {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+      .mini-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .tag {
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-weight: 700;
+        background: #e2ecf2;
+        color: #304959;
+      }
+      .tag.ok { background: #ccfbf1; color: #115e59; }
+      .tag.off { background: #fee2e2; color: #991b1b; }
+
+      .top-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .button {
+        border: 0;
+        border-radius: 9px;
+        padding: 9px 12px;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 700;
+        background: linear-gradient(120deg, #0a9396, #007b83);
+      }
+      .button:disabled { opacity: 0.6; cursor: progress; }
+
+      .details {
+        background: var(--surface-strong);
+        border: 1px solid #d7e2e9;
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 12px;
+      }
+      .details h2 { margin: 0 0 4px; font-size: 22px; }
+      .details .desc { margin: 0 0 12px; color: var(--muted); line-height: 1.45; }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(110px, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .stat {
+        border: 1px solid #d6e2ea;
+        border-radius: 10px;
+        background: #f6fbff;
+        padding: 9px;
+      }
+      .stat .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+      .stat .v { font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+      .json-block {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #f3f7fa;
+        border: 1px solid #d3dee6;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 12px;
+      }
+      .muted { color: var(--muted); }
+      .error { color: var(--danger); font-weight: 700; }
+
+      @media (max-width: 980px) {
+        .hero { align-items: start; flex-direction: column; }
+        .layout { grid-template-columns: 1fr; }
+        .stats { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <a href="/">CLI</a>
+      <a href="/assets.html" class="active">Assets</a>
+      <a href="/executions.html">Executions</a>
+    </div>
+    <div id="root"></div>
+    <script type="text/babel">
+      function prettyType(assetType) {
+        return assetType === 0 ? "Dataset" : "Application";
+      }
+
+      function shortText(text, max = 82) {
+        const value = String(text || "").trim();
+        if (!value) return "No description";
+        return value.length > max ? `${value.slice(0, max)}...` : value;
+      }
+
+      function AssetList({ title, items, selectedId, onSelect }) {
+        return (
+          <section style={{ marginBottom: 14 }}>
+            <h3 className="list-title">{title}</h3>
+            {items.length === 0 && <div className="muted">No assets in this category.</div>}
+            {items.length > 0 && (
+              <ul className="asset-list">
+                {items.map((item) => (
+                  <li
+                    key={item.id}
+                    className={`asset-item ${selectedId === item.id ? "active" : ""}`}
+                    onClick={() => onSelect(item)}
+                  >
+                    <div className="asset-name">{item.title || `${prettyType(item.assetType)} #${item.id}`}</div>
+                    <div className="asset-snippet">{shortText(item.description)}</div>
+                    <div className="mini-meta">
+                      <span className="tag">ID {item.id}</span>
+                      <span className="tag">{item.priceWei} wei</span>
+                      <span className={`tag ${item.active ? "ok" : "off"}`}>{item.active ? "Active" : "Inactive"}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        );
+      }
+
+      function App() {
+        const [loading, setLoading] = React.useState(false);
+        const [error, setError] = React.useState("");
+        const [data, setData] = React.useState({ all: [], datasets: [], applications: [] });
+        const [selected, setSelected] = React.useState(null);
+
+        function isEmptyAsset(asset) {
+          if (!asset || typeof asset !== "object") return true;
+          const zeroAddress = "0x0000000000000000000000000000000000000000";
+          const zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
+          return (
+            (asset.owner || "").toLowerCase() === zeroAddress &&
+            String(asset.encryptedUri || "") === "" &&
+            String(asset.manifestUri || "") === "" &&
+            String(asset.contentHash || "").toLowerCase() === zeroHash &&
+            String(asset.priceWei || "0") === "0" &&
+            asset.active === false
+          );
+        }
+
+        function splitAssets(all) {
+          return {
+            all,
+            datasets: all.filter((a) => a.assetType === 0),
+            applications: all.filter((a) => a.assetType === 1),
+          };
+        }
+
+        async function loadAssetsByFallbackScan() {
+          const infoRes = await fetch("/api/contract-info");
+          const infoBody = await infoRes.json();
+          if (!infoRes.ok) throw new Error(infoBody.error || "Failed to load contract info");
+
+          const nextAssetId = Number(infoBody.nextAssetId || 0);
+          const maxId = Math.max(nextAssetId + 2, 6);
+          const found = [];
+
+          for (let id = 0; id <= maxId; id += 1) {
+            const res = await fetch("/api/get-asset", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ assetId: String(id) }),
+            });
+            if (!res.ok) continue;
+            const asset = await res.json();
+            if (isEmptyAsset(asset)) continue;
+            found.push({ id, ...asset });
+          }
+
+          return splitAssets(found);
+        }
+
+        async function loadAssets() {
+          setLoading(true);
+          setError("");
+          try {
+            let body = null;
+            const res = await fetch("/api/assets");
+            const contentType = (res.headers.get("content-type") || "").toLowerCase();
+            if (contentType.includes("application/json")) body = await res.json();
+            if (!res.ok || !body || !Array.isArray(body.all)) body = await loadAssetsByFallbackScan();
+
+            setData(body);
+            if (body.all.length > 0) setSelected(body.all[0]);
+            else setSelected(null);
+          } catch (e) {
+            setError(e.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        React.useEffect(() => { loadAssets(); }, []);
+
+        const total = data.all.length;
+        const activeCount = data.all.filter((item) => item.active).length;
+
+        return (
+          <main className="wrap">
+            <section className="hero">
+              <div>
+                <h1>Asset Catalog</h1>
+                <p>Browse datasets and applications with richer metadata for faster discovery.</p>
+              </div>
+              <span className="pill">{total} assets loaded</span>
+            </section>
+
+            <div className="layout">
+              <section className="panel">
+                <div className="top-actions">
+                  <strong>Catalog</strong>
+                  <button className="button" onClick={loadAssets} disabled={loading}>
+                    {loading ? "Refreshing..." : "Refresh"}
+                  </button>
+                </div>
+                <p className="muted" style={{ margin: "8px 0 12px" }}>
+                  {activeCount} active, {total - activeCount} inactive
+                </p>
+                <AssetList
+                  title="Datasets"
+                  items={data.datasets}
+                  selectedId={selected?.id}
+                  onSelect={setSelected}
+                />
+                <AssetList
+                  title="Applications"
+                  items={data.applications}
+                  selectedId={selected?.id}
+                  onSelect={setSelected}
+                />
+              </section>
+
+              <section className="panel">
+                <strong>Details</strong>
+                {error && <p className="error">{error}</p>}
+                {!error && !selected && <p className="muted">No assets found.</p>}
+                {!error && selected && (
+                  <article className="details">
+                    <h2>{selected.title || `${prettyType(selected.assetType)} #${selected.id}`}</h2>
+                    <p className="desc">{selected.description || "No description provided."}</p>
+                    <div className="stats">
+                      <div className="stat">
+                        <div className="k">Type</div>
+                        <div className="v">{prettyType(selected.assetType)}</div>
+                      </div>
+                      <div className="stat">
+                        <div className="k">Asset ID</div>
+                        <div className="v">{selected.id}</div>
+                      </div>
+                      <div className="stat">
+                        <div className="k">Status</div>
+                        <div className="v">{selected.active ? "Active" : "Inactive"}</div>
+                      </div>
+                      <div className="stat">
+                        <div className="k">Price</div>
+                        <div className="v">{selected.priceWei} wei</div>
+                      </div>
+                      <div className="stat">
+                        <div className="k">Owner</div>
+                        <div className="v">{shortText(selected.owner, 16)}</div>
+                      </div>
+                      <div className="stat">
+                        <div className="k">Bloom Filter</div>
+                        <div className="v">{selected.bloomFilter && selected.bloomFilter !== "0x" ? "Set" : "Empty"}</div>
+                      </div>
+                    </div>
+                    <pre className="json-block">{JSON.stringify(selected, null, 2)}</pre>
+                  </article>
+                )}
+              </section>
+            </div>
+          </main>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

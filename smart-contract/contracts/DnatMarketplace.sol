@@ -34,6 +34,8 @@ contract DnatMarketplace {
         uint256 id;               // internal ID
         AssetType assetType;      // dataset or application
         address payable owner;    // dataset provider or application provider
+        string title;             // short title for catalog visualization
+        string description;       // descriptive text for catalog visualization
 
         // Off-chain references:
         // - encryptedUri: IPFS CID or any URL for the encrypted asset ϵ(α, κ)
@@ -72,9 +74,6 @@ contract DnatMarketplace {
         uint256 indexed id,
         AssetType assetType,
         address indexed owner,
-        string encryptedUri,
-        string manifestUri,
-        bytes32 contentHash,
         uint256 price,
         bool hasBloomFilter
     );
@@ -126,12 +125,15 @@ contract DnatMarketplace {
      */
     function registerAsset(
         AssetType assetType,
+        string calldata title,
+        string calldata description,
         string calldata encryptedUri,
         string calldata manifestUri,
         bytes32 contentHash,
         uint256 price,
         bytes calldata bloomFilter
     ) external returns (uint256 id) {
+        require(bytes(title).length > 0, "Title required");
         id = ++nextAssetId;
 
         bytes memory bf;
@@ -140,28 +142,20 @@ contract DnatMarketplace {
             bf = bloomFilter;
         }
 
-        assets[id] = Asset({
-            id: id,
-            assetType: assetType,
-            owner: payable(msg.sender),
-            encryptedUri: encryptedUri,
-            manifestUri: manifestUri,
-            contentHash: contentHash,
-            price: price,
-            bloomFilter: bf,
-            active: true
-        });
+        Asset storage newAsset = assets[id];
+        newAsset.id = id;
+        newAsset.assetType = assetType;
+        newAsset.owner = payable(msg.sender);
+        newAsset.title = title;
+        newAsset.description = description;
+        newAsset.encryptedUri = encryptedUri;
+        newAsset.manifestUri = manifestUri;
+        newAsset.contentHash = contentHash;
+        newAsset.price = price;
+        newAsset.bloomFilter = bf;
+        newAsset.active = true;
 
-        emit AssetRegistered(
-            id,
-            assetType,
-            msg.sender,
-            encryptedUri,
-            manifestUri,
-            contentHash,
-            price,
-            bf.length > 0
-        );
+        emit AssetRegistered(id, assetType, msg.sender, price, bf.length > 0);
     }
 
     /**
@@ -325,6 +319,8 @@ contract DnatMarketplace {
         returns (
             AssetType assetType,
             address owner,
+            string memory title,
+            string memory description,
             string memory encryptedUri,
             string memory manifestUri,
             bytes32 contentHash,
@@ -339,6 +335,8 @@ contract DnatMarketplace {
         return (
             a.assetType,
             a.owner,
+            a.title,
+            a.description,
             a.encryptedUri,
             a.manifestUri,
             a.contentHash,
