@@ -1,17 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import {
   Box,
   Typography,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   CircularProgress,
   Alert,
   Paper,
+  Stack,
 } from "@mui/material";
 import { useAssetIds } from "@/hooks/useAssets";
 import { useAsset } from "@/hooks/useContract";
@@ -19,27 +15,24 @@ import { assetFromContractData } from "@/hooks/useAssets";
 import AssetCard from "./AssetCard";
 
 // Component to fetch and display a single asset
-function AssetItem({ assetId, filter }: { assetId: number; filter: "all" | "datasets" | "applications" }) {
+function AssetItem({ assetId }: { assetId: number }) {
   const { data, isLoading } = useAsset(assetId);
   
   if (isLoading) return null;
   if (!data) return null;
   
   const asset = assetFromContractData(assetId, data);
-  
-  // Apply filter
-  if (filter === "datasets" && asset.assetType !== 0) return null;
-  if (filter === "applications" && asset.assetType !== 1) return null;
-  
+
+  const isDataset = asset.assetType === 0;
+
   return (
-    <Grid item xs={12} sm={6} md={4}>
+    <Box sx={{ gridColumn: { xs: "1 / -1", md: isDataset ? "1 / 2" : "2 / 3" } }}>
       <AssetCard asset={asset} />
-    </Grid>
+    </Box>
   );
 }
 
 export default function AssetList() {
-  const [filter, setFilter] = useState<"all" | "datasets" | "applications">("all");
   const { assetIds, isLoading, error } = useAssetIds();
 
   // Limit to first 20 assets to avoid too many requests
@@ -47,20 +40,23 @@ export default function AssetList() {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-        <Typography variant="h4">Browse Assets</Typography>
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Filter</InputLabel>
-          <Select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as any)}
-            label="Filter"
-          >
-            <MenuItem value="all">All Assets</MenuItem>
-            <MenuItem value="datasets">Datasets Only</MenuItem>
-            <MenuItem value="applications">Applications Only</MenuItem>
-          </Select>
-        </FormControl>
+      <Box
+        sx={{
+          mb: 3,
+          p: 3,
+          borderRadius: 4,
+          border: "1px solid",
+          borderColor: "divider",
+          background:
+            "radial-gradient(circle at top left, rgba(21, 101, 192, 0.12) 0%, rgba(255,255,255,0.95) 58%)",
+        }}
+      >
+        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+          Asset Marketplace
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5 }}>
+          Datasets are listed on the left, and applications are listed on the right.
+        </Typography>
       </Box>
 
       {isLoading && (
@@ -87,11 +83,64 @@ export default function AssetList() {
       )}
 
       {!isLoading && displayedIds.length > 0 && (
-        <Grid container spacing={3}>
-          {displayedIds.map((id) => (
-            <AssetItem key={id} assetId={id} filter={filter} />
-          ))}
-        </Grid>
+        <Stack spacing={2}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+              gap: 2,
+              mb: 1,
+            }}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: "primary.light",
+                backgroundColor: "rgba(25, 118, 210, 0.06)",
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Datasets
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Structured data assets
+              </Typography>
+            </Paper>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: "secondary.light",
+                backgroundColor: "rgba(156, 39, 176, 0.06)",
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Applications
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Executable models and scripts
+              </Typography>
+            </Paper>
+          </Box>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+              gap: 3,
+              alignItems: "start",
+            }}
+          >
+            {displayedIds.map((id) => (
+              <AssetItem key={id} assetId={id} />
+            ))}
+          </Box>
+        </Stack>
       )}
     </Box>
   );

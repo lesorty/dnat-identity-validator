@@ -120,13 +120,25 @@
       function App() {
         const [actionKey, setActionKey] = React.useState(actions[0].key);
         const selected = actions.find((a) => a.key === actionKey);
-        const [payload, setPayload] = React.useState(clone(selected.body));
+        const selectedBody = selected && selected.body ? selected.body : {};
+        const [payload, setPayload] = React.useState(clone(selectedBody));
         const [result, setResult] = React.useState("{}");
         const [loading, setLoading] = React.useState(false);
 
         React.useEffect(() => {
-          setPayload(clone(selected.body));
+          const body = selected && selected.body ? selected.body : {};
+          setPayload(clone(body));
         }, [actionKey]);
+
+        if (!selected) {
+          return (
+            <div className="wrap">
+              <div className="card">
+                <strong>Invalid action selected.</strong>
+              </div>
+            </div>
+          );
+        }
 
         function updateField(key, value) {
           setPayload((prev) => ({ ...prev, [key]: value }));
@@ -140,6 +152,11 @@
               [key]: value,
             },
           }));
+        }
+
+        function getManifestValue(key) {
+          const manifest = payload && payload.manifest ? payload.manifest : {};
+          return textInput(manifest[key]);
         }
 
         function renderRegisterFields() {
@@ -201,7 +218,7 @@
                   <label>Version</label>
                   <input
                     type="text"
-                    value={textInput(payload.manifest?.version)}
+                    value={getManifestValue("version")}
                     onChange={(e) => updateManifestField("version", e.target.value)}
                     placeholder="1.0.0"
                   />
@@ -209,21 +226,21 @@
                   <label>Author</label>
                   <input
                     type="text"
-                    value={textInput(payload.manifest?.author)}
+                    value={getManifestValue("author")}
                     onChange={(e) => updateManifestField("author", e.target.value)}
                   />
 
                   <label>Framework</label>
                   <input
                     type="text"
-                    value={textInput(payload.manifest?.framework)}
+                    value={getManifestValue("framework")}
                     onChange={(e) => updateManifestField("framework", e.target.value)}
                   />
 
                   <label>Dependencies</label>
                   <input
                     type="text"
-                    value={textInput(payload.manifest?.dependencies)}
+                    value={getManifestValue("dependencies")}
                     onChange={(e) => updateManifestField("dependencies", e.target.value)}
                     placeholder="numpy,pandas"
                   />
@@ -286,14 +303,15 @@
             ) {
               const normalizedTitle = String(payload.title || "").trim();
               const normalizedDescription = String(payload.description || "").trim();
+              const currentManifest = payload && payload.manifest ? payload.manifest : {};
               requestBody = {
                 ...payload,
                 title: normalizedTitle,
                 description: normalizedDescription,
                 manifest: {
-                  ...(payload.manifest || {}),
-                  name: normalizedTitle || payload.manifest?.name || "",
-                  description: normalizedDescription || payload.manifest?.description || "",
+                  ...currentManifest,
+                  name: normalizedTitle || currentManifest.name || "",
+                  description: normalizedDescription || currentManifest.description || "",
                 },
               };
             }

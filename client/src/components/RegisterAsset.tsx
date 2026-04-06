@@ -26,6 +26,7 @@ import { uploadFileToIPFS, uploadToIPFS, checkIPFSConnection } from "@/utils/ipf
 import { uploadKeyToCAS, generateSessionName, storeKeyLocally } from "@/services/cas";
 
 interface ManifestData {
+  title: string;
   name: string;
   description: string;
   version: string;
@@ -47,6 +48,7 @@ export default function RegisterAsset() {
 
   // Manifest fields
   const [manifest, setManifest] = useState<ManifestData>({
+    title: "",
     name: "",
     description: "",
     version: "1.0.0",
@@ -110,8 +112,8 @@ export default function RegisterAsset() {
     }
 
     // Validate required manifest fields
-    if (!manifest.name || !manifest.description || !manifest.author) {
-      alert("Please fill in all required manifest fields (name, description, author)");
+    if (!manifest.title || !manifest.description || !manifest.author) {
+      alert("Please fill in all required manifest fields (title, description, author)");
       return;
     }
 
@@ -347,12 +349,17 @@ export default function RegisterAsset() {
 
         <TextField
           fullWidth
-          label="Name *"
-          value={manifest.name}
-          onChange={(e) => handleManifestChange("name", e.target.value)}
+          label={assetType === 0 ? "Dataset Title *" : "Application Title *"}
+          value={manifest.title}
+          onChange={(e) => {
+            const value = e.target.value;
+            handleManifestChange("title", value);
+            // Keep `name` for backward compatibility with existing manifest readers.
+            handleManifestChange("name", value);
+          }}
           required
           sx={{ mb: 2 }}
-          placeholder="My Dataset / My Application"
+          placeholder={assetType === 0 ? "Customer Churn Dataset" : "Fraud Detection Model"}
         />
 
         <TextField
