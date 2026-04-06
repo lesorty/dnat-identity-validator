@@ -105,7 +105,7 @@ function computeSha256Hex(localPath) {
   return `0x${crypto.createHash("sha256").update(fileBuffer).digest("hex")}`;
 }
 
-async function addFileToIpfsFlow({ filePath, manifest = {} }) {
+async function addFileToIpfsFlow({ filePath, manifest = {}, title = "", description = "" }) {
   const resolvedPath = path.resolve(String(filePath || "").trim());
   if (!resolvedPath) throw new Error("filePath is required");
   if (!fs.existsSync(resolvedPath)) throw new Error(`File not found: ${resolvedPath}`);
@@ -122,8 +122,8 @@ async function addFileToIpfsFlow({ filePath, manifest = {} }) {
   const manifestPath = path.join(manifestsDir, manifestFileName);
 
   const manifestYaml = buildManifestYaml({
-    name: manifest.name || defaultName,
-    description: manifest.description || "",
+    name: manifest.name || manifest.title || title || defaultName,
+    description: manifest.description || description || "",
     version: manifest.version || "1.0.0",
     author: manifest.author || "",
     framework: manifest.framework || "",
@@ -216,14 +216,19 @@ async function listAssetsByScanningIds() {
   return { all: assets, datasets, applications };
 }
 
-async function registerAsset({ assetType, filePath, priceWei, bloomFilter, manifest }) {
-  const uploaded = await addFileToIpfsFlow({ filePath, manifest });
-  const title = String(manifest?.name || path.basename(uploaded.localPath || filePath || "Untitled asset")).trim();
-  const description = String(manifest?.description || "").trim();
+async function registerAsset({ assetType, filePath, priceWei, bloomFilter, title, description, manifest }) {
+  const uploaded = await addFileToIpfsFlow({ filePath, manifest, title, description });
+  const normalizedTitle = String(
+    title ||
+      manifest?.title ||
+      manifest?.name ||
+      path.basename(uploaded.localPath || filePath || "Untitled asset"),
+  ).trim();
+  const normalizedDescription = String(description || manifest?.description || "").trim();
   const tx = await contract.registerAsset(
     Number(assetType),
-    title,
-    description,
+    normalizedTitle,
+    normalizedDescription,
     uploaded.assetUri,
     uploaded.manifestUri,
     uploaded.assetContentHash,

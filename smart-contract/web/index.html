@@ -52,11 +52,15 @@
         box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
       }
       .grid { display: grid; gap: 10px; }
-      textarea, select, button {
+      input, textarea, select, button {
         font: inherit;
         padding: 10px;
         border-radius: 9px;
         border: 1px solid #bdd0db;
+      }
+      input, select, textarea {
+        background: #f7fbff;
+        color: var(--ink);
       }
       textarea { min-height: 210px; font-family: Consolas, "Courier New", monospace; font-size: 13px; }
       button {
@@ -86,8 +90,8 @@
     <div id="root"></div>
     <script type="text/babel">
       const actions = [
-        { key: "register-dataset", label: "1) Register Dataset", method: "POST", body: { filePath: "", priceWei: "0", bloomFilter: "0x", manifest: { name: "Dataset Title", description: "Dataset description", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
-        { key: "register-application", label: "2) Register Application", method: "POST", body: { filePath: "", priceWei: "0", manifest: { name: "Application Title", description: "Application description", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+        { key: "register-dataset", label: "1) Register Dataset", method: "POST", body: { filePath: "", title: "Dataset Title", description: "Dataset description", priceWei: "0", bloomFilter: "0x", manifest: { version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+        { key: "register-application", label: "2) Register Application", method: "POST", body: { filePath: "", title: "Application Title", description: "Application description", priceWei: "0", manifest: { version: "1.0.0", author: "", framework: "", dependencies: "" } } },
         { key: "get-asset", label: "3) Get Asset", method: "POST", body: { assetId: "" } },
         { key: "purchase-access", label: "4) Purchase Access", method: "POST", body: { datasetId: "", applicationId: "" } },
         { key: "check-access-by-ids", label: "5) Check Access (by IDs)", method: "POST", body: { user: "", datasetId: "", applicationId: "" } },
@@ -97,29 +101,209 @@
         { key: "list-my-purchases", label: "9) List My AccessPurchased Events", method: "GET" },
         { key: "run-from-cids", label: "10) Run From CIDs", method: "POST", body: { datasetCid: "", scriptCid: "", pythonBin: "python", ipfsApiUrl: "http://localhost:5001" } },
         { key: "contract-info", label: "11) Show Contract Info", method: "GET" },
-        { key: "add-file-to-ipfs", label: "12) Add File To IPFS", method: "POST", body: { filePath: "", manifest: { name: "", description: "", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+        { key: "add-file-to-ipfs", label: "12) Add File To IPFS", method: "POST", body: { filePath: "", title: "", description: "", manifest: { version: "1.0.0", author: "", framework: "", dependencies: "" } } },
       ];
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value || {}));
+      }
+
+      function fieldLabel(key) {
+        return key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
+      }
+
+      function textInput(value) {
+        if (value === undefined || value === null) return "";
+        return String(value);
+      }
 
       function App() {
         const [actionKey, setActionKey] = React.useState(actions[0].key);
         const selected = actions.find((a) => a.key === actionKey);
-        const [payloadText, setPayloadText] = React.useState(JSON.stringify(selected.body || {}, null, 2));
+        const [payload, setPayload] = React.useState(clone(selected.body));
         const [result, setResult] = React.useState("{}");
         const [loading, setLoading] = React.useState(false);
 
         React.useEffect(() => {
-          setPayloadText(JSON.stringify(selected.body || {}, null, 2));
+          setPayload(clone(selected.body));
         }, [actionKey]);
+
+        function updateField(key, value) {
+          setPayload((prev) => ({ ...prev, [key]: value }));
+        }
+
+        function updateManifestField(key, value) {
+          setPayload((prev) => ({
+            ...prev,
+            manifest: {
+              ...(prev.manifest || {}),
+              [key]: value,
+            },
+          }));
+        }
+
+        function renderRegisterFields() {
+          const isDataset = selected.key === "register-dataset";
+          const showManifest = selected.key === "register-dataset" || selected.key === "register-application" || selected.key === "add-file-to-ipfs";
+
+          return (
+            <>
+              <label>File Path</label>
+              <input
+                type="text"
+                value={textInput(payload.filePath)}
+                onChange={(e) => updateField("filePath", e.target.value)}
+                placeholder="/absolute/path/to/file.csv or .py"
+              />
+
+              {(selected.key === "register-dataset" || selected.key === "register-application") && (
+                <>
+                  <label>Price (Wei)</label>
+                  <input
+                    type="text"
+                    value={textInput(payload.priceWei)}
+                    onChange={(e) => updateField("priceWei", e.target.value)}
+                  />
+                </>
+              )}
+
+              {isDataset && (
+                <>
+                  <label>Bloom Filter</label>
+                  <input
+                    type="text"
+                    value={textInput(payload.bloomFilter)}
+                    onChange={(e) => updateField("bloomFilter", e.target.value)}
+                    placeholder="0x"
+                  />
+                </>
+              )}
+
+              <label>Title</label>
+              <input
+                type="text"
+                value={textInput(payload.title)}
+                onChange={(e) => updateField("title", e.target.value)}
+                placeholder={isDataset ? "Dataset Title" : "Application Title"}
+              />
+
+              <label>Description</label>
+              <input
+                type="text"
+                value={textInput(payload.description)}
+                onChange={(e) => updateField("description", e.target.value)}
+                placeholder={isDataset ? "Describe dataset" : "Describe application"}
+              />
+
+              {showManifest && (
+                <>
+                  <div className="muted" style={{ marginTop: 4, fontWeight: 700 }}>Manifest Metadata</div>
+                  <label>Version</label>
+                  <input
+                    type="text"
+                    value={textInput(payload.manifest?.version)}
+                    onChange={(e) => updateManifestField("version", e.target.value)}
+                    placeholder="1.0.0"
+                  />
+
+                  <label>Author</label>
+                  <input
+                    type="text"
+                    value={textInput(payload.manifest?.author)}
+                    onChange={(e) => updateManifestField("author", e.target.value)}
+                  />
+
+                  <label>Framework</label>
+                  <input
+                    type="text"
+                    value={textInput(payload.manifest?.framework)}
+                    onChange={(e) => updateManifestField("framework", e.target.value)}
+                  />
+
+                  <label>Dependencies</label>
+                  <input
+                    type="text"
+                    value={textInput(payload.manifest?.dependencies)}
+                    onChange={(e) => updateManifestField("dependencies", e.target.value)}
+                    placeholder="numpy,pandas"
+                  />
+                </>
+              )}
+            </>
+          );
+        }
+
+        function renderGenericFields() {
+          if (selected.method === "GET") {
+            return <div className="muted">This action uses GET. No request body is needed.</div>;
+          }
+
+          if (
+            selected.key === "register-dataset" ||
+            selected.key === "register-application" ||
+            selected.key === "add-file-to-ipfs"
+          ) {
+            return renderRegisterFields();
+          }
+
+          const keys = Object.keys(selected.body || {});
+          return keys.map((key) => {
+            const value = payload[key];
+            const isBool = typeof value === "boolean";
+
+            return (
+              <React.Fragment key={key}>
+                <label>{fieldLabel(key)}</label>
+                {isBool ? (
+                  <select
+                    value={String(Boolean(value))}
+                    onChange={(e) => updateField(key, e.target.value === "true")}
+                  >
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={textInput(value)}
+                    onChange={(e) => updateField(key, e.target.value)}
+                  />
+                )}
+              </React.Fragment>
+            );
+          });
+        }
 
         async function executeAction() {
           setLoading(true);
           try {
+            let requestBody = payload;
+
+            if (
+              selected.key === "register-dataset" ||
+              selected.key === "register-application" ||
+              selected.key === "add-file-to-ipfs"
+            ) {
+              const normalizedTitle = String(payload.title || "").trim();
+              const normalizedDescription = String(payload.description || "").trim();
+              requestBody = {
+                ...payload,
+                title: normalizedTitle,
+                description: normalizedDescription,
+                manifest: {
+                  ...(payload.manifest || {}),
+                  name: normalizedTitle || payload.manifest?.name || "",
+                  description: normalizedDescription || payload.manifest?.description || "",
+                },
+              };
+            }
+
             const response = selected.method === "GET"
               ? await fetch(`/api/${selected.key}`)
               : await fetch(`/api/${selected.key}`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payloadText.trim() ? JSON.parse(payloadText) : {}),
+                  body: JSON.stringify(requestBody || {}),
                 });
 
             const data = await response.json();
@@ -135,7 +319,7 @@
           <div className="wrap">
             <div className="top">
               <h1 style={{ margin: 0 }}>DNAT Web CLI</h1>
-              <p>Run contract operations and register assets with title/description metadata.</p>
+              <p>Run contract operations and register assets with direct form inputs.</p>
             </div>
 
             <div className="card grid">
@@ -146,9 +330,7 @@
                 ))}
               </select>
 
-              <label>Request JSON</label>
-              <textarea value={payloadText} onChange={(e) => setPayloadText(e.target.value)} disabled={selected.method === "GET"} />
-              <div className="muted">For GET actions, request body is ignored.</div>
+              {renderGenericFields()}
               <button onClick={executeAction} disabled={loading}>{loading ? "Running..." : "Execute"}</button>
             </div>
 
