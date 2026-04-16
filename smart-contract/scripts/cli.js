@@ -32,6 +32,23 @@ let contractAddress =
   CONTRACT_ADDRESS_ENV || "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 let contract = new ethers.Contract(contractAddress, abi, wallet);
 
+function resolvePythonBin(pythonBin) {
+  const requested = String(pythonBin || "").trim();
+  if (requested && requested.toLowerCase() !== "python") return requested;
+
+  const repoPython = path.resolve(
+    __dirname,
+    "..",
+    "..",
+    ".venv",
+    "Scripts",
+    "python.exe",
+  );
+  if (fs.existsSync(repoPython)) return repoPython;
+
+  return requested || "python";
+}
+
 async function resolveContractAddress() {
   if (CONTRACT_ADDRESS_ENV) {
     const code = await provider.getCode(CONTRACT_ADDRESS_ENV);
@@ -278,7 +295,8 @@ async function runFromCids(rl) {
     return;
   }
 
-  const pythonBin = (await prompt(rl, "Python binary (default: python)")) || "python";
+  const pythonBinInput = await prompt(rl, "Python binary (empty = auto)");
+  const pythonBin = resolvePythonBin(pythonBinInput);
   const ipfsApiUrl =
     (await prompt(rl, `IPFS API URL (default: ${IPFS_API_URL})`)) || IPFS_API_URL;
 
@@ -312,6 +330,7 @@ async function runFromCids(rl) {
       resolve();
     });
     child.on("close", (code) => {
+      console.log("python binary:", pythonBin);
       console.log("run_from_cids exit code:", code);
       resolve();
     });

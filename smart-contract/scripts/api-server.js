@@ -33,6 +33,16 @@ const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 let contractAddress = CONTRACT_ADDRESS_ENV || "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 let contract = new ethers.Contract(contractAddress, abi, wallet);
 
+function resolvePythonBin(pythonBin) {
+  const requested = String(pythonBin || "").trim();
+  if (requested && requested.toLowerCase() !== "python") return requested;
+
+  const repoPython = path.resolve(__dirname, "..", "..", ".venv", "Scripts", "python.exe");
+  if (fs.existsSync(repoPython)) return repoPython;
+
+  return requested || "python";
+}
+
 async function resolveContractAddress() {
   if (CONTRACT_ADDRESS_ENV) {
     const code = await provider.getCode(CONTRACT_ADDRESS_ENV);
@@ -323,6 +333,7 @@ async function listMyPurchases() {
 async function runFromCids({ datasetCid, scriptCid, pythonBin, ipfsApiUrl }) {
   const runnerPath = path.resolve(__dirname, "..", "..", "executor", "ipfs_executor", "run_from_cids.py");
   if (!fs.existsSync(runnerPath)) throw new Error(`Runner not found: ${runnerPath}`);
+  const resolvedPythonBin = resolvePythonBin(pythonBin);
 
   const args = [
     runnerPath,
@@ -335,7 +346,7 @@ async function runFromCids({ datasetCid, scriptCid, pythonBin, ipfsApiUrl }) {
   ];
 
   return await new Promise((resolve, reject) => {
-    const child = spawn(String(pythonBin || "python"), args);
+    const child = spawn(resolvedPythonBin, args);
     let stdout = "";
     let stderr = "";
 
@@ -355,11 +366,18 @@ async function runFromCids({ datasetCid, scriptCid, pythonBin, ipfsApiUrl }) {
         parsed = null;
       }
 
+      const executionId = parsed?.executionId;
+      const execution = executionId ? getExecutionById(executionId) : null;
+
       resolve({
         exitCode: code,
+        pythonBin: resolvedPythonBin,
         metadata: parsed,
-        stdout,
-        stderr,
+        runnerStdout: stdout,
+        runnerStderr: stderr,
+        stdout: execution?.stdout || "",
+        stderr: execution?.stderr || "",
+        result: execution?.result || null,
       });
     });
   });

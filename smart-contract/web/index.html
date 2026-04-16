@@ -16,7 +16,6 @@
         --line: #c7d7e3;
         --ink: #122a3d;
         --muted: #557085;
-        --accent: #0a9396;
       }
       * { box-sizing: border-box; }
       body {
@@ -52,13 +51,29 @@
         box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
       }
       .grid { display: grid; gap: 10px; }
-      textarea, select, button {
+      .fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+        gap: 10px;
+      }
+      label { font-size: 13px; color: var(--muted); font-weight: 700; }
+      input, select, button {
+        width: 100%;
         font: inherit;
         padding: 10px;
         border-radius: 9px;
         border: 1px solid #bdd0db;
       }
-      textarea { min-height: 210px; font-family: Consolas, "Courier New", monospace; font-size: 13px; }
+      .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .checkbox input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+      }
       button {
         background: linear-gradient(120deg, #0a9396, #007b83);
         color: #fff;
@@ -75,6 +90,50 @@
         border: 1px solid #cfdee8;
       }
       .muted { color: var(--muted); font-size: 14px; }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .summary-item {
+        background: #edf5fb;
+        border: 1px solid #cfdee8;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .summary-item strong {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .summary-item span {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .status-success span { color: #0c7a43; }
+      .status-failed span { color: #b42318; }
+      .output-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .panel-title {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      @media (max-width: 780px) {
+        .fields { grid-template-columns: 1fr; }
+        .summary-grid,
+        .output-grid { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
   <body>
@@ -86,56 +145,239 @@
     <div id="root"></div>
     <script type="text/babel">
       const actions = [
-        { key: "register-dataset", label: "1) Register Dataset", method: "POST", body: { filePath: "", priceWei: "0", bloomFilter: "0x", manifest: { name: "Dataset Title", description: "Dataset description", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
-        { key: "register-application", label: "2) Register Application", method: "POST", body: { filePath: "", priceWei: "0", manifest: { name: "Application Title", description: "Application description", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
-        { key: "get-asset", label: "3) Get Asset", method: "POST", body: { assetId: "" } },
-        { key: "purchase-access", label: "4) Purchase Access", method: "POST", body: { datasetId: "", applicationId: "" } },
-        { key: "check-access-by-ids", label: "5) Check Access (by IDs)", method: "POST", body: { user: "", datasetId: "", applicationId: "" } },
-        { key: "check-access-by-uris", label: "6) Check Access (by URIs)", method: "POST", body: { user: "", datasetUri: "", applicationUri: "" } },
-        { key: "update-asset", label: "7) Update Asset", method: "POST", body: { assetId: "", newPriceWei: "0", newActive: true } },
-        { key: "revoke-asset", label: "8) Revoke Asset", method: "POST", body: { assetId: "" } },
-        { key: "list-my-purchases", label: "9) List My AccessPurchased Events", method: "GET" },
-        { key: "run-from-cids", label: "10) Run From CIDs", method: "POST", body: { datasetCid: "", scriptCid: "", pythonBin: "python", ipfsApiUrl: "http://localhost:5001" } },
-        { key: "contract-info", label: "11) Show Contract Info", method: "GET" },
-        { key: "add-file-to-ipfs", label: "12) Add File To IPFS", method: "POST", body: { filePath: "", manifest: { name: "", description: "", version: "1.0.0", author: "", framework: "", dependencies: "" } } },
+        {
+          key: "register-dataset",
+          label: "1) Register Dataset",
+          method: "POST",
+          fields: [
+            { name: "filePath", label: "File Path", type: "text", defaultValue: "" },
+            { name: "priceWei", label: "Price (wei)", type: "text", defaultValue: "0" },
+            { name: "bloomFilter", label: "Bloom Filter", type: "text", defaultValue: "0x" },
+            { name: "manifest.name", label: "Title", type: "text", defaultValue: "Dataset Title" },
+            { name: "manifest.description", label: "Description", type: "text", defaultValue: "Dataset description" },
+            { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
+            { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
+            { name: "manifest.framework", label: "Framework", type: "text", defaultValue: "" },
+            { name: "manifest.dependencies", label: "Dependencies", type: "text", defaultValue: "" },
+          ],
+        },
+        {
+          key: "register-application",
+          label: "2) Register Application",
+          method: "POST",
+          fields: [
+            { name: "filePath", label: "File Path", type: "text", defaultValue: "" },
+            { name: "priceWei", label: "Price (wei)", type: "text", defaultValue: "0" },
+            { name: "manifest.name", label: "Title", type: "text", defaultValue: "Application Title" },
+            { name: "manifest.description", label: "Description", type: "text", defaultValue: "Application description" },
+            { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
+            { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
+            { name: "manifest.framework", label: "Framework", type: "text", defaultValue: "" },
+            { name: "manifest.dependencies", label: "Dependencies", type: "text", defaultValue: "" },
+          ],
+        },
+        { key: "get-asset", label: "3) Get Asset", method: "POST", fields: [{ name: "assetId", label: "Asset ID", type: "text", defaultValue: "" }] },
+        {
+          key: "purchase-access",
+          label: "4) Purchase Access",
+          method: "POST",
+          fields: [
+            { name: "datasetId", label: "Dataset ID", type: "text", defaultValue: "" },
+            { name: "applicationId", label: "Application ID", type: "text", defaultValue: "" },
+          ],
+        },
+        {
+          key: "check-access-by-ids",
+          label: "5) Check Access (by IDs)",
+          method: "POST",
+          fields: [
+            { name: "user", label: "User Address", type: "text", defaultValue: "" },
+            { name: "datasetId", label: "Dataset ID", type: "text", defaultValue: "" },
+            { name: "applicationId", label: "Application ID", type: "text", defaultValue: "" },
+          ],
+        },
+        {
+          key: "check-access-by-uris",
+          label: "6) Check Access (by URIs)",
+          method: "POST",
+          fields: [
+            { name: "user", label: "User Address", type: "text", defaultValue: "" },
+            { name: "datasetUri", label: "Dataset URI", type: "text", defaultValue: "" },
+            { name: "applicationUri", label: "Application URI", type: "text", defaultValue: "" },
+          ],
+        },
+        {
+          key: "update-asset",
+          label: "7) Update Asset",
+          method: "POST",
+          fields: [
+            { name: "assetId", label: "Asset ID", type: "text", defaultValue: "" },
+            { name: "newPriceWei", label: "New Price (wei)", type: "text", defaultValue: "0" },
+            { name: "newActive", label: "Active", type: "checkbox", defaultValue: true },
+          ],
+        },
+        { key: "revoke-asset", label: "8) Revoke Asset", method: "POST", fields: [{ name: "assetId", label: "Asset ID", type: "text", defaultValue: "" }] },
+        { key: "list-my-purchases", label: "9) List My AccessPurchased Events", method: "GET", fields: [] },
+        {
+          key: "run-from-cids",
+          label: "10) Run From CIDs",
+          method: "POST",
+          fields: [
+            { name: "datasetCid", label: "Dataset CID", type: "text", defaultValue: "" },
+            { name: "scriptCid", label: "Script CID", type: "text", defaultValue: "" },
+            { name: "pythonBin", label: "Python Bin", type: "text", defaultValue: "" },
+            { name: "ipfsApiUrl", label: "IPFS API URL", type: "text", defaultValue: "http://localhost:5001" },
+          ],
+        },
+        { key: "contract-info", label: "11) Show Contract Info", method: "GET", fields: [] },
+        {
+          key: "add-file-to-ipfs",
+          label: "12) Add File To IPFS",
+          method: "POST",
+          fields: [
+            { name: "filePath", label: "File Path", type: "text", defaultValue: "" },
+            { name: "manifest.name", label: "Title", type: "text", defaultValue: "" },
+            { name: "manifest.description", label: "Description", type: "text", defaultValue: "" },
+            { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
+            { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
+            { name: "manifest.framework", label: "Framework", type: "text", defaultValue: "" },
+            { name: "manifest.dependencies", label: "Dependencies", type: "text", defaultValue: "" },
+          ],
+        },
       ];
+
+      function createInitialFieldState(action) {
+        const out = {};
+        for (const field of action.fields || []) out[field.name] = field.defaultValue;
+        return out;
+      }
+
+      function setByPath(obj, path, value) {
+        const parts = path.split(".");
+        let cursor = obj;
+        for (let i = 0; i < parts.length - 1; i += 1) {
+          const key = parts[i];
+          if (!cursor[key] || typeof cursor[key] !== "object") cursor[key] = {};
+          cursor = cursor[key];
+        }
+        cursor[parts[parts.length - 1]] = value;
+      }
 
       function App() {
         const [actionKey, setActionKey] = React.useState(actions[0].key);
         const selected = actions.find((a) => a.key === actionKey);
-        const [payloadText, setPayloadText] = React.useState(JSON.stringify(selected.body || {}, null, 2));
-        const [result, setResult] = React.useState("{}");
+        const [fieldValues, setFieldValues] = React.useState(createInitialFieldState(actions[0]));
+        const [result, setResult] = React.useState(null);
         const [loading, setLoading] = React.useState(false);
 
         React.useEffect(() => {
-          setPayloadText(JSON.stringify(selected.body || {}, null, 2));
+          setFieldValues(createInitialFieldState(selected));
         }, [actionKey]);
+
+        function updateField(name, value) {
+          setFieldValues((prev) => ({ ...prev, [name]: value }));
+        }
+
+        function buildPayload() {
+          const payload = {};
+          for (const field of selected.fields || []) {
+            setByPath(payload, field.name, fieldValues[field.name]);
+          }
+          return payload;
+        }
 
         async function executeAction() {
           setLoading(true);
           try {
+            const payload = buildPayload();
             const response = selected.method === "GET"
               ? await fetch(`/api/${selected.key}`)
               : await fetch(`/api/${selected.key}`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payloadText.trim() ? JSON.parse(payloadText) : {}),
+                  body: JSON.stringify(payload),
                 });
 
             const data = await response.json();
-            setResult(JSON.stringify(data, null, 2));
+            setResult(data);
           } catch (error) {
-            setResult(JSON.stringify({ error: error.message }, null, 2));
+            setResult({ error: error.message });
           } finally {
             setLoading(false);
           }
+        }
+
+        function renderRunFromCidsResult(data) {
+          if (!data || typeof data !== "object") return null;
+
+          const metadata = data.metadata || {};
+          const status = metadata.status || "unknown";
+          const returnCode = metadata.returnCode ?? data.exitCode ?? "n/a";
+          const output = data.stdout || "";
+          const errorOutput = data.stderr || "";
+          const runnerOutput = data.runnerStdout || "";
+          const runnerErrorOutput = data.runnerStderr || "";
+          const statusClass = status === "success" ? "status-success" : "status-failed";
+
+          return (
+            <div>
+              <div className="summary-grid">
+                <div className={`summary-item ${statusClass}`}>
+                  <strong>Status</strong>
+                  <span>{status}</span>
+                </div>
+                <div className="summary-item">
+                  <strong>Return</strong>
+                  <span>{String(returnCode)}</span>
+                </div>
+                <div className="summary-item">
+                  <strong>Execution</strong>
+                  <span style={{ fontSize: "14px" }}>{metadata.executionId || "n/a"}</span>
+                </div>
+              </div>
+
+              <div className="output-grid">
+                <div>
+                  <div className="panel-title">Command Output</div>
+                  <pre>{output || "No stdout"}</pre>
+                </div>
+                <div>
+                  <div className="panel-title">Command Error Output</div>
+                  <pre>{errorOutput || "No stderr"}</pre>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                <div className="panel-title">Runner Output</div>
+                <pre>{runnerOutput || "No runner stdout"}</pre>
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                <div className="panel-title">Runner Error Output</div>
+                <pre>{runnerErrorOutput || "No runner stderr"}</pre>
+              </div>
+
+              <div style={{ marginTop: 12 }}>
+                <div className="panel-title">Full Response</div>
+                <pre>{JSON.stringify(data, null, 2)}</pre>
+              </div>
+            </div>
+          );
+        }
+
+        function renderResult() {
+          if (!result) return "{}";
+          if (selected.key === "run-from-cids" && typeof result === "object") {
+            return renderRunFromCidsResult(result);
+          }
+          return <pre>{JSON.stringify(result, null, 2)}</pre>;
         }
 
         return (
           <div className="wrap">
             <div className="top">
               <h1 style={{ margin: 0 }}>DNAT Web CLI</h1>
-              <p>Run contract operations and register assets with title/description metadata.</p>
+              <p>Fill inputs directly and submit, no manual JSON body required.</p>
             </div>
 
             <div className="card grid">
@@ -146,15 +388,42 @@
                 ))}
               </select>
 
-              <label>Request JSON</label>
-              <textarea value={payloadText} onChange={(e) => setPayloadText(e.target.value)} disabled={selected.method === "GET"} />
-              <div className="muted">For GET actions, request body is ignored.</div>
+              {selected.fields.length > 0 && (
+                <div className="fields">
+                  {selected.fields.map((field) => (
+                    <div key={field.name}>
+                      <label>{field.label}</label>
+                      {field.type === "checkbox" ? (
+                        <div className="checkbox">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(fieldValues[field.name])}
+                            onChange={(e) => updateField(field.name, e.target.checked)}
+                          />
+                          <span className="muted">Enabled</span>
+                        </div>
+                      ) : (
+                        <input
+                          type="text"
+                          value={fieldValues[field.name] ?? ""}
+                          onChange={(e) => updateField(field.name, e.target.value)}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {selected.fields.length === 0 && (
+                <div className="muted">This action does not require input fields.</div>
+              )}
+
               <button onClick={executeAction} disabled={loading}>{loading ? "Running..." : "Execute"}</button>
             </div>
 
             <div className="card" style={{ marginTop: 14 }}>
               <strong>Response</strong>
-              <pre>{result}</pre>
+              {renderResult()}
             </div>
           </div>
         );

@@ -1,0 +1,8 @@
+# Ignore app, cert, data, and manifest directories
+assets/apps/
+assets/certs/
+assets/data/
+smart-contract/manifests/
+
+# Ignore temporary and system files
+.tmp/
