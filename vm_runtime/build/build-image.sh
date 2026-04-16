@@ -1,19 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-IMAGE=build/rootfs.img
-ROOTFS=build/rootfs
-
-SIZE=512M
-
-qemu-img create -f qcow2 $IMAGE $SIZE
-
-mkfs.ext4 $IMAGE
-
-mkdir -p build/mount
-
-sudo mount -o loop $IMAGE build/mount
-
-sudo cp -r $ROOTFS/* build/mount/
-
-sudo umount build/mount
+# Este script está obsoleto - build-rootfs.sh já cria a imagem ext4 corretamente
+# em artifacts/rootfs.ext4
+echo "Note: This script is deprecated. Use build-rootfs.sh instead."
+exit 0

@@ -1,31 +1,87 @@
 #!/usr/bin/env python3
 
-import subprocess
-import sys
-import pathlib
-import json
+import subprocess, sys, os, json, time
 
-dataset = pathlib.Path("/data/dataset.csv")
-script = pathlib.Path("/data/application.py")
-result = pathlib.Path("/data/result.json")
+def write_serial(msg):
+    try:
+        with open('/dev/ttyS0', 'w') as f:
+            f.write(msg + '\n')
+            f.flush()
+    except:
+        pass
 
-cmd = [
-    sys.executable,
-    str(script),
-    "--dataset",
-    str(dataset),
-    "--output",
-    str(result)
-]
+BUNDLE_URL = 'http://127.0.0.1:8888/bundle.tar.gz'
+WORKDIR = '/tmp/exec'
+OUTPUT_DIR = '/mnt/output'
 
-proc = subprocess.run(cmd, capture_output=True, text=True)
+os.makedirs(WORKDIR, exist_ok=True)
+os.chdir(WORKDIR)
 
-metadata = {
-    "returncode": proc.returncode,
-    "stdout": proc.stdout,
-    "stderr": proc.stderr
-}
+# Wait for output disk
+output_disk = None
+for i in range(30):
+    for disk in ['/dev/vdb', '/dev/vdc', '/dev/vdd']:
+        if os.path.exists(disk):
+            output_disk = disk
+            break
+    if output_disk:
+        break
+    time.sleep(1)
 
-print(json.dumps(metadata))
+if output_disk:
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    subprocess.run(['mount', output_disk, OUTPUT_DIR], check=False)
 
-sys.exit(proc.returncode)
+try:
+    write_serial("[START]")
+    
+    # Download bundle
+    for attempt in range(20):
+        result = subprocess.run(
+            ['curl', '-f', '-m', '30', BUNDLE_URL, '-o', 'bundle.tar.gz'],
+            capture_output=True, text=True, timeout=35
+        )
+        if result.returncode == 0:
+            break
+        if attempt < 19:
+            time.sleep(2)
+    else:
+        raise Exception("Download failed")
+    
+    # Extract
+    result = subprocess.run(['tar', '-xzf', 'bundle.tar.gz'], capture_output=True, text=True)
+    if result.returncode != 0:
+        raise Exception(result.stderr)
+    
+    # Execute
+    result = subprocess.run(
+        ['bash', 'workspace/run.sh'],
+        capture_output=True, text=True, timeout=600
+    )
+    
+    output = {
+        "returncode": result.returncode,
+        "stdout": result.stdout,
+        "stderr": result.stderr
+    }
+
+except Exception as e:
+    output = {"returncode": 1, "stdout": "", "stderr": str(e)}
+except subprocess.TimeoutExpired:
+    output = {"returncode": 124, "stdout": "", "stderr": "timeout"}
+
+finally:
+    if os.path.ismount(OUTPUT_DIR):
+        try:
+            with open(f'{OUTPUT_DIR}/result.json', 'w') as f:
+                json.dump(output, f)
+        except:
+            print(json.dumps(output))
+    else:
+        print(json.dumps(output))
+    
+    write_serial("EXECUTION_COMPLETE")
+    subprocess.run(['sync'], check=False)
+    subprocess.run(['poweroff', '-f'], check=False)
+
+sys.exit(output.get("returncode", 1))

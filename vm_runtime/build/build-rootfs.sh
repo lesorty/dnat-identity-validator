@@ -1,34 +1,30 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-ARTIFACT_DIR="$ROOT_DIR/artifacts"
-ROOTFS_DIR=/tmp/firecracker-rootfs
+ARTIFACT="$(cd "$(dirname "$0")/.." && pwd)/artifacts/rootfs.ext4"
 
-rm -rf "$ROOTFS_DIR"
+if [ -f "$ARTIFACT" ]; then
+    exit 0
+fi
 
-sudo debootstrap \
-    --arch=amd64 \
-    --variant=minbase \
-    noble \
-    "$ROOTFS_DIR" \
-    http://archive.ubuntu.com/ubuntu/
+mkdir -p "$(dirname "$ARTIFACT")"
+ROOTFS=/tmp/firecracker-rootfs
+rm -rf "$ROOTFS"
 
-sudo cp "$ROOT_DIR/rootfs/init" "$ROOTFS_DIR/init"
-sudo cp "$ROOT_DIR/rootfs/runner" "$ROOTFS_DIR/runner"
+sudo debootstrap --arch=amd64 --variant=minbase noble "$ROOTFS" http://archive.ubuntu.com/ubuntu/
 
-sudo chmod +x "$ROOTFS_DIR/init"
-sudo chmod +x "$ROOTFS_DIR/runner"
+sudo chroot "$ROOTFS" apt-get update
+sudo chroot "$ROOTFS" apt-get install -y python3 curl tar gzip
 
-IMAGE="$ARTIFACT_DIR/rootfs.ext4"
+sudo cp "$(dirname "$0")/../rootfs/init" "$ROOTFS/init"
+sudo cp "$(dirname "$0")/../rootfs/runner" "$ROOTFS/runner"
+sudo chmod +x "$ROOTFS/init" "$ROOTFS/runner"
 
-dd if=/dev/zero of="$IMAGE" bs=1M count=256
-mkfs.ext4 "$IMAGE"
+dd if=/dev/zero of="$ARTIFACT" bs=1M count=512 2>/dev/null
+mkfs.ext4 "$ARTIFACT" >/dev/null 2>&1
 
-mkdir -p /tmp/rootfs-mount
-
-sudo mount "$IMAGE" /tmp/rootfs-mount
-sudo cp -r "$ROOTFS_DIR"/* /tmp/rootfs-mount/
-sudo umount /tmp/rootfs-mount
-
-echo "RootFS built."
+mount_dir=$(mktemp -d)
+sudo mount "$ARTIFACT" "$mount_dir"
+sudo cp -r "$ROOTFS"/* "$mount_dir/"
+sudo umount "$mount_dir"
+rmdir "$mount_dir"
