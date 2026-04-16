@@ -1,0 +1,22 @@
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    curl \
+    debootstrap \
+    qemu-utils \
+    firecracker \
+    python3 \
+    python3-pip
+
+WORKDIR /vm-runtime
+
+COPY . .
+
+RUN chmod +x build/*.sh
+RUN chmod +x executor/*.sh
+RUN chmod +x vm/*.sh
+RUN chmod +x rootfs/*
+
+CMD ["executor/setup-runtime.sh"]

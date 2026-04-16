@@ -41,3 +41,22 @@ Open:
 - `http://localhost:3001/` for CLI functions UI
 - `http://localhost:3001/assets.html` for available assets (datasets/apps split)
 - `http://localhost:3001/executions.html` for execution results (`stdout/stderr/metadata/result`)
+
+
+# Execute the VM_Runtime
+## Build Environment
+- docker build -t vm-builder -f Dockerfile.build .
+
+## Open Container
+- docker build -t vm-builder -f Dockerfile.build .
+
+## Build VM
+- bash build/build-kernel.sh
+- bash build/build-rootfs.sh
+- bash build/build-image.sh
+
+## Design Security Properties:
+rootfs.img -> imutable, base image
+
+overlay-UUID.qcow2 -> mutable instance to be runned
+
