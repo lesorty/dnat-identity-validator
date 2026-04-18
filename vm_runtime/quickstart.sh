@@ -13,11 +13,8 @@ bash build/ensure-image.sh >/dev/null
 echo "Setting up runtime..."
 bash setup-runtime.sh >/dev/null
 
-echo "Creating test bundle..."
-bash create-test-bundle.sh >/dev/null
-
 echo "✓ Ready"
 echo ""
 echo "Usage:"
-echo "  bash execute-bundle.sh test-bundle/bundle.tar.gz | jq ."
+echo "  bash execute-bundle.sh | jq ."
 echo "  python3 executor.py 5000"

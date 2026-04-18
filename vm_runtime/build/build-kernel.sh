@@ -14,8 +14,12 @@ git clone --depth=1 -b v6.6 https://github.com/torvalds/linux.git 2>/dev/null ||
 cd linux
 
 make defconfig
-scripts/config --disable CONFIG_DEBUG_INFO
-scripts/config --enable CONFIG_KVM_GUEST CONFIG_VIRTIO CONFIG_VIRTIO_PCI CONFIG_VIRTIO_BLK CONFIG_VIRTIO_NET
+scripts/config --disable DEBUG_INFO
+scripts/config --enable KVM_GUEST
+scripts/config --enable VIRTIO
+scripts/config --enable VIRTIO_PCI
+scripts/config --enable VIRTIO_BLK
+scripts/config --enable VIRTIO_NET
 
 make -j$(nproc)
 cp arch/x86/boot/bzImage "$ARTIFACT"
