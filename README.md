@@ -4,6 +4,53 @@ This repository now contains only the parts needed to run the smart-contract CLI
 - Hardhat local blockchain
 - IPFS node
 
+## Root Docker stack for frontend + Hardhat + IPFS
+
+The root `Dockerfile` starts a local stack dedicated to the frontend/API flow in `smart-contract`, without bundling `vm_runtime`.
+
+Build:
+
+```bash
+docker build -t dnat-client-local .
+```
+
+Run:
+
+```bash
+docker run --rm \
+  --name dnat-client-local \
+  --add-host=host.docker.internal:host-gateway \
+  -p 3001:3001 \
+  -p 5001:5001 \
+  -p 8080:8080 \
+  -p 8545:8545 \
+  -v dnat_ipfs_data:/data/ipfs \
+  dnat-client-local
+```
+
+This container will:
+- start a local IPFS daemon
+- start `hardhat node`
+- deploy the marketplace contract on the local chain
+- start the frontend/API at `http://localhost:3001`
+
+Useful environment overrides:
+
+```bash
+docker run --rm \
+  --name dnat-client-local \
+  --add-host=host.docker.internal:host-gateway \
+  -e WEB_PORT=3001 \
+  -e EXECUTOR_URL=http://host.docker.internal:5000 \
+  -p 3001:3001 \
+  -p 5001:5001 \
+  -p 8080:8080 \
+  -p 8545:8545 \
+  dnat-client-local
+```
+
+`EXECUTOR_URL` is optional and is only needed when the web client should call an external `vm_runtime` executor running separately from this container.
+
 ## Run
 
 ```powershell
