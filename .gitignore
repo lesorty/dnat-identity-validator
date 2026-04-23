@@ -6,3 +6,29 @@ smart-contract/manifests/
 
 # Ignore temporary and system files
 .tmp/
+.tmp/**
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Ignore local Codex/runtime directories and files
+.codex
+.codex/
+.codexvm_runtime/
+
+# Ignore VM/runtime build artifacts, disk images, and filesystem files
+vm_runtime/artifacts/
+*.img
+*.iso
+*.qcow2
+*.raw
+*.ext2
+*.ext3
+*.ext4
+*.squashfs

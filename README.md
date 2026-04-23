@@ -23,7 +23,7 @@ RPC_URL=http://127.0.0.1:8545
 PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 IPFS_API_URL=http://localhost:5001
 CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
-EXECUTOR_URL=http://localhost:8081
+EXECUTOR_URL=http://localhost:5000
 ```
 
 `EXECUTOR_URL` is optional if you are not using option 10/11 in the CLI.
@@ -59,4 +59,3 @@ Open:
 rootfs.img -> imutable, base image
 
 overlay-UUID.qcow2 -> mutable instance to be runned
-

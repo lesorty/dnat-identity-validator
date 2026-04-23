@@ -2,6 +2,63 @@
 
 Minimal executor para microVMs: recebe bundle → executa → retorna resultado → deleta.
 
+## Setup Rápido (Local - Recomendado)
+
+**Para evitar demora do Docker, execute localmente no Linux:**
+
+```bash
+# Setup de uma vez (~30-40 min: Linux kernel 6.6 + Ubuntu rootfs)
+bash setup-local.sh
+
+# Testa se está tudo ok
+firecracker --version
+ls -lh artifacts/vmlinux artifacts/rootfs.ext4
+
+# Start servidor executor
+python3 executor.py 5000 &
+
+# Demo
+curl -X POST --data-binary @seu-bundle.tar.gz http://localhost:5000/execute | jq .
+```
+
+**O que setup-local.sh faz:**
+
+- ✅ Instala: build-essential, python3, debootstrap, qemu-utils, Firecracker v1.7.0
+- ✅ Compila Linux 6.6 otimizado (KVM, Virtio drivers)
+- ✅ Cria Ubuntu Jammy rootfs mínimo (~512MB)
+- ✅ Verifica todas as dependências
+
+> **Nota:** Primeira execução compila kernel (20-30 min com paralelização). Próximas são instantâneas.
+
+## Setup com Docker (Alternativa)
+
+Se preferir containerizado, o Dockerfile agora faz o build completo automaticamente:
+
+```bash
+# Build completo (kernel + rootfs) - ~40-50 min primeira vez
+docker build -f Dockerfile.build -t dnat-executor .
+
+# Executar servidor automaticamente
+docker run -p 5000:5000 dnat-executor
+
+# Ou executar shell para debug
+docker run -it dnat-executor /bin/bash
+```
+
+**Nota Importante:** O build completo do Docker pode falhar devido a limitações de privilégios para montar filesystems. Para uso completo, recomendamos usar o setup local (`bash setup-local.sh`) que funciona perfeitamente no Linux nativo.
+
+Se quiser usar Docker mesmo assim, você pode:
+
+1. Buildar localmente primeiro: `bash setup-local.sh`
+2. Depois usar Docker apenas para runtime: `docker build -f Dockerfile.build -t dnat-executor .`
+
+**O que o Dockerfile faz:**
+
+- ✅ Instala todas as dependências (build-essential, python3, debootstrap, etc.)
+- ✅ Compila Linux 6.6 otimizado (~20-30 min)
+- ✅ Cria Ubuntu rootfs (~5-10 min)
+- ✅ Inicia executor HTTP automaticamente na porta 5000
+
 ## Rápido
 
 ```bash
@@ -144,15 +201,15 @@ python code/script.py data/dataset.parquet
 
 ## Performance
 
-| Etapa | Tempo |
-|-------|-------|
-| Kernel compile | 5-10 min (uma vez) |
-| Rootfs create | 30-60 seg (uma vez) |
-| VM startup | ~2 seg |
-| Bundle download | ~100ms |
-| Execution | ~1-30 seg (depende do workload) |
-| Cleanup | ~2 seg |
-| **Total (por execução)** | **~5-40 seg** |
+| Etapa                    | Tempo                           |
+| ------------------------ | ------------------------------- |
+| Kernel compile           | 5-10 min (uma vez)              |
+| Rootfs create            | 30-60 seg (uma vez)             |
+| VM startup               | ~2 seg                          |
+| Bundle download          | ~100ms                          |
+| Execution                | ~1-30 seg (depende do workload) |
+| Cleanup                  | ~2 seg                          |
+| **Total (por execução)** | **~5-40 seg**                   |
 
 ## Security
 
@@ -193,22 +250,26 @@ docker run -it dnat-executor bash quickstart.sh
 ## Troubleshooting
 
 ### "Kernel or rootfs not found"
+
 ```bash
 bash build/ensure-image.sh
 ```
 
 ### "VM execution timeout"
+
 - Aumentar TIMEOUT em `vm/run-vm.sh`
 - Verificar se bundle é válido
 - Verificar se run.sh tem execute permission
 
 ### Sem resultado JSON
+
 - Verificar serial log: `vm_runtime/build/`
 - VM talvez não terminou (timeout ou erro)
 
 ## Minimalism Philosophy
 
 **Linhas de Código** (total ~250):
+
 - executor.py: ~60 (HTTP server)
 - vm/run-vm.sh: ~55 (VM orchestration)
 - rootfs/runner: ~45 (bundle execution)
@@ -224,6 +285,7 @@ Open source - Use como quiser.
 ---
 
 Veja também:
+
 - [PURE_EXECUTOR.md](PURE_EXECUTOR.md) - Filosofia de simplicidade
 - [AMNESIA_GUARANTEE.md](AMNESIA_GUARANTEE.md) - Como amnesia funciona
 - [SYNC_ANALYSIS.md](SYNC_ANALYSIS.md) - Sincronização VM↔Host

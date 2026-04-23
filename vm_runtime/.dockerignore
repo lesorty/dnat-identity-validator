@@ -1,0 +1,12 @@
+artifacts/
+input/
+output/
+.git/
+.gitignore
+*.md
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
