@@ -35,12 +35,15 @@ let contract = new ethers.Contract(contractAddress, abi, wallet);
 
 function resolvePythonBin(pythonBin) {
   const requested = String(pythonBin || "").trim();
-  if (requested && requested.toLowerCase() !== "python") return requested;
+  if (requested) {
+    if (requested.toLowerCase() === "python") return "python3";
+    return requested;
+  }
 
   const repoPython = path.resolve(__dirname, "..", "..", ".venv", "Scripts", "python.exe");
   if (fs.existsSync(repoPython)) return repoPython;
 
-  return requested || "python";
+  return "python3";
 }
 
 async function resolveContractAddress() {
@@ -115,53 +118,186 @@ function computeSha256Hex(localPath) {
   return `0x${crypto.createHash("sha256").update(fileBuffer).digest("hex")}`;
 }
 
-async function addFileToIpfsFlow({ filePath, manifest = {} }) {
-  const resolvedPath = path.resolve(String(filePath || "").trim());
-  if (!resolvedPath) throw new Error("filePath is required");
-  if (!fs.existsSync(resolvedPath)) throw new Error(`File not found: ${resolvedPath}`);
+function parseMultipartForm(req) {
+  const contentType = String(req.headers["content-type"] || "");
+  const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
+  if (!boundaryMatch) throw new Error("Multipart boundary not found");
 
-  const stats = fs.statSync(resolvedPath);
-  if (!stats.isFile()) throw new Error(`Path is not a file: ${resolvedPath}`);
+  const boundary = Buffer.from(`--${boundaryMatch[1] || boundaryMatch[2]}`);
+  const bodyBuffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body || []);
+  const parts = [];
+  let start = bodyBuffer.indexOf(boundary);
 
-  const defaultName = path.basename(resolvedPath);
-  const manifestsDir = path.join(__dirname, "..", "manifests");
-  fs.mkdirSync(manifestsDir, { recursive: true });
+  while (start !== -1) {
+    start += boundary.length;
+    if (bodyBuffer.slice(start, start + 2).equals(Buffer.from("--"))) break;
+    if (bodyBuffer[start] === 13 && bodyBuffer[start + 1] === 10) start += 2;
 
-  const baseName = path.basename(resolvedPath, path.extname(resolvedPath));
-  const manifestFileName = `${baseName}.manifest.yaml`;
-  const manifestPath = path.join(manifestsDir, manifestFileName);
+    const nextBoundary = bodyBuffer.indexOf(boundary, start);
+    if (nextBoundary === -1) break;
 
-  const manifestYaml = buildManifestYaml({
-    name: manifest.name || defaultName,
-    description: manifest.description || "",
-    version: manifest.version || "1.0.0",
-    author: manifest.author || "",
-    framework: manifest.framework || "",
-    dependencies: manifest.dependencies || "",
-  });
+    let partBuffer = bodyBuffer.slice(start, nextBoundary);
+    if (partBuffer.slice(-2).equals(Buffer.from("\r\n"))) {
+      partBuffer = partBuffer.slice(0, -2);
+    }
+    parts.push(partBuffer);
+    start = nextBoundary;
+  }
 
-  fs.writeFileSync(manifestPath, manifestYaml, "utf8");
+  const fields = {};
+  let file = null;
 
-  const assetParsed = await uploadLocalFileToIpfs(resolvedPath);
-  const manifestParsed = await uploadLocalFileToIpfs(manifestPath);
+  for (const part of parts) {
+    const headerEnd = part.indexOf(Buffer.from("\r\n\r\n"));
+    if (headerEnd === -1) continue;
 
-  const assetCid = assetParsed && assetParsed.Hash ? assetParsed.Hash : null;
-  const manifestCid = manifestParsed && manifestParsed.Hash ? manifestParsed.Hash : null;
+    const headerText = part.slice(0, headerEnd).toString("utf8");
+    const content = part.slice(headerEnd + 4);
+    const disposition = headerText
+      .split("\r\n")
+      .find((line) => line.toLowerCase().startsWith("content-disposition:"));
 
-  if (!assetCid || !manifestCid) {
-    throw new Error("IPFS upload succeeded but missing CID in response.");
+    if (!disposition) continue;
+
+    const nameMatch = disposition.match(/name="([^"]+)"/i);
+    if (!nameMatch) continue;
+
+    const fieldName = nameMatch[1];
+    const fileNameMatch = disposition.match(/filename="([^"]*)"/i);
+
+    if (fileNameMatch) {
+      const originalName = path.basename(fileNameMatch[1] || "").trim();
+      if (originalName) {
+        file = {
+          fieldName,
+          originalName,
+          buffer: content,
+        };
+      }
+      continue;
+    }
+
+    fields[fieldName] = content.toString("utf8");
+  }
+
+  const manifest = {};
+  for (const [key, value] of Object.entries(fields)) {
+    if (key.startsWith("manifest.")) {
+      manifest[key.slice("manifest.".length)] = value;
+    }
   }
 
   return {
-    assetCid,
-    assetUri: `ipfs://${assetCid}`,
-    assetContentHash: computeSha256Hex(resolvedPath),
-    manifestCid,
-    manifestUri: `ipfs://${manifestCid}`,
-    manifestContentHash: computeSha256Hex(manifestPath),
-    localPath: resolvedPath,
-    manifestPath,
+    ...fields,
+    manifest,
+    fileName: file?.originalName || "",
+    fileBuffer: file?.buffer || null,
   };
+}
+
+function normalizeUploadRequest(req) {
+  const contentType = String(req.headers["content-type"] || "").toLowerCase();
+  if (contentType.startsWith("multipart/form-data")) {
+    return parseMultipartForm(req);
+  }
+  return req.body || {};
+}
+
+function materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer }) {
+  const requestedPath = String(filePath || "").trim();
+  if (requestedPath) {
+    const resolvedPath = path.resolve(requestedPath);
+    if (!fs.existsSync(resolvedPath)) throw new Error(`File not found: ${resolvedPath}`);
+    return {
+      localPath: resolvedPath,
+      cleanup: () => {},
+    };
+  }
+
+  if (fileBuffer && Buffer.isBuffer(fileBuffer) && fileBuffer.length > 0) {
+    const uploadsDir = path.join(__dirname, "..", "uploads");
+    fs.mkdirSync(uploadsDir, { recursive: true });
+
+    const safeName = path.basename(String(fileName || "uploaded-file").trim()) || "uploaded-file";
+    const tempPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-${safeName}`);
+    fs.writeFileSync(tempPath, fileBuffer);
+
+    return {
+      localPath: tempPath,
+      cleanup: () => {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+      },
+    };
+  }
+
+  const encoded = String(fileBase64 || "").trim();
+  if (!encoded) throw new Error("filePath or uploaded file is required");
+
+  const uploadsDir = path.join(__dirname, "..", "uploads");
+  fs.mkdirSync(uploadsDir, { recursive: true });
+
+  const safeName = path.basename(String(fileName || "uploaded-file").trim()) || "uploaded-file";
+  const tempPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-${safeName}`);
+  fs.writeFileSync(tempPath, Buffer.from(encoded, "base64"));
+
+  return {
+    localPath: tempPath,
+    cleanup: () => {
+      if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+    },
+  };
+}
+
+async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest = {} }) {
+  const uploadedInput = materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer });
+  const resolvedPath = uploadedInput.localPath;
+
+  try {
+    const stats = fs.statSync(resolvedPath);
+    if (!stats.isFile()) throw new Error(`Path is not a file: ${resolvedPath}`);
+
+    const defaultName = path.basename(resolvedPath);
+    const manifestsDir = path.join(__dirname, "..", "manifests");
+    fs.mkdirSync(manifestsDir, { recursive: true });
+
+    const baseName = path.basename(resolvedPath, path.extname(resolvedPath));
+    const manifestFileName = `${baseName}.manifest.yaml`;
+    const manifestPath = path.join(manifestsDir, manifestFileName);
+
+    const manifestYaml = buildManifestYaml({
+      name: manifest.name || defaultName,
+      description: manifest.description || "",
+      version: manifest.version || "1.0.0",
+      author: manifest.author || "",
+      framework: manifest.framework || "",
+      dependencies: manifest.dependencies || "",
+    });
+
+    fs.writeFileSync(manifestPath, manifestYaml, "utf8");
+
+    const assetParsed = await uploadLocalFileToIpfs(resolvedPath);
+    const manifestParsed = await uploadLocalFileToIpfs(manifestPath);
+
+    const assetCid = assetParsed && assetParsed.Hash ? assetParsed.Hash : null;
+    const manifestCid = manifestParsed && manifestParsed.Hash ? manifestParsed.Hash : null;
+
+    if (!assetCid || !manifestCid) {
+      throw new Error("IPFS upload succeeded but missing CID in response.");
+    }
+
+    return {
+      assetCid,
+      assetUri: `ipfs://${assetCid}`,
+      assetContentHash: computeSha256Hex(resolvedPath),
+      manifestCid,
+      manifestUri: `ipfs://${manifestCid}`,
+      manifestContentHash: computeSha256Hex(manifestPath),
+      localPath: resolvedPath,
+      manifestPath,
+    };
+  } finally {
+    uploadedInput.cleanup();
+  }
 }
 
 function mapAsset(a) {
@@ -226,9 +362,9 @@ async function listAssetsByScanningIds() {
   return { all: assets, datasets, applications };
 }
 
-async function registerAsset({ assetType, filePath, priceWei, bloomFilter, manifest }) {
-  const uploaded = await addFileToIpfsFlow({ filePath, manifest });
-  const title = String(manifest?.name || path.basename(uploaded.localPath || filePath || "Untitled asset")).trim();
+async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBuffer, priceWei, bloomFilter, manifest }) {
+  const uploaded = await addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest });
+  const title = String(manifest?.name || path.basename(uploaded.localPath || fileName || filePath || "Untitled asset")).trim();
   const description = String(manifest?.description || "").trim();
   const tx = await contract.registerAsset(
     Number(assetType),
@@ -330,7 +466,16 @@ async function listMyPurchases() {
   }));
 }
 
-async function runFromCids({ datasetCid, scriptCid, pythonBin, ipfsApiUrl }) {
+async function runFromCids({ datasetId, applicationId, datasetCid, scriptCid, pythonBin, ipfsApiUrl, user }) {
+  if (datasetId === undefined || datasetId === null || applicationId === undefined || applicationId === null) {
+    throw new Error("datasetId and applicationId are required");
+  }
+
+  const access = await hasAccessByIds({ user, datasetId, applicationId });
+  if (!access.hasAccessByIds) {
+    throw new Error("Access denied. Purchase access to the selected dataset and application before executing.");
+  }
+
   const runnerPath = path.resolve(__dirname, "..", "..", "executor", "ipfs_executor", "run_from_cids.py");
   if (!fs.existsSync(runnerPath)) throw new Error(`Runner not found: ${runnerPath}`);
   const resolvedPythonBin = resolvePythonBin(pythonBin);
@@ -466,24 +611,25 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
   app.use(express.static(path.resolve(__dirname, "..", "web")));
+  const multipartParser = express.raw({ type: "multipart/form-data", limit: "100mb" });
 
   app.get("/api/health", async (_req, res) => {
     const info = await showContractInfo();
     res.json({ ok: true, info });
   });
 
-  app.post("/api/register-dataset", async (req, res) => {
+  app.post("/api/register-dataset", multipartParser, async (req, res) => {
     try {
-      const data = await registerAsset({ ...req.body, assetType: 0 });
+      const data = await registerAsset({ ...normalizeUploadRequest(req), assetType: 0 });
       res.json(data);
     } catch (e) {
       res.status(400).json({ error: e.message });
     }
   });
 
-  app.post("/api/register-application", async (req, res) => {
+  app.post("/api/register-application", multipartParser, async (req, res) => {
     try {
-      const data = await registerAsset({ ...req.body, assetType: 1 });
+      const data = await registerAsset({ ...normalizeUploadRequest(req), assetType: 1 });
       res.json(data);
     } catch (e) {
       res.status(400).json({ error: e.message });
@@ -567,9 +713,9 @@ async function startServer() {
     }
   });
 
-  app.post("/api/add-file-to-ipfs", async (req, res) => {
+  app.post("/api/add-file-to-ipfs", multipartParser, async (req, res) => {
     try {
-      res.json(await addFileToIpfsFlow(req.body));
+      res.json(await addFileToIpfsFlow(normalizeUploadRequest(req)));
     } catch (e) {
       res.status(400).json({ error: e.message });
     }

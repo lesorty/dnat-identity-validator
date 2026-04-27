@@ -129,10 +129,101 @@
         font-weight: 700;
         margin-bottom: 6px;
       }
+      .file-picker {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 8px 10px;
+        border: 1px solid #bdd0db;
+        border-radius: 11px;
+        background: linear-gradient(180deg, #f8fcff, #eef5fb);
+      }
+      .file-picker input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+      }
+      .file-picker-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 14px;
+        border-radius: 9px;
+        border: 1px solid #0f7f86;
+        background: linear-gradient(120deg, #0a9396, #0d6e75);
+        color: #fff;
+        font-weight: 700;
+        white-space: nowrap;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        cursor: pointer;
+      }
+      .file-picker-name {
+        min-width: 0;
+        color: var(--ink);
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .asset-choice-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .asset-choice-panel {
+        border: 1px solid #cfdee8;
+        background: #f8fbff;
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .asset-choice-list {
+        display: grid;
+        gap: 8px;
+        max-height: 280px;
+        overflow: auto;
+      }
+      .asset-choice-item {
+        border: 1px solid #c8d8e0;
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px;
+        cursor: pointer;
+      }
+      .asset-choice-item.active {
+        border-color: #0a9396;
+        background: linear-gradient(120deg, #ecfeff, #f0fdfa);
+      }
+      .asset-choice-name {
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .asset-choice-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .mini-tag {
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #e2ecf2;
+        color: #304959;
+        font-weight: 700;
+      }
+      .selection-summary {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
       @media (max-width: 780px) {
         .fields { grid-template-columns: 1fr; }
         .summary-grid,
-        .output-grid { grid-template-columns: 1fr; }
+        .output-grid,
+        .asset-choice-grid { grid-template-columns: 1fr; }
       }
     </style>
   </head>
@@ -150,7 +241,7 @@
           label: "1) Register Dataset",
           method: "POST",
           fields: [
-            { name: "filePath", label: "File Path", type: "text", defaultValue: "" },
+            { name: "file", label: "Dataset File", type: "file", defaultValue: null },
             { name: "priceWei", label: "Price (wei)", type: "text", defaultValue: "0" },
             { name: "bloomFilter", label: "Bloom Filter", type: "text", defaultValue: "0x" },
             { name: "manifest.name", label: "Title", type: "text", defaultValue: "Dataset Title" },
@@ -166,7 +257,7 @@
           label: "2) Register Application",
           method: "POST",
           fields: [
-            { name: "filePath", label: "File Path", type: "text", defaultValue: "" },
+            { name: "file", label: "Application File", type: "file", defaultValue: null },
             { name: "priceWei", label: "Price (wei)", type: "text", defaultValue: "0" },
             { name: "manifest.name", label: "Title", type: "text", defaultValue: "Application Title" },
             { name: "manifest.description", label: "Description", type: "text", defaultValue: "Application description" },
@@ -222,12 +313,7 @@
           key: "run-from-cids",
           label: "10) Run From CIDs",
           method: "POST",
-          fields: [
-            { name: "datasetCid", label: "Dataset CID", type: "text", defaultValue: "" },
-            { name: "scriptCid", label: "Script CID", type: "text", defaultValue: "" },
-            { name: "pythonBin", label: "Python Bin", type: "text", defaultValue: "" },
-            { name: "ipfsApiUrl", label: "IPFS API URL", type: "text", defaultValue: "http://localhost:5001" },
-          ],
+          fields: [],
         },
         { key: "contract-info", label: "11) Show Contract Info", method: "GET", fields: [] },
         {
@@ -235,7 +321,7 @@
           label: "12) Add File To IPFS",
           method: "POST",
           fields: [
-            { name: "filePath", label: "File Path", type: "text", defaultValue: "" },
+            { name: "file", label: "File", type: "file", defaultValue: null },
             { name: "manifest.name", label: "Title", type: "text", defaultValue: "" },
             { name: "manifest.description", label: "Description", type: "text", defaultValue: "" },
             { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
@@ -263,40 +349,120 @@
         cursor[parts[parts.length - 1]] = value;
       }
 
+      function actionUsesFileUpload(action) {
+        return (action.fields || []).some((field) => field.type === "file");
+      }
+
+      function shortText(text, max = 80) {
+        const value = String(text || "").trim();
+        if (!value) return "No description";
+        return value.length > max ? `${value.slice(0, max)}...` : value;
+      }
+
       function App() {
         const [actionKey, setActionKey] = React.useState(actions[0].key);
         const selected = actions.find((a) => a.key === actionKey);
         const [fieldValues, setFieldValues] = React.useState(createInitialFieldState(actions[0]));
+        const [selectedFiles, setSelectedFiles] = React.useState({});
+        const [assetCatalog, setAssetCatalog] = React.useState({ all: [], datasets: [], applications: [] });
+        const [runSelection, setRunSelection] = React.useState({ dataset: null, application: null });
         const [result, setResult] = React.useState(null);
         const [loading, setLoading] = React.useState(false);
 
         React.useEffect(() => {
           setFieldValues(createInitialFieldState(selected));
+          setSelectedFiles({});
+          setRunSelection({ dataset: null, application: null });
+        }, [actionKey]);
+
+        React.useEffect(() => {
+          if (actionKey !== "run-from-cids") return;
+
+          async function loadAssets() {
+            try {
+              const res = await fetch("/api/assets");
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || "Failed to load assets");
+              setAssetCatalog(data);
+            } catch (error) {
+              setResult({ error: error.message });
+            }
+          }
+
+          loadAssets();
         }, [actionKey]);
 
         function updateField(name, value) {
           setFieldValues((prev) => ({ ...prev, [name]: value }));
         }
 
+        function updateFile(name, file) {
+          setSelectedFiles((prev) => ({ ...prev, [name]: file || null }));
+        }
+
+        function isMissingRequiredFile() {
+          return (selected.fields || []).some((field) => field.type === "file" && !selectedFiles[field.name]);
+        }
+
+        function isMissingRunSelection() {
+          return actionKey === "run-from-cids" && (!runSelection.dataset || !runSelection.application);
+        }
+
         function buildPayload() {
+          if (actionKey === "run-from-cids") {
+            return {
+              datasetId: String(runSelection.dataset?.id ?? ""),
+              applicationId: String(runSelection.application?.id ?? ""),
+              datasetCid: runSelection.dataset?.encryptedUri || "",
+              scriptCid: runSelection.application?.encryptedUri || "",
+            };
+          }
+
           const payload = {};
           for (const field of selected.fields || []) {
+            if (field.type === "file") continue;
             setByPath(payload, field.name, fieldValues[field.name]);
           }
           return payload;
         }
 
+        function buildFormData() {
+          const formData = new FormData();
+          for (const field of selected.fields || []) {
+            if (field.type === "file") {
+              const file = selectedFiles[field.name];
+              if (file) formData.append(field.name, file, file.name);
+              continue;
+            }
+            formData.append(field.name, fieldValues[field.name] ?? "");
+          }
+          return formData;
+        }
+
         async function executeAction() {
           setLoading(true);
           try {
-            const payload = buildPayload();
+            if (isMissingRequiredFile()) {
+              setResult({ error: "Select a file before executing this action." });
+              return;
+            }
+            if (isMissingRunSelection()) {
+              setResult({ error: "Select one dataset and one application before executing." });
+              return;
+            }
+            const usesFileUpload = actionUsesFileUpload(selected);
             const response = selected.method === "GET"
               ? await fetch(`/api/${selected.key}`)
-              : await fetch(`/api/${selected.key}`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload),
-                });
+              : usesFileUpload
+                ? await fetch(`/api/${selected.key}`, {
+                    method: "POST",
+                    body: buildFormData(),
+                  })
+                : await fetch(`/api/${selected.key}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(buildPayload()),
+                  });
 
             const data = await response.json();
             setResult(data);
@@ -373,6 +539,67 @@
           return <pre>{JSON.stringify(result, null, 2)}</pre>;
         }
 
+        function renderRunFromCidsPicker() {
+          return (
+            <div className="grid">
+              <div className="asset-choice-grid">
+                <section className="asset-choice-panel">
+                  <label>Datasets</label>
+                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
+                    {assetCatalog.datasets.length === 0 && <div className="muted">No datasets found.</div>}
+                    {assetCatalog.datasets.map((item) => (
+                      <div
+                        key={`dataset-${item.id}`}
+                        className={`asset-choice-item ${runSelection.dataset?.id === item.id ? "active" : ""}`}
+                        onClick={() => setRunSelection((prev) => ({ ...prev, dataset: item }))}
+                      >
+                        <div className="asset-choice-name">{item.title || `Dataset #${item.id}`}</div>
+                        <div className="muted">{shortText(item.description)}</div>
+                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
+                          <span className="mini-tag">ID {item.id}</span>
+                          <span className="mini-tag">{item.priceWei} wei</span>
+                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="asset-choice-panel">
+                  <label>Applications</label>
+                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
+                    {assetCatalog.applications.length === 0 && <div className="muted">No applications found.</div>}
+                    {assetCatalog.applications.map((item) => (
+                      <div
+                        key={`application-${item.id}`}
+                        className={`asset-choice-item ${runSelection.application?.id === item.id ? "active" : ""}`}
+                        onClick={() => setRunSelection((prev) => ({ ...prev, application: item }))}
+                      >
+                        <div className="asset-choice-name">{item.title || `Application #${item.id}`}</div>
+                        <div className="muted">{shortText(item.description)}</div>
+                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
+                          <span className="mini-tag">ID {item.id}</span>
+                          <span className="mini-tag">{item.priceWei} wei</span>
+                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <div className="selection-summary">
+                <div className="muted">
+                  Selected dataset CID: {runSelection.dataset?.encryptedUri || "none"}
+                </div>
+                <div className="muted">
+                  Selected application CID: {runSelection.application?.encryptedUri || "none"}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         return (
           <div className="wrap">
             <div className="top">
@@ -388,6 +615,8 @@
                 ))}
               </select>
 
+              {selected.key === "run-from-cids" && renderRunFromCidsPicker()}
+
               {selected.fields.length > 0 && (
                 <div className="fields">
                   {selected.fields.map((field) => (
@@ -401,6 +630,19 @@
                             onChange={(e) => updateField(field.name, e.target.checked)}
                           />
                           <span className="muted">Enabled</span>
+                        </div>
+                      ) : field.type === "file" ? (
+                        <div>
+                          <label className="file-picker">
+                            <span className="file-picker-button">Choose File</span>
+                            <span className="file-picker-name">
+                              {selectedFiles[field.name]?.name || "No file selected"}
+                            </span>
+                            <input
+                              type="file"
+                              onChange={(e) => updateFile(field.name, e.target.files?.[0] || null)}
+                            />
+                          </label>
                         </div>
                       ) : (
                         <input
@@ -418,7 +660,9 @@
                 <div className="muted">This action does not require input fields.</div>
               )}
 
-              <button onClick={executeAction} disabled={loading}>{loading ? "Running..." : "Execute"}</button>
+              <button onClick={executeAction} disabled={loading || isMissingRequiredFile() || isMissingRunSelection()}>
+                {loading ? "Running..." : "Execute"}
+              </button>
             </div>
 
             <div className="card" style={{ marginTop: 14 }}>

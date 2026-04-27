@@ -64,7 +64,11 @@ if python3 code/application.py --dataset data/dataset.csv --output result.json; 
     exit 0
 fi
 
-python3 code/application.py data/dataset.csv
+if python3 code/application.py data/dataset.csv; then
+    exit 0
+fi
+
+python3 code/application.py
 """
     run_path = workspace_dir / "run.sh"
     run_path.write_text(run_sh, encoding="utf-8")
