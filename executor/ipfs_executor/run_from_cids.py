@@ -60,15 +60,42 @@ set -euo pipefail
 
 cd /tmp/exec/workspace
 
-if python3 code/application.py --dataset data/dataset.csv --output result.json; then
+attempt_1_stdout="$(mktemp)"
+attempt_1_stderr="$(mktemp)"
+attempt_2_stdout="$(mktemp)"
+attempt_2_stderr="$(mktemp)"
+attempt_3_stdout="$(mktemp)"
+attempt_3_stderr="$(mktemp)"
+
+if python3 code/application.py --dataset data/dataset.csv --output result.json >"$attempt_1_stdout" 2>"$attempt_1_stderr"; then
+    cat "$attempt_1_stdout"
+    cat "$attempt_1_stderr" >&2
     exit 0
 fi
 
-if python3 code/application.py data/dataset.csv; then
+if python3 code/application.py data/dataset.csv >"$attempt_2_stdout" 2>"$attempt_2_stderr"; then
+    cat "$attempt_2_stdout"
+    cat "$attempt_2_stderr" >&2
     exit 0
 fi
 
-python3 code/application.py
+if python3 code/application.py >"$attempt_3_stdout" 2>"$attempt_3_stderr"; then
+    cat "$attempt_3_stdout"
+    cat "$attempt_3_stderr" >&2
+    exit 0
+fi
+
+echo "All execution strategies failed." >&2
+echo "--- attempt 1: python3 code/application.py --dataset data/dataset.csv --output result.json" >&2
+cat "$attempt_1_stdout"
+cat "$attempt_1_stderr" >&2
+echo "--- attempt 2: python3 code/application.py data/dataset.csv" >&2
+cat "$attempt_2_stdout"
+cat "$attempt_2_stderr" >&2
+echo "--- attempt 3: python3 code/application.py" >&2
+cat "$attempt_3_stdout"
+cat "$attempt_3_stderr" >&2
+exit 1
 """
     run_path = workspace_dir / "run.sh"
     run_path.write_text(run_sh, encoding="utf-8")

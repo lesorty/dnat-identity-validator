@@ -272,10 +272,7 @@
           key: "purchase-access",
           label: "4) Purchase Access",
           method: "POST",
-          fields: [
-            { name: "datasetId", label: "Dataset ID", type: "text", defaultValue: "" },
-            { name: "applicationId", label: "Application ID", type: "text", defaultValue: "" },
-          ],
+          fields: [],
         },
         {
           key: "check-access-by-ids",
@@ -353,6 +350,10 @@
         return (action.fields || []).some((field) => field.type === "file");
       }
 
+      function actionUsesAssetPairSelector(actionKey) {
+        return actionKey === "run-from-cids" || actionKey === "purchase-access";
+      }
+
       function shortText(text, max = 80) {
         const value = String(text || "").trim();
         if (!value) return "No description";
@@ -366,6 +367,7 @@
         const [selectedFiles, setSelectedFiles] = React.useState({});
         const [assetCatalog, setAssetCatalog] = React.useState({ all: [], datasets: [], applications: [] });
         const [runSelection, setRunSelection] = React.useState({ dataset: null, application: null });
+        const [purchaseSelection, setPurchaseSelection] = React.useState({ dataset: null, application: null });
         const [result, setResult] = React.useState(null);
         const [loading, setLoading] = React.useState(false);
 
@@ -373,10 +375,11 @@
           setFieldValues(createInitialFieldState(selected));
           setSelectedFiles({});
           setRunSelection({ dataset: null, application: null });
+          setPurchaseSelection({ dataset: null, application: null });
         }, [actionKey]);
 
         React.useEffect(() => {
-          if (actionKey !== "run-from-cids") return;
+          if (!actionUsesAssetPairSelector(actionKey)) return;
 
           async function loadAssets() {
             try {
@@ -408,6 +411,10 @@
           return actionKey === "run-from-cids" && (!runSelection.dataset || !runSelection.application);
         }
 
+        function isMissingPurchaseSelection() {
+          return actionKey === "purchase-access" && (!purchaseSelection.dataset || !purchaseSelection.application);
+        }
+
         function buildPayload() {
           if (actionKey === "run-from-cids") {
             return {
@@ -415,6 +422,13 @@
               applicationId: String(runSelection.application?.id ?? ""),
               datasetCid: runSelection.dataset?.encryptedUri || "",
               scriptCid: runSelection.application?.encryptedUri || "",
+            };
+          }
+
+          if (actionKey === "purchase-access") {
+            return {
+              datasetId: String(purchaseSelection.dataset?.id ?? ""),
+              applicationId: String(purchaseSelection.application?.id ?? ""),
             };
           }
 
@@ -448,6 +462,10 @@
             }
             if (isMissingRunSelection()) {
               setResult({ error: "Select one dataset and one application before executing." });
+              return;
+            }
+            if (isMissingPurchaseSelection()) {
+              setResult({ error: "Select one dataset and one application before purchasing access." });
               return;
             }
             const usesFileUpload = actionUsesFileUpload(selected);
@@ -600,6 +618,67 @@
           );
         }
 
+        function renderAssetPairSelector(selection, setSelection, summaryLabels) {
+          return (
+            <div className="grid">
+              <div className="asset-choice-grid">
+                <section className="asset-choice-panel">
+                  <label>Datasets</label>
+                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
+                    {assetCatalog.datasets.length === 0 && <div className="muted">No datasets found.</div>}
+                    {assetCatalog.datasets.map((item) => (
+                      <div
+                        key={`pair-dataset-${item.id}`}
+                        className={`asset-choice-item ${selection.dataset?.id === item.id ? "active" : ""}`}
+                        onClick={() => setSelection((prev) => ({ ...prev, dataset: item }))}
+                      >
+                        <div className="asset-choice-name">{item.title || `Dataset #${item.id}`}</div>
+                        <div className="muted">{shortText(item.description)}</div>
+                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
+                          <span className="mini-tag">ID {item.id}</span>
+                          <span className="mini-tag">{item.priceWei} wei</span>
+                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="asset-choice-panel">
+                  <label>Applications</label>
+                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
+                    {assetCatalog.applications.length === 0 && <div className="muted">No applications found.</div>}
+                    {assetCatalog.applications.map((item) => (
+                      <div
+                        key={`pair-application-${item.id}`}
+                        className={`asset-choice-item ${selection.application?.id === item.id ? "active" : ""}`}
+                        onClick={() => setSelection((prev) => ({ ...prev, application: item }))}
+                      >
+                        <div className="asset-choice-name">{item.title || `Application #${item.id}`}</div>
+                        <div className="muted">{shortText(item.description)}</div>
+                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
+                          <span className="mini-tag">ID {item.id}</span>
+                          <span className="mini-tag">{item.priceWei} wei</span>
+                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <div className="selection-summary">
+                <div className="muted">
+                  {summaryLabels.dataset}: {selection.dataset ? `${selection.dataset.title || `Dataset #${selection.dataset.id}`} (ID ${selection.dataset.id})` : "none"}
+                </div>
+                <div className="muted">
+                  {summaryLabels.application}: {selection.application ? `${selection.application.title || `Application #${selection.application.id}`} (ID ${selection.application.id})` : "none"}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         return (
           <div className="wrap">
             <div className="top">
@@ -616,6 +695,11 @@
               </select>
 
               {selected.key === "run-from-cids" && renderRunFromCidsPicker()}
+              {selected.key === "purchase-access" &&
+                renderAssetPairSelector(purchaseSelection, setPurchaseSelection, {
+                  dataset: "Selected dataset",
+                  application: "Selected application",
+                })}
 
               {selected.fields.length > 0 && (
                 <div className="fields">
@@ -660,7 +744,7 @@
                 <div className="muted">This action does not require input fields.</div>
               )}
 
-              <button onClick={executeAction} disabled={loading || isMissingRequiredFile() || isMissingRunSelection()}>
+              <button onClick={executeAction} disabled={loading || isMissingRequiredFile() || isMissingRunSelection() || isMissingPurchaseSelection()}>
                 {loading ? "Running..." : "Execute"}
               </button>
             </div>
