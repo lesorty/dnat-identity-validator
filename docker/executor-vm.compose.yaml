@@ -1,0 +1,13 @@
+services:
+  dnat-executor:
+    build:
+      context: ../vm_runtime
+      dockerfile: Dockerfile.build
+    image: dnat-executor:latest
+    container_name: dnat-executor
+    privileged: true
+    devices:
+      - /dev/kvm:/dev/kvm
+    ports:
+      - "5000:5000"
+    restart: unless-stopped

@@ -12,6 +12,21 @@ ROOTFS="$ROOT/artifacts/rootfs.ext4"
 
 [ -f "$KERNEL" ] && [ -f "$ROOTFS" ] || { echo "Artifacts not found" >&2; exit 1; }
 
+run_as_root() {
+    if [ "$(id -u)" -eq 0 ]; then
+        "$@"
+        return
+    fi
+
+    if command -v sudo >/dev/null 2>&1; then
+        sudo "$@"
+        return
+    fi
+
+    echo "Root privileges required to run: $*" >&2
+    exit 1
+}
+
 WORKDIR=$(mktemp -d)
 trap "pkill -9 firecracker 2>/dev/null; rm -rf $WORKDIR" EXIT
 
@@ -57,6 +72,6 @@ for i in {1..120}; do
 done
 
 mkdir -p "$OUTPUT_MOUNT"
-sudo mount -o ro "$OUTPUT_DISK" "$OUTPUT_MOUNT" 2>/dev/null || { echo "{\"error\": \"mount failed\"}"; exit 1; }
+run_as_root mount -o ro "$OUTPUT_DISK" "$OUTPUT_MOUNT" 2>/dev/null || { echo "{\"error\": \"mount failed\"}"; exit 1; }
 [ -f "$OUTPUT_MOUNT/result.json" ] && cat "$OUTPUT_MOUNT/result.json" || echo "{\"error\": \"no result\"}"
-sudo umount "$OUTPUT_MOUNT" 2>/dev/null || true
+run_as_root umount "$OUTPUT_MOUNT" 2>/dev/null || true
