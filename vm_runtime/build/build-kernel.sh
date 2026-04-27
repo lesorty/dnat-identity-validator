@@ -22,4 +22,4 @@ scripts/config --enable VIRTIO_BLK
 scripts/config --enable VIRTIO_NET
 
 make -j$(nproc)
-cp arch/x86/boot/bzImage "$ARTIFACT"
+cp vmlinux "$ARTIFACT"

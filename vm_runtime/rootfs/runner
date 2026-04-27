@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import subprocess, sys, os, json, time
+import subprocess, sys, os, json, time, shutil
 
 def write_serial(msg):
     try:
@@ -10,43 +10,41 @@ def write_serial(msg):
     except:
         pass
 
-BUNDLE_URL = 'http://127.0.0.1:8888/bundle.tar.gz'
 WORKDIR = '/tmp/exec'
 OUTPUT_DIR = '/mnt/output'
 
 os.makedirs(WORKDIR, exist_ok=True)
 os.chdir(WORKDIR)
 
-# Wait for output disk
-output_disk = None
+# Wait for data disks
+bundle_path = None
+output_mount = None
 for i in range(30):
-    for disk in ['/dev/vdb', '/dev/vdc', '/dev/vdd']:
+    for disk in ['/dev/vdb', '/dev/vdc', '/dev/vdd', '/dev/vde']:
         if os.path.exists(disk):
-            output_disk = disk
-            break
-    if output_disk:
+            mount_dir = f"/mnt/{os.path.basename(disk)}"
+            os.makedirs(mount_dir, exist_ok=True)
+            subprocess.run(['mount', disk, mount_dir], check=False)
+
+            candidate_bundle = os.path.join(mount_dir, 'bundle.tar.gz')
+            if os.path.isfile(candidate_bundle):
+                bundle_path = candidate_bundle
+            else:
+                output_mount = mount_dir
+    if bundle_path and output_mount:
         break
     time.sleep(1)
 
-if output_disk:
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    subprocess.run(['mount', output_disk, OUTPUT_DIR], check=False)
+if output_mount:
+    OUTPUT_DIR = output_mount
 
 try:
     write_serial("[START]")
-    
-    # Download bundle
-    for attempt in range(20):
-        result = subprocess.run(
-            ['curl', '-f', '-m', '30', BUNDLE_URL, '-o', 'bundle.tar.gz'],
-            capture_output=True, text=True, timeout=35
-        )
-        if result.returncode == 0:
-            break
-        if attempt < 19:
-            time.sleep(2)
-    else:
-        raise Exception("Download failed")
+
+    if not bundle_path or not os.path.isfile(bundle_path):
+        raise Exception("Bundle disk not found")
+
+    shutil.copyfile(bundle_path, 'bundle.tar.gz')
     
     # Extract
     result = subprocess.run(['tar', '-xzf', 'bundle.tar.gz'], capture_output=True, text=True)
