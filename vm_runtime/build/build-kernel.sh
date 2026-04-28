@@ -15,11 +15,17 @@ cd linux
 
 make defconfig
 scripts/config --disable DEBUG_INFO
+scripts/config --enable ACPI
+scripts/config --enable PCI
 scripts/config --enable KVM_GUEST
 scripts/config --enable VIRTIO
-scripts/config --enable VIRTIO_PCI
+scripts/config --enable VIRTIO_MMIO
 scripts/config --enable VIRTIO_BLK
 scripts/config --enable VIRTIO_NET
+scripts/config --enable DEVTMPFS
+scripts/config --enable DEVTMPFS_MOUNT
+scripts/config --enable BLK_DEV
+scripts/config --enable EXT4_FS
 
 make -j$(nproc)
 cp vmlinux "$ARTIFACT"

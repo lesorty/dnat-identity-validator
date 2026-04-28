@@ -61,7 +61,7 @@ curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/machine-config' \
 
 curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/boot-source' \
   -H 'Content-Type: application/json' \
-  -d "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 reboot=k panic=1 pci=off root=/dev/vda rw init=/init\"}" >/dev/null 2>&1
+  -d "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 reboot=k panic=1 root=/dev/vda rw init=/init\"}" >/dev/null 2>&1
 
 curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/drives/rootfs' \
   -H 'Content-Type: application/json' \
