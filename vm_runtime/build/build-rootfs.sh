@@ -27,6 +27,7 @@ sudo chroot "$ROOTFS" apt-get install -y python3 curl tar gzip
 
 sudo cp "$(dirname "$0")/../rootfs/init" "$ROOTFS/init"
 sudo cp "$(dirname "$0")/../rootfs/runner" "$ROOTFS/runner"
+sudo sed -i 's/\r$//' "$ROOTFS/init" "$ROOTFS/runner"
 sudo chmod +x "$ROOTFS/init" "$ROOTFS/runner"
 
 sudo tar -C "$ROOTFS" -czf "$ROOTFS_TARBALL" .
