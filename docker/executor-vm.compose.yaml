@@ -10,4 +10,9 @@ services:
       - /dev/kvm:/dev/kvm
     ports:
       - "5000:5000"
+    volumes:
+      - ../vm_runtime/executor.py:/app/executor.py
+      - ../vm_runtime/start-executor.sh:/app/start-executor.sh
+      - ../vm_runtime/vm:/app/vm
+      - ../vm_runtime/rootfs:/app/rootfs
     restart: unless-stopped

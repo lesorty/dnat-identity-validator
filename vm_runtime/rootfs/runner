@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 
-import subprocess, sys, os, json, time, shutil
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+
+RESULT_BEGIN = "__DNAT_RESULT_BEGIN__"
+RESULT_END = "__DNAT_RESULT_END__"
 
 def write_serial(msg):
     try:
@@ -10,15 +18,21 @@ def write_serial(msg):
     except:
         pass
 
+def write_serial_raw(msg):
+    try:
+        with open('/dev/ttyS0', 'w') as f:
+            f.write(msg)
+            f.flush()
+    except:
+        pass
+
 WORKDIR = '/tmp/exec'
-OUTPUT_DIR = '/mnt/output'
 
 os.makedirs(WORKDIR, exist_ok=True)
 os.chdir(WORKDIR)
 
-# Wait for data disks
+# Wait for input disk with bundle
 bundle_path = None
-output_mount = None
 for i in range(30):
     for disk in ['/dev/vdb', '/dev/vdc', '/dev/vdd', '/dev/vde']:
         if os.path.exists(disk):
@@ -29,14 +43,10 @@ for i in range(30):
             candidate_bundle = os.path.join(mount_dir, 'bundle.tar.gz')
             if os.path.isfile(candidate_bundle):
                 bundle_path = candidate_bundle
-            else:
-                output_mount = mount_dir
-    if bundle_path and output_mount:
+                break
+    if bundle_path:
         break
     time.sleep(1)
-
-if output_mount:
-    OUTPUT_DIR = output_mount
 
 try:
     write_serial("[START]")
@@ -69,17 +79,10 @@ except subprocess.TimeoutExpired:
     output = {"returncode": 124, "stdout": "", "stderr": "timeout"}
 
 finally:
-    if os.path.ismount(OUTPUT_DIR):
-        try:
-            with open(f'{OUTPUT_DIR}/result.json', 'w') as f:
-                json.dump(output, f)
-        except:
-            print(json.dumps(output))
-    else:
-        print(json.dumps(output))
-    
+    payload = json.dumps(output)
+    write_serial(RESULT_BEGIN)
+    write_serial_raw(f"{payload}\n")
+    write_serial(RESULT_END)
     write_serial("EXECUTION_COMPLETE")
     subprocess.run(['sync'], check=False)
-    subprocess.run(['poweroff', '-f'], check=False)
-
-sys.exit(output.get("returncode", 1))
+    sys.exit(0)

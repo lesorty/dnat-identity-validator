@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="/app"
 ROOTFS="$ROOT/artifacts/rootfs.ext4"
 ROOTFS_TARBALL="$ROOT/artifacts/rootfs.tar.gz"
+GUEST_INIT_SRC="$ROOT/rootfs/init"
+GUEST_RUNNER_SRC="$ROOT/rootfs/runner"
 
 rebuild_rootfs_from_tarball() {
     local mount_dir
@@ -20,6 +22,10 @@ rebuild_rootfs_from_tarball() {
     mount_dir="$(mktemp -d)"
     mount -o loop "$ROOTFS" "$mount_dir"
     tar -xzf "$ROOTFS_TARBALL" -C "$mount_dir"
+    cp "$GUEST_INIT_SRC" "$mount_dir/init"
+    cp "$GUEST_RUNNER_SRC" "$mount_dir/runner"
+    sed -i 's/\r$//' "$mount_dir/init" "$mount_dir/runner"
+    chmod +x "$mount_dir/init" "$mount_dir/runner"
     sync
     umount "$mount_dir"
     rmdir "$mount_dir"
@@ -45,9 +51,25 @@ validate_rootfs() {
     [ "$ok" -eq 1 ]
 }
 
+sync_guest_scripts() {
+    local mount_dir
+    mount_dir="$(mktemp -d)"
+    mount -o loop "$ROOTFS" "$mount_dir"
+    cp "$GUEST_INIT_SRC" "$mount_dir/init"
+    cp "$GUEST_RUNNER_SRC" "$mount_dir/runner"
+    sed -i 's/\r$//' "$mount_dir/init" "$mount_dir/runner"
+    chmod +x "$mount_dir/init" "$mount_dir/runner"
+    sync
+    umount "$mount_dir"
+    rmdir "$mount_dir"
+}
+
 if [ ! -f "$ROOTFS" ] || ! validate_rootfs; then
     echo "Rebuilding rootfs artifact from bundled tarball..."
     rebuild_rootfs_from_tarball
 fi
+
+echo "Syncing guest scripts into rootfs..."
+sync_guest_scripts
 
 exec python3 "$ROOT/executor.py" 5000

@@ -9,6 +9,8 @@ HTTP_PORT="${2:-8888}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KERNEL="$ROOT/artifacts/vmlinux"
 ROOTFS="$ROOT/artifacts/rootfs.ext4"
+RESULT_BEGIN="__DNAT_RESULT_BEGIN__"
+RESULT_END="__DNAT_RESULT_END__"
 
 [ -f "$KERNEL" ] && [ -f "$ROOTFS" ] || { echo "Artifacts not found" >&2; exit 1; }
 
@@ -51,17 +53,13 @@ trap "pkill -9 firecracker 2>/dev/null; rm -rf $WORKDIR" EXIT
 
 OVERLAY="$WORKDIR/rootfs-overlay.ext4"
 INPUT_DISK="$WORKDIR/input.ext4"
-OUTPUT_DISK="$WORKDIR/output.ext4"
 SOCKET="$WORKDIR/firecracker.socket"
 INPUT_MOUNT="$WORKDIR/input-mount"
-OUTPUT_MOUNT="$WORKDIR/output-mount"
 SERIAL_LOG="$WORKDIR/serial.log"
 
 cp "$ROOTFS" "$OVERLAY"
 dd if=/dev/zero of="$INPUT_DISK" bs=1M count=64 >/dev/null 2>&1
-dd if=/dev/zero of="$OUTPUT_DISK" bs=1M count=64 >/dev/null 2>&1
 mkfs.ext4 -q "$INPUT_DISK" 2>/dev/null || true
-mkfs.ext4 -q "$OUTPUT_DISK" 2>/dev/null || true
 
 mkdir -p "$INPUT_MOUNT"
 run_as_root mount "$INPUT_DISK" "$INPUT_MOUNT"
@@ -87,8 +85,6 @@ fc_put "drives/rootfs" "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\
 
 fc_put "drives/input" "{\"drive_id\": \"input\", \"path_on_host\": \"$INPUT_DISK\", \"is_root_device\": false, \"is_read_only\": true}"
 
-fc_put "drives/output" "{\"drive_id\": \"output\", \"path_on_host\": \"$OUTPUT_DISK\", \"is_root_device\": false, \"is_read_only\": false}"
-
 fc_put "actions" '{"action_type": "InstanceStart"}'
 
 for i in {1..120}; do
@@ -97,7 +93,29 @@ for i in {1..120}; do
     sleep 1
 done
 
-mkdir -p "$OUTPUT_MOUNT"
-run_as_root mount -o ro "$OUTPUT_DISK" "$OUTPUT_MOUNT" 2>/dev/null || { echo "{\"error\": \"mount failed\"}"; exit 1; }
-[ -f "$OUTPUT_MOUNT/result.json" ] && cat "$OUTPUT_MOUNT/result.json" || echo "{\"error\": \"no result\", \"serialLog\": $(python3 -c "import json, pathlib; print(json.dumps(pathlib.Path('$SERIAL_LOG').read_text(errors='ignore')[-4000:]))")}"
-run_as_root umount "$OUTPUT_MOUNT" 2>/dev/null || true
+python3 - <<PY
+import json
+from pathlib import Path
+
+serial_log = Path(r"$SERIAL_LOG").read_text(errors="ignore")
+begin = serial_log.rfind("$RESULT_BEGIN")
+end = serial_log.rfind("$RESULT_END")
+
+if begin != -1 and end != -1 and end > begin:
+    payload = serial_log[begin + len("$RESULT_BEGIN"):end].strip()
+    try:
+        parsed = json.loads(payload)
+    except json.JSONDecodeError:
+        print(json.dumps({
+            "error": "invalid result payload",
+            "payload": payload,
+            "serialLog": serial_log[-4000:],
+        }))
+    else:
+        print(json.dumps(parsed))
+else:
+    print(json.dumps({
+        "error": "no result",
+        "serialLog": serial_log[-4000:],
+    }))
+PY
