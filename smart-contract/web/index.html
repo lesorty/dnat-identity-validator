@@ -420,8 +420,6 @@
             return {
               datasetId: String(runSelection.dataset?.id ?? ""),
               applicationId: String(runSelection.application?.id ?? ""),
-              datasetCid: runSelection.dataset?.encryptedUri || "",
-              scriptCid: runSelection.application?.encryptedUri || "",
             };
           }
 
@@ -608,10 +606,10 @@
 
               <div className="selection-summary">
                 <div className="muted">
-                  Selected dataset CID: {runSelection.dataset?.encryptedUri || "none"}
+                  Selected dataset: {runSelection.dataset ? `${runSelection.dataset.title || `Dataset #${runSelection.dataset.id}`} (ID ${runSelection.dataset.id})` : "none"}
                 </div>
                 <div className="muted">
-                  Selected application CID: {runSelection.application?.encryptedUri || "none"}
+                  Selected application: {runSelection.application ? `${runSelection.application.title || `Application #${runSelection.application.id}`} (ID ${runSelection.application.id})` : "none"}
                 </div>
               </div>
             </div>

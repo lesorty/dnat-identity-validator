@@ -9,6 +9,22 @@ import os
 from pathlib import Path
 
 class Handler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path != "/health":
+            self.send_error(404)
+            return
+
+        body = {
+            "ok": True,
+            "service": "dnat-executor",
+        }
+        encoded = json.dumps(body).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(encoded)))
+        self.end_headers()
+        self.wfile.write(encoded)
+
     def do_POST(self):
         if self.path != "/execute":
             self.send_error(404)
@@ -68,6 +84,6 @@ if __name__ == "__main__":
     Path(__file__).parent.joinpath("output").mkdir(exist_ok=True)
     
     with http.server.HTTPServer(("0.0.0.0", port), Handler) as server:
-        print(f"Listening on port {port}, POST /execute")
+        print(f"Listening on port {port}, GET /health, POST /execute")
         server.serve_forever()
 

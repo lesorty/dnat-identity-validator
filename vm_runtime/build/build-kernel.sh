@@ -20,7 +20,9 @@ scripts/config --enable PCI
 scripts/config --enable KVM_GUEST
 scripts/config --enable VIRTIO
 scripts/config --enable VIRTIO_MMIO
+scripts/config --enable VIRTIO_MMIO_CMDLINE_DEVICES
 scripts/config --enable VIRTIO_BLK
+scripts/config --enable VIRTIO_CONSOLE
 scripts/config --enable VIRTIO_NET
 scripts/config --enable DEVTMPFS
 scripts/config --enable DEVTMPFS_MOUNT

@@ -12,6 +12,25 @@ ROOTFS="$ROOT/artifacts/rootfs.ext4"
 
 [ -f "$KERNEL" ] && [ -f "$ROOTFS" ] || { echo "Artifacts not found" >&2; exit 1; }
 
+fc_put() {
+    local endpoint="$1"
+    local payload="$2"
+    local response
+    local body
+    local status
+
+    response=$(curl --unix-socket "$SOCKET" -sS -w $'\n%{http_code}' -X PUT "http://localhost/${endpoint}" \
+      -H 'Content-Type: application/json' \
+      -d "$payload")
+    body="${response%$'\n'*}"
+    status="${response##*$'\n'}"
+
+    if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+        echo "{\"error\": \"firecracker api error\", \"endpoint\": \"${endpoint}\", \"status\": ${status}, \"body\": $(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$body")}" 
+        exit 1
+    fi
+}
+
 run_as_root() {
     if [ "$(id -u)" -eq 0 ]; then
         "$@"
@@ -53,31 +72,24 @@ run_as_root umount "$INPUT_MOUNT"
 firecracker --api-sock "$SOCKET" >"$SERIAL_LOG" 2>&1 &
 FC_PID=$!
 
-sleep 1
+for _ in {1..20}; do
+    [ -S "$SOCKET" ] && break
+    sleep 0.5
+done
 
-curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/machine-config' \
-  -H 'Content-Type: application/json' \
-  -d '{"vcpu_count": 1, "mem_size_mib": 512, "ht_enabled": false}' >/dev/null 2>&1
+[ -S "$SOCKET" ] || { echo "{\"error\": \"firecracker socket not created\", \"serialLog\": $(python3 -c "import json, pathlib; print(json.dumps(pathlib.Path('$SERIAL_LOG').read_text(errors='ignore')))" )}"; exit 1; }
 
-curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/boot-source' \
-  -H 'Content-Type: application/json' \
-  -d "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 reboot=k panic=1 root=/dev/vda rw init=/init\"}" >/dev/null 2>&1
+fc_put "machine-config" '{"vcpu_count": 1, "mem_size_mib": 512, "smt": false}'
 
-curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/drives/rootfs' \
-  -H 'Content-Type: application/json' \
-  -d "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\", \"is_root_device\": true, \"is_read_only\": false}" >/dev/null 2>&1
+fc_put "boot-source" "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 noapic reboot=k panic=1 pci=off nomodules root=/dev/vda rootfstype=ext4 rootwait rw init=/init\"}"
 
-curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/drives/input' \
-  -H 'Content-Type: application/json' \
-  -d "{\"drive_id\": \"input\", \"path_on_host\": \"$INPUT_DISK\", \"is_root_device\": false, \"is_read_only\": true}" >/dev/null 2>&1
+fc_put "drives/rootfs" "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\", \"is_root_device\": true, \"is_read_only\": false}"
 
-curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/drives/output' \
-  -H 'Content-Type: application/json' \
-  -d "{\"drive_id\": \"output\", \"path_on_host\": \"$OUTPUT_DISK\", \"is_root_device\": false, \"is_read_only\": false}" >/dev/null 2>&1
+fc_put "drives/input" "{\"drive_id\": \"input\", \"path_on_host\": \"$INPUT_DISK\", \"is_root_device\": false, \"is_read_only\": true}"
 
-curl --unix-socket "$SOCKET" -s -X PUT 'http://localhost/actions' \
-  -H 'Content-Type: application/json' \
-  -d '{"action_type": "InstanceStart"}' >/dev/null 2>&1
+fc_put "drives/output" "{\"drive_id\": \"output\", \"path_on_host\": \"$OUTPUT_DISK\", \"is_root_device\": false, \"is_read_only\": false}"
+
+fc_put "actions" '{"action_type": "InstanceStart"}'
 
 for i in {1..120}; do
     grep -q "EXECUTION_COMPLETE" "$SERIAL_LOG" 2>/dev/null && break

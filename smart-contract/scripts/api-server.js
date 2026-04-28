@@ -13,6 +13,7 @@ const PRIVATE_KEY =
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 const CONTRACT_ADDRESS_ENV = process.env.CONTRACT_ADDRESS;
 const IPFS_API_URL = process.env.IPFS_API_URL || "http://localhost:5001";
+const EXECUTOR_URL = process.env.EXECUTOR_URL || "http://localhost:5000";
 const PORT = Number(process.env.WEB_PORT || "3001");
 
 const abi = [
@@ -44,6 +45,43 @@ function resolvePythonBin(pythonBin) {
   if (fs.existsSync(repoPython)) return repoPython;
 
   return "python3";
+}
+
+function normalizeExecutorBaseUrl(rawUrl) {
+  const value = String(rawUrl || "").trim().replace(/\/+$/, "");
+  if (!value) {
+    throw new Error("Executor URL is required");
+  }
+  return value.endsWith("/execute") ? value.slice(0, -"/execute".length) : value;
+}
+
+function normalizeExecutorUrl(rawUrl) {
+  return `${normalizeExecutorBaseUrl(rawUrl)}/execute`;
+}
+
+async function probeExecutor(executorUrl) {
+  const baseUrl = normalizeExecutorBaseUrl(executorUrl);
+  const url = `${baseUrl}/health`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      signal: AbortSignal.timeout(3000),
+    });
+
+    return {
+      ok: true,
+      url,
+      status: response.status,
+      statusText: response.statusText,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      url,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
 
 async function resolveContractAddress() {
@@ -466,7 +504,30 @@ async function listMyPurchases() {
   }));
 }
 
-async function runFromCids({ datasetId, applicationId, datasetCid, scriptCid, pythonBin, ipfsApiUrl, user }) {
+async function resolveExecutionAssets(datasetId, applicationId) {
+  const dataset = mapAsset(await contract.getAsset(BigInt(datasetId)));
+  const application = mapAsset(await contract.getAsset(BigInt(applicationId)));
+
+  if (dataset.assetType !== 0) {
+    throw new Error(`Asset ${datasetId} is not a dataset.`);
+  }
+  if (application.assetType !== 1) {
+    throw new Error(`Asset ${applicationId} is not an application.`);
+  }
+  if (!String(dataset.encryptedUri || "").trim()) {
+    throw new Error(`Dataset ${datasetId} does not have an execution URI.`);
+  }
+  if (!String(application.encryptedUri || "").trim()) {
+    throw new Error(`Application ${applicationId} does not have an execution URI.`);
+  }
+
+  return {
+    dataset,
+    application,
+  };
+}
+
+async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user }) {
   if (datasetId === undefined || datasetId === null || applicationId === undefined || applicationId === null) {
     throw new Error("datasetId and applicationId are required");
   }
@@ -475,19 +536,30 @@ async function runFromCids({ datasetId, applicationId, datasetCid, scriptCid, py
   if (!access.hasAccessByIds) {
     throw new Error("Access denied. Purchase access to the selected dataset and application before executing.");
   }
+  const { dataset, application } = await resolveExecutionAssets(datasetId, applicationId);
 
   const runnerPath = path.resolve(__dirname, "..", "..", "executor", "ipfs_executor", "run_from_cids.py");
   if (!fs.existsSync(runnerPath)) throw new Error(`Runner not found: ${runnerPath}`);
   const resolvedPythonBin = resolvePythonBin(pythonBin);
+  const executorProbe = await probeExecutor(EXECUTOR_URL);
+  if (!executorProbe.ok) {
+    throw new Error(
+      `Executor unreachable at ${executorProbe.url}. ` +
+        `Verify the VM/container is running and listening on port 5000. ` +
+        `Probe error: ${executorProbe.error}`,
+    );
+  }
 
   const args = [
     runnerPath,
     "--dataset-cid",
-    String(datasetCid || ""),
+    String(dataset.encryptedUri),
     "--script-cid",
-    String(scriptCid || ""),
+    String(application.encryptedUri),
     "--ipfs-api-url",
     String(ipfsApiUrl || IPFS_API_URL),
+    "--executor-url",
+    EXECUTOR_URL,
   ];
 
   return await new Promise((resolve, reject) => {
@@ -615,7 +687,12 @@ async function startServer() {
 
   app.get("/api/health", async (_req, res) => {
     const info = await showContractInfo();
-    res.json({ ok: true, info });
+    const executor = await probeExecutor(EXECUTOR_URL);
+    res.json({
+      ok: executor.ok,
+      info,
+      executor,
+    });
   });
 
   app.post("/api/register-dataset", multipartParser, async (req, res) => {
