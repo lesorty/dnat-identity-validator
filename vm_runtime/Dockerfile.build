@@ -40,14 +40,14 @@ RUN mkdir -p /tmp/fc-download && \
     rm -rf /tmp/fc-download && \
     firecracker --version
 
-# Layer 4: Application files and setup
+# Layer 4: Runtime files and build context
 WORKDIR /app
 COPY . .
 
-RUN chmod +x build/*.sh vm/*.sh rootfs/* setup-runtime.sh start-executor.sh 2>/dev/null || true && \
+RUN chmod +x build/*.sh vm/*.sh rootfs/* start-executor.sh 2>/dev/null || true && \
     mkdir -p /app/artifacts /app/input /app/output
 
-# Layer 5: Build kernel and rootfs (same as local setup)
+# Layer 5: Build kernel and rootfs
 RUN echo "🔨 Building Linux kernel..." && \
     bash /app/build/build-kernel.sh && \
     echo "📦 Building Ubuntu rootfs..." && \
@@ -80,7 +80,7 @@ COPY --from=builder /app /app
 WORKDIR /app
 
 # Make scripts executable
-RUN chmod +x build/*.sh vm/*.sh rootfs/* setup-runtime.sh start-executor.sh 2>/dev/null || true
+RUN chmod +x build/*.sh vm/*.sh rootfs/* start-executor.sh 2>/dev/null || true
 
 ENV PATH="/usr/local/bin:$PATH"
 

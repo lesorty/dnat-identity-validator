@@ -22,11 +22,10 @@ COPY smart-contract/package.json smart-contract/package-lock.json ./smart-contra
 RUN cd smart-contract && npm ci
 
 COPY smart-contract ./smart-contract
-COPY executor/ipfs_executor ./executor/ipfs_executor
 COPY docker/root-entrypoint.sh /usr/local/bin/root-entrypoint.sh
 
 RUN chmod +x /usr/local/bin/root-entrypoint.sh \
-    && mkdir -p /data/ipfs /app/executor/executions
+    && mkdir -p /data/ipfs /app/smart-contract/executions
 
 EXPOSE 3001 5001 8080 8545
 

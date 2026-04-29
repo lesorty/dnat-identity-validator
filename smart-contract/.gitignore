@@ -3,6 +3,9 @@ node_modules/
 cache/
 artifacts/
 deployments/
+executions/
+uploads/
+manifests/
 coverage/
 coverage.json
 typechain/

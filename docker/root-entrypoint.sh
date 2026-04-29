@@ -54,7 +54,7 @@ wait_for_http() {
   return 1
 }
 
-mkdir -p "${IPFS_PATH}" /app/executor/executions
+mkdir -p "${IPFS_PATH}" /app/smart-contract/executions
 
 if [[ ! -f "${IPFS_PATH}/config" ]]; then
   echo "Initializing IPFS repository at ${IPFS_PATH}"

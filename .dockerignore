@@ -5,12 +5,14 @@
 **/.venv/
 **/__pycache__/
 **/*.pyc
+**/.pytest_cache/
 **/node_modules/
 **/cache/
 **/artifacts/
+**/executions/
+**/uploads/
 assets/
 smart-contract/manifests/
-executor/executions/
 vm_runtime/
 *.log
 *.tmp
@@ -18,4 +20,3 @@ vm_runtime/
 .DS_Store
 .codex
 .codex/
-.codexvm_runtime/

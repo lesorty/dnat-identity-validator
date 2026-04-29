@@ -15,6 +15,8 @@ const CONTRACT_ADDRESS_ENV = process.env.CONTRACT_ADDRESS;
 const IPFS_API_URL = process.env.IPFS_API_URL || "http://localhost:5001";
 const EXECUTOR_URL = process.env.EXECUTOR_URL || "http://localhost:5000";
 const PORT = Number(process.env.WEB_PORT || "3001");
+const EXECUTIONS_ROOT = path.resolve(__dirname, "..", "executions");
+const RUNNER_PATH = path.resolve(__dirname, "run_from_cids.py");
 
 const abi = [
   "function registerAsset(uint8 assetType, string title, string description, string encryptedUri, string manifestUri, bytes32 contentHash, uint256 price, bytes bloomFilter) returns (uint256)",
@@ -538,8 +540,7 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
   }
   const { dataset, application } = await resolveExecutionAssets(datasetId, applicationId);
 
-  const runnerPath = path.resolve(__dirname, "..", "..", "executor", "ipfs_executor", "run_from_cids.py");
-  if (!fs.existsSync(runnerPath)) throw new Error(`Runner not found: ${runnerPath}`);
+  if (!fs.existsSync(RUNNER_PATH)) throw new Error(`Runner not found: ${RUNNER_PATH}`);
   const resolvedPythonBin = resolvePythonBin(pythonBin);
   const executorProbe = await probeExecutor(EXECUTOR_URL);
   if (!executorProbe.ok) {
@@ -551,7 +552,7 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
   }
 
   const args = [
-    runnerPath,
+    RUNNER_PATH,
     "--dataset-cid",
     String(dataset.encryptedUri),
     "--script-cid",
@@ -628,17 +629,16 @@ function readJsonIfExists(filePath) {
 }
 
 function listExecutions() {
-  const root = path.resolve(__dirname, "..", "..", "executor", "executions");
-  if (!fs.existsSync(root)) return [];
+  if (!fs.existsSync(EXECUTIONS_ROOT)) return [];
 
   const dirs = fs
-    .readdirSync(root, { withFileTypes: true })
+    .readdirSync(EXECUTIONS_ROOT, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => d.name)
     .sort((a, b) => b.localeCompare(a));
 
   return dirs.map((id) => {
-    const dir = path.join(root, id);
+    const dir = path.join(EXECUTIONS_ROOT, id);
     const metadata = readJsonIfExists(path.join(dir, "metadata.json"));
     return {
       executionId: id,
@@ -650,8 +650,7 @@ function listExecutions() {
 }
 
 function getExecutionById(executionId) {
-  const root = path.resolve(__dirname, "..", "..", "executor", "executions");
-  const dir = path.join(root, executionId);
+  const dir = path.join(EXECUTIONS_ROOT, executionId);
   if (!fs.existsSync(dir)) {
     throw new Error(`Execution not found: ${executionId}`);
   }

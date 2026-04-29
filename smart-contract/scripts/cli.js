@@ -302,10 +302,6 @@ async function runFromCids(rl) {
 
   const runnerPath = path.resolve(
     __dirname,
-    "..",
-    "..",
-    "executor",
-    "ipfs_executor",
     "run_from_cids.py",
   );
   if (!fs.existsSync(runnerPath)) {
