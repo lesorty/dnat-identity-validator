@@ -15,4 +15,10 @@ services:
       - ../vm_runtime/start-executor.sh:/app/start-executor.sh
       - ../vm_runtime/vm:/app/vm
       - ../vm_runtime/rootfs:/app/rootfs
+    networks:
+      - dnat-runtime
     restart: unless-stopped
+
+networks:
+  dnat-runtime:
+    name: dnat-runtime

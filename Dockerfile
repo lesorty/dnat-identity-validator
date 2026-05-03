@@ -7,7 +7,7 @@ ENV IPFS_PATH=/data/ipfs
 ENV RPC_URL=http://127.0.0.1:8545
 ENV IPFS_API_URL=http://127.0.0.1:5001
 ENV WEB_PORT=3001
-ENV EXECUTOR_URL=http://host.docker.internal:5000
+ENV EXECUTOR_URL=http://dnat-executor:5000
 ENV PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
 RUN apt-get update \

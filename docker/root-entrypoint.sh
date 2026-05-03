@@ -5,7 +5,7 @@ IPFS_PATH="${IPFS_PATH:-/data/ipfs}"
 RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
 IPFS_API_URL="${IPFS_API_URL:-http://127.0.0.1:5001}"
 WEB_PORT="${WEB_PORT:-3001}"
-EXECUTOR_URL="${EXECUTOR_URL:-http://host.docker.internal:5000}"
+EXECUTOR_URL="${EXECUTOR_URL:-http://dnat-executor:5000}"
 PRIVATE_KEY="${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}"
 
 cleanup() {

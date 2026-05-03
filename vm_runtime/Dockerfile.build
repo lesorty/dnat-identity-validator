@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for DNAT VM Runtime
 # Stage 1: Base system with all build dependencies
-FROM ubuntu:24.04 AS builder
+FROM ubuntu:24.04 AS build-base
 
 ARG FC_VERSION=1.7.0
 ARG UBUNTU_RELEASE=jammy
@@ -40,20 +40,48 @@ RUN mkdir -p /tmp/fc-download && \
     rm -rf /tmp/fc-download && \
     firecracker --version
 
-# Layer 4: Runtime files and build context
+# Stage 2: Build kernel in an isolated cacheable layer
+FROM build-base AS kernel-builder
+
+WORKDIR /app
+RUN mkdir -p /app/build /app/artifacts
+
+COPY build/build-kernel.sh /app/build/build-kernel.sh
+
+RUN chmod +x /app/build/build-kernel.sh && \
+    echo "Building Linux kernel..." && \
+    bash /app/build/build-kernel.sh && \
+    ls -lh /app/artifacts/vmlinux
+
+# Stage 3: Build rootfs in its own cacheable layer
+FROM build-base AS rootfs-builder
+
+WORKDIR /app
+RUN mkdir -p /app/build /app/rootfs /app/artifacts
+
+COPY build/build-rootfs.sh /app/build/build-rootfs.sh
+COPY rootfs/init /app/rootfs/init
+COPY rootfs/runner /app/rootfs/runner
+
+RUN chmod +x /app/build/build-rootfs.sh /app/rootfs/init /app/rootfs/runner && \
+    echo "Building Ubuntu rootfs..." && \
+    bash /app/build/build-rootfs.sh && \
+    ls -lh /app/artifacts/
+
+# Stage 4: Assemble runtime files without forcing kernel/rootfs rebuilds
+FROM build-base AS builder
+
 WORKDIR /app
 COPY . .
 
 RUN chmod +x build/*.sh vm/*.sh rootfs/* start-executor.sh 2>/dev/null || true && \
     mkdir -p /app/artifacts /app/input /app/output
 
-# Layer 5: Build kernel and rootfs
-RUN echo "🔨 Building Linux kernel..." && \
-    bash /app/build/build-kernel.sh && \
-    echo "📦 Building Ubuntu rootfs..." && \
-    bash /app/build/build-rootfs.sh && \
-    echo "✅ Build complete!" && \
-    ls -lh /app/artifacts/
+COPY --from=kernel-builder /app/artifacts/vmlinux /app/artifacts/vmlinux
+COPY --from=rootfs-builder /app/artifacts/rootfs.ext4 /app/artifacts/rootfs.ext4
+COPY --from=rootfs-builder /app/artifacts/rootfs.tar.gz /app/artifacts/rootfs.tar.gz
+
+RUN echo "Assembled runtime artifacts:" && ls -lh /app/artifacts/
 
 # Final stage: Small runtime image
 FROM ubuntu:24.04 AS runtime
@@ -72,8 +100,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy Firecracker from builder
-COPY --from=builder /usr/local/bin/firecracker /usr/local/bin/firecracker
+# Copy Firecracker from build base
+COPY --from=build-base /usr/local/bin/firecracker /usr/local/bin/firecracker
 
 # Copy application and built artifacts
 COPY --from=builder /app /app

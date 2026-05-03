@@ -118,7 +118,7 @@ def submit_bundle(executor_url: str, bundle_path: pathlib.Path) -> dict:
         method="POST",
         headers={"Content-Type": "application/gzip"},
     )
-    with urlopen(request, timeout=330) as response:  # nosec B310 - trusted executor URL in this project
+    with urlopen(request, timeout=750) as response:  # nosec B310 - trusted executor URL in this project
         raw = response.read().decode("utf-8")
     return json.loads(raw)
 

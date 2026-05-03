@@ -22,8 +22,11 @@ scripts/config --enable VIRTIO
 scripts/config --enable VIRTIO_MMIO
 scripts/config --enable VIRTIO_MMIO_CMDLINE_DEVICES
 scripts/config --enable VIRTIO_BLK
-scripts/config --enable VIRTIO_CONSOLE
-scripts/config --enable VIRTIO_NET
+scripts/config --disable VIRTIO_CONSOLE
+scripts/config --disable VIRTIO_NET
+scripts/config --disable NET
+scripts/config --disable INET
+scripts/config --disable IPV6
 scripts/config --enable DEVTMPFS
 scripts/config --enable DEVTMPFS_MOUNT
 scripts/config --enable BLK_DEV

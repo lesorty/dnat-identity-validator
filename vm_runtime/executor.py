@@ -42,13 +42,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
         try:
             # Execute VM
             result = subprocess.run(
-                ["bash", str(Path(__file__).parent / "vm" / "run-vm.sh"), bundle_path, "8888"],
+                ["bash", str(Path(__file__).parent / "vm" / "run-vm.sh"), bundle_path],
                 capture_output=True,
                 text=True,
-                timeout=300,
+                timeout=720,
             )
             
-            # Parse result (should be JSON from runner)
+            # Parse persisted result recovered by the host after the microVM shuts down.
             try:
                 output = json.loads(result.stdout)
             except json.JSONDecodeError:

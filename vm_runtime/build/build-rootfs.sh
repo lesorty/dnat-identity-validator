@@ -23,7 +23,7 @@ if ! sudo chroot "$ROOTFS" apt-get update; then
     sudo chroot "$ROOTFS" apt-get update
 fi
 
-sudo chroot "$ROOTFS" apt-get install -y python3 curl tar gzip
+sudo chroot "$ROOTFS" apt-get install -y python3 tar gzip busybox-static
 
 sudo cp "$(dirname "$0")/../rootfs/init" "$ROOTFS/init"
 sudo cp "$(dirname "$0")/../rootfs/runner" "$ROOTFS/runner"
