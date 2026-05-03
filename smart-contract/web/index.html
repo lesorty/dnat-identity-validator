@@ -489,6 +489,7 @@
 
         async function executeAction() {
           setLoading(true);
+          setResult(null);
           try {
             if (isMissingRequiredFile()) {
               setResult({ error: "Select a file before executing this action." });
