@@ -142,6 +142,43 @@ def build_wheels(
     subprocess.run(command, check=True)
 
 
+def clear_directory_contents(target_dir: Path) -> None:
+    if not target_dir.exists():
+        return
+
+    for child in target_dir.iterdir():
+        if child.is_dir():
+            shutil.rmtree(child)
+        else:
+            child.unlink()
+
+
+def pip_install(
+    target_dir: Path,
+    dependencies: list[str],
+    *,
+    find_links: list[Path],
+    no_index: bool,
+) -> None:
+    command = [
+        "python3",
+        "-m",
+        "pip",
+        "install",
+        "--disable-pip-version-check",
+        "--no-cache-dir",
+        "--target",
+        str(target_dir),
+    ]
+    if no_index:
+        command.append("--no-index")
+    for link_dir in find_links:
+        if link_dir.is_dir():
+            command.extend(["--find-links", str(link_dir)])
+    command.extend(dependencies)
+    subprocess.run(command, check=True)
+
+
 def install_python_dependencies(
     target_dir: Path,
     dependencies: list[str],
@@ -153,29 +190,39 @@ def install_python_dependencies(
         return
 
     target_dir.mkdir(parents=True, exist_ok=True)
+
+    # Fast path: if the cache already has a complete wheel set, install
+    # directly from it and skip rebuilding wheelhouse contents.
+    if wheel_cache_dir is not None and wheel_cache_dir.is_dir():
+        try:
+            pip_install(
+                target_dir,
+                dependencies,
+                find_links=[wheel_cache_dir],
+                no_index=True,
+            )
+            return
+        except subprocess.CalledProcessError:
+            clear_directory_contents(target_dir)
+
     build_wheels(
         dependencies,
         wheel_cache_dir=wheel_cache_dir,
         output_wheelhouse_dir=output_wheelhouse_dir,
     )
 
-    command = [
-        "python3",
-        "-m",
-        "pip",
-        "install",
-        "--disable-pip-version-check",
-        "--no-cache-dir",
-        "--target",
-        str(target_dir),
-        "--no-index",
-    ]
-    if output_wheelhouse_dir is not None and output_wheelhouse_dir.is_dir():
-        command.extend(["--find-links", str(output_wheelhouse_dir)])
-    if wheel_cache_dir is not None and wheel_cache_dir.is_dir():
-        command.extend(["--find-links", str(wheel_cache_dir)])
-    command.extend(dependencies)
-    subprocess.run(command, check=True)
+    link_dirs: list[Path] = []
+    if output_wheelhouse_dir is not None:
+        link_dirs.append(output_wheelhouse_dir)
+    if wheel_cache_dir is not None:
+        link_dirs.append(wheel_cache_dir)
+
+    pip_install(
+        target_dir,
+        dependencies,
+        find_links=link_dirs,
+        no_index=True,
+    )
 
 
 def freeze_installed_dependencies(target_dir: Path) -> str:
