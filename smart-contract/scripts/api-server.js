@@ -629,7 +629,7 @@ async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
       let parsedError = null;
       try {
         const parsed = JSON.parse(raw);
-        parsedError = parsed.error || raw;
+        parsedError = parsed.error ? `${parsed.error}${parsed.stderr ? ` | stderr: ${parsed.stderr}` : ""}` : raw;
       } catch {
         parsedError = raw;
       }
