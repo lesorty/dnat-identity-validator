@@ -13,6 +13,8 @@ RESULT_FILE="result.json"
 RESULT_STDOUT_FILE="stdout.txt"
 RESULT_STDERR_FILE="stderr.txt"
 EXECUTION_COMPLETE_MARKER="EXECUTION_COMPLETE"
+EXECUTION_COMPLETE_PREFIX="EXECUTION_COMPLE"
+GUEST_HALTED_MARKER="System halted"
 VM_TIMEOUT_SECONDS="${VM_TIMEOUT_SECONDS:-660}"
 SHUTDOWN_GRACE_SECONDS="${SHUTDOWN_GRACE_SECONDS:-20}"
 
@@ -165,7 +167,9 @@ fc_put "actions" '{"action_type": "InstanceStart"}'
 
 execution_complete=0
 for ((i=0; i<VM_TIMEOUT_SECONDS; i++)); do
-    if grep -q "$EXECUTION_COMPLETE_MARKER" "$SERIAL_LOG" 2>/dev/null; then
+    if grep -q "$EXECUTION_COMPLETE_MARKER" "$SERIAL_LOG" 2>/dev/null || \
+       grep -q "$EXECUTION_COMPLETE_PREFIX" "$SERIAL_LOG" 2>/dev/null || \
+       grep -q "$GUEST_HALTED_MARKER" "$SERIAL_LOG" 2>/dev/null; then
         execution_complete=1
         break
     fi
