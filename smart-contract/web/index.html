@@ -57,12 +57,25 @@
         gap: 10px;
       }
       label { font-size: 13px; color: var(--muted); font-weight: 700; }
-      input, select, button {
+      input, select, textarea, button {
         width: 100%;
         font: inherit;
         padding: 10px;
         border-radius: 9px;
         border: 1px solid #bdd0db;
+      }
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      .field-span-2 {
+        grid-column: 1 / -1;
+      }
+      .field-help {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
       }
       .checkbox {
         display: flex;
@@ -248,8 +261,6 @@
             { name: "manifest.description", label: "Description", type: "text", defaultValue: "Dataset description" },
             { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
             { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
-            { name: "manifest.framework", label: "Framework", type: "text", defaultValue: "" },
-            { name: "manifest.dependencies", label: "Dependencies (comma-separated or JSON array)", type: "text", defaultValue: "" },
           ],
         },
         {
@@ -263,8 +274,15 @@
             { name: "manifest.description", label: "Description", type: "text", defaultValue: "Application description" },
             { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
             { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
-            { name: "manifest.framework", label: "Framework", type: "text", defaultValue: "" },
-            { name: "manifest.dependencies", label: "Dependencies (comma-separated or JSON array)", type: "text", defaultValue: "" },
+            {
+              name: "manifest.dependencies",
+              label: "Dependencies",
+              type: "textarea",
+              defaultValue: "",
+              fullWidth: true,
+              placeholder: "One dependency per line\nrequests==2.32.3\npandas>=2,<3",
+              help: "Use one dependency per line. Without a version, the builder first tries the newest version already present in the wheel cache; otherwise it resolves normally. You can also use a comma-separated list or a JSON array.",
+            },
           ],
         },
         { key: "get-asset", label: "3) Get Asset", method: "POST", fields: [{ name: "assetId", label: "Asset ID", type: "text", defaultValue: "" }] },
@@ -323,8 +341,15 @@
             { name: "manifest.description", label: "Description", type: "text", defaultValue: "" },
             { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
             { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
-            { name: "manifest.framework", label: "Framework", type: "text", defaultValue: "" },
-            { name: "manifest.dependencies", label: "Dependencies (comma-separated or JSON array)", type: "text", defaultValue: "" },
+            {
+              name: "manifest.dependencies",
+              label: "Dependencies",
+              type: "textarea",
+              defaultValue: "",
+              fullWidth: true,
+              placeholder: "One dependency per line\nrequests==2.32.3\npandas>=2,<3",
+              help: "Use one dependency per line. Without a version, the builder first tries the newest version already present in the wheel cache; otherwise it resolves normally. You can also use a comma-separated list or a JSON array.",
+            },
           ],
         },
       ];
@@ -348,6 +373,10 @@
 
       function actionUsesFileUpload(action) {
         return (action.fields || []).some((field) => field.type === "file");
+      }
+
+      function actionUsesManifest(action) {
+        return (action.fields || []).some((field) => field.name.startsWith("manifest."));
       }
 
       function actionUsesAssetPairSelector(actionKey) {
@@ -435,6 +464,10 @@
             if (field.type === "file") continue;
             setByPath(payload, field.name, fieldValues[field.name]);
           }
+          if (actionUsesManifest(selected)) {
+            if (!payload.manifest || typeof payload.manifest !== "object") payload.manifest = {};
+            if (payload.manifest.framework === undefined) payload.manifest.framework = "";
+          }
           return payload;
         }
 
@@ -447,6 +480,9 @@
               continue;
             }
             formData.append(field.name, fieldValues[field.name] ?? "");
+          }
+          if (actionUsesManifest(selected)) {
+            formData.append("manifest.framework", "");
           }
           return formData;
         }
@@ -702,7 +738,7 @@
               {selected.fields.length > 0 && (
                 <div className="fields">
                   {selected.fields.map((field) => (
-                    <div key={field.name}>
+                    <div key={field.name} className={field.fullWidth ? "field-span-2" : ""}>
                       <label>{field.label}</label>
                       {field.type === "checkbox" ? (
                         <div className="checkbox">
@@ -726,9 +762,19 @@
                             />
                           </label>
                         </div>
+                      ) : field.type === "textarea" ? (
+                        <div>
+                          <textarea
+                            value={fieldValues[field.name] ?? ""}
+                            placeholder={field.placeholder || ""}
+                            onChange={(e) => updateField(field.name, e.target.value)}
+                          />
+                          {field.help && <div className="field-help">{field.help}</div>}
+                        </div>
                       ) : (
                         <input
                           type="text"
+                          placeholder={field.placeholder || ""}
                           value={fieldValues[field.name] ?? ""}
                           onChange={(e) => updateField(field.name, e.target.value)}
                         />

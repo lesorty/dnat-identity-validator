@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const zlib = require("node:zlib");
 const { spawn } = require("node:child_process");
 
 const RPC_URL = process.env.RPC_URL || "http://127.0.0.1:8545";
@@ -21,6 +22,7 @@ const RUNNER_PATH = path.resolve(__dirname, "run_from_cids.py");
 const BUILDER_URL = process.env.BUILDER_URL || "http://dnat-builder:5100";
 const ASSET_ENCRYPTION_KEY = process.env.ASSET_ENCRYPTION_KEY || "dnat-dev-asset-key";
 const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
+const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
 const WHEEL_CACHE_DIR = path.resolve(process.env.WHEEL_CACHE_DIR || path.resolve(__dirname, "..", "wheel-cache"));
 const WHEEL_CACHE_MAX_BYTES = Number(process.env.WHEEL_CACHE_MAX_BYTES || String(2 * 1024 * 1024 * 1024));
 const WHEEL_CACHE_MAX_FILE_BYTES = Number(process.env.WHEEL_CACHE_MAX_FILE_BYTES || String(250 * 1024 * 1024));
@@ -182,28 +184,44 @@ function deriveAssetEncryptionKey() {
 }
 
 function encryptBuffer(buffer, metadata = {}) {
+  const compressed = zlib.gzipSync(buffer, { level: 9 });
   const iv = crypto.randomBytes(12);
   const key = deriveAssetEncryptionKey();
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-  const ciphertext = Buffer.concat([cipher.update(buffer), cipher.final()]);
+  const ciphertext = Buffer.concat([cipher.update(compressed), cipher.final()]);
   const tag = cipher.getAuthTag();
-
-  return Buffer.from(
+  const header = Buffer.from(
     JSON.stringify({
-      version: 1,
+      version: 2,
       format: APP_ARTIFACT_FORMAT,
       cipher: "aes-256-gcm",
       iv: iv.toString("base64"),
       tag: tag.toString("base64"),
-      ciphertext: ciphertext.toString("base64"),
+      compression: "gzip",
       metadata,
     }),
     "utf8",
   );
+  const headerLength = Buffer.alloc(4);
+  headerLength.writeUInt32BE(header.length, 0);
+  return Buffer.concat([APP_ARTIFACT_ENVELOPE_MAGIC, headerLength, header, ciphertext]);
 }
 
 function decryptBufferEnvelope(buffer) {
-  const parsed = JSON.parse(buffer.toString("utf8"));
+  let parsed;
+  let ciphertext;
+
+  if (buffer.subarray(0, APP_ARTIFACT_ENVELOPE_MAGIC.length).equals(APP_ARTIFACT_ENVELOPE_MAGIC)) {
+    const headerLength = buffer.readUInt32BE(APP_ARTIFACT_ENVELOPE_MAGIC.length);
+    const headerStart = APP_ARTIFACT_ENVELOPE_MAGIC.length + 4;
+    const headerEnd = headerStart + headerLength;
+    parsed = JSON.parse(buffer.subarray(headerStart, headerEnd).toString("utf8"));
+    ciphertext = buffer.subarray(headerEnd);
+  } else {
+    parsed = JSON.parse(buffer.toString("utf8"));
+    ciphertext = Buffer.from(parsed.ciphertext, "base64");
+  }
+
   if (parsed.format !== APP_ARTIFACT_FORMAT) {
     throw new Error(`Unsupported application artifact format: ${parsed.format || "unknown"}`);
   }
@@ -213,11 +231,11 @@ function decryptBufferEnvelope(buffer) {
 
   const iv = Buffer.from(parsed.iv, "base64");
   const tag = Buffer.from(parsed.tag, "base64");
-  const ciphertext = Buffer.from(parsed.ciphertext, "base64");
   const key = deriveAssetEncryptionKey();
   const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
   decipher.setAuthTag(tag);
-  const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  const plaintext = parsed.compression === "gzip" ? zlib.gunzipSync(decrypted) : decrypted;
   return {
     plaintext,
     metadata: parsed.metadata || {},

@@ -9,6 +9,10 @@ import sys
 import tempfile
 from pathlib import Path
 
+from packaging.requirements import InvalidRequirement, Requirement
+from packaging.utils import canonicalize_name, parse_wheel_filename
+from packaging.version import Version
+
 MIN_IMAGE_BYTES = 16 * 1024 * 1024
 EXTRA_IMAGE_BYTES = 8 * 1024 * 1024
 IMAGE_HEADROOM_FACTOR = 4
@@ -58,6 +62,57 @@ def parse_dependencies(raw_dependencies: str) -> list[str]:
             return candidates
 
     return lines
+
+
+def latest_cached_versions_by_package(wheel_cache_dir: Path | None) -> dict[str, Version]:
+    if wheel_cache_dir is None or not wheel_cache_dir.is_dir():
+        return {}
+
+    latest: dict[str, Version] = {}
+    for entry in wheel_cache_dir.iterdir():
+        if not entry.is_file() or entry.suffix != ".whl":
+            continue
+        try:
+            name, version, _, _ = parse_wheel_filename(entry.name)
+        except Exception:  # noqa: BLE001 - skip malformed cache entries
+            continue
+        current = latest.get(name)
+        if current is None or version > current:
+            latest[name] = version
+    return latest
+
+
+def pin_unversioned_dependencies_from_cache(
+    dependencies: list[str],
+    wheel_cache_dir: Path | None,
+) -> list[str]:
+    if not dependencies:
+        return []
+
+    latest_cached = latest_cached_versions_by_package(wheel_cache_dir)
+    resolved: list[str] = []
+
+    for raw_dependency in dependencies:
+        try:
+            requirement = Requirement(raw_dependency)
+        except InvalidRequirement:
+            resolved.append(raw_dependency)
+            continue
+
+        if requirement.url or str(requirement.specifier):
+            resolved.append(raw_dependency)
+            continue
+
+        cached_version = latest_cached.get(canonicalize_name(requirement.name))
+        if cached_version is None:
+            resolved.append(raw_dependency)
+            continue
+
+        extras = f"[{','.join(sorted(requirement.extras))}]" if requirement.extras else ""
+        marker = f"; {requirement.marker}" if requirement.marker else ""
+        resolved.append(f"{requirement.name}{extras}=={cached_version}{marker}")
+
+    return resolved
 
 
 def build_wheels(
@@ -159,6 +214,7 @@ def main() -> int:
     dependencies = parse_dependencies(args.dependencies)
     wheel_cache_dir = Path(args.wheel_cache_dir).resolve() if args.wheel_cache_dir else None
     output_wheelhouse_dir = Path(args.output_wheelhouse_dir).resolve() if args.output_wheelhouse_dir else None
+    resolved_dependencies = pin_unversioned_dependencies_from_cache(dependencies, wheel_cache_dir)
     output_image.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(prefix="dnat-app-artifact-") as temp_dir:
@@ -170,7 +226,7 @@ def main() -> int:
         (root_dir / "dnat-application.marker").write_text("dnat-application\n", encoding="utf-8")
         install_python_dependencies(
             app_dir / SITE_PACKAGES_DIRNAME,
-            dependencies,
+            resolved_dependencies,
             wheel_cache_dir=wheel_cache_dir,
             output_wheelhouse_dir=output_wheelhouse_dir,
         )
@@ -179,14 +235,17 @@ def main() -> int:
             "title": args.title,
             "description": args.description,
             "framework": args.framework,
-            "dependencies": dependencies,
+            "dependencies": resolved_dependencies,
+            "requestedDependencies": dependencies,
             "entrypoint": "/app/application.py",
             "pythonVersion": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
             "sourceFileName": source_file.name,
         }
         (app_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-        if dependencies:
-            (app_dir / "requirements.lock.txt").write_text("\n".join(dependencies) + "\n", encoding="utf-8")
+        if resolved_dependencies:
+            (app_dir / "requirements.lock.txt").write_text("\n".join(resolved_dependencies) + "\n", encoding="utf-8")
+            if dependencies != resolved_dependencies:
+                (app_dir / "requirements.requested.txt").write_text("\n".join(dependencies) + "\n", encoding="utf-8")
             frozen = freeze_installed_dependencies(app_dir / SITE_PACKAGES_DIRNAME)
             if frozen:
                 (app_dir / "requirements.installed.txt").write_text(frozen + "\n", encoding="utf-8")
