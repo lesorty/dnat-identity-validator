@@ -1,0 +1,101 @@
+FROM ubuntu:24.04 AS build-base
+
+ARG FC_VERSION=1.7.0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    wget \
+    git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3 \
+    sudo \
+    debootstrap \
+    qemu-utils \
+    flex \
+    bison \
+    libncurses-dev \
+    libssl-dev \
+    bc \
+    libelf-dev \
+    libdw-dev \
+    pkg-config \
+    libpython3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /tmp/fc-download && \
+    cd /tmp/fc-download && \
+    curl -sL https://github.com/firecracker-microvm/firecracker/releases/download/v${FC_VERSION}/firecracker-v${FC_VERSION}-x86_64.tgz | tar -xz && \
+    mv release-v${FC_VERSION}-x86_64/firecracker-v${FC_VERSION}-x86_64 /usr/local/bin/firecracker && \
+    chmod +x /usr/local/bin/firecracker && \
+    rm -rf /tmp/fc-download && \
+    firecracker --version
+
+FROM build-base AS kernel-builder
+
+WORKDIR /app
+RUN mkdir -p /app/build /app/artifacts
+
+COPY build_vm_runtime/build/build-kernel.sh /app/build/build-kernel.sh
+
+RUN chmod +x /app/build/build-kernel.sh && \
+    bash /app/build/build-kernel.sh
+
+FROM build-base AS rootfs-builder
+
+WORKDIR /app
+RUN mkdir -p /app/build /app/rootfs /app/artifacts /app/smart-contract/scripts
+
+COPY build_vm_runtime/build/build-rootfs.sh /app/build/build-rootfs.sh
+COPY build_vm_runtime/rootfs/init /app/rootfs/init
+COPY build_vm_runtime/rootfs/runner /app/rootfs/runner
+COPY smart-contract/scripts/build_application_artifact.py /app/smart-contract/scripts/build_application_artifact.py
+
+RUN chmod +x /app/build/build-rootfs.sh /app/rootfs/init /app/rootfs/runner /app/smart-contract/scripts/build_application_artifact.py && \
+    bash /app/build/build-rootfs.sh
+
+FROM build-base AS builder
+
+WORKDIR /app
+COPY build_vm_runtime /app
+COPY smart-contract/scripts/build_application_artifact.py /app/guest-tools/build_application_artifact.py
+
+RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py && \
+    mkdir -p /app/artifacts /app/input
+
+COPY --from=kernel-builder /app/artifacts/vmlinux /app/artifacts/vmlinux
+COPY --from=rootfs-builder /app/artifacts/rootfs.ext4 /app/artifacts/rootfs.ext4
+COPY --from=rootfs-builder /app/artifacts/rootfs.tar.gz /app/artifacts/rootfs.tar.gz
+
+FROM ubuntu:24.04 AS runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    curl \
+    qemu-utils \
+    e2fsprogs \
+    tar \
+    gzip \
+    sudo \
+    ca-certificates \
+    iproute2 \
+    iptables && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=build-base /usr/local/bin/firecracker /usr/local/bin/firecracker
+COPY --from=builder /app /app
+
+WORKDIR /app
+
+RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py
+
+ENV PATH="/usr/local/bin:$PATH"
+ENV WHEEL_CACHE_SOURCE_DIR=/var/dnat/wheel-cache
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl --fail --silent http://127.0.0.1:5100/health >/dev/null || exit 1
+
+CMD ["bash", "start-builder.sh"]

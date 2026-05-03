@@ -115,6 +115,10 @@ cd /tmp/exec/workspace
 APP="/mnt/dnat-app/app/application.py"
 test -f "$APP"
 
+if [ -d /mnt/dnat-app/app/site-packages ]; then
+    export PYTHONPATH="/mnt/dnat-app/app/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+fi
+
 attempt_1_stdout="$(mktemp)"
 attempt_1_stderr="$(mktemp)"
 attempt_2_stdout="$(mktemp)"

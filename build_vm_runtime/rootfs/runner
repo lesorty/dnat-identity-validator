@@ -1,0 +1,183 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+WORKDIR = "/tmp/build-exec"
+INPUT_DISKS = ["/dev/vdb", "/dev/vdc", "/dev/vdd", "/dev/vde"]
+OUTPUT_MARKER = "dnat-build-output.marker"
+WHEEL_CACHE_MARKER = "dnat-wheel-cache.marker"
+BUILD_RESULT_PATH = "build-result.json"
+BUILD_STDOUT_PATH = "build-stdout.txt"
+BUILD_STDERR_PATH = "build-stderr.txt"
+APPLICATION_ARTIFACT_NAME = "application.ext4"
+COMPLETE_MARKER = "BUILD_COMPLETE"
+HOST_IP = "172.31.0.1"
+GUEST_CIDR = "172.31.0.2/30"
+
+
+def safe_mount(device: str, mount_dir: str) -> bool:
+    result = subprocess.run(
+        ["mount", device, mount_dir],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
+
+
+def write_serial(message: str) -> None:
+    try:
+        with open("/dev/ttyS0", "a", encoding="utf-8", errors="ignore") as serial:
+            serial.write(f"{message}\n")
+            serial.flush()
+    except OSError:
+        pass
+
+
+def configure_network() -> None:
+    if not Path("/sys/class/net/eth0").exists():
+        return
+
+    subprocess.run(["ip", "link", "set", "lo", "up"], check=False)
+    subprocess.run(["ip", "addr", "flush", "dev", "eth0"], check=False)
+    subprocess.run(["ip", "addr", "add", GUEST_CIDR, "dev", "eth0"], check=True)
+    subprocess.run(["ip", "link", "set", "eth0", "up"], check=True)
+    subprocess.run(["ip", "route", "replace", "default", "via", HOST_IP], check=True)
+    Path("/etc/resolv.conf").write_text("nameserver 1.1.1.1\nnameserver 8.8.8.8\n", encoding="utf-8")
+
+
+def discover_mounts() -> tuple[str | None, str | None, str | None]:
+    mounted: dict[str, str] = {}
+
+    for _ in range(30):
+        bundle_path = None
+        output_dir = None
+        wheel_cache_dir = None
+
+        for disk in INPUT_DISKS:
+            if not os.path.exists(disk):
+                continue
+
+            mount_dir = mounted.get(disk)
+            if mount_dir is None:
+                mount_dir = f"/mnt/{os.path.basename(disk)}"
+                os.makedirs(mount_dir, exist_ok=True)
+                if not safe_mount(disk, mount_dir):
+                    continue
+                mounted[disk] = mount_dir
+
+            candidate_bundle = os.path.join(mount_dir, "bundle.tar.gz")
+            if bundle_path is None and os.path.isfile(candidate_bundle):
+                bundle_path = candidate_bundle
+
+            if output_dir is None and os.path.isfile(os.path.join(mount_dir, OUTPUT_MARKER)):
+                output_dir = mount_dir
+
+            if wheel_cache_dir is None and os.path.isfile(os.path.join(mount_dir, WHEEL_CACHE_MARKER)):
+                wheel_cache_dir = mount_dir
+
+        if bundle_path and output_dir:
+            return bundle_path, output_dir, wheel_cache_dir
+
+        time.sleep(1)
+
+    return None, None, None
+
+
+def persist_output(output_dir: str | None, payload: dict, stdout: str = "", stderr: str = "") -> None:
+    if not output_dir:
+        return
+
+    out = Path(output_dir)
+    (out / BUILD_RESULT_PATH).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    (out / BUILD_STDOUT_PATH).write_text(stdout or "", encoding="utf-8")
+    (out / BUILD_STDERR_PATH).write_text(stderr or "", encoding="utf-8")
+    subprocess.run(["sync"], check=False)
+
+
+def main() -> int:
+    os.makedirs(WORKDIR, exist_ok=True)
+    os.chdir(WORKDIR)
+    configure_network()
+
+    bundle_path, output_dir, wheel_cache_dir = discover_mounts()
+    payload: dict
+    stdout = ""
+    stderr = ""
+
+    try:
+        if not bundle_path or not os.path.isfile(bundle_path):
+            raise RuntimeError("Build bundle disk not found")
+        if not output_dir:
+            raise RuntimeError("Build output disk not found")
+
+        shutil.copyfile(bundle_path, "bundle.tar.gz")
+        subprocess.run(["tar", "-xzf", "bundle.tar.gz"], check=True)
+
+        source_path = Path("source/application.py")
+        manifest_path = Path("manifest.json")
+        if not source_path.is_file():
+            raise RuntimeError("source/application.py missing from build bundle")
+        if not manifest_path.is_file():
+            raise RuntimeError("manifest.json missing from build bundle")
+
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        built_artifact = Path(WORKDIR) / APPLICATION_ARTIFACT_NAME
+        wheelhouse_dir = Path(output_dir) / "wheelhouse"
+        wheelhouse_dir.mkdir(parents=True, exist_ok=True)
+
+        command = [
+            "python3",
+            "/opt/dnat/build_application_artifact.py",
+            "--source-file",
+            str(source_path.resolve()),
+            "--output-image",
+            str(built_artifact),
+            "--title",
+            str(manifest.get("name", "")),
+            "--description",
+            str(manifest.get("description", "")),
+            "--framework",
+            str(manifest.get("framework", "python")),
+            "--dependencies",
+            json.dumps(manifest.get("dependencies", "")),
+            "--output-wheelhouse-dir",
+            str(wheelhouse_dir.resolve()),
+        ]
+        cache_wheels = Path(wheel_cache_dir) / "wheels" if wheel_cache_dir else None
+        if cache_wheels and cache_wheels.is_dir():
+            command.extend(["--wheel-cache-dir", str(cache_wheels.resolve())])
+
+        completed = subprocess.run(command, capture_output=True, text=True, check=False)
+        stdout = completed.stdout
+        stderr = completed.stderr
+        if completed.returncode != 0:
+            raise RuntimeError(f"artifact build failed with code {completed.returncode}")
+
+        shutil.move(str(built_artifact), str(Path(output_dir) / APPLICATION_ARTIFACT_NAME))
+        payload = {
+            "returncode": 0,
+            "sourceFileName": source_path.name,
+            "dependencies": manifest.get("dependencies", []),
+            "wheelCacheUsed": bool(cache_wheels and cache_wheels.is_dir()),
+        }
+
+    except Exception as exc:  # pylint: disable=broad-except
+        payload = {
+            "returncode": 1,
+            "error": str(exc),
+        }
+
+    persist_output(output_dir, payload, stdout, stderr)
+    write_serial(COMPLETE_MARKER)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

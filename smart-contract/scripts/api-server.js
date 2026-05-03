@@ -18,9 +18,12 @@ const EXECUTOR_URL = process.env.EXECUTOR_URL || "http://localhost:5000";
 const PORT = Number(process.env.WEB_PORT || "3001");
 const EXECUTIONS_ROOT = path.resolve(__dirname, "..", "executions");
 const RUNNER_PATH = path.resolve(__dirname, "run_from_cids.py");
-const APP_ARTIFACT_BUILDER_PATH = path.resolve(__dirname, "build_application_artifact.py");
+const BUILDER_URL = process.env.BUILDER_URL || "http://dnat-builder:5100";
 const ASSET_ENCRYPTION_KEY = process.env.ASSET_ENCRYPTION_KEY || "dnat-dev-asset-key";
 const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
+const WHEEL_CACHE_DIR = path.resolve(process.env.WHEEL_CACHE_DIR || path.resolve(__dirname, "..", "wheel-cache"));
+const WHEEL_CACHE_MAX_BYTES = Number(process.env.WHEEL_CACHE_MAX_BYTES || String(2 * 1024 * 1024 * 1024));
+const WHEEL_CACHE_MAX_FILE_BYTES = Number(process.env.WHEEL_CACHE_MAX_FILE_BYTES || String(250 * 1024 * 1024));
 
 const abi = [
   "function registerAsset(uint8 assetType, string title, string description, string encryptedUri, string manifestUri, bytes32 contentHash, uint256 price, bytes bloomFilter) returns (uint256)",
@@ -65,8 +68,45 @@ function normalizeExecutorUrl(rawUrl) {
   return `${normalizeExecutorBaseUrl(rawUrl)}/execute`;
 }
 
+function normalizeBuilderBaseUrl(rawUrl) {
+  const value = String(rawUrl || "").trim().replace(/\/+$/, "");
+  if (!value) {
+    throw new Error("Builder URL is required");
+  }
+  return value.endsWith("/build") ? value.slice(0, -"/build".length) : value;
+}
+
+function normalizeBuilderUrl(rawUrl) {
+  return `${normalizeBuilderBaseUrl(rawUrl)}/build`;
+}
+
 async function probeExecutor(executorUrl) {
   const baseUrl = normalizeExecutorBaseUrl(executorUrl);
+  const url = `${baseUrl}/health`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      signal: AbortSignal.timeout(3000),
+    });
+
+    return {
+      ok: true,
+      url,
+      status: response.status,
+      statusText: response.statusText,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      url,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+async function probeBuilder(builderUrl) {
+  const baseUrl = normalizeBuilderBaseUrl(builderUrl);
   const url = `${baseUrl}/health`;
 
   try {
@@ -208,6 +248,147 @@ function runCommand(command, args, options = {}) {
       resolve({ stdout, stderr });
     });
   });
+}
+
+function ensureWheelCacheDir() {
+  fs.mkdirSync(WHEEL_CACHE_DIR, { recursive: true });
+  return WHEEL_CACHE_DIR;
+}
+
+function parseManifestDependencies(rawDependencies) {
+  const rawValue = String(rawDependencies || "").trim();
+  if (!rawValue) return [];
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    if (Array.isArray(parsed)) {
+      return parsed.map((value) => String(value).trim()).filter(Boolean);
+    }
+  } catch {
+    // Fall through to line-based parsing.
+  }
+
+  const lines = rawValue
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"));
+  if (lines.length === 0) return [];
+
+  if (lines.length === 1 && lines[0].includes(",")) {
+    return lines[0]
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean);
+  }
+
+  return lines;
+}
+
+function computeBufferSha256Hex(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
+function validateWheelFilename(fileName) {
+  const base = path.basename(String(fileName || "").trim());
+  if (!base || base !== fileName) {
+    throw new Error(`Invalid wheel filename: ${fileName}`);
+  }
+  if (!base.endsWith(".whl")) {
+    throw new Error(`Only .whl files may enter the wheel cache: ${fileName}`);
+  }
+  if (base.includes("/") || base.includes("\\")) {
+    throw new Error(`Unsafe wheel filename: ${fileName}`);
+  }
+  return base;
+}
+
+function removeEmptyParentDirs(dirPath, stopAt) {
+  let current = dirPath;
+  const boundary = path.resolve(stopAt);
+  while (current.startsWith(boundary)) {
+    if (current === boundary) break;
+    if (fs.existsSync(current) && fs.readdirSync(current).length === 0) {
+      fs.rmdirSync(current);
+      current = path.dirname(current);
+      continue;
+    }
+    break;
+  }
+}
+
+function listCachedWheelEntries() {
+  ensureWheelCacheDir();
+  const entries = [];
+  const stack = [WHEEL_CACHE_DIR];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    for (const dirent of fs.readdirSync(current, { withFileTypes: true })) {
+      const fullPath = path.join(current, dirent.name);
+      if (dirent.isDirectory()) {
+        stack.push(fullPath);
+        continue;
+      }
+      if (!dirent.isFile() || !dirent.name.endsWith(".whl")) continue;
+      const stats = fs.statSync(fullPath);
+      entries.push({ path: fullPath, size: stats.size, mtimeMs: stats.mtimeMs });
+    }
+  }
+
+  return entries;
+}
+
+function pruneWheelCache() {
+  const entries = listCachedWheelEntries().sort((a, b) => a.mtimeMs - b.mtimeMs);
+  let totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
+
+  for (const entry of entries) {
+    if (totalBytes <= WHEEL_CACHE_MAX_BYTES) break;
+    fs.unlinkSync(entry.path);
+    totalBytes -= entry.size;
+    removeEmptyParentDirs(path.dirname(entry.path), WHEEL_CACHE_DIR);
+  }
+}
+
+function ingestBuiltWheelhouse(wheelhouseDir) {
+  if (!wheelhouseDir || !fs.existsSync(wheelhouseDir)) {
+    return [];
+  }
+
+  ensureWheelCacheDir();
+  const stored = [];
+  for (const dirent of fs.readdirSync(wheelhouseDir, { withFileTypes: true })) {
+    if (!dirent.isFile()) continue;
+
+    const wheelName = validateWheelFilename(dirent.name);
+    const sourcePath = path.join(wheelhouseDir, dirent.name);
+    const stats = fs.statSync(sourcePath);
+    if (stats.size > WHEEL_CACHE_MAX_FILE_BYTES) {
+      continue;
+    }
+
+    const data = fs.readFileSync(sourcePath);
+    const digest = computeBufferSha256Hex(data);
+    const targetPath = path.join(WHEEL_CACHE_DIR, wheelName);
+    if (fs.existsSync(targetPath)) {
+      const existingDigest = computeBufferSha256Hex(fs.readFileSync(targetPath));
+      if (existingDigest !== digest) {
+        continue;
+      }
+    }
+    if (!fs.existsSync(targetPath)) {
+      fs.writeFileSync(targetPath, data);
+    }
+    stored.push({
+      fileName: wheelName,
+      sha256: digest,
+      sizeBytes: stats.size,
+      cachePath: targetPath,
+    });
+  }
+
+  pruneWheelCache();
+  return stored;
 }
 
 async function downloadFromIpfsBytes(cidOrUri, ipfsApiUrl = IPFS_API_URL) {
@@ -387,36 +568,76 @@ function materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer })
 }
 
 async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
-  if (!fs.existsSync(APP_ARTIFACT_BUILDER_PATH)) {
-    throw new Error(`Application artifact builder not found: ${APP_ARTIFACT_BUILDER_PATH}`);
+  ensureWheelCacheDir();
+  const builderProbe = await probeBuilder(BUILDER_URL);
+  if (!builderProbe.ok) {
+    throw new Error(
+      `Builder unreachable at ${builderProbe.url}. ` +
+        `Verify the build service is running on the CVM1. ` +
+        `Probe error: ${builderProbe.error}`,
+    );
   }
 
-  const uploadsDir = path.join(__dirname, "..", "uploads");
-  fs.mkdirSync(uploadsDir, { recursive: true });
+  const dependencies = parseManifestDependencies(manifest.dependencies);
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-build-request-"));
+  const sourceDir = path.join(tempRoot, "source");
+  const requestBundlePath = path.join(tempRoot, "request.tar.gz");
+  const responseBundlePath = path.join(tempRoot, "response.tar.gz");
+  const responseDir = path.join(tempRoot, "response");
+  try {
+    fs.mkdirSync(sourceDir, { recursive: true });
+    fs.mkdirSync(responseDir, { recursive: true });
 
-  const artifactPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-application.ext4`);
-  await runCommand("python3", [
-    APP_ARTIFACT_BUILDER_PATH,
-    "--source-file",
-    sourceFilePath,
-    "--output-image",
-    artifactPath,
-    "--title",
-    String(manifest.name || ""),
-    "--description",
-    String(manifest.description || ""),
-    "--framework",
-    String(manifest.framework || "python"),
-    "--dependencies",
-    String(manifest.dependencies || ""),
-  ]);
+    const requestManifest = {
+      name: String(manifest.name || ""),
+      description: String(manifest.description || ""),
+      framework: String(manifest.framework || "python"),
+      dependencies,
+    };
+    fs.copyFileSync(sourceFilePath, path.join(sourceDir, "application.py"));
+    fs.writeFileSync(path.join(tempRoot, "manifest.json"), JSON.stringify(requestManifest, null, 2), "utf8");
 
-  return {
-    artifactPath,
-    cleanup: () => {
-      if (fs.existsSync(artifactPath)) fs.unlinkSync(artifactPath);
-    },
-  };
+    await runCommand("tar", ["-czf", requestBundlePath, "-C", tempRoot, "source", "manifest.json"]);
+
+    const response = await fetch(normalizeBuilderUrl(BUILDER_URL), {
+      method: "POST",
+      headers: { "Content-Type": "application/gzip" },
+      body: fs.readFileSync(requestBundlePath),
+      signal: AbortSignal.timeout(2_100_000),
+    });
+
+    if (!response.ok) {
+      const raw = await response.text();
+      let parsedError = null;
+      try {
+        const parsed = JSON.parse(raw);
+        parsedError = parsed.error || raw;
+      } catch {
+        parsedError = raw;
+      }
+      throw new Error(`Builder request failed (${response.status}): ${parsedError}`);
+    }
+
+    fs.writeFileSync(responseBundlePath, Buffer.from(await response.arrayBuffer()));
+    await runCommand("tar", ["-xzf", responseBundlePath, "-C", responseDir]);
+
+    const artifactPath = path.join(responseDir, "application.ext4");
+    if (!fs.existsSync(artifactPath)) {
+      throw new Error("Builder response did not contain application.ext4");
+    }
+
+    const cachedWheels = ingestBuiltWheelhouse(path.join(responseDir, "wheelhouse"));
+    return {
+      artifactPath,
+      cachedWheels,
+      cleanup: () => {
+        fs.rmSync(tempRoot, { recursive: true, force: true });
+      },
+    };
+  } catch (error) {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest = {} }) {
@@ -571,6 +792,7 @@ async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBu
 
       uploaded.assetType = APP_ARTIFACT_FORMAT;
       uploaded.plaintextArtifactContentHash = computeSha256Hex(builtArtifact.artifactPath);
+      uploaded.cachedWheels = builtArtifact.cachedWheels || [];
     } finally {
       uploadedInput.cleanup();
       builtArtifact?.cleanup?.();
@@ -880,10 +1102,12 @@ async function startServer() {
   app.get("/api/health", async (_req, res) => {
     const info = await showContractInfo();
     const executor = await probeExecutor(EXECUTOR_URL);
+    const builder = await probeBuilder(BUILDER_URL);
     res.json({
-      ok: executor.ok,
+      ok: executor.ok && builder.ok,
       info,
       executor,
+      builder,
     });
   });
 

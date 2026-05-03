@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 ARTIFACT="$(cd "$(dirname "$0")/.." && pwd)/artifacts/rootfs.ext4"
 ROOTFS_TARBALL="$(cd "$(dirname "$0")/.." && pwd)/artifacts/rootfs.tar.gz"
@@ -13,7 +13,7 @@ fi
 
 mkdir -p "$(dirname "$ARTIFACT")"
 rm -f "$ARTIFACT"
-ROOTFS=/tmp/firecracker-rootfs
+ROOTFS=/tmp/firecracker-build-rootfs
 rm -rf "$ROOTFS"
 
 sudo debootstrap --arch=amd64 --variant=minbase "$DEBIAN_RELEASE" "$ROOTFS" "$DEBIAN_MIRROR"
@@ -23,16 +23,35 @@ if ! sudo chroot "$ROOTFS" apt-get update; then
     sudo chroot "$ROOTFS" apt-get update
 fi
 
-sudo chroot "$ROOTFS" apt-get install -y python3 tar gzip busybox-static ca-certificates
+sudo chroot "$ROOTFS" apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    gcc \
+    g++ \
+    make \
+    pkg-config \
+    libffi-dev \
+    libssl-dev \
+    ca-certificates \
+    e2fsprogs \
+    iproute2 \
+    tar \
+    gzip \
+    curl \
+    busybox-static
 
+sudo mkdir -p "$ROOTFS/opt/dnat"
 sudo cp "$(dirname "$0")/../rootfs/init" "$ROOTFS/init"
 sudo cp "$(dirname "$0")/../rootfs/runner" "$ROOTFS/runner"
-sudo sed -i 's/\r$//' "$ROOTFS/init" "$ROOTFS/runner"
-sudo chmod +x "$ROOTFS/init" "$ROOTFS/runner"
+sudo cp "$(dirname "$0")/../smart-contract/scripts/build_application_artifact.py" "$ROOTFS/opt/dnat/build_application_artifact.py"
+sudo sed -i 's/\r$//' "$ROOTFS/init" "$ROOTFS/runner" "$ROOTFS/opt/dnat/build_application_artifact.py"
+sudo chmod +x "$ROOTFS/init" "$ROOTFS/runner" "$ROOTFS/opt/dnat/build_application_artifact.py"
 
 sudo tar -C "$ROOTFS" -czf "$ROOTFS_TARBALL" .
 
-dd if=/dev/zero of="$ARTIFACT" bs=1M count=512 2>/dev/null
+dd if=/dev/zero of="$ARTIFACT" bs=1M count=1536 2>/dev/null
 mkfs.ext4 "$ARTIFACT" >/dev/null 2>&1
 
 mount_dir=$(mktemp -d)
@@ -40,11 +59,9 @@ if sudo mount "$ARTIFACT" "$mount_dir" 2>/dev/null; then
     sudo cp -r "$ROOTFS"/* "$mount_dir/"
     sudo umount "$mount_dir"
     rmdir "$mount_dir"
-    echo "Filesystem created successfully"
 else
-    echo "Mount failed, keeping tar archive fallback..."
     rm -f "$ARTIFACT"
-    dd if=/dev/zero of="$ARTIFACT" bs=1M count=512 2>/dev/null
+    dd if=/dev/zero of="$ARTIFACT" bs=1M count=1536 2>/dev/null
     mkfs.ext4 "$ARTIFACT" >/dev/null 2>&1
     rmdir "$mount_dir"
 fi

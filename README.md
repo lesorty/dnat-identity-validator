@@ -11,13 +11,15 @@ Use [RUN_COMPOSE.md](RUN_COMPOSE.md) como fonte unica de execucao para:
 ## Estrutura
 
 - `docker/`: arquivos Compose ativos
+- `build_vm_runtime/`: builder isolado de aplicacoes na CVM1
 - `vm_runtime/`: executor baseado em microVM
 - `smart-contract/`: contrato, API e interface web
 
 ## Observacoes
 
 - O runner usado pela API para baixar assets do IPFS e enviar bundles ao `vm_runtime` agora fica em `smart-contract/scripts/run_from_cids.py`.
-- O registro de aplicacao agora gera um artefato `ext4` read-only, criptografa esse artefato na CVM1 e publica o blob criptografado no IPFS.
+- O registro de aplicacao agora passa por um builder Firecracker na CVM1, que gera `application.ext4`, retorna novas `.whl` para cache e so depois a CVM1 criptografa e publica o artefato no IPFS.
+- O cache de dependencias da CVM1 guarda apenas arquivos `.whl` em volume separado e nunca faz `pip install` no servico web.
 - A `microVM` do executor roda sem interface de rede e devolve o resultado via disco persistente anexado ao guest, que a VM hospedeira coleta apos o shutdown.
 - Resultados de execucao, uploads, manifests e artefatos locais ficam fora do versionamento.
 - A explicacao detalhada da arquitetura atual implementada e da arquitetura alvo aprovada fica em [ARCHITECTURE.md](ARCHITECTURE.md).
