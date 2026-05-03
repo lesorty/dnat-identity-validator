@@ -9,6 +9,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KERNEL="$ROOT/artifacts/vmlinux"
 ROOTFS="$ROOT/artifacts/rootfs.ext4"
 OUTPUT_MARKER="dnat-output.marker"
+APP_MARKER="dnat-application.marker"
 RESULT_FILE="result.json"
 RESULT_STDOUT_FILE="stdout.txt"
 RESULT_STDERR_FILE="stderr.txt"
@@ -121,13 +122,25 @@ trap cleanup EXIT
 OVERLAY="$WORKDIR/rootfs-overlay.ext4"
 INPUT_DISK="$WORKDIR/input.ext4"
 OUTPUT_DISK="$WORKDIR/output.ext4"
+APP_DISK="$WORKDIR/application.ext4"
 SOCKET="$WORKDIR/firecracker.socket"
 INPUT_MOUNT="$WORKDIR/input-mount"
 OUTPUT_MOUNT="$WORKDIR/output-mount"
 RESULT_MOUNT="$WORKDIR/result-mount"
+STAGING_DIR="$WORKDIR/staging"
+GUEST_BUNDLE_PATH="$WORKDIR/guest-bundle.tar.gz"
 SERIAL_LOG="$WORKDIR/serial.log"
 
 cp "$ROOTFS" "$OVERLAY"
+mkdir -p "$STAGING_DIR"
+tar -xzf "$BUNDLE_PATH" -C "$STAGING_DIR"
+[ -d "$STAGING_DIR/workspace" ] || { emit_error "workspace missing from execution bundle"; exit 1; }
+tar -C "$STAGING_DIR" -czf "$GUEST_BUNDLE_PATH" workspace
+
+if [ -f "$STAGING_DIR/artifacts/application.ext4" ]; then
+    cp "$STAGING_DIR/artifacts/application.ext4" "$APP_DISK"
+fi
+
 dd if=/dev/zero of="$INPUT_DISK" bs=1M count=64 >/dev/null 2>&1
 dd if=/dev/zero of="$OUTPUT_DISK" bs=1M count=64 >/dev/null 2>&1
 mkfs.ext4 -q "$INPUT_DISK" 2>/dev/null || true
@@ -136,7 +149,7 @@ mkfs.ext4 -q "$OUTPUT_DISK" 2>/dev/null || true
 mkdir -p "$INPUT_MOUNT"
 mkdir -p "$OUTPUT_MOUNT" "$RESULT_MOUNT"
 run_as_root mount -o loop "$INPUT_DISK" "$INPUT_MOUNT"
-run_as_root cp "$BUNDLE_PATH" "$INPUT_MOUNT/bundle.tar.gz"
+run_as_root cp "$GUEST_BUNDLE_PATH" "$INPUT_MOUNT/bundle.tar.gz"
 run_as_root sync
 run_as_root umount "$INPUT_MOUNT"
 run_as_root mount -o loop "$OUTPUT_DISK" "$OUTPUT_MOUNT"
@@ -162,6 +175,9 @@ fc_put "drives/rootfs" "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\
 
 fc_put "drives/input" "{\"drive_id\": \"input\", \"path_on_host\": \"$INPUT_DISK\", \"is_root_device\": false, \"is_read_only\": true}"
 fc_put "drives/output" "{\"drive_id\": \"output\", \"path_on_host\": \"$OUTPUT_DISK\", \"is_root_device\": false, \"is_read_only\": false}"
+if [ -f "$APP_DISK" ]; then
+    fc_put "drives/application" "{\"drive_id\": \"application\", \"path_on_host\": \"$APP_DISK\", \"is_root_device\": false, \"is_read_only\": true}"
+fi
 
 fc_put "actions" '{"action_type": "InstanceStart"}'
 

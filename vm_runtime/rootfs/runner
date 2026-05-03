@@ -11,6 +11,7 @@ from pathlib import Path
 WORKDIR = '/tmp/exec'
 INPUT_DISKS = ['/dev/vdb', '/dev/vdc', '/dev/vdd', '/dev/vde']
 OUTPUT_MARKER = 'dnat-output.marker'
+APPLICATION_MARKER = 'dnat-application.marker'
 RESULT_PATH = 'result.json'
 STDOUT_PATH = 'stdout.txt'
 STDERR_PATH = 'stderr.txt'
@@ -27,12 +28,13 @@ def safe_mount(device: str, mount_dir: str) -> bool:
     return result.returncode == 0
 
 
-def discover_mounts() -> tuple[str | None, str | None]:
+def discover_mounts() -> tuple[str | None, str | None, str | None]:
     mounted: dict[str, str] = {}
 
     for _ in range(30):
         bundle_path = None
         output_dir = None
+        application_dir = None
 
         for disk in INPUT_DISKS:
             if not os.path.exists(disk):
@@ -53,12 +55,15 @@ def discover_mounts() -> tuple[str | None, str | None]:
             if output_dir is None and os.path.isfile(os.path.join(mount_dir, OUTPUT_MARKER)):
                 output_dir = mount_dir
 
+            if application_dir is None and os.path.isfile(os.path.join(mount_dir, APPLICATION_MARKER)):
+                application_dir = mount_dir
+
         if bundle_path and output_dir:
-            return bundle_path, output_dir
+            return bundle_path, output_dir, application_dir
 
         time.sleep(1)
 
-    return None, None
+    return None, None, None
 
 
 def persist_output(output_dir: str | None, output: dict) -> None:
@@ -86,13 +91,22 @@ def write_serial(message: str) -> None:
 os.makedirs(WORKDIR, exist_ok=True)
 os.chdir(WORKDIR)
 
-bundle_path, output_dir = discover_mounts()
+bundle_path, output_dir, application_dir = discover_mounts()
 
 try:
     if not bundle_path or not os.path.isfile(bundle_path):
         raise Exception("Bundle disk not found")
     if not output_dir:
         raise Exception("Output disk not found")
+
+    app_symlink = Path('/mnt/dnat-app')
+    if application_dir:
+        try:
+            if app_symlink.exists() or app_symlink.is_symlink():
+                app_symlink.unlink()
+        except OSError:
+            pass
+        os.symlink(application_dir, app_symlink)
 
     shutil.copyfile(bundle_path, 'bundle.tar.gz')
     

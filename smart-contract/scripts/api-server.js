@@ -3,6 +3,7 @@ const { ethers } = require("hardhat");
 const express = require("express");
 const cors = require("cors");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { spawn } = require("node:child_process");
@@ -17,6 +18,9 @@ const EXECUTOR_URL = process.env.EXECUTOR_URL || "http://localhost:5000";
 const PORT = Number(process.env.WEB_PORT || "3001");
 const EXECUTIONS_ROOT = path.resolve(__dirname, "..", "executions");
 const RUNNER_PATH = path.resolve(__dirname, "run_from_cids.py");
+const APP_ARTIFACT_BUILDER_PATH = path.resolve(__dirname, "build_application_artifact.py");
+const ASSET_ENCRYPTION_KEY = process.env.ASSET_ENCRYPTION_KEY || "dnat-dev-asset-key";
+const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
 
 const abi = [
   "function registerAsset(uint8 assetType, string title, string description, string encryptedUri, string manifestUri, bytes32 contentHash, uint256 price, bytes bloomFilter) returns (uint256)",
@@ -123,6 +127,100 @@ function buildManifestYaml(manifest) {
   if (manifest.dependencies) lines.push(`dependencies: ${toYamlValue(manifest.dependencies)}`);
 
   return `${lines.join("\n")}\n`;
+}
+
+function normalizeCid(cidOrUri) {
+  const value = String(cidOrUri || "").trim();
+  if (value.startsWith("ipfs://")) {
+    return value.slice("ipfs://".length);
+  }
+  return value;
+}
+
+function deriveAssetEncryptionKey() {
+  return crypto.createHash("sha256").update(String(ASSET_ENCRYPTION_KEY)).digest();
+}
+
+function encryptBuffer(buffer, metadata = {}) {
+  const iv = crypto.randomBytes(12);
+  const key = deriveAssetEncryptionKey();
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const ciphertext = Buffer.concat([cipher.update(buffer), cipher.final()]);
+  const tag = cipher.getAuthTag();
+
+  return Buffer.from(
+    JSON.stringify({
+      version: 1,
+      format: APP_ARTIFACT_FORMAT,
+      cipher: "aes-256-gcm",
+      iv: iv.toString("base64"),
+      tag: tag.toString("base64"),
+      ciphertext: ciphertext.toString("base64"),
+      metadata,
+    }),
+    "utf8",
+  );
+}
+
+function decryptBufferEnvelope(buffer) {
+  const parsed = JSON.parse(buffer.toString("utf8"));
+  if (parsed.format !== APP_ARTIFACT_FORMAT) {
+    throw new Error(`Unsupported application artifact format: ${parsed.format || "unknown"}`);
+  }
+  if (parsed.cipher !== "aes-256-gcm") {
+    throw new Error(`Unsupported cipher: ${parsed.cipher || "unknown"}`);
+  }
+
+  const iv = Buffer.from(parsed.iv, "base64");
+  const tag = Buffer.from(parsed.tag, "base64");
+  const ciphertext = Buffer.from(parsed.ciphertext, "base64");
+  const key = deriveAssetEncryptionKey();
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+  decipher.setAuthTag(tag);
+  const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  return {
+    plaintext,
+    metadata: parsed.metadata || {},
+  };
+}
+
+function runCommand(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      ...options,
+    });
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject(new Error(`${command} exited with code ${code}: ${stderr || stdout}`.trim()));
+        return;
+      }
+      resolve({ stdout, stderr });
+    });
+  });
+}
+
+async function downloadFromIpfsBytes(cidOrUri, ipfsApiUrl = IPFS_API_URL) {
+  const cid = normalizeCid(cidOrUri);
+  if (!cid) throw new Error("CID is required");
+
+  const url = `${String(ipfsApiUrl || IPFS_API_URL).replace(/\/$/, "")}/api/v0/cat?arg=${encodeURIComponent(cid)}`;
+  const response = await fetch(url, { method: "POST" });
+  if (!response.ok) {
+    throw new Error(`IPFS download failed (${response.status}) for CID ${cid}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer);
 }
 
 async function uploadLocalFileToIpfs(localPath) {
@@ -288,6 +386,39 @@ function materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer })
   };
 }
 
+async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
+  if (!fs.existsSync(APP_ARTIFACT_BUILDER_PATH)) {
+    throw new Error(`Application artifact builder not found: ${APP_ARTIFACT_BUILDER_PATH}`);
+  }
+
+  const uploadsDir = path.join(__dirname, "..", "uploads");
+  fs.mkdirSync(uploadsDir, { recursive: true });
+
+  const artifactPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-application.ext4`);
+  await runCommand("python3", [
+    APP_ARTIFACT_BUILDER_PATH,
+    "--source-file",
+    sourceFilePath,
+    "--output-image",
+    artifactPath,
+    "--title",
+    String(manifest.name || ""),
+    "--description",
+    String(manifest.description || ""),
+    "--framework",
+    String(manifest.framework || "python"),
+    "--dependencies",
+    String(manifest.dependencies || ""),
+  ]);
+
+  return {
+    artifactPath,
+    cleanup: () => {
+      if (fs.existsSync(artifactPath)) fs.unlinkSync(artifactPath);
+    },
+  };
+}
+
 async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest = {} }) {
   const uploadedInput = materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer });
   const resolvedPath = uploadedInput.localPath;
@@ -403,7 +534,52 @@ async function listAssetsByScanningIds() {
 }
 
 async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBuffer, priceWei, bloomFilter, manifest }) {
-  const uploaded = await addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest });
+  let uploaded;
+
+  if (Number(assetType) === 1) {
+    const uploadedInput = materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer });
+    let builtArtifact = null;
+    let encryptedPath = null;
+
+    try {
+      builtArtifact = await buildApplicationArtifact({
+        sourceFilePath: uploadedInput.localPath,
+        manifest,
+      });
+
+      const artifactBuffer = fs.readFileSync(builtArtifact.artifactPath);
+      const encryptedBuffer = encryptBuffer(artifactBuffer, {
+        sourceFileName: path.basename(uploadedInput.localPath),
+        artifactType: APP_ARTIFACT_FORMAT,
+        framework: String(manifest?.framework || "python"),
+        dependencies: String(manifest?.dependencies || ""),
+      });
+
+      const uploadsDir = path.join(__dirname, "..", "uploads");
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      encryptedPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-application-artifact.enc.json`);
+      fs.writeFileSync(encryptedPath, encryptedBuffer);
+
+      uploaded = await addFileToIpfsFlow({
+        filePath: encryptedPath,
+        manifest: {
+          ...manifest,
+          framework: manifest?.framework || "python",
+          dependencies: manifest?.dependencies || "",
+        },
+      });
+
+      uploaded.assetType = APP_ARTIFACT_FORMAT;
+      uploaded.plaintextArtifactContentHash = computeSha256Hex(builtArtifact.artifactPath);
+    } finally {
+      uploadedInput.cleanup();
+      builtArtifact?.cleanup?.();
+      if (encryptedPath && fs.existsSync(encryptedPath)) fs.unlinkSync(encryptedPath);
+    }
+  } else {
+    uploaded = await addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest });
+  }
+
   const title = String(manifest?.name || path.basename(uploaded.localPath || fileName || filePath || "Untitled asset")).trim();
   const description = String(manifest?.description || "").trim();
   const tx = await contract.registerAsset(
@@ -412,7 +588,7 @@ async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBu
     description,
     uploaded.assetUri,
     uploaded.manifestUri,
-    uploaded.assetContentHash,
+    uploaded.plaintextArtifactContentHash || uploaded.assetContentHash,
     BigInt(priceWei || "0"),
     bloomFilter ? String(bloomFilter) : "0x",
   );
@@ -551,54 +727,71 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     );
   }
 
+  const preparationDir = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-execution-"));
+  const datasetPath = path.join(preparationDir, "dataset.csv");
+  const applicationArtifactPath = path.join(preparationDir, "application.ext4");
+
+  try {
+    const datasetBytes = await downloadFromIpfsBytes(dataset.encryptedUri, ipfsApiUrl || IPFS_API_URL);
+    fs.writeFileSync(datasetPath, datasetBytes);
+
+    const encryptedApplicationBytes = await downloadFromIpfsBytes(application.encryptedUri, ipfsApiUrl || IPFS_API_URL);
+    const decryptedApplication = decryptBufferEnvelope(encryptedApplicationBytes);
+    fs.writeFileSync(applicationArtifactPath, decryptedApplication.plaintext);
+
   const args = [
     RUNNER_PATH,
+    "--local-dataset-path",
+    datasetPath,
+    "--application-artifact-path",
+    applicationArtifactPath,
     "--dataset-cid",
     String(dataset.encryptedUri),
-    "--script-cid",
+    "--application-cid",
     String(application.encryptedUri),
-    "--ipfs-api-url",
-    String(ipfsApiUrl || IPFS_API_URL),
     "--executor-url",
     EXECUTOR_URL,
   ];
 
-  return await new Promise((resolve, reject) => {
-    const child = spawn(resolvedPythonBin, args);
-    let stdout = "";
-    let stderr = "";
+    return await new Promise((resolve, reject) => {
+      const child = spawn(resolvedPythonBin, args);
+      let stdout = "";
+      let stderr = "";
 
-    child.stdout.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
+      child.stdout.on("data", (chunk) => {
+        stdout += chunk.toString();
+      });
+      child.stderr.on("data", (chunk) => {
+        stderr += chunk.toString();
+      });
 
-    child.on("error", (err) => reject(err));
-    child.on("close", (code) => {
-      let parsed = null;
-      try {
-        parsed = JSON.parse(stdout);
-      } catch {
-        parsed = null;
-      }
+      child.on("error", (err) => reject(err));
+      child.on("close", (code) => {
+        let parsed = null;
+        try {
+          parsed = JSON.parse(stdout);
+        } catch {
+          parsed = null;
+        }
 
-      const executionId = parsed?.executionId;
-      const execution = executionId ? getExecutionById(executionId) : null;
+        const executionId = parsed?.executionId;
+        const execution = executionId ? getExecutionById(executionId) : null;
 
-      resolve({
-        exitCode: code,
-        pythonBin: resolvedPythonBin,
-        metadata: parsed,
-        runnerStdout: stdout,
-        runnerStderr: stderr,
-        stdout: execution?.stdout || "",
-        stderr: execution?.stderr || "",
-        result: execution?.result || null,
+        resolve({
+          exitCode: code,
+          pythonBin: resolvedPythonBin,
+          metadata: parsed,
+          runnerStdout: stdout,
+          runnerStderr: stderr,
+          stdout: execution?.stdout || "",
+          stderr: execution?.stderr || "",
+          result: execution?.result || null,
+        });
       });
     });
-  });
+  } finally {
+    fs.rmSync(preparationDir, { recursive: true, force: true });
+  }
 }
 
 async function showContractInfo() {

@@ -7,6 +7,7 @@ IPFS_API_URL="${IPFS_API_URL:-http://127.0.0.1:5001}"
 WEB_PORT="${WEB_PORT:-3001}"
 EXECUTOR_URL="${EXECUTOR_URL:-http://dnat-executor:5000}"
 PRIVATE_KEY="${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}"
+ASSET_ENCRYPTION_KEY="${ASSET_ENCRYPTION_KEY:-dnat-dev-asset-key}"
 
 cleanup() {
   local exit_code=$?
@@ -87,6 +88,7 @@ IPFS_API_URL="${IPFS_API_URL}" \
 WEB_PORT="${WEB_PORT}" \
 EXECUTOR_URL="${EXECUTOR_URL}" \
 PRIVATE_KEY="${PRIVATE_KEY}" \
+ASSET_ENCRYPTION_KEY="${ASSET_ENCRYPTION_KEY}" \
 node scripts/api-server.js &
 WEB_PID=$!
 

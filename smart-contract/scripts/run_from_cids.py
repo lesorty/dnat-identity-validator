@@ -4,6 +4,7 @@ import datetime as dt
 import json
 import os
 import pathlib
+import shutil
 import tarfile
 import uuid
 from urllib.error import HTTPError, URLError
@@ -42,7 +43,13 @@ def download_from_ipfs(ipfs_api_url: str, cid_or_uri: str) -> bytes:
         return response.read()
 
 
-def build_workspace(execution_dir: pathlib.Path, dataset_bytes: bytes, script_bytes: bytes) -> pathlib.Path:
+def build_workspace(
+    execution_dir: pathlib.Path,
+    dataset_bytes: bytes,
+    *,
+    script_bytes: bytes | None = None,
+    use_application_artifact: bool = False,
+) -> pathlib.Path:
     workspace_dir = execution_dir / "workspace"
     code_dir = workspace_dir / "code"
     data_dir = workspace_dir / "data"
@@ -51,11 +58,13 @@ def build_workspace(execution_dir: pathlib.Path, dataset_bytes: bytes, script_by
     data_dir.mkdir(parents=True, exist_ok=True)
 
     (execution_dir / "dataset.csv").write_bytes(dataset_bytes)
-    (execution_dir / "application.py").write_bytes(script_bytes)
     (data_dir / "dataset.csv").write_bytes(dataset_bytes)
-    (code_dir / "application.py").write_bytes(script_bytes)
 
-    run_sh = """#!/bin/bash
+    if script_bytes is not None:
+        (execution_dir / "application.py").write_bytes(script_bytes)
+        (code_dir / "application.py").write_bytes(script_bytes)
+
+        run_sh = """#!/bin/bash
 set -euo pipefail
 
 cd /tmp/exec/workspace
@@ -97,6 +106,55 @@ cat "$attempt_3_stdout"
 cat "$attempt_3_stderr" >&2
 exit 1
 """
+    elif use_application_artifact:
+        run_sh = """#!/bin/bash
+set -euo pipefail
+
+cd /tmp/exec/workspace
+
+APP="/mnt/dnat-app/app/application.py"
+test -f "$APP"
+
+attempt_1_stdout="$(mktemp)"
+attempt_1_stderr="$(mktemp)"
+attempt_2_stdout="$(mktemp)"
+attempt_2_stderr="$(mktemp)"
+attempt_3_stdout="$(mktemp)"
+attempt_3_stderr="$(mktemp)"
+
+if python3 "$APP" --dataset data/dataset.csv --output result.json >"$attempt_1_stdout" 2>"$attempt_1_stderr"; then
+    cat "$attempt_1_stdout"
+    cat "$attempt_1_stderr" >&2
+    exit 0
+fi
+
+if python3 "$APP" data/dataset.csv >"$attempt_2_stdout" 2>"$attempt_2_stderr"; then
+    cat "$attempt_2_stdout"
+    cat "$attempt_2_stderr" >&2
+    exit 0
+fi
+
+if python3 "$APP" >"$attempt_3_stdout" 2>"$attempt_3_stderr"; then
+    cat "$attempt_3_stdout"
+    cat "$attempt_3_stderr" >&2
+    exit 0
+fi
+
+echo "All execution strategies failed." >&2
+echo "--- attempt 1: python3 $APP --dataset data/dataset.csv --output result.json" >&2
+cat "$attempt_1_stdout"
+cat "$attempt_1_stderr" >&2
+echo "--- attempt 2: python3 $APP data/dataset.csv" >&2
+cat "$attempt_2_stdout"
+cat "$attempt_2_stderr" >&2
+echo "--- attempt 3: python3 $APP" >&2
+cat "$attempt_3_stdout"
+cat "$attempt_3_stderr" >&2
+exit 1
+"""
+    else:
+        raise ValueError("Either script bytes or an application artifact is required")
+
     run_path = workspace_dir / "run.sh"
     run_path.write_text(run_sh, encoding="utf-8")
     run_path.chmod(0o755)
@@ -104,10 +162,17 @@ exit 1
     return workspace_dir
 
 
-def create_bundle(execution_dir: pathlib.Path, workspace_dir: pathlib.Path) -> pathlib.Path:
+def create_bundle(
+    execution_dir: pathlib.Path,
+    workspace_dir: pathlib.Path,
+    *,
+    application_artifact_path: pathlib.Path | None = None,
+) -> pathlib.Path:
     bundle_path = execution_dir / "bundle.tar.gz"
     with tarfile.open(bundle_path, "w:gz") as tar:
         tar.add(workspace_dir, arcname="workspace")
+        if application_artifact_path is not None:
+            tar.add(application_artifact_path, arcname="artifacts/application.ext4")
     return bundle_path
 
 
@@ -126,7 +191,7 @@ def submit_bundle(executor_url: str, bundle_path: pathlib.Path) -> dict:
 def build_metadata(
     execution_id: str,
     dataset_cid: str,
-    script_cid: str,
+    application_cid: str,
     ipfs_api_url: str,
     executor_url: str,
     execution_dir: pathlib.Path,
@@ -134,18 +199,20 @@ def build_metadata(
     status: str,
     return_code: int | None = None,
     error: str | None = None,
+    used_application_artifact: bool = False,
 ) -> dict:
     metadata = {
         "executionId": execution_id,
         "status": status,
         "returnCode": return_code,
         "datasetCid": normalize_cid(dataset_cid),
-        "scriptCid": normalize_cid(script_cid),
+        "applicationCid": normalize_cid(application_cid),
         "ipfsApiUrl": ipfs_api_url,
         "executorUrl": normalize_executor_url(executor_url),
         "datasetPath": str((execution_dir / "dataset.csv").resolve()),
-        "scriptPath": str((execution_dir / "application.py").resolve()),
         "bundlePath": str((execution_dir / "bundle.tar.gz").resolve()),
+        "applicationArtifactPath": str((execution_dir / "application.ext4").resolve()) if used_application_artifact else None,
+        "scriptPath": str((execution_dir / "application.py").resolve()) if (execution_dir / "application.py").exists() else None,
         "resultPath": str((execution_dir / "result.json").resolve()),
         "stdoutPath": str((execution_dir / "stdout.txt").resolve()),
         "stderrPath": str((execution_dir / "stderr.txt").resolve()),
@@ -164,10 +231,13 @@ def write_execution_files(execution_dir: pathlib.Path, vm_result: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Download dataset and script from IPFS CIDs, package them for vm_runtime, and store execution artifacts."
+        description="Prepare dataset and application artifacts for vm_runtime and store execution artifacts."
     )
-    parser.add_argument("--dataset-cid", required=True, help="IPFS CID for CSV dataset")
-    parser.add_argument("--script-cid", required=True, help="IPFS CID for Python script")
+    parser.add_argument("--dataset-cid", default="", help="IPFS CID for dataset")
+    parser.add_argument("--application-cid", default="", help="IPFS CID for application artifact")
+    parser.add_argument("--script-cid", default="", help="Legacy IPFS CID for plain Python script")
+    parser.add_argument("--local-dataset-path", default="", help="Local dataset path, bypassing IPFS download")
+    parser.add_argument("--application-artifact-path", default="", help="Local application ext4 artifact path")
     parser.add_argument(
         "--ipfs-api-url",
         default=os.getenv("IPFS_API_URL", "http://localhost:5001"),
@@ -185,16 +255,43 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    if not args.local_dataset_path and not args.dataset_cid:
+        raise SystemExit("Either --local-dataset-path or --dataset-cid is required")
+    if not args.application_artifact_path and not args.script_cid:
+        raise SystemExit("Either --application-artifact-path or --script-cid is required")
+
     execution_id = f"{utc_now().strftime('%Y%m%dT%H%M%SZ')}_{uuid.uuid4().hex[:8]}"
     execution_dir = pathlib.Path(args.executions_dir).resolve() / execution_id
     execution_dir.mkdir(parents=True, exist_ok=True)
     metadata_path = execution_dir / "metadata.json"
 
     try:
-        dataset_bytes = download_from_ipfs(args.ipfs_api_url, args.dataset_cid)
-        script_bytes = download_from_ipfs(args.ipfs_api_url, args.script_cid)
-        workspace_dir = build_workspace(execution_dir, dataset_bytes, script_bytes)
-        bundle_path = create_bundle(execution_dir, workspace_dir)
+        if args.local_dataset_path:
+            dataset_bytes = pathlib.Path(args.local_dataset_path).resolve().read_bytes()
+        else:
+            dataset_bytes = download_from_ipfs(args.ipfs_api_url, args.dataset_cid)
+
+        script_bytes = None
+        application_artifact_path = None
+
+        if args.application_artifact_path:
+            source_artifact = pathlib.Path(args.application_artifact_path).resolve()
+            application_artifact_path = execution_dir / "application.ext4"
+            shutil.copyfile(source_artifact, application_artifact_path)
+        elif args.script_cid:
+            script_bytes = download_from_ipfs(args.ipfs_api_url, args.script_cid)
+
+        workspace_dir = build_workspace(
+            execution_dir,
+            dataset_bytes,
+            script_bytes=script_bytes,
+            use_application_artifact=application_artifact_path is not None,
+        )
+        bundle_path = create_bundle(
+            execution_dir,
+            workspace_dir,
+            application_artifact_path=application_artifact_path,
+        )
         vm_result = submit_bundle(args.executor_url, bundle_path)
 
         write_execution_files(execution_dir, vm_result)
@@ -202,12 +299,13 @@ def main() -> int:
         metadata = build_metadata(
             execution_id,
             args.dataset_cid,
-            args.script_cid,
+            args.application_cid or args.script_cid,
             args.ipfs_api_url,
             args.executor_url,
             execution_dir,
             status="success" if vm_result.get("returncode") == 0 else "script_failed",
             return_code=vm_result.get("returncode"),
+            used_application_artifact=application_artifact_path is not None,
         )
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         print(json.dumps(metadata, indent=2))
@@ -217,12 +315,13 @@ def main() -> int:
         metadata = build_metadata(
             execution_id,
             args.dataset_cid,
-            args.script_cid,
+            args.application_cid or args.script_cid,
             args.ipfs_api_url,
             args.executor_url,
             execution_dir,
             status="execution_failed",
             error=str(exc),
+            used_application_artifact=bool(args.application_artifact_path),
         )
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         print(json.dumps(metadata, indent=2))

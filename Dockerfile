@@ -9,9 +9,10 @@ ENV IPFS_API_URL=http://127.0.0.1:5001
 ENV WEB_PORT=3001
 ENV EXECUTOR_URL=http://dnat-executor:5000
 ENV PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+ENV ASSET_ENCRYPTION_KEY=dnat-dev-asset-key
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends bash ca-certificates curl python3 tini \
+    && apt-get install -y --no-install-recommends bash ca-certificates curl e2fsprogs python3 tini \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ipfs /usr/local/bin/ipfs /usr/local/bin/ipfs
