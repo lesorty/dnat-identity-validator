@@ -23,6 +23,18 @@ def compute_directory_size(root: Path) -> int:
     return total
 
 
+def resolve_required_binary(name: str, fallbacks: list[str] | None = None) -> str:
+    resolved = shutil.which(name)
+    if resolved:
+        return resolved
+
+    for candidate in fallbacks or []:
+        if Path(candidate).is_file():
+            return candidate
+
+    raise FileNotFoundError(f"Required binary not found: {name}")
+
+
 def parse_dependencies(raw_dependencies: str) -> list[str]:
     raw_value = str(raw_dependencies or "").strip()
     if not raw_value:
@@ -185,9 +197,12 @@ def main() -> int:
         if output_image.exists():
             output_image.unlink()
 
-        subprocess.run(["truncate", "-s", str(image_size), str(output_image)], check=True)
+        truncate_bin = resolve_required_binary("truncate", ["/usr/bin/truncate", "/bin/truncate"])
+        mkfs_ext4_bin = resolve_required_binary("mkfs.ext4", ["/usr/sbin/mkfs.ext4", "/sbin/mkfs.ext4"])
+
+        subprocess.run([truncate_bin, "-s", str(image_size), str(output_image)], check=True)
         subprocess.run(
-            ["mkfs.ext4", "-q", "-F", "-d", str(root_dir), str(output_image)],
+            [mkfs_ext4_bin, "-q", "-F", "-d", str(root_dir), str(output_image)],
             check=True,
         )
 
