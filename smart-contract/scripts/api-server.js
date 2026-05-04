@@ -23,9 +23,6 @@ const BUILDER_URL = process.env.BUILDER_URL || "http://dnat-builder:5100";
 const ASSET_ENCRYPTION_KEY = process.env.ASSET_ENCRYPTION_KEY || "dnat-dev-asset-key";
 const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
 const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
-const WHEEL_CACHE_DIR = path.resolve(process.env.WHEEL_CACHE_DIR || path.resolve(__dirname, "..", "wheel-cache"));
-const WHEEL_CACHE_MAX_BYTES = Number(process.env.WHEEL_CACHE_MAX_BYTES || String(2 * 1024 * 1024 * 1024));
-const WHEEL_CACHE_MAX_FILE_BYTES = Number(process.env.WHEEL_CACHE_MAX_FILE_BYTES || String(250 * 1024 * 1024));
 
 const abi = [
   "function registerAsset(uint8 assetType, string title, string description, string encryptedUri, string manifestUri, bytes32 contentHash, uint256 price, bytes bloomFilter) returns (uint256)",
@@ -268,11 +265,6 @@ function runCommand(command, args, options = {}) {
   });
 }
 
-function ensureWheelCacheDir() {
-  fs.mkdirSync(WHEEL_CACHE_DIR, { recursive: true });
-  return WHEEL_CACHE_DIR;
-}
-
 function parseManifestDependencies(rawDependencies) {
   const rawValue = String(rawDependencies || "").trim();
   if (!rawValue) return [];
@@ -304,109 +296,6 @@ function parseManifestDependencies(rawDependencies) {
 
 function computeBufferSha256Hex(buffer) {
   return crypto.createHash("sha256").update(buffer).digest("hex");
-}
-
-function validateWheelFilename(fileName) {
-  const base = path.basename(String(fileName || "").trim());
-  if (!base || base !== fileName) {
-    throw new Error(`Invalid wheel filename: ${fileName}`);
-  }
-  if (!base.endsWith(".whl")) {
-    throw new Error(`Only .whl files may enter the wheel cache: ${fileName}`);
-  }
-  if (base.includes("/") || base.includes("\\")) {
-    throw new Error(`Unsafe wheel filename: ${fileName}`);
-  }
-  return base;
-}
-
-function removeEmptyParentDirs(dirPath, stopAt) {
-  let current = dirPath;
-  const boundary = path.resolve(stopAt);
-  while (current.startsWith(boundary)) {
-    if (current === boundary) break;
-    if (fs.existsSync(current) && fs.readdirSync(current).length === 0) {
-      fs.rmdirSync(current);
-      current = path.dirname(current);
-      continue;
-    }
-    break;
-  }
-}
-
-function listCachedWheelEntries() {
-  ensureWheelCacheDir();
-  const entries = [];
-  const stack = [WHEEL_CACHE_DIR];
-
-  while (stack.length > 0) {
-    const current = stack.pop();
-    for (const dirent of fs.readdirSync(current, { withFileTypes: true })) {
-      const fullPath = path.join(current, dirent.name);
-      if (dirent.isDirectory()) {
-        stack.push(fullPath);
-        continue;
-      }
-      if (!dirent.isFile() || !dirent.name.endsWith(".whl")) continue;
-      const stats = fs.statSync(fullPath);
-      entries.push({ path: fullPath, size: stats.size, mtimeMs: stats.mtimeMs });
-    }
-  }
-
-  return entries;
-}
-
-function pruneWheelCache() {
-  const entries = listCachedWheelEntries().sort((a, b) => a.mtimeMs - b.mtimeMs);
-  let totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
-
-  for (const entry of entries) {
-    if (totalBytes <= WHEEL_CACHE_MAX_BYTES) break;
-    fs.unlinkSync(entry.path);
-    totalBytes -= entry.size;
-    removeEmptyParentDirs(path.dirname(entry.path), WHEEL_CACHE_DIR);
-  }
-}
-
-function ingestBuiltWheelhouse(wheelhouseDir) {
-  if (!wheelhouseDir || !fs.existsSync(wheelhouseDir)) {
-    return [];
-  }
-
-  ensureWheelCacheDir();
-  const stored = [];
-  for (const dirent of fs.readdirSync(wheelhouseDir, { withFileTypes: true })) {
-    if (!dirent.isFile()) continue;
-
-    const wheelName = validateWheelFilename(dirent.name);
-    const sourcePath = path.join(wheelhouseDir, dirent.name);
-    const stats = fs.statSync(sourcePath);
-    if (stats.size > WHEEL_CACHE_MAX_FILE_BYTES) {
-      continue;
-    }
-
-    const data = fs.readFileSync(sourcePath);
-    const digest = computeBufferSha256Hex(data);
-    const targetPath = path.join(WHEEL_CACHE_DIR, wheelName);
-    if (fs.existsSync(targetPath)) {
-      const existingDigest = computeBufferSha256Hex(fs.readFileSync(targetPath));
-      if (existingDigest !== digest) {
-        continue;
-      }
-    }
-    if (!fs.existsSync(targetPath)) {
-      fs.writeFileSync(targetPath, data);
-    }
-    stored.push({
-      fileName: wheelName,
-      sha256: digest,
-      sizeBytes: stats.size,
-      cachePath: targetPath,
-    });
-  }
-
-  pruneWheelCache();
-  return stored;
 }
 
 async function downloadFromIpfsBytes(cidOrUri, ipfsApiUrl = IPFS_API_URL) {
@@ -586,12 +475,11 @@ function materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer })
 }
 
 async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
-  ensureWheelCacheDir();
   const builderProbe = await probeBuilder(BUILDER_URL);
   if (!builderProbe.ok) {
     throw new Error(
       `Builder unreachable at ${builderProbe.url}. ` +
-        `Verify the build service is running on the CVM1. ` +
+        `Verify the CVM3 builder service is running and reachable from the CVM1. ` +
         `Probe error: ${builderProbe.error}`,
     );
   }
@@ -644,10 +532,8 @@ async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
       throw new Error("Builder response did not contain application.ext4");
     }
 
-    const cachedWheels = ingestBuiltWheelhouse(path.join(responseDir, "wheelhouse"));
     return {
       artifactPath,
-      cachedWheels,
       cleanup: () => {
         fs.rmSync(tempRoot, { recursive: true, force: true });
       },
@@ -810,7 +696,6 @@ async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBu
 
       uploaded.assetType = APP_ARTIFACT_FORMAT;
       uploaded.plaintextArtifactContentHash = computeSha256Hex(builtArtifact.artifactPath);
-      uploaded.cachedWheels = builtArtifact.cachedWheels || [];
     } finally {
       uploadedInput.cleanup();
       builtArtifact?.cleanup?.();

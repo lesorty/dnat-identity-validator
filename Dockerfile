@@ -11,9 +11,6 @@ ENV EXECUTOR_URL=http://dnat-executor:5000
 ENV BUILDER_URL=http://dnat-builder:5100
 ENV PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 ENV ASSET_ENCRYPTION_KEY=dnat-dev-asset-key
-ENV WHEEL_CACHE_DIR=/app/smart-contract/wheel-cache
-ENV WHEEL_CACHE_MAX_BYTES=2147483648
-ENV WHEEL_CACHE_MAX_FILE_BYTES=262144000
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends bash ca-certificates curl e2fsprogs python3 tar tini \
@@ -30,7 +27,7 @@ COPY smart-contract ./smart-contract
 COPY docker/root-entrypoint.sh /usr/local/bin/root-entrypoint.sh
 
 RUN chmod +x /usr/local/bin/root-entrypoint.sh \
-    && mkdir -p /data/ipfs /app/smart-contract/executions /app/smart-contract/wheel-cache
+    && mkdir -p /data/ipfs /app/smart-contract/executions
 
 EXPOSE 3001 5001 8080 8545
 

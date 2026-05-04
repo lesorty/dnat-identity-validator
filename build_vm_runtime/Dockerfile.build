@@ -63,7 +63,7 @@ WORKDIR /app
 COPY build_vm_runtime /app
 COPY smart-contract/scripts/build_application_artifact.py /app/guest-tools/build_application_artifact.py
 
-RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py && \
+RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py worker.py && \
     mkdir -p /app/artifacts /app/input
 
 COPY --from=kernel-builder /app/artifacts/vmlinux /app/artifacts/vmlinux
@@ -90,7 +90,7 @@ COPY --from=builder /app /app
 
 WORKDIR /app
 
-RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py
+RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py worker.py
 
 ENV PATH="/usr/local/bin:$PATH"
 ENV WHEEL_CACHE_SOURCE_DIR=/var/dnat/wheel-cache

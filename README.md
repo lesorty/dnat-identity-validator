@@ -1,25 +1,26 @@
 # DNAT Identity Validator
 
-O fluxo operacional suportado neste repositorio e o stack via `docker compose`.
+O fluxo operacional suportado neste repositório é o stack via `docker compose`.
 
-Use [RUN_COMPOSE.md](RUN_COMPOSE.md) como fonte unica de execucao para:
-- subir o executor `vm_runtime`
-- subir o frontend/API com Hardhat e IPFS
-- configurar `EXECUTOR_URL`
+Use [RUN_COMPOSE.md](RUN_COMPOSE.md) como fonte principal de execução para:
+- subir a `CVM1` com frontend/API/IPFS/contrato
+- subir a `CVM3` com builder Firecracker e cache de `.whl`
+- subir a `CVM2` com executor Firecracker
+- configurar `BUILDER_URL` e `EXECUTOR_URL`
 - consultar o fluxo de testes operacionais
 
 ## Estrutura
 
 - `docker/`: arquivos Compose ativos
-- `build_vm_runtime/`: builder isolado de aplicacoes na CVM1
-- `vm_runtime/`: executor baseado em microVM
-- `smart-contract/`: contrato, API e interface web
+- `smart-contract/`: contrato, API e interface web da CVM1
+- `build_vm_runtime/`: builder isolado da CVM3
+- `vm_runtime/`: executor isolado da CVM2
 
-## Observacoes
+## Observações
 
-- O runner usado pela API para baixar assets do IPFS e enviar bundles ao `vm_runtime` agora fica em `smart-contract/scripts/run_from_cids.py`.
-- O registro de aplicacao agora passa por um builder Firecracker na CVM1, que gera `application.ext4`, retorna novas `.whl` para cache e so depois a CVM1 criptografa e publica o artefato no IPFS.
-- O cache de dependencias da CVM1 guarda apenas arquivos `.whl` em volume separado e nunca faz `pip install` no servico web.
-- A `microVM` do executor roda sem interface de rede e devolve o resultado via disco persistente anexado ao guest, que a VM hospedeira coleta apos o shutdown.
-- Resultados de execucao, uploads, manifests e artefatos locais ficam fora do versionamento.
-- A explicacao detalhada da arquitetura atual implementada e da arquitetura alvo aprovada fica em [ARCHITECTURE.md](ARCHITECTURE.md).
+- A CVM1 recebe app e dataset, fala com IPFS/contrato e nunca instala dependências Python externas.
+- O registro de aplicação agora passa pela CVM3, que cria um `worker` efêmero por build, sobe uma `microVM` de build, devolve `application.ext4` e persiste apenas `.whl`.
+- O cache de dependências fica somente na CVM3 e guarda apenas arquivos `.whl`.
+- A CVM2 executa a aplicação sem rede e devolve o resultado via disco persistente anexado ao guest.
+- Resultados de execução, uploads, manifests e artefatos locais ficam fora do versionamento.
+- A explicação detalhada da arquitetura atual implementada fica em [ARCHITECTURE.md](ARCHITECTURE.md).

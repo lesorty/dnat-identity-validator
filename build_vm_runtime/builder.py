@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal HTTP builder for isolated DNAT application artifact builds."""
+"""Minimal HTTP orchestrator for isolated DNAT application artifact builds."""
 
 import http.server
 import json
@@ -7,6 +7,8 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
+
+WORKER_PATH = Path(__file__).parent / "worker.py"
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -44,7 +46,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
         try:
             result = subprocess.run(
-                ["bash", str(Path(__file__).parent / "vm" / "build-vm.sh"), bundle_path, output_bundle_path],
+                ["python3", str(WORKER_PATH), bundle_path, output_bundle_path],
                 capture_output=True,
                 text=True,
                 timeout=2400,
