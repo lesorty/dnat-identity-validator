@@ -17,30 +17,30 @@ skinparam sequence {
 
 actor Usuario as U
 participant "CVM1\nFrontend + API" as C1
-participant "CVM3\nBuilder API" as C3
+participant "CVM2\nBuilder API" as C2
 participant "worker\nefemero" as W
 participant "microVM de build" as B
 participant "IPFS" as I
 
-U -> C1 : envia aplicacao + manifesto
+U -> C1 : 1. envia aplicacao + manifesto
 activate C1
-C1 -> C1 : materializa upload\nmonta request bundle
-C1 -> C3 : POST /build
-activate C3
-C3 -> W : cria worker por requisicao
+C1 -> C1 : 2. materializa upload\nmonta request bundle
+C1 -> C2 : 3. POST /build
+activate C2
+C2 -> W : 4. cria worker por requisicao
 activate W
-W -> B : sobe microVM via Firecracker
+W -> B : 5. sobe microVM via Firecracker
 activate B
-B -> B : resolve dependencias\ninstala site-packages\ngera application.ext4
-B --> W : application.ext4 + wheelhouse
+B -> B : 6. resolve dependencias\ninstala site-packages\ngera application.ext4
+B --> W : 7. application.ext4 + wheelhouse
 deactivate B
-W -> C3 : persiste apenas .whl validas
+W -> C2 : 8. persiste apenas .whl validas
 deactivate W
-C3 --> C1 : application.ext4 + build-result.json
-deactivate C3
-C1 -> C1 : criptografa application.ext4
-C1 -> I : publica blob no IPFS
-C1 --> U : confirma registro
+C2 --> C1 : 9. application.ext4 + build-result.json
+deactivate C2
+C1 -> C1 : 10. criptografa application.ext4
+C1 -> I : 11. publica blob no IPFS
+C1 --> U : 12. confirma registro
 deactivate C1
 
 @enduml

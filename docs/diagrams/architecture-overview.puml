@@ -1,13 +1,18 @@
 @startuml
 title DNAT - Visao Geral da Arquitetura
 
+left to right direction
+
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName Arial
 skinparam ArrowColor #2E4057
 skinparam ArrowThickness 1.2
+skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam componentStyle rectangle
+skinparam nodesep 70
+skinparam ranksep 90
 skinparam node {
   BackgroundColor #F7FAFC
   BorderColor #2E4057
@@ -37,13 +42,13 @@ node "CVM1\nCliente e camada de acesso" as CVM1 {
   component "Marketplace\ncontrato + criptografia" as MARKET
 }
 
-node "CVM3\nBuilder isolado" as CVM3 {
+node "CVM2\nBuilder isolado" as CVM2 {
   component "dnat-builder\nAPI de build" as BUILDER
   component "worker efemero" as WORKER
   database "Cache de .whl" as WHEELCACHE
 }
 
-node "CVM2\nExecutor isolado" as CVM2 {
+node "CVM3\nExecutor isolado" as CVM3 {
   component "dnat-executor\nAPI de execucao" as EXECUTOR
 }
 
@@ -53,21 +58,29 @@ node "microVM de execucao\nFirecracker" as EXECVM
 artifact "application.ext4" as APPART
 artifact "dataset + result.json\nstdout/stderr" as EXECART
 
-User --> CLIENT : upload / consulta / execucao
-CLIENT --> BUILDER : bundle de build
-BUILDER --> WORKER : cria worker por requisicao
-WORKER --> BUILDVM : build-vm.sh
-BUILDVM --> WHEELCACHE : reutiliza / gera wheels
-BUILDVM --> APPART : gera artefato
-BUILDER --> CLIENT : application.ext4 + build-result.json
-CLIENT --> IPFS : publica blob criptografado
-CLIENT --> EXECUTOR : bundle de execucao
-EXECUTOR --> EXECVM : run-vm.sh
-EXECVM --> EXECART : grava saida
-EXECUTOR --> CLIENT : result.json + stdout/stderr
-CLIENT --> User : resposta final
+BUILDVM -[hidden]down- APPART
+EXECVM -[hidden]down- EXECART
+CVM1 -[hidden]right- CVM2
+CVM2 -[hidden]right- CVM3
 
-note right of CVM3
+User -down-> CLIENT : B1 / E1\nupload / consulta /\nexecucao
+CLIENT -up-> User : B7 / E6\nresposta final
+
+CLIENT -right-> BUILDER : B2\nbundle\nde build
+BUILDER -down-> WORKER : B3\ncria worker\npor requisicao
+WORKER -left-> BUILDVM : B4\nbuild-vm.sh
+BUILDVM -down-> APPART : B5\ngera\nartefato
+BUILDVM -up-> WHEELCACHE : B5a\nreutiliza /\ngera wheels
+BUILDER -left-> CLIENT : B6\napplication.ext4 +\nbuild-result.json
+
+CLIENT -down-> IPFS : B7a\npublica blob\ncriptografado
+
+CLIENT -right-> EXECUTOR : E2\nbundle\nde execucao
+EXECUTOR -down-> EXECVM : E3\nrun-vm.sh
+EXECVM -down-> EXECART : E4\ngrava\nsaida
+EXECUTOR -left-> CLIENT : E5\nresult.json +\nstdout/stderr
+
+note right of CVM2
 Persistente:
 - cache de .whl
 
@@ -77,7 +90,7 @@ Efemero:
 - microVM de build
 end note
 
-note right of CVM2
+note right of CVM3
 Persistente:
 - runtime base
 

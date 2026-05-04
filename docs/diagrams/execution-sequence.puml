@@ -19,30 +19,30 @@ actor Usuario as U
 participant "CVM1\nFrontend + API" as C1
 participant "Marketplace" as M
 participant "IPFS" as I
-participant "CVM2\nExecutor API" as C2
+participant "CVM3\nExecutor API" as C3
 participant "microVM de execucao" as E
 
-U -> C1 : solicita execucao
+U -> C1 : 1. solicita execucao
 activate C1
-C1 -> M : verifica permissao de acesso
+C1 -> M : 2. verifica permissao de acesso
 activate M
-M --> C1 : acesso autorizado
+M --> C1 : 3. acesso autorizado
 deactivate M
-C1 -> I : baixa dataset + application.ext4 criptografado
+C1 -> I : 4. baixa dataset + application.ext4 criptografado
 activate I
-I --> C1 : retorna artefatos
+I --> C1 : 5. retorna artefatos
 deactivate I
-C1 -> C1 : descriptografa artefato\nmonta bundle temporario
-C1 -> C2 : POST /execute
-activate C2
-C2 -> E : sobe microVM sem rede
+C1 -> C1 : 6. descriptografa artefato\nmonta bundle temporario
+C1 -> C3 : 7. POST /execute
+activate C3
+C3 -> E : 8. sobe microVM sem rede
 activate E
-E -> E : monta dataset + application.ext4\nexecuta aplicacao
-E --> C2 : result.json + stdout.txt + stderr.txt
+E -> E : 9. monta dataset + application.ext4\nexecuta aplicacao
+E --> C3 : 10. result.json + stdout.txt + stderr.txt
 deactivate E
-C2 --> C1 : resposta consolidada
-deactivate C2
-C1 --> U : exibe resultado final
+C3 --> C1 : 11. resposta consolidada
+deactivate C3
+C1 --> U : 12. exibe resultado final
 deactivate C1
 
 @enduml

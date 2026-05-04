@@ -3,8 +3,8 @@
 Este documento descreve a arquitetura atualmente implementada no repositório, agora separada em 3 camadas:
 
 - `CVM1`: cliente, frontend, IPFS, contrato e criptografia
-- `CVM3`: builder isolado e cache de `.whl`
-- `CVM2`: executor isolado da aplicação
+- `CVM2`: builder isolado e cache de `.whl`
+- `CVM3`: executor isolado da aplicação
 
 ## 1. Componentes
 
@@ -16,10 +16,10 @@ Responsabilidades da CVM1:
 
 - receber uploads de dataset e aplicação
 - manter o IPFS e o marketplace local
-- falar com a CVM3 para buildar `application.ext4`
+- falar com a CVM2 para buildar `application.ext4`
 - nunca instalar nem importar dependências Python externas
-- criptografar `application.ext4` recebido da CVM3 e salvar no IPFS
-- na execução, buscar dataset + artefato criptografado no IPFS, descriptografar localmente e enviar para a CVM2
+- criptografar `application.ext4` recebido da CVM2 e salvar no IPFS
+- na execução, buscar dataset + artefato criptografado no IPFS, descriptografar localmente e enviar para a CVM3
 
 Arquivos principais:
 
@@ -29,11 +29,11 @@ Arquivos principais:
 - `smart-contract/scripts/api-server.js`
 - `smart-contract/scripts/run_from_cids.py`
 
-### 1.2 CVM3
+### 1.2 CVM2
 
-A CVM3 executa apenas o serviço `dnat-builder`.
+A CVM2 executa apenas o serviço `dnat-builder`.
 
-Responsabilidades da CVM3:
+Responsabilidades da CVM2:
 
 - manter somente cache persistente de `.whl`
 - expor uma API mínima de build para a CVM1
@@ -51,11 +51,11 @@ Arquivos principais:
 - `build_vm_runtime/vm/build-vm.sh`
 - `build_vm_runtime/rootfs/runner`
 
-### 1.3 CVM2
+### 1.3 CVM3
 
-A CVM2 continua sendo o executor isolado da aplicação.
+A CVM3 continua sendo o executor isolado da aplicação.
 
-Responsabilidades da CVM2:
+Responsabilidades da CVM3:
 
 - receber da CVM1 apenas o bundle de execução
 - instanciar a `microVM` executora sem rede
@@ -99,20 +99,20 @@ plantuml docs/diagrams/execution-sequence.puml
 3. A CVM1 monta um bundle de build com:
    - `application.py`
    - `manifest.json`
-4. A CVM1 envia esse bundle para a API da CVM3.
-5. A CVM3 cria um `worker` efêmero para aquela build.
+4. A CVM1 envia esse bundle para a API da CVM2.
+5. A CVM2 cria um `worker` efêmero para aquela build.
 6. O `worker` cria os artefatos temporários da build e chama `build-vm.sh`.
 7. `build-vm.sh` instancia a `microVM` de build temporária.
 8. A `microVM` de build recebe:
    - o código da aplicação
    - o manifesto com dependências
-   - um disco com o cache atual de `.whl` da CVM3
+   - um disco com o cache atual de `.whl` da CVM2
 9. A `microVM` resolve dependências, instala em `site-packages` e gera:
    - `application.ext4`
    - `wheelhouse` com wheels reaproveitáveis
 10. A `microVM` grava esses artefatos no disco persistente de saída e morre.
-11. O `worker` coleta a saída, ingere apenas arquivos `.whl` válidos no cache da CVM3, reempacota a resposta e termina.
-12. A CVM3 devolve à CVM1 apenas:
+11. O `worker` coleta a saída, ingere apenas arquivos `.whl` válidos no cache da CVM2, reempacota a resposta e termina.
+12. A CVM2 devolve à CVM1 apenas:
    - `application.ext4`
    - `build-result.json`
 13. A CVM1 criptografa `application.ext4` e publica o blob no IPFS.
@@ -124,18 +124,18 @@ plantuml docs/diagrams/execution-sequence.puml
    - o dataset
    - o `application.ext4` criptografado
 3. A CVM1 descriptografa o artefato da aplicação localmente.
-4. A CVM1 monta um bundle temporário e envia para a CVM2.
-5. A CVM2 instancia a `microVM` executora com:
+4. A CVM1 monta um bundle temporário e envia para a CVM3.
+5. A CVM3 instancia a `microVM` executora com:
    - `rootfs` base imutável
    - disco de entrada com `workspace`
    - disco read-only com `application.ext4`
    - disco persistente de saída
 6. O guest executa a aplicação sem rede.
 7. O resultado é gravado no disco de saída.
-8. A CVM2 coleta `result.json`, `stdout.txt` e `stderr.txt`.
-9. A CVM2 limpa overlay, discos temporários, mounts e socket do Firecracker.
+8. A CVM3 coleta `result.json`, `stdout.txt` e `stderr.txt`.
+9. A CVM3 limpa overlay, discos temporários, mounts e socket do Firecracker.
 
-## 4. Worker da CVM3
+## 4. Worker da CVM2
 
 O `worker` é um processo efêmero criado por build.
 
@@ -143,12 +143,12 @@ Ele existe para:
 
 - dar um escopo limpo de processo por requisição
 - concentrar diretórios temporários, subprocessos, mounts e artefatos daquela build
-- ingerir wheels novas no cache da CVM3 sem deixar a aplicação persistida
+- ingerir wheels novas no cache da CVM2 sem deixar a aplicação persistida
 - morrer completamente ao final, evitando contaminação entre builds
 
 Então a cadeia real fica:
 
-- `builder.py`: serviço HTTP persistente da CVM3
+- `builder.py`: serviço HTTP persistente da CVM2
 - `worker.py`: processo temporário por build
 - `build-vm.sh`: orquestrador host-side da `microVM`
 - `microVM` de build: ambiente que instala dependências e monta o `application.ext4`
@@ -157,21 +157,21 @@ Então a cadeia real fica:
 
 - A CVM1 não executa `pip install` nem importa wheels.
 - A CVM1 não mantém cache de dependências Python.
-- A CVM3 persiste apenas `.whl`, nunca a aplicação.
-- Apenas `.whl` entram no cache da CVM3.
+- A CVM2 persiste apenas `.whl`, nunca a aplicação.
+- Apenas `.whl` entram no cache da CVM2.
 - Wheels maiores que o limite configurado são descartadas.
-- O cache total da CVM3 é podado por tamanho.
-- A CVM3 não tem IPFS, wallet privada nem frontend.
-- A comunicação CVM1 -> CVM3 é feita apenas pela API de build.
+- O cache total da CVM2 é podado por tamanho.
+- A CVM2 não tem IPFS, wallet privada nem frontend.
+- A comunicação CVM1 -> CVM2 é feita apenas pela API de build.
 - A `microVM` de build devolve resultados apenas via disco persistente de saída.
 - A `microVM` executora continua sem stack de rede no kernel.
-- A CVM2 não acessa IPFS.
-- O dataset nunca é enviado para a CVM3.
-- A aplicação sensível não fica persistida na CVM2 após a limpeza.
+- A CVM3 não acessa IPFS.
+- O dataset nunca é enviado para a CVM2.
+- A aplicação sensível não fica persistida na CVM3 após a limpeza.
 
 Observação:
 - `mTLS` ainda não está implementado no repositório.
-- Em ambiente distribuído real, a restrição de rede entre CVM1, CVM3 e CVM2 deve ser reforçada via firewall/security groups/ACLs do host.
+- Em ambiente distribuído real, a restrição de rede entre CVM1, CVM2 e CVM3 deve ser reforçada via firewall/security groups/ACLs do host.
 
 ## 6. Persistência por Camada
 
@@ -182,13 +182,13 @@ Observação:
 - artefatos e execuções exibidos na interface
 - blobs criptografados de aplicação publicados no IPFS
 
-### 6.2 Persistente na CVM3
+### 6.2 Persistente na CVM2
 
 - runtime base do builder
 - kernel e rootfs base do guest de build
 - cache de `.whl`
 
-### 6.3 Persistente na CVM2
+### 6.3 Persistente na CVM3
 
 - runtime base do executor
 - kernel e rootfs base do guest
@@ -196,17 +196,17 @@ Observação:
 ### 6.4 Efêmero na CVM1
 
 - uploads temporários
-- bundles temporários antes do envio à CVM3
-- artefatos temporários descriptografados antes do envio à CVM2
+- bundles temporários antes do envio à CVM2
+- artefatos temporários descriptografados antes do envio à CVM3
 
-### 6.5 Efêmero na CVM3
+### 6.5 Efêmero na CVM2
 
 - diretórios temporários do `worker`
 - bundles de entrada e saída do build
 - overlays e discos temporários da `microVM` de build
 - cópia temporária da aplicação durante o build
 
-### 6.6 Efêmero na CVM2
+### 6.6 Efêmero na CVM3
 
 - overlay do rootfs
 - discos de entrada/saída
@@ -246,7 +246,7 @@ docker compose -f docker/frontend-vm.compose.yaml exec dnat-client curl http://d
 4. Comprar acesso
 5. Executar `Run From CIDs`
 
-### 7.4 Verificar o cache de wheels da CVM3
+### 7.4 Verificar o cache de wheels da CVM2
 
 ```bash
 docker exec dnat-builder sh -lc 'find /var/dnat/wheel-cache -maxdepth 1 -type f -name "*.whl" | sort'
