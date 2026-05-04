@@ -68,6 +68,30 @@ Arquivos principais:
 - `docker/executor-vm.compose.yaml`
 - `vm_runtime/`
 
+## 1.4 Diagramas Visuais
+
+Os diagramas abaixo foram movidos para `PlantUML`, pensando em exportacao para figuras de TCC e apresentacoes.
+
+Arquivos:
+
+- `docs/diagrams/architecture-overview.puml`
+- `docs/diagrams/application-registration-sequence.puml`
+- `docs/diagrams/execution-sequence.puml`
+
+Eles cobrem:
+
+- visao geral da arquitetura com `CVM1`, `CVM2`, `CVM3` e as `microVMs`
+- sequencia de registro da aplicacao
+- sequencia de execucao
+
+Para renderizar localmente, voce pode usar uma extensao PlantUML no VS Code ou o CLI oficial, por exemplo:
+
+```bash
+plantuml docs/diagrams/architecture-overview.puml
+plantuml docs/diagrams/application-registration-sequence.puml
+plantuml docs/diagrams/execution-sequence.puml
+```
+
 ## 2. Fluxo de Registro da Aplicação
 
 1. A aplicação chega à CVM1 com metadados e dependências.

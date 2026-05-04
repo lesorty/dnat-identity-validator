@@ -1,0 +1,46 @@
+@startuml
+title DNAT - Sequencia de Registro da Aplicacao
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #2E4057
+skinparam ArrowThickness 1.2
+skinparam sequence {
+  LifeLineBorderColor #486581
+  LifeLineBackgroundColor #F7FAFC
+  ParticipantBorderColor #2E4057
+  ParticipantBackgroundColor #FFFFFF
+  ActorBorderColor #2E4057
+  ActorBackgroundColor #FFFFFF
+}
+
+actor Usuario as U
+participant "CVM1\nFrontend + API" as C1
+participant "CVM3\nBuilder API" as C3
+participant "worker\nefemero" as W
+participant "microVM de build" as B
+participant "IPFS" as I
+
+U -> C1 : envia aplicacao + manifesto
+activate C1
+C1 -> C1 : materializa upload\nmonta request bundle
+C1 -> C3 : POST /build
+activate C3
+C3 -> W : cria worker por requisicao
+activate W
+W -> B : sobe microVM via Firecracker
+activate B
+B -> B : resolve dependencias\ninstala site-packages\ngera application.ext4
+B --> W : application.ext4 + wheelhouse
+deactivate B
+W -> C3 : persiste apenas .whl validas
+deactivate W
+C3 --> C1 : application.ext4 + build-result.json
+deactivate C3
+C1 -> C1 : criptografa application.ext4
+C1 -> I : publica blob no IPFS
+C1 --> U : confirma registro
+deactivate C1
+
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+title DNAT - Visao Geral da Arquitetura
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #2E4057
+skinparam ArrowThickness 1.2
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam node {
+  BackgroundColor #F7FAFC
+  BorderColor #2E4057
+  FontColor #1F2933
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #486581
+  FontColor #102A43
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #486581
+  FontColor #102A43
+}
+skinparam artifact {
+  BackgroundColor #FFFFFF
+  BorderColor #486581
+  FontColor #102A43
+}
+
+actor "Usuario / Browser" as User
+
+node "CVM1\nCliente e camada de acesso" as CVM1 {
+  component "dnat-client\nFrontend + API" as CLIENT
+  database "IPFS local" as IPFS
+  component "Marketplace\ncontrato + criptografia" as MARKET
+}
+
+node "CVM3\nBuilder isolado" as CVM3 {
+  component "dnat-builder\nAPI de build" as BUILDER
+  component "worker efemero" as WORKER
+  database "Cache de .whl" as WHEELCACHE
+}
+
+node "CVM2\nExecutor isolado" as CVM2 {
+  component "dnat-executor\nAPI de execucao" as EXECUTOR
+}
+
+node "microVM de build\nFirecracker" as BUILDVM
+node "microVM de execucao\nFirecracker" as EXECVM
+
+artifact "application.ext4" as APPART
+artifact "dataset + result.json\nstdout/stderr" as EXECART
+
+User --> CLIENT : upload / consulta / execucao
+CLIENT --> BUILDER : bundle de build
+BUILDER --> WORKER : cria worker por requisicao
+WORKER --> BUILDVM : build-vm.sh
+BUILDVM --> WHEELCACHE : reutiliza / gera wheels
+BUILDVM --> APPART : gera artefato
+BUILDER --> CLIENT : application.ext4 + build-result.json
+CLIENT --> IPFS : publica blob criptografado
+CLIENT --> EXECUTOR : bundle de execucao
+EXECUTOR --> EXECVM : run-vm.sh
+EXECVM --> EXECART : grava saida
+EXECUTOR --> CLIENT : result.json + stdout/stderr
+CLIENT --> User : resposta final
+
+note right of CVM3
+Persistente:
+- cache de .whl
+
+Efemero:
+- worker
+- discos temporarios
+- microVM de build
+end note
+
+note right of CVM2
+Persistente:
+- runtime base
+
+Efemero:
+- bundle de execucao
+- microVM executora
+- discos de entrada/saida
+end note
+
+@enduml
