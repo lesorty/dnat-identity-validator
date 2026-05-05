@@ -8,6 +8,7 @@ BUNDLE_PATH="$1"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KERNEL="$ROOT/artifacts/vmlinux"
 ROOTFS="$ROOT/artifacts/rootfs.ext4"
+# O guest identifica discos olhando apenas para arquivos-marker criados pelo host.
 OUTPUT_MARKER="dnat-output.marker"
 APP_MARKER="dnat-application.marker"
 RESULT_FILE="result.json"
@@ -86,6 +87,7 @@ emit_error() {
 }
 
 cleanup() {
+    # Toda execucao usa overlays/discos temporarios novos; nada da aplicacao e reutilizado depois.
     if [ -n "${RESULT_MOUNT:-}" ] && mountpoint -q "$RESULT_MOUNT" 2>/dev/null; then
         run_as_root umount "$RESULT_MOUNT" || true
     fi
@@ -119,6 +121,7 @@ mount_output_disk() {
 WORKDIR=$(mktemp -d)
 trap cleanup EXIT
 
+# `APP_DISK` e anexado somente quando a execucao usa um artefato ext4 construido pelo builder.
 OVERLAY="$WORKDIR/rootfs-overlay.ext4"
 INPUT_DISK="$WORKDIR/input.ext4"
 OUTPUT_DISK="$WORKDIR/output.ext4"
@@ -135,6 +138,7 @@ cp "$ROOTFS" "$OVERLAY"
 mkdir -p "$STAGING_DIR"
 tar -xzf "$BUNDLE_PATH" -C "$STAGING_DIR"
 [ -d "$STAGING_DIR/workspace" ] || { emit_error "workspace missing from execution bundle"; exit 1; }
+# Reempacota apenas `workspace/` para o guest; o host interpreta e filtra o bundle original antes.
 tar -C "$STAGING_DIR" -czf "$GUEST_BUNDLE_PATH" workspace
 
 if [ -f "$STAGING_DIR/artifacts/application.ext4" ]; then
@@ -167,6 +171,7 @@ done
 
 [ -S "$SOCKET" ] || { emit_error "firecracker socket not created" "$SERIAL_LOG"; exit 1; }
 
+# Executor usa menos recursos porque apenas roda o script ja empacotado.
 fc_put "machine-config" '{"vcpu_count": 1, "mem_size_mib": 512, "smt": false}'
 
 fc_put "boot-source" "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 loglevel=4 noapic reboot=k panic=1 pci=off nomodules random.trust_cpu=on root=/dev/vda rootfstype=ext4 rootwait rw init=/init\"}"
@@ -176,12 +181,14 @@ fc_put "drives/rootfs" "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\
 fc_put "drives/input" "{\"drive_id\": \"input\", \"path_on_host\": \"$INPUT_DISK\", \"is_root_device\": false, \"is_read_only\": true}"
 fc_put "drives/output" "{\"drive_id\": \"output\", \"path_on_host\": \"$OUTPUT_DISK\", \"is_root_device\": false, \"is_read_only\": false}"
 if [ -f "$APP_DISK" ]; then
+    # O artefato da aplicacao entra read-only para separar codigo/deps do workspace efemero.
     fc_put "drives/application" "{\"drive_id\": \"application\", \"path_on_host\": \"$APP_DISK\", \"is_root_device\": false, \"is_read_only\": true}"
 fi
 
 fc_put "actions" '{"action_type": "InstanceStart"}'
 
 execution_complete=0
+# A serial e o canal de sincronizacao entre host e guest para timeout/termino.
 for ((i=0; i<VM_TIMEOUT_SECONDS; i++)); do
     if grep -q "$EXECUTION_COMPLETE_MARKER" "$SERIAL_LOG" 2>/dev/null || \
        grep -q "$EXECUTION_COMPLETE_PREFIX" "$SERIAL_LOG" 2>/dev/null || \
@@ -225,6 +232,7 @@ wait "$FC_PID" || true
 
 mount_output_disk
 
+# A resposta HTTP final e sempre derivada do disco de saida persistido pela microVM.
 python3 - <<PY
 import json
 from pathlib import Path

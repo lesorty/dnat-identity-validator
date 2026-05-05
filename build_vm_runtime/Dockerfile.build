@@ -1,7 +1,9 @@
+# Imagem base do builder: compila kernel/rootfs e tambem serve de runtime host-side do Firecracker.
 FROM ubuntu:24.04 AS build-base
 
 ARG FC_VERSION=1.7.0
 
+# Dependencias pequenas e estaveis primeiro para maximizar cache entre rebuilds.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -9,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git && \
     rm -rf /var/lib/apt/lists/*
 
+# Toolchain completa porque o guest de build precisa compilar dependencias Python nativas quando necessario.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     python3 \
@@ -26,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpython3-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# Firecracker roda no host container; o guest usa o kernel/rootfs gerados nas stages seguintes.
 RUN mkdir -p /tmp/fc-download && \
     cd /tmp/fc-download && \
     curl -sL https://github.com/firecracker-microvm/firecracker/releases/download/v${FC_VERSION}/firecracker-v${FC_VERSION}-x86_64.tgz | tar -xz && \
@@ -34,6 +38,7 @@ RUN mkdir -p /tmp/fc-download && \
     rm -rf /tmp/fc-download && \
     firecracker --version
 
+# Kernel usado pela microVM de build. Aqui rede fica habilitada para baixar wheels/deps.
 FROM build-base AS kernel-builder
 
 WORKDIR /app
@@ -44,6 +49,7 @@ COPY build_vm_runtime/build/build-kernel.sh /app/build/build-kernel.sh
 RUN chmod +x /app/build/build-kernel.sh && \
     bash /app/build/build-kernel.sh
 
+# Rootfs base do guest de build, contendo Python, pip e helper de empacotamento.
 FROM build-base AS rootfs-builder
 
 WORKDIR /app
@@ -57,6 +63,7 @@ COPY smart-contract/scripts/build_application_artifact.py /app/smart-contract/sc
 RUN chmod +x /app/build/build-rootfs.sh /app/rootfs/init /app/rootfs/runner /app/smart-contract/scripts/build_application_artifact.py && \
     bash /app/build/build-rootfs.sh
 
+# Junta scripts host-side e artefatos do guest sem recompilar o mundo todo a cada mudanca.
 FROM build-base AS builder
 
 WORKDIR /app
@@ -70,6 +77,7 @@ COPY --from=kernel-builder /app/artifacts/vmlinux /app/artifacts/vmlinux
 COPY --from=rootfs-builder /app/artifacts/rootfs.ext4 /app/artifacts/rootfs.ext4
 COPY --from=rootfs-builder /app/artifacts/rootfs.tar.gz /app/artifacts/rootfs.tar.gz
 
+# Imagem final executada pela CVM builder.
 FROM ubuntu:24.04 AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -93,6 +101,7 @@ WORKDIR /app
 RUN chmod +x build/*.sh vm/*.sh rootfs/* start-builder.sh guest-tools/build_application_artifact.py worker.py
 
 ENV PATH="/usr/local/bin:$PATH"
+# Local unico persistido pelo builder entre requisicoes.
 ENV WHEEL_CACHE_SOURCE_DIR=/var/dnat/wheel-cache
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

@@ -7,6 +7,7 @@ DEBIAN_RELEASE="bookworm"
 DEBIAN_MIRROR="http://deb.debian.org/debian/"
 FORCE_REBUILD="${FORCE_REBUILD_ROOTFS:-0}"
 
+# O rootfs do executor e pequeno e estavel; evita rebuild desnecessario.
 if [ "$FORCE_REBUILD" != "1" ] && [ -f "$ARTIFACT" ]; then
     exit 0
 fi
@@ -16,6 +17,7 @@ rm -f "$ARTIFACT"
 ROOTFS=/tmp/firecracker-rootfs
 rm -rf "$ROOTFS"
 
+# Guest minimo focado apenas em extrair bundle e rodar `workspace/run.sh`.
 sudo debootstrap --arch=amd64 --variant=minbase "$DEBIAN_RELEASE" "$ROOTFS" "$DEBIAN_MIRROR"
 
 if ! sudo chroot "$ROOTFS" apt-get update; then
@@ -30,6 +32,7 @@ sudo cp "$(dirname "$0")/../rootfs/runner" "$ROOTFS/runner"
 sudo sed -i 's/\r$//' "$ROOTFS/init" "$ROOTFS/runner"
 sudo chmod +x "$ROOTFS/init" "$ROOTFS/runner"
 
+# O tarball e usado como fallback para restaurar o ext4 no startup do container executor.
 sudo tar -C "$ROOTFS" -czf "$ROOTFS_TARBALL" .
 
 dd if=/dev/zero of="$ARTIFACT" bs=1M count=512 2>/dev/null

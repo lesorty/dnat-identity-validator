@@ -3,6 +3,7 @@ set -euo pipefail
 
 ARTIFACT="$(cd "$(dirname "$0")/.." && pwd)/artifacts/vmlinux"
 
+# Evita recompilar o kernel quando o artefato ja esta disponivel no cache da imagem.
 if [ -f "$ARTIFACT" ]; then
     exit 0
 fi
@@ -13,6 +14,7 @@ cd /tmp
 git clone --depth=1 -b v6.6 https://github.com/torvalds/linux.git 2>/dev/null || (cd linux && git pull)
 cd linux
 
+# Baseia o kernel em `defconfig` e depois liga apenas o necessario para guest Firecracker com rede.
 make defconfig
 scripts/config --disable DEBUG_INFO
 scripts/config --enable ACPI

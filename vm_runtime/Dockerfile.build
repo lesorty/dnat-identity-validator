@@ -4,7 +4,6 @@ FROM ubuntu:24.04 AS build-base
 
 ARG FC_VERSION=1.7.0
 ARG UBUNTU_RELEASE=jammy
-
 # Layer 1: System packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -53,7 +52,8 @@ RUN chmod +x /app/build/build-kernel.sh && \
     bash /app/build/build-kernel.sh && \
     ls -lh /app/artifacts/vmlinux
 
-# Stage 3: Build rootfs in its own cacheable layer
+# Stage 3: Build rootfs in its own cacheable layer.
+# O guest de execucao e propositalmente menor e sem stack de rede util.
 FROM build-base AS rootfs-builder
 
 WORKDIR /app
@@ -68,7 +68,8 @@ RUN chmod +x /app/build/build-rootfs.sh /app/rootfs/init /app/rootfs/runner && \
     bash /app/build/build-rootfs.sh && \
     ls -lh /app/artifacts/
 
-# Stage 4: Assemble runtime files without forcing kernel/rootfs rebuilds
+# Stage 4: Assemble runtime files without forcing kernel/rootfs rebuilds.
+# Isso mantem o ciclo de desenvolvimento rapido para scripts host-side.
 FROM build-base AS builder
 
 WORKDIR /app
@@ -83,7 +84,7 @@ COPY --from=rootfs-builder /app/artifacts/rootfs.tar.gz /app/artifacts/rootfs.ta
 
 RUN echo "Assembled runtime artifacts:" && ls -lh /app/artifacts/
 
-# Final stage: Small runtime image
+# Final stage: Small runtime image that hosts Firecracker and exposes the executor API.
 FROM ubuntu:24.04 AS runtime
 
 ARG FC_VERSION=1.7.0
@@ -112,7 +113,7 @@ RUN chmod +x build/*.sh vm/*.sh rootfs/* start-executor.sh 2>/dev/null || true
 
 ENV PATH="/usr/local/bin:$PATH"
 
-# Health check
+# Health check leve: confirma que o binario do Firecracker esta disponivel no runtime final.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD firecracker --version || exit 1
 

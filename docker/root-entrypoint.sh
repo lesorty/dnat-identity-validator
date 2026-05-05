@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Defaults locais para a CVM1 quando builder/executor estao na mesma rede Docker.
 IPFS_PATH="${IPFS_PATH:-/data/ipfs}"
 RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
 IPFS_API_URL="${IPFS_API_URL:-http://127.0.0.1:5001}"
@@ -13,6 +14,7 @@ ASSET_ENCRYPTION_KEY="${ASSET_ENCRYPTION_KEY:-dnat-dev-asset-key}"
 cleanup() {
   local exit_code=$?
 
+  # O entrypoint e responsavel por encerrar os 3 processos filhos na ordem inversa.
   if [[ -n "${WEB_PID:-}" ]] && kill -0 "${WEB_PID}" 2>/dev/null; then
     kill "${WEB_PID}" 2>/dev/null || true
   fi
@@ -36,6 +38,7 @@ wait_for_http() {
   local data="${4:-}"
   local attempts="${5:-60}"
 
+  # Espera cada dependencia responder antes de encadear a proxima etapa do bootstrap.
   for ((i = 1; i <= attempts; i += 1)); do
     if [[ -n "${data}" ]]; then
       if curl --silent --show-error --fail -X "${method}" -H "Content-Type: application/json" --data "${data}" "${url}" >/dev/null; then
@@ -63,6 +66,7 @@ if [[ ! -f "${IPFS_PATH}/config" ]]; then
   ipfs init --profile=server
 fi
 
+# O daemon IPFS precisa subir antes do deploy, porque o frontend/API usa a API local dele.
 echo "Starting IPFS daemon"
 ipfs daemon --migrate=true &
 IPFS_PID=$!
@@ -80,9 +84,11 @@ wait_for_http \
   "${RPC_URL}" \
   '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}'
 
+# O deploy sempre acontece no startup para alinhar o estado do contrato local com a UI/API.
 echo "Deploying local smart contract"
 RPC_URL="${RPC_URL}" npx hardhat run scripts/deploy.js --network localhost
 
+# A API Node e o ultimo processo, porque depende de IPFS e RPC ja operacionais.
 echo "Starting DNAT web client on port ${WEB_PORT}"
 RPC_URL="${RPC_URL}" \
 IPFS_API_URL="${IPFS_API_URL}" \

@@ -15,6 +15,7 @@ rebuild_rootfs_from_tarball() {
         return 1
     }
 
+    # Reconstroi o ext4 a partir do tarball empacotado quando a imagem em disco nao esta confiavel.
     rm -f "$ROOTFS"
     dd if=/dev/zero of="$ROOTFS" bs=1M count=512 >/dev/null 2>&1
     mkfs.ext4 "$ROOTFS" >/dev/null 2>&1
@@ -40,6 +41,7 @@ validate_rootfs() {
         return 1
     fi
 
+    # O guest executora precisa apenas de `init` e `runner`.
     local ok=0
     if [ -x "$mount_dir/init" ] && [ -x "$mount_dir/runner" ]; then
         ok=1
@@ -54,6 +56,7 @@ validate_rootfs() {
 sync_guest_scripts() {
     local mount_dir
     mount_dir="$(mktemp -d)"
+    # Permite iterar nos scripts do guest sem refazer toda a imagem Docker do executor.
     mount -o loop "$ROOTFS" "$mount_dir"
     cp "$GUEST_INIT_SRC" "$mount_dir/init"
     cp "$GUEST_RUNNER_SRC" "$mount_dir/runner"
@@ -72,4 +75,5 @@ fi
 echo "Syncing guest scripts into rootfs..."
 sync_guest_scripts
 
+# O container executor permanece como API HTTP; cada chamada `/execute` sobe uma microVM nova.
 exec python3 "$ROOT/executor.py" 5000

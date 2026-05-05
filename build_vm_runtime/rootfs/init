@@ -1,15 +1,18 @@
 #!/bin/sh
 set -eu
 
+# Bootstrap minimo de PID 1 dentro da microVM de build.
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev 2>/dev/null || true
+# Toda observabilidade do guest sai pela serial do Firecracker.
 exec >/dev/ttyS0 2>&1
 
 /runner
 
 sync
 
+# Tenta varias estrategias de desligamento porque nem toda combinacao kernel/rootfs reage igual.
 poweroff -f || true
 reboot -f || true
 halt -f || true

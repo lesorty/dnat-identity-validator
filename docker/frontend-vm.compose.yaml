@@ -9,15 +9,18 @@ services:
       WEB_PORT: ${WEB_PORT:-3001}
       RPC_URL: http://127.0.0.1:8545
       IPFS_API_URL: http://127.0.0.1:5001
+      # Por default a CVM1 fala com builder/executor pelos nomes de servico na rede Docker compartilhada.
       EXECUTOR_URL: ${EXECUTOR_URL:-http://dnat-executor:5000}
       BUILDER_URL: ${BUILDER_URL:-http://dnat-builder:5100}
       PRIVATE_KEY: ${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
     ports:
+      # Expoe UI, API IPFS, gateway IPFS e RPC Hardhat para testes locais.
       - "3001:3001"
       - "5001:5001"
       - "8080:8080"
       - "8545:8545"
     volumes:
+      # Persiste o repositorio IPFS da CVM1 entre reinicios.
       - dnat_ipfs_data:/data/ipfs
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -30,4 +33,5 @@ volumes:
 
 networks:
   dnat-runtime:
+    # Rede comum para os tres papeis no modo local.
     name: dnat-runtime

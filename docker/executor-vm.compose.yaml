@@ -5,12 +5,14 @@ services:
       dockerfile: Dockerfile.build
     image: dnat-executor:latest
     container_name: dnat-executor
+    # Tambem precisa de privilegios para KVM e para montar discos ext4 temporarios.
     privileged: true
     devices:
       - /dev/kvm:/dev/kvm
     ports:
       - "5000:5000"
     volumes:
+      # Mantem scripts do executor editaveis sem rebuild completo da imagem durante desenvolvimento.
       - ../vm_runtime/executor.py:/app/executor.py
       - ../vm_runtime/start-executor.sh:/app/start-executor.sh
       - ../vm_runtime/vm:/app/vm

@@ -3,6 +3,7 @@ set -e
 
 ARTIFACT="$(cd "$(dirname "$0")/.." && pwd)/artifacts/vmlinux"
 
+# Reutiliza o kernel compilado se ele ja estiver presente.
 if [ -f "$ARTIFACT" ]; then
     exit 0
 fi
@@ -13,6 +14,7 @@ cd /tmp
 git clone --depth=1 -b v6.6 https://github.com/torvalds/linux.git 2>/dev/null || (cd linux && git pull)
 cd linux
 
+# O kernel do executor remove rede para reduzir a superficie do guest de execucao.
 make defconfig
 scripts/config --disable DEBUG_INFO
 scripts/config --enable ACPI

@@ -5,16 +5,19 @@ services:
       dockerfile: build_vm_runtime/Dockerfile.build
     image: dnat-builder:latest
     container_name: dnat-builder
+    # Necessario para KVM, mounts loopback, TAP e iptables usados pelo Firecracker.
     privileged: true
     devices:
       - /dev/kvm:/dev/kvm
     environment:
+      # O cache persistente da CVM builder guarda apenas arquivos `.whl`.
       WHEEL_CACHE_SOURCE_DIR: /var/dnat/wheel-cache
       WHEEL_CACHE_MAX_BYTES: ${WHEEL_CACHE_MAX_BYTES:-2147483648}
       WHEEL_CACHE_MAX_FILE_BYTES: ${WHEEL_CACHE_MAX_FILE_BYTES:-262144000}
     ports:
       - "5100:5100"
     volumes:
+      # Volume unico e persistente do builder: cache de wheels reaproveitaveis.
       - dnat_builder_wheel_cache:/var/dnat/wheel-cache
     networks:
       - dnat-runtime

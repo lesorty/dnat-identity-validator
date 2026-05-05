@@ -1,0 +1,93 @@
+@startuml
+title DNAT - Sequencia de Startup da VM1
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #2E4057
+skinparam ArrowThickness 1.2
+skinparam linetype ortho
+skinparam sequence {
+  LifeLineBorderColor #486581
+  LifeLineBackgroundColor #F7FAFC
+  ParticipantBorderColor #486581
+  ParticipantBackgroundColor #FFFFFF
+  ParticipantFontColor #102A43
+  ActorBorderColor #486581
+  ActorBackgroundColor #FFFFFF
+  ActorFontColor #102A43
+}
+
+actor "Operador" as User
+participant "docker compose\nfrontend-vm.compose.yaml" as Compose
+participant "docker build\nDockerfile" as Dockerfile
+participant "container dnat-client\nENTRYPOINT=tini" as Container
+participant "root-entrypoint.sh" as Entry
+participant "IPFS daemon" as IPFS
+participant "Hardhat node" as Hardhat
+participant "deploy.js" as Deploy
+participant "api-server.js" as Api
+
+User -> Compose : docker compose up -d --build
+Compose -> Dockerfile : build image da CVM1
+
+activate Dockerfile
+Dockerfile -> Dockerfile : copia binario `ipfs`\ninstala pacotes base
+Dockerfile -> Dockerfile : npm ci em `smart-contract/`
+Dockerfile -> Dockerfile : copia `root-entrypoint.sh`
+Dockerfile -> Compose : imagem `dnat-client-local`
+deactivate Dockerfile
+
+Compose -> Container : cria container\ninjeta env/ports/volume/rede
+activate Container
+Container -> Entry : executa via `tini`
+activate Entry
+
+Entry -> Entry : resolve defaults de ambiente
+Entry -> Entry : cria `/data/ipfs`\ne `/app/smart-contract/executions`
+
+alt repo IPFS ainda nao existe
+  Entry -> IPFS : `ipfs init --profile=server`
+end
+
+Entry -> IPFS : `ipfs daemon --migrate=true`
+activate IPFS
+Entry -> IPFS : wait_for_http POST `/api/v0/version`
+IPFS --> Entry : API pronta
+
+Entry -> Hardhat : `npx hardhat node --hostname 0.0.0.0`
+activate Hardhat
+Entry -> Hardhat : wait_for_http POST JSON-RPC `eth_chainId`
+Hardhat --> Entry : RPC pronta
+
+Entry -> Deploy : `npx hardhat run scripts/deploy.js --network localhost`
+activate Deploy
+Deploy --> Entry : contrato implantado
+deactivate Deploy
+
+Entry -> Api : `node scripts/api-server.js`
+activate Api
+Api --> Entry : processo principal em execucao
+
+note right of Entry
+Ordem obrigatoria:
+1. IPFS
+2. Hardhat
+3. deploy do contrato
+4. API/web
+end note
+
+note right of Compose
+`frontend-vm.compose.yaml` define:
+- build context
+- env vars
+- portas
+- volume IPFS
+- rede `dnat-runtime`
+end note
+
+deactivate Api
+deactivate Entry
+deactivate Container
+
+@enduml

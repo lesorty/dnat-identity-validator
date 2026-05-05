@@ -10,6 +10,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KERNEL="$ROOT/artifacts/vmlinux"
 ROOTFS="$ROOT/artifacts/rootfs.ext4"
 WHEEL_CACHE_SOURCE_DIR="${WHEEL_CACHE_SOURCE_DIR:-/var/dnat/wheel-cache}"
+# Markers simples em disco permitem ao guest descobrir papeis dos volumes sem metadata extra.
 OUTPUT_MARKER="dnat-build-output.marker"
 WHEEL_CACHE_MARKER="dnat-wheel-cache.marker"
 BUILD_RESULT_FILE="build-result.json"
@@ -76,6 +77,7 @@ emit_error() {
 mount_disk_ro_or_rw() {
     local image="$1"
     local mount_dir="$2"
+    # Tenta leitura pura primeiro; cai para RW quando o journal ext4 exige replay.
     if run_as_root mount -o loop,ro "$image" "$mount_dir"; then
         return
     fi
@@ -99,6 +101,7 @@ cleanup_network() {
 }
 
 cleanup() {
+    # Todo o estado da build fica dentro de um workdir efemero para evitar vazamento entre requisicoes.
     if [ -n "${RESULT_MOUNT:-}" ] && mountpoint -q "$RESULT_MOUNT" 2>/dev/null; then
         run_as_root umount "$RESULT_MOUNT" || true
     fi
@@ -143,6 +146,7 @@ create_data_disk_from_dir() {
 
     local size_bytes
     size_bytes="$(directory_size_bytes "$source_dir")"
+    # Superdimensiona o disco para dar folga ao mkfs e a metadados ext4.
     local image_mb
     image_mb="$(python3 - "$size_bytes" <<'PY'
 import math
@@ -161,6 +165,7 @@ PY
 }
 
 setup_network() {
+    # A microVM de build tem acesso de saida para baixar dependencias, mas bloqueia faixas privadas do host.
     WAN_IF="$(ip route show default | awk '/default/ {print $5; exit}')"
     [ -n "$WAN_IF" ] || { emit_error "Unable to determine default egress interface"; exit 1; }
 
@@ -184,6 +189,7 @@ setup_network() {
 WORKDIR="$(mktemp -d)"
 trap cleanup EXIT
 
+# O host monta discos separados para entrada, saida e cache; o guest os descobre por markers.
 OVERLAY="$WORKDIR/rootfs-overlay.ext4"
 INPUT_DISK="$WORKDIR/input.ext4"
 OUTPUT_DISK="$WORKDIR/output.ext4"
@@ -257,6 +263,7 @@ fc_put() {
     fi
 }
 
+# Builder recebe mais CPU/memoria porque pode compilar wheels e resolver dependencias pesadas.
 fc_put "machine-config" '{"vcpu_count": 2, "mem_size_mib": 1536, "smt": false}'
 fc_put "boot-source" "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 loglevel=4 noapic reboot=k panic=1 pci=off nomodules random.trust_cpu=on root=/dev/vda rootfstype=ext4 rootwait rw init=/init\"}"
 fc_put "drives/rootfs" "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\", \"is_root_device\": true, \"is_read_only\": false}"
@@ -269,6 +276,7 @@ fc_put "network-interfaces/eth0" "{\"iface_id\": \"eth0\", \"guest_mac\": \"$GUE
 fc_put "actions" '{"action_type": "InstanceStart"}'
 
 build_complete=0
+# O host considera a execucao finalizada quando o guest escreve um marcador na serial ou encerra.
 for ((i=0; i<VM_TIMEOUT_SECONDS; i++)); do
     if grep -q "$COMPLETE_MARKER" "$SERIAL_LOG" 2>/dev/null || \
        grep -q "$COMPLETE_PREFIX" "$SERIAL_LOG" 2>/dev/null || \
@@ -349,4 +357,5 @@ if [ -d "$RESULT_MOUNT/wheelhouse" ]; then
     find "$RESULT_MOUNT/wheelhouse" -maxdepth 1 -type f -name '*.whl' -exec cp {} "$PACKAGE_DIR/wheelhouse/" \;
 fi
 
+# A resposta devolve apenas o artefato final e metadados do build; o estado temporario da app e descartado.
 tar -C "$PACKAGE_DIR" -czf "$OUTPUT_BUNDLE_PATH" .
