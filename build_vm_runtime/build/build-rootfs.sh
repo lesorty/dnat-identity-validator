@@ -1,8 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+# Define local onde o rootfs vai ser armazenado.
 ARTIFACT="$(cd "$(dirname "$0")/.." && pwd)/artifacts/rootfs.ext4"
+# O tarball serve como fallback para reconstruir o ext4 no startup do container.
 ROOTFS_TARBALL="$(cd "$(dirname "$0")/.." && pwd)/artifacts/rootfs.tar.gz"
+
 DEBIAN_RELEASE="bookworm"
 DEBIAN_MIRROR="http://deb.debian.org/debian/"
 FORCE_REBUILD="${FORCE_REBUILD_ROOTFS:-0}"
@@ -17,6 +20,7 @@ rm -f "$ARTIFACT"
 ROOTFS=/tmp/firecracker-build-rootfs
 rm -rf "$ROOTFS"
 
+#!!
 # Cria um guest Debian minimo para a microVM de build.
 sudo debootstrap --arch=amd64 --variant=minbase "$DEBIAN_RELEASE" "$ROOTFS" "$DEBIAN_MIRROR"
 
@@ -47,6 +51,7 @@ sudo chroot "$ROOTFS" apt-get install -y \
     curl \
     busybox-static
 
+# Copia os scripts de inicializacao e o builder de artefatos para dentro do rootfs, e garante que sejam executaveis.
 sudo mkdir -p "$ROOTFS/opt/dnat"
 sudo cp "$(dirname "$0")/../rootfs/init" "$ROOTFS/init"
 sudo cp "$(dirname "$0")/../rootfs/runner" "$ROOTFS/runner"
@@ -57,6 +62,7 @@ sudo chmod +x "$ROOTFS/init" "$ROOTFS/runner" "$ROOTFS/opt/dnat/build_applicatio
 # O tarball serve como fallback para reconstruir o ext4 no startup do container.
 sudo tar -C "$ROOTFS" -czf "$ROOTFS_TARBALL" .
 
+# Cria um arquivo preenchido com zeros, formate como ext4, e tenta montar para copiar os arquivos do rootfs.
 dd if=/dev/zero of="$ARTIFACT" bs=1M count=1536 2>/dev/null
 mkfs.ext4 "$ARTIFACT" >/dev/null 2>&1
 
@@ -68,7 +74,10 @@ if sudo mount "$ARTIFACT" "$mount_dir" 2>/dev/null; then
 else
     # Se o mount falhar aqui, o startup posterior ainda consegue regenerar o ext4 a partir do tarball.
     rm -f "$ARTIFACT"
+
+    #cria o arquivo disco, com 1536MiB
     dd if=/dev/zero of="$ARTIFACT" bs=1M count=1536 2>/dev/null
+
     mkfs.ext4 "$ARTIFACT" >/dev/null 2>&1
     rmdir "$mount_dir"
 fi

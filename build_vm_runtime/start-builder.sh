@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT="/app"
+
+# Imagem utilizada como base para o builder de microVMs.
 ROOTFS="$ROOT/artifacts/rootfs.ext4"
 ROOTFS_TARBALL="$ROOT/artifacts/rootfs.tar.gz"
 GUEST_INIT_SRC="$ROOT/rootfs/init"
