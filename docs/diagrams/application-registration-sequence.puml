@@ -1,5 +1,5 @@
 @startuml
-title DNAT - Sequencia de Registro da Aplicacao
+title DNAT - Application Registration Sequence
 
 skinparam backgroundColor white
 skinparam shadowing false
@@ -15,32 +15,32 @@ skinparam sequence {
   ActorBackgroundColor #FFFFFF
 }
 
-actor Usuario as U
+actor User as U
 participant "CVM1\nFrontend + API" as C1
 participant "CVM2\nBuilder API" as C2
-participant "worker\nefemero" as W
-participant "microVM de build" as B
+participant "ephemeral\nworker" as W
+participant "build microVM" as B
 participant "IPFS" as I
 
-U -> C1 : 1. envia aplicacao + manifesto
+U -> C1 : 1. submit application + manifest
 activate C1
-C1 -> C1 : 2. materializa upload\nmonta request bundle
+C1 -> C1 : 2. materialize upload\nassemble request bundle
 C1 -> C2 : 3. POST /build
 activate C2
-C2 -> W : 4. cria worker por requisicao
+C2 -> W : 4. create worker per request
 activate W
-W -> B : 5. sobe microVM via Firecracker
+W -> B : 5. start microVM via Firecracker
 activate B
-B -> B : 6. resolve dependencias\ninstala site-packages\ngera application.ext4
+B -> B : 6. resolve dependencies\ninstall site-packages\ngenerate application.ext4
 B --> W : 7. application.ext4 + wheelhouse
 deactivate B
-W -> C2 : 8. persiste apenas .whl validas
+W -> C2 : 8. persist only valid .whl files
 deactivate W
 C2 --> C1 : 9. application.ext4 + build-result.json
 deactivate C2
-C1 -> C1 : 10. criptografa application.ext4
-C1 -> I : 11. publica blob no IPFS
-C1 --> U : 12. confirma registro
+C1 -> C1 : 10. encrypt application.ext4
+C1 -> I : 11. publish blob to IPFS
+C1 --> U : 12. confirm registration
 deactivate C1
 
 @enduml

@@ -1,0 +1,79 @@
+@startuml
+title DNAT - Etapa 2
+caption Mesmo com execucao em microVM, a falha ainda pode se alastrar para a VM inteira
+
+left to right direction
+skinparam backgroundColor #FCFCFD
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontColor #14324A
+skinparam dpi 180
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+skinparam roundcorner 18
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam ArrowColor #355C7D
+skinparam ArrowThickness 1.4
+skinparam wrapWidth 220
+skinparam maxMessageSize 140
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #4B6584
+  FontColor #14324A
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #577590
+  FontColor #14324A
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #577590
+  FontColor #14324A
+}
+skinparam cloud {
+  BackgroundColor #F5F7FA
+  BorderColor #829AB1
+  FontColor #243B53
+}
+skinparam note {
+  BackgroundColor #FFF7D6
+  BorderColor #D4B85F
+  FontColor #5C4813
+}
+skinparam rectangle<<mainvm>> {
+  BackgroundColor #EAF4FF
+  BorderColor #2F6FB5
+  FontColor #113A63
+}
+skinparam rectangle<<microvm>> {
+  BackgroundColor #FFFDF2
+  BorderColor #C0A000
+  FontColor #6E5A00
+}
+skinparam database<<secret>> {
+  BackgroundColor #E8ECFF
+  BorderColor #5B6EE1
+  FontColor #263A99
+}
+
+cloud "Codigo nao confiavel" as ATTACK
+
+rectangle "CVM confidencial unica" <<mainvm>> as ALL {
+  component "Frontend, APIs\ne controle" as CTRL
+  rectangle "microVM executora" <<microvm>> as EXECM
+  database "Dados sensiveis\nwallet, chaves,\ndatasets e artefatos" <<secret>> as SEC
+}
+
+ATTACK --> EXECM : entrada maliciosa
+EXECM -[#C73E1D,dashed,thickness=2]-> CTRL : escape / movimento lateral
+EXECM -[#C73E1D,dashed,thickness=2]-> SEC : leitura ou exfiltracao
+
+note bottom of ALL
+Separar somente o guest nao basta quando o host ainda concentra todas as funcoes criticas.
+end note
+
+@enduml

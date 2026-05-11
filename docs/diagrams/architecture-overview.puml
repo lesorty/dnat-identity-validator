@@ -1,5 +1,5 @@
 @startuml
-title DNAT - Visao Geral da Arquitetura
+title DNAT - Architecture Overview
 
 left to right direction
 
@@ -34,26 +34,26 @@ skinparam artifact {
   FontColor #102A43
 }
 
-actor "Usuario / Browser" as User
+actor "User / Browser" as User
 
-node "CVM1\nCliente e camada de acesso" as CVM1 {
+node "CVM1\nClient and access layer" as CVM1 {
   component "dnat-client\nFrontend + API" as CLIENT
-  database "IPFS local" as IPFS
-  component "Marketplace\ncontrato + criptografia" as MARKET
+  database "Local IPFS" as IPFS
+  component "Marketplace\ncontract + encryption" as MARKET
 }
 
-node "CVM2\nBuilder isolado" as CVM2 {
-  component "dnat-builder\nAPI de build" as BUILDER
-  component "worker efemero" as WORKER
-  database "Cache de .whl" as WHEELCACHE
+node "CVM2\nIsolated builder" as CVM2 {
+  component "dnat-builder\nBuild API" as BUILDER
+  component "ephemeral worker" as WORKER
+  database ".whl cache" as WHEELCACHE
 }
 
-node "CVM3\nExecutor isolado" as CVM3 {
-  component "dnat-executor\nAPI de execucao" as EXECUTOR
+node "CVM3\nIsolated executor" as CVM3 {
+  component "dnat-executor\nExecution API" as EXECUTOR
 }
 
-node "microVM de build\nFirecracker" as BUILDVM
-node "microVM de execucao\nFirecracker" as EXECVM
+node "build microVM\nFirecracker" as BUILDVM
+node "execution microVM\nFirecracker" as EXECVM
 
 artifact "application.ext4" as APPART
 artifact "dataset + result.json\nstdout/stderr" as EXECART
@@ -63,41 +63,41 @@ EXECVM -[hidden]down- EXECART
 CVM1 -[hidden]right- CVM2
 CVM2 -[hidden]right- CVM3
 
-User -down-> CLIENT : B1 / E1\nupload / consulta /\nexecucao
-CLIENT -up-> User : B7 / E6\nresposta final
+User -down-> CLIENT : B1 / E1\nupload / query /\nexecute
+CLIENT -up-> User : B7 / E6\nfinal response
 
-CLIENT -right-> BUILDER : B2\nbundle\nde build
-BUILDER -down-> WORKER : B3\ncria worker\npor requisicao
+CLIENT -right-> BUILDER : B2\nbuild\nbundle
+BUILDER -down-> WORKER : B3\ncreate worker\nper request
 WORKER -left-> BUILDVM : B4\nbuild-vm.sh
-BUILDVM -down-> APPART : B5\ngera\nartefato
-BUILDVM -up-> WHEELCACHE : B5a\nreutiliza /\ngera wheels
+BUILDVM -down-> APPART : B5\ngenerate\nartifact
+BUILDVM -up-> WHEELCACHE : B5a\nreuse /\ngenerate wheels
 BUILDER -left-> CLIENT : B6\napplication.ext4 +\nbuild-result.json
 
-CLIENT -down-> IPFS : B7a\npublica blob\ncriptografado
+CLIENT -down-> IPFS : B7a\npublish encrypted\nblob
 
-CLIENT -right-> EXECUTOR : E2\nbundle\nde execucao
+CLIENT -right-> EXECUTOR : E2\nexecution\nbundle
 EXECUTOR -down-> EXECVM : E3\nrun-vm.sh
-EXECVM -down-> EXECART : E4\ngrava\nsaida
+EXECVM -down-> EXECART : E4\nwrite\noutput
 EXECUTOR -left-> CLIENT : E5\nresult.json +\nstdout/stderr
 
 note right of CVM2
-Persistente:
-- cache de .whl
+Persistent:
+- .whl cache
 
-Efemero:
+Ephemeral:
 - worker
-- discos temporarios
-- microVM de build
+- temporary disks
+- build microVM
 end note
 
 note right of CVM3
-Persistente:
-- runtime base
+Persistent:
+- base runtime
 
-Efemero:
-- bundle de execucao
-- microVM executora
-- discos de entrada/saida
+Ephemeral:
+- execution bundle
+- execution microVM
+- input/output disks
 end note
 
 @enduml

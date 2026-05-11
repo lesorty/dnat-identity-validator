@@ -1,0 +1,103 @@
+@startuml
+title DNAT - Etapa 4
+caption A microVM executora fica sem internet e devolve a saida apenas por armazenamento persistente
+
+left to right direction
+skinparam backgroundColor #FCFCFD
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontColor #14324A
+skinparam dpi 180
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+skinparam roundcorner 18
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam ArrowColor #355C7D
+skinparam ArrowThickness 1.4
+skinparam wrapWidth 220
+skinparam maxMessageSize 140
+
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #4B6584
+  FontColor #14324A
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #577590
+  FontColor #14324A
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #577590
+  FontColor #14324A
+}
+skinparam cloud {
+  BackgroundColor #F5F7FA
+  BorderColor #829AB1
+  FontColor #243B53
+}
+skinparam note {
+  BackgroundColor #FFF7D6
+  BorderColor #D4B85F
+  FontColor #5C4813
+}
+skinparam rectangle<<mainvm>> {
+  BackgroundColor #EAF4FF
+  BorderColor #2F6FB5
+  FontColor #113A63
+}
+skinparam rectangle<<execvm>> {
+  BackgroundColor #EEF9F1
+  BorderColor #2E8B57
+  FontColor #1F5C3E
+}
+skinparam rectangle<<microvm>> {
+  BackgroundColor #FFFDF2
+  BorderColor #C0A000
+  FontColor #6E5A00
+}
+skinparam database<<secret>> {
+  BackgroundColor #E8ECFF
+  BorderColor #5B6EE1
+  FontColor #263A99
+}
+skinparam database<<storage>> {
+  BackgroundColor #F3F7FB
+  BorderColor #6C8EBF
+  FontColor #294A70
+}
+
+cloud "Internet" as NET
+
+rectangle "CVM principal" <<mainvm>> as MAIN {
+  component "Frontend + API" as FE
+  database "Dados sensiveis" <<secret>> as SEC
+}
+
+rectangle "CVM executora" <<execvm>> as EXEC {
+  component "API de execucao" as API
+  rectangle "microVM executora\nsem rede" <<microvm>> as M
+  database "Disco persistente de saida\nresult.json / stdout / stderr" <<storage>> as OUT
+}
+
+FE --> API : bundle temporario
+API --> M : executa aplicacao
+M --> OUT : grava resultado
+OUT --> API : coleta saida
+API --> FE : devolve resultado
+M -[#C73E1D,dashed]-> NET : acesso bloqueado
+
+note right of M
+Sem NIC e sem stack de rede.
+Retorno apenas pelo disco de saida.
+end note
+
+note bottom of EXEC
+A superficie de ataque cai porque o guest deixa de falar com a internet
+e nao precisa interagir com servicos externos.
+end note
+
+@enduml
