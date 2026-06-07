@@ -1,0 +1,128 @@
+# Baseline centralizado (Ambiente A do TCC): junta CVM1 + builder + executor num unico container.
+# Mantem Firecracker como mecanismo de microVM para isolar a variavel arquitetural,
+# mas remove a separacao em tres trust domains: tudo roda como o mesmo usuario, no mesmo
+# namespace de mount, no mesmo namespace de rede.
+
+# Reaproveita binario IPFS (igual a CVM1 atual).
+FROM ipfs/kubo:release AS ipfs
+
+# Builder do guest do dnat-builder (mesmas stages do build_vm_runtime/Dockerfile.build).
+FROM ubuntu:24.04 AS build-base
+
+ARG FC_VERSION=1.7.0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl wget git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential python3 sudo debootstrap qemu-utils \
+    flex bison libncurses-dev libssl-dev bc libelf-dev libdw-dev \
+    pkg-config libpython3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /tmp/fc-download && cd /tmp/fc-download && \
+    curl -sL https://github.com/firecracker-microvm/firecracker/releases/download/v${FC_VERSION}/firecracker-v${FC_VERSION}-x86_64.tgz | tar -xz && \
+    mv release-v${FC_VERSION}-x86_64/firecracker-v${FC_VERSION}-x86_64 /usr/local/bin/firecracker && \
+    chmod +x /usr/local/bin/firecracker && \
+    rm -rf /tmp/fc-download && \
+    firecracker --version
+
+# Kernel/rootfs do BUILDER guest.
+FROM build-base AS builder-kernel
+WORKDIR /app
+RUN mkdir -p /app/build /app/artifacts
+COPY build_vm_runtime/build/build-kernel.sh /app/build/build-kernel.sh
+RUN chmod +x /app/build/build-kernel.sh && bash /app/build/build-kernel.sh
+
+FROM build-base AS builder-rootfs
+WORKDIR /app
+RUN mkdir -p /app/build /app/rootfs /app/artifacts /app/smart-contract/scripts
+COPY build_vm_runtime/build/build-rootfs.sh /app/build/build-rootfs.sh
+COPY build_vm_runtime/rootfs/init /app/rootfs/init
+COPY build_vm_runtime/rootfs/runner /app/rootfs/runner
+COPY smart-contract/scripts/build_application_artifact.py /app/smart-contract/scripts/build_application_artifact.py
+RUN chmod +x /app/build/build-rootfs.sh /app/rootfs/init /app/rootfs/runner /app/smart-contract/scripts/build_application_artifact.py && \
+    bash /app/build/build-rootfs.sh
+
+# Kernel/rootfs do EXECUTOR guest.
+FROM build-base AS executor-kernel
+WORKDIR /app
+RUN mkdir -p /app/build /app/artifacts
+COPY vm_runtime/build/build-kernel.sh /app/build/build-kernel.sh
+RUN chmod +x /app/build/build-kernel.sh && bash /app/build/build-kernel.sh
+
+FROM build-base AS executor-rootfs
+WORKDIR /app
+RUN mkdir -p /app/build /app/rootfs /app/artifacts
+COPY vm_runtime/build/build-rootfs.sh /app/build/build-rootfs.sh
+COPY vm_runtime/rootfs/init /app/rootfs/init
+COPY vm_runtime/rootfs/runner /app/rootfs/runner
+RUN chmod +x /app/build/build-rootfs.sh /app/rootfs/init /app/rootfs/runner && \
+    bash /app/build/build-rootfs.sh
+
+# Imagem final: control plane (Node 20) + Firecracker host-side + arvores do builder e do executor.
+FROM node:20-bookworm-slim AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Pacotes do CVM1 (api-server, ipfs CLI, tar para artefatos) + pacotes do host-side do Firecracker
+# (qemu-utils para imagens ext4, iproute2/iptables porque o builder configura TAP/iptables).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash ca-certificates curl e2fsprogs python3 tar tini \
+    sudo qemu-utils gzip iproute2 iptables procps kmod && \
+    rm -rf /var/lib/apt/lists/*
+
+# Binarios reaproveitados.
+COPY --from=ipfs /usr/local/bin/ipfs /usr/local/bin/ipfs
+COPY --from=build-base /usr/local/bin/firecracker /usr/local/bin/firecracker
+
+# === CVM1 (control plane) em /app ===
+WORKDIR /app
+COPY smart-contract/package.json smart-contract/package-lock.json ./smart-contract/
+RUN cd smart-contract && npm ci
+COPY smart-contract ./smart-contract
+
+# === Builder em /opt/dnat-builder (era /app no builder original) ===
+RUN mkdir -p /opt/dnat-builder/artifacts /opt/dnat-builder/input
+COPY build_vm_runtime /opt/dnat-builder/
+COPY smart-contract/scripts/build_application_artifact.py /opt/dnat-builder/guest-tools/build_application_artifact.py
+COPY --from=builder-kernel /app/artifacts/vmlinux /opt/dnat-builder/artifacts/vmlinux
+COPY --from=builder-rootfs /app/artifacts/rootfs.ext4 /opt/dnat-builder/artifacts/rootfs.ext4
+COPY --from=builder-rootfs /app/artifacts/rootfs.tar.gz /opt/dnat-builder/artifacts/rootfs.tar.gz
+# Repointar ROOT="/app" -> ROOT="/opt/dnat-builder" no start-builder.sh sem manter fork divergente.
+RUN sed -i 's|^ROOT="/app"|ROOT="/opt/dnat-builder"|' /opt/dnat-builder/start-builder.sh && \
+    chmod +x /opt/dnat-builder/build/*.sh /opt/dnat-builder/vm/*.sh /opt/dnat-builder/rootfs/* \
+             /opt/dnat-builder/start-builder.sh /opt/dnat-builder/guest-tools/build_application_artifact.py \
+             /opt/dnat-builder/worker.py
+
+# === Executor em /opt/dnat-executor (era /app no executor original) ===
+RUN mkdir -p /opt/dnat-executor/artifacts /opt/dnat-executor/input /opt/dnat-executor/output
+COPY vm_runtime /opt/dnat-executor/
+COPY --from=executor-kernel /app/artifacts/vmlinux /opt/dnat-executor/artifacts/vmlinux
+COPY --from=executor-rootfs /app/artifacts/rootfs.ext4 /opt/dnat-executor/artifacts/rootfs.ext4
+COPY --from=executor-rootfs /app/artifacts/rootfs.tar.gz /opt/dnat-executor/artifacts/rootfs.tar.gz
+RUN sed -i 's|^ROOT="/app"|ROOT="/opt/dnat-executor"|' /opt/dnat-executor/start-executor.sh && \
+    chmod +x /opt/dnat-executor/build/*.sh /opt/dnat-executor/vm/*.sh /opt/dnat-executor/rootfs/* \
+             /opt/dnat-executor/start-executor.sh 2>/dev/null || true
+
+# Entrypoint do baseline.
+COPY docker/baseline-entrypoint.sh /usr/local/bin/baseline-entrypoint.sh
+RUN chmod +x /usr/local/bin/baseline-entrypoint.sh
+
+# Defaults internos: tudo fala 127.0.0.1 porque builder/executor/control-plane co-habitam o container.
+ENV IPFS_PATH=/data/ipfs
+ENV RPC_URL=http://127.0.0.1:8545
+ENV IPFS_API_URL=http://127.0.0.1:5001
+ENV WEB_PORT=3001
+ENV EXECUTOR_URL=http://127.0.0.1:5000
+ENV BUILDER_URL=http://127.0.0.1:5100
+ENV PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+ENV ASSET_ENCRYPTION_KEY=dnat-dev-asset-key
+ENV WHEEL_CACHE_SOURCE_DIR=/var/dnat/wheel-cache
+
+RUN mkdir -p /data/ipfs /app/smart-contract/executions /var/dnat/wheel-cache
+
+EXPOSE 3001 5001 8080 8545 5100 5000
+
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/baseline-entrypoint.sh"]

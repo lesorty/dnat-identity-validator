@@ -1,0 +1,48 @@
+services:
+  dnat-baseline:
+    build:
+      context: ..
+      dockerfile: Dockerfile.baseline
+    image: dnat-baseline:latest
+    container_name: dnat-baseline
+    # Mesmas capacidades dos containers individuais (KVM, mounts loopback, TAP, iptables).
+    privileged: true
+    devices:
+      - /dev/kvm:/dev/kvm
+    environment:
+      # Endpoints internos resolvem em 127.0.0.1 porque control plane, builder e executor
+      # co-habitam o mesmo namespace de rede. Este e o ponto da comparacao com o Ambiente B.
+      WEB_PORT: ${WEB_PORT:-3001}
+      RPC_URL: http://127.0.0.1:8545
+      IPFS_API_URL: http://127.0.0.1:5001
+      EXECUTOR_URL: http://127.0.0.1:5000
+      BUILDER_URL: http://127.0.0.1:5100
+      PRIVATE_KEY: ${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
+      ASSET_ENCRYPTION_KEY: ${ASSET_ENCRYPTION_KEY:-dnat-dev-asset-key}
+      WHEEL_CACHE_SOURCE_DIR: /var/dnat/wheel-cache
+      WHEEL_CACHE_MAX_BYTES: ${WHEEL_CACHE_MAX_BYTES:-2147483648}
+      WHEEL_CACHE_MAX_FILE_BYTES: ${WHEEL_CACHE_MAX_FILE_BYTES:-262144000}
+    ports:
+      # Portas externas no range 4xxx para coexistir com o Ambiente B (que ocupa 3001/5001/8080/8545/5100/5000).
+      # Internamente o container continua usando as mesmas portas do B; so o mapeamento host->container muda.
+      - "4001:3001"   # frontend / api-server
+      - "4501:5001"   # IPFS API
+      - "4480:8080"   # IPFS gateway
+      - "4545:8545"   # Hardhat RPC
+      - "4100:5100"   # builder API
+      - "4000:5000"   # executor API
+    volumes:
+      # IPFS, wheel cache e executions ficam todos no MESMO filesystem do container.
+      # Esse e o cerne da comparacao com o Ambiente B: se W3 escapar do build microVM,
+      # ele cai num namespace que tambem ve o repo IPFS e o estado do control plane.
+      - dnat_baseline_ipfs:/data/ipfs
+      - dnat_baseline_wheel_cache:/var/dnat/wheel-cache
+      - dnat_baseline_executions:/app/smart-contract/executions
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  dnat_baseline_ipfs:
+  dnat_baseline_wheel_cache:
+  dnat_baseline_executions:

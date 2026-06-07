@@ -13,7 +13,16 @@
 **/uploads/
 assets/
 smart-contract/manifests/
+# Excluido do contexto da raiz porque os composes do Ambiente B usam context=../vm_runtime.
+# Mas o Dockerfile.baseline do Ambiente A precisa copiar vm_runtime/ a partir da raiz,
+# entao mantemos uma excecao para os arquivos fonte (artifacts/input/output continuam exclusos).
 vm_runtime/
+!vm_runtime/build/
+!vm_runtime/rootfs/
+!vm_runtime/vm/
+!vm_runtime/*.py
+!vm_runtime/*.sh
+!vm_runtime/Dockerfile.build
 *.log
 *.tmp
 *.temp

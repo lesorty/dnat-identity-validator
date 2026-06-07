@@ -1,4 +1,40 @@
-## Modo local no mesmo host Docker
+## Ambiente A (baseline centralizado) - usado pelo TCC para comparacao
+
+Sobe um unico container `dnat-baseline` que hospeda control plane, builder e executor no mesmo trust domain (mesmo usuario, mesmo namespace de mount/rede). Firecracker continua isolando os microVMs de build e execucao para manter a comparacao com o Ambiente B justa (a unica variavel e a separacao em planos).
+
+```bash
+docker compose -f docker/baseline-vm.compose.yaml build --no-cache
+docker compose -f docker/baseline-vm.compose.yaml up -d
+```
+
+As portas externas do Ambiente A ficam no range 4xxx para coexistir com o B:
+
+| Servico         | Ambiente B | Ambiente A |
+|-----------------|-----------:|-----------:|
+| frontend/API    | 3001       | 4001       |
+| IPFS API        | 5001       | 4501       |
+| IPFS gateway    | 8080       | 4480       |
+| Hardhat RPC     | 8545       | 4545       |
+| Builder API     | 5100       | 4100       |
+| Executor API    | 5000       | 4000       |
+
+Verificacao rapida:
+
+```bash
+curl http://127.0.0.1:4001/api/health
+curl http://127.0.0.1:4100/health
+curl http://127.0.0.1:4000/health
+```
+
+Para encerrar:
+
+```bash
+docker compose -f docker/baseline-vm.compose.yaml down
+```
+
+## Ambiente B (arquitetura compartimentada DNAT)
+
+### Modo local no mesmo host Docker
 
 Suba os 3 papéis separadamente:
 - `CVM1`: `dnat-client`
@@ -33,7 +69,7 @@ docker compose -f docker/frontend-vm.compose.yaml exec dnat-client curl http://d
 docker compose -f docker/frontend-vm.compose.yaml exec dnat-client curl http://dnat-executor:5000/health
 ```
 
-## Modo distribuido em VMs separadas
+### Modo distribuido em VMs separadas
 
 Na CVM3:
 
