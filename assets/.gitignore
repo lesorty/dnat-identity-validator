@@ -1,0 +1,5 @@
+test-results/
+malicious_wheel/dist/
+malicious_wheel/*.egg-info/
+malicious_wheel/__pycache__/
+malicious_wheel/malicious_pkg/__pycache__/

@@ -17,7 +17,7 @@ services:
       # Expoe UI, API IPFS, gateway IPFS e RPC Hardhat para testes locais.
       - "3001:3001"
       - "5001:5001"
-      - "8080:8080"
+      - "8082:8080"
       - "8545:8545"
     volumes:
       # Persiste o repositorio IPFS da CVM1 entre reinicios.
