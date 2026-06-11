@@ -10,9 +10,11 @@ como o restante do artigo.
 | Arquivo | O que é | Como usar no Overleaf |
 |---------|---------|------------------------|
 | `results_raw.md` | Todas as medições reais (T1–T5, latência), com contexto e interpretação. | Referência para preencher números; **não** vai no PDF. |
+| `results_ab_campaign.md` | **Segunda coleta (2026-06-11):** corrida comparativa A vs B com o baseline mono-VM exercitado ao vivo (não mais derivado da config). | Referência; **não** vai no PDF. |
 | `results_tables.tex` | 3 tabelas LaTeX com os dados reais (T1–T5, blast radius B×A, desempenho). | Cole as tabelas no corpo do artigo ou use `\input`. |
 | `section_implementation.tex` | Seção **Implementation** nova. | Inserir após "DNAT Architecture", antes de "Security Analysis". |
 | `section_evaluation.tex` | Seção **Evaluation** reescrita (metodologia + resultados). | Substituir a atual "Evaluation Methodology". |
+| `section_results_ab.tex` | Subseção **A/B Comparison: Live Measurement** + tabelas `tab:ab-performance` (custo A×B) e `tab:blast-radius` (versão inglesa). | Inserir ao final da Evaluation, antes de "Threats to Validity". Se usar esta tabela `tab:blast-radius` (EN), **não** inclua a versão PT de `results_tables.tex` (colisão de label). |
 | `section_conclusion.tex` | **Conclusion** revisada integrando as evidências. | Substituir a "Conclusion" atual. |
 
 ## Ordem sugerida das seções no `main.tex`
@@ -37,10 +39,17 @@ T5 (controle de acesso), latência de execução (n=6, média 31,4 s), corretude
 **latência de build / tamanho de artefato** (sem deps 103 s/16 MiB; `requests`
 131 s/19,6 MiB; cache quente 114 s).
 
+**Coletado (Ambiente A vs B ao vivo, 2026-06-11 — `results_ab_campaign.md`):**
+Plano de execução (T1/T1b/benigno) e plano de build (latência + tamanho) medidos
+nos dois ambientes; T4 (segredos/stores/topologia) medido nos containers vivos
+via `docker inspect`; T3 via `docker diff`; T5 negado nos dois. A coluna do
+Ambiente A deixou de ser derivada da config e passou a ser medida.
+
 **A preencher (opcional — fortalece o artigo):**
-- Coluna do Ambiente A (baseline) nas tabelas comparativas com o container vivo
-  (a coluna arquitetural de A já está derivada da config).
 - Ferramentas estáticas/supply-chain (Bandit, Semgrep, pip-audit, Trivy, Grype).
+- Reachability de rede em runtime de *dentro* do executor recoletada (a desta
+  máquina veio do `docker inspect`/topologia; o probe interno está em
+  `results_raw.md` T4, da primeira coleta).
 
 O passo a passo para coletar o que falta está em
 [`assets/tests/EVALUATION_PROTOCOL.md`](../../assets/tests/EVALUATION_PROTOCOL.md).
