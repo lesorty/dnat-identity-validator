@@ -171,10 +171,65 @@ o isolamento por microVM efêmera adiciona ~30 s de overhead fixo por execução
 
 ---
 
-## Pendências (requerem o builder/baseline construídos — ver MANUAL_TESTS.md)
+## T2 — Supply chain no plano de build (execution + build plane)
 
-- **T2 (supply chain no build plane):** requer imagem `dnat-builder` construída e
-  o pacote malicioso semeado no cache (`assets/malicious_wheel/seed_cache.sh`).
-- **Latência de build** (com e sem dependências) e **tamanho do artefato**.
-- **Comparação A/B end-to-end** com o container `dnat-baseline` no ar.
-- **Ferramentas estáticas/supply-chain** (Bandit, Semgrep, pip-audit, Trivy, Grype).
+Pacote malicioso `malicious-pkg` (em `assets/malicious_wheel/`) com dois payloads.
+
+### T2a — Import-time (contido na execução, CVM3) — ✔ SUCESSO
+Wheel semeado no cache da CVM2; build resolveu a dependência
+(`wheelCacheUsed: true`, build em 137 s, returncode 0) e a empacotou no
+`application.ext4`. Executado no executor, o `import malicious_pkg` disparou o
+payload **dentro da microVM de execução sem rede**:
+
+```
+[malicious_pkg] import-time payload executed:
+  env: {ASSET_ENCRYPTION_KEY: absent, PRIVATE_KEY: absent, AWS_SECRET_ACCESS_KEY: absent}
+  files: {/etc/passwd: readable, /proc/self/cgroup: readable}   (rootfs efêmero)
+  network: {8.8.8.8:53: BLOCKED: OSError}
+[T2] import_ran=true
+```
+
+**Interpretação:** o código de uma dependência comprometida **executa**, mas está
+**contido**: nenhum segredo do control plane no ambiente e nenhuma rota de rede.
+Evidência da claim (i) containment aplicada ao vetor de supply chain.
+
+### T2b — Build-time (setup.py no build microVM, CVM2) — parcial
+Com o `sdist` semeado, o pip **iniciou** a reconstrução do pacote dentro do build
+microVM (`Processing malicious_pkg-1.0.0.tar.gz; Preparing metadata (setup.py):
+started`), confirmando que código de supply chain roda no plano de build. A
+build então abortou (`Permission denied: egg_info`, cache montado read-only),
+returncode 1. Observação: o payload de build-time **inicia** no plano de build
+isolado (CVM2), nunca no control plane.
+
+---
+
+## Desempenho — Latência de build (build plane) e tamanho de artefato
+
+Builds enviados diretamente ao builder (`POST :5100/build`). Amostras únicas
+(alta variância no ciclo do build microVM; tratar como indicativas, n=1 cada).
+
+| Cenário | Latência | Artefato `application.ext4` | Cache |
+|---------|---------:|----------------------------:|-------|
+| Sem dependências | 103 s | 16,0 MiB (16777216 B) | n/a |
+| 1 dep do cache (`malicious-pkg`) | 137 s | 16,0 MiB | quente |
+| `requests` (rede, cache frio) | 131 s | 19,6 MiB (20546900 B) | frio → populado |
+| `requests` (cache quente) | 114 s | 19,6 MiB | quente |
+
+**Interpretação:**
+- O build (~100–140 s) é ~3–4× mais caro que a execução (~31 s): o build microVM
+  é mais pesado (2 vCPU / 1536 MiB, rede, resolução de dependências).
+- O build VM **alcança o PyPI** (egress NAT funciona); as faixas privadas são
+  bloqueadas por iptables no host (`build-vm.sh`, claim verificada por config).
+- O **cache quente** reduz o build de `requests` de 131 s → 114 s (~13%) e evita
+  re-download; os wheels resolvidos são persistidos (`certifi`, `urllib3`,
+  `idna`, `charset_normalizer`, `requests`).
+- Dependências aumentam o artefato: 16,0 → 19,6 MiB com `requests`.
+
+---
+
+## Pendências (opcionais — fortalecem o artigo)
+
+- **Comparação A/B end-to-end** com o container `dnat-baseline` no ar (a coluna
+  arquitetural de A já está derivada da config em `results_raw.md`/tabelas).
+- **Ferramentas estáticas/supply-chain** (Bandit, Semgrep, pip-audit, Trivy, Grype)
+  — comandos prontos em `assets/tests/EVALUATION_PROTOCOL.md` seção 7.

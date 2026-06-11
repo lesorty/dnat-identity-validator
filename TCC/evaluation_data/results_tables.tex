@@ -21,7 +21,7 @@ T1 & Exfiltracao de rede a partir da microVM de execucao & (ii) exfiltration res
 \addlinespace
 T1b & Leitura de segredos e escape de filesystem na execucao & (i) containment & Nenhum segredo do control plane no ambiente; guest so enxerga seus proprios discos; escritas confinadas a disco efemero. \\
 \addlinespace
-T2 & Dependencia maliciosa (codigo em build-time) & (i) containment & \emph{TODO: requer builder construido (ver MANUAL\_TESTS.md).} \\
+T2 & Dependencia maliciosa (codigo de uma dependencia comprometida) & (i) containment & Resolvida via cache e empacotada; o payload de import-time roda na execucao mas sem segredos e sem rede; o de build-time inicia no build microVM isolado. \\
 \addlinespace
 T3 & Persistencia de artefatos entre execucoes & (iii) persistence resistance & Nenhum socket, disco \texttt{.ext4}, mount ou dataset remanescente apos 9+ execucoes. \\
 \addlinespace
@@ -70,14 +70,20 @@ RPC blockchain (porta 8545, rede) & Alcancavel$^{\dagger}$ & Alcancavel (127.0.0
 \toprule
 Metrica & Valor \\
 \midrule
-Latencia de execucao --- media & 31{,}4 s \\
+Latencia de execucao --- media (n=6) & 31{,}4 s \\
 Latencia de execucao --- mediana & 31{,}8 s \\
 Latencia de execucao --- min / max & 28{,}5 / 32{,}9 s \\
 Latencia de execucao --- desvio-padrao & 1{,}4 s \\
 \addlinespace
-Latencia de build (sem dependencias) & \emph{TODO} \\
-Latencia de build (com dependencias) & \emph{TODO} \\
-Tamanho do artefato \texttt{application.ext4} & \emph{TODO} \\
+Latencia de build --- sem dependencias & 103 s \\
+Latencia de build --- 1 dep (cache) & 137 s \\
+Latencia de build --- \texttt{requests} (rede, cache frio) & 131 s \\
+Latencia de build --- \texttt{requests} (cache quente) & 114 s \\
+\addlinespace
+Artefato \texttt{application.ext4} --- sem deps & 16{,}0 MiB \\
+Artefato \texttt{application.ext4} --- com \texttt{requests} & 19{,}6 MiB \\
 \bottomrule
 \end{tabularx}
+\par\smallskip
+{\footnotesize Latencias de build sao amostras unicas (n=1, alta variancia no ciclo do build microVM); a latencia de execucao usa n=6. Build $\approx$ 3--4$\times$ a execucao por usar um microVM mais pesado com rede e resolucao de dependencias.}
 \end{table}

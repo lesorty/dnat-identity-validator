@@ -70,6 +70,20 @@ consecutive executions, the executor retains no Firecracker socket, no
 working directory. The \texttt{cleanup} trap removes the entire per-run working
 directory, so no ephemeral state survives to contaminate a later run.
 
+The supply-chain test (T2) connects the two planes. We seeded a malicious package
+into the builder's wheel cache and registered an application that declares it as a
+dependency. The builder resolved and bundled the package (a 137~s build that
+reported the cache hit), and the package then ran its payload at import time
+inside the execution microVM. That payload is the interesting evidence: the
+dependency's code does execute, but it finds no control-plane secrets in the
+environment and reports its outbound probe to a public resolver as blocked,
+exactly mirroring the T1 and T1b results. A compromised dependency therefore
+inherits the containment of the plane that runs it. The complementary build-time
+vector (a source distribution whose \texttt{setup.py} runs during the build)
+begins executing inside the build microVM before failing under the read-only
+cache mount, which confirms that such code, when it does run, runs in the
+isolated builder rather than in the control plane.
+
 \subsection{Blast Radius and Lateral Movement}
 
 The clearest architectural difference between the two designs appears in the
@@ -115,10 +129,19 @@ synchronization, and the guarded shutdown sequence---rather than by the
 application itself, whose computation over sixty rows completes in milliseconds.
 The roughly thirty-second fixed overhead per execution is the price of launching
 a fresh, networkless microVM for every run; it is the operational counterpart of
-the containment and persistence properties demonstrated above. Build-plane cost
-(latency with and without dependencies and artifact size) and the build-time
-supply-chain test (T2) require the builder image and are documented as a
-reproducible manual protocol in the artifact repository.
+the containment and persistence properties demonstrated above.
+
+The build plane is more expensive, as expected from its heavier configuration
+(two vCPUs, more memory, network egress, and dependency resolution). A
+dependency-free build completes in about 103~s and produces a 16~MiB artifact; a
+build that pulls a real dependency tree (\texttt{requests} and four transitive
+packages) takes about 131~s from a cold cache and grows the artifact to 19.6~MiB.
+The wheel cache is a measurable optimization: a warm-cache rebuild of the same
+dependency set drops to about 114~s and avoids re-downloading, confirming that
+caching trades a controlled supply-chain surface for build-time savings. Build
+latencies are single-run samples with higher variance than the execution
+measurements, but the order of magnitude is stable: building is roughly three to
+four times the cost of an execution.
 
 \subsection{Threats to Validity}
 

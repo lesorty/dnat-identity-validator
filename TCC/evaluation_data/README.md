@@ -32,12 +32,14 @@ como o restante do artigo.
 
 **Coletado (Ambiente B, máquina de teste, 2026-06-11):**
 T1 (exfiltração), T1b (filesystem), T3 (limpeza), T4 (blast radius — env/FS/rede),
-T5 (controle de acesso), latência de execução (n=6, média 31,4 s), corretude funcional.
+T5 (controle de acesso), latência de execução (n=6, média 31,4 s), corretude funcional,
+**T2 (supply chain — import-time contido + build-time iniciado)** e
+**latência de build / tamanho de artefato** (sem deps 103 s/16 MiB; `requests`
+131 s/19,6 MiB; cache quente 114 s).
 
-**A preencher (marcado como `TODO`/`_____` nos arquivos):**
-- T2 (supply chain no build) — requer a imagem `dnat-builder` construída.
-- Latência de build e tamanho de `application.ext4`.
-- Coluna do Ambiente A (baseline) nas tabelas comparativas.
+**A preencher (opcional — fortalece o artigo):**
+- Coluna do Ambiente A (baseline) nas tabelas comparativas com o container vivo
+  (a coluna arquitetural de A já está derivada da config).
 - Ferramentas estáticas/supply-chain (Bandit, Semgrep, pip-audit, Trivy, Grype).
 
 O passo a passo para coletar o que falta está em

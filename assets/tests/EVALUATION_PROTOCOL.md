@@ -120,9 +120,14 @@ curl -s -X POST http://127.0.0.1:3001/api/run-from-cids \
 
 ---
 
-## 5. T2 — Supply chain no plano de build (MANUAL — requer builder)
+## 5. T2 — Supply chain no plano de build (AUTOMATIZADO — requer builder)
 
-Reproduz uma dependência comprometida cujo código roda durante o build na CVM2.
+> Harness: `RUN_T2=1 bash assets/tests/run_build_plane_tests.sh` (após semear o
+> cache). ✔ Coletado: o pacote é resolvido do cache e empacotado; o payload de
+> import-time roda na execução **sem segredos e sem rede**; o de build-time
+> inicia no build microVM. Ver `results_raw.md` (seção T2).
+
+Reprodução passo a passo de uma dependência comprometida cujo código roda na CVM2/CVM3.
 
 ```bash
 # 1. Gera o pacote malicioso (sdist dispara setup.py no build microVM)
@@ -167,7 +172,11 @@ Média **31,4 s** (n=6; ver `results_raw.md`). Repita no Ambiente A:
 EXECUTOR_PORT=4000 bash assets/tests/run_execution_plane_tests.sh
 ```
 
-### 6.2 Latência de build e tamanho de artefato (MANUAL — requer builder)
+### 6.2 Latência de build e tamanho de artefato (AUTOMATIZADO — requer builder)
+
+> Harness: `bash assets/tests/run_build_plane_tests.sh`. ✔ Coletado: sem deps
+> 103 s / 16 MiB; `requests` (rede) 131 s / 19,6 MiB; `requests` (cache quente)
+> 114 s. Comandos manuais equivalentes abaixo.
 ```bash
 # Build SEM dependências
 time curl -s -X POST http://127.0.0.1:3001/api/register-application \
