@@ -1,0 +1,133 @@
+% =====================================================================
+% Secao de Evaluation reescrita (metodologia + resultados experimentais).
+% Substitui/expande a atual "Evaluation Methodology" do main.tex.
+% Idioma: ingles, para casar com o restante do artigo.
+% Insira as tabelas de results_tables.tex onde indicado.
+% =====================================================================
+
+\section{Evaluation}
+\label{sec:evaluation}
+
+The architectural argument of this paper is comparative: the compartmentalized
+design should contain compromise better than a centralized baseline while paying
+an acceptable operational cost. We therefore evaluate the implementation against
+four explicit criteria derived from the design goals: (i)~\emph{compromise
+containment}, whether a failure in one plane reaches assets owned by another;
+(ii)~\emph{exfiltration resistance}, whether execution-time code can open
+outbound channels; (iii)~\emph{persistence resistance}, whether one run can
+contaminate later runs; and (iv)~\emph{operational cost}, the latency introduced
+by the isolation strategy.
+
+\subsection{Methodology}
+
+We exercise the running prototype with a small suite of purpose-built
+applications, each designed to attack one criterion. The applications and the
+synthetic, PII-free dataset used as input are versioned with the artifact
+repository (\texttt{assets/apps/} and \texttt{assets/data/}). Tests that target
+the execution plane submit an application bundle directly to the executor service
+(\texttt{POST /execute}), reproducing exactly the \texttt{workspace/run.sh}
+contract that the control plane generates; this isolates the variable under study
+(the execution microVM) from unrelated services. Tests that target lateral
+movement inspect the executor container, and the access-control test drives the
+public marketplace API. Every adverse application reports machine-readable
+evidence markers on standard output, which the harness
+(\texttt{assets/tests/}) collects into timestamped evidence files. Each test is
+mapped to the design claim it is meant to support, following the principle that
+an evaluation should connect each observation to a property rather than merely
+listing successful checks.
+
+The centralized baseline (Environment~A) keeps execution under the same
+Firecracker isolation as the compartmentalized design (Environment~B), so the
+only independent variable between the two is the separation of planes. This makes
+the comparison fair: any measured difference reflects compartmentalization, not a
+weaker execution sandbox.
+
+\subsection{Containment, Exfiltration, and Persistence}
+
+Table~\ref{tab:security-results} summarizes the suite. The execution plane shows
+the strongest, most direct evidence. For exfiltration resistance (T1), the
+malicious application observes only the loopback and \texttt{sit0} pseudo-devices
+inside the guest: there is no \texttt{eth0}, because the execution microVM is
+launched without a network interface. All seven outbound attempts---DNS
+resolution, raw UDP and TCP to public resolvers, HTTPS, plain HTTP, and an SMTP
+probe---fail with \texttt{Network is unreachable} or name-resolution errors. The
+channel is closed by construction rather than by a firewall rule that an attacker
+might disable, which is the strongest form the property can take.
+
+For containment at the filesystem level (T1b), the execution code runs as root
+inside the disposable guest but finds no control-plane secrets in its environment
+(\texttt{ASSET\_ENCRYPTION\_KEY}, \texttt{PRIVATE\_KEY}, and related variables are
+all absent), and it can enumerate only its own input and output disks; sibling
+execution disks are not present. The files it can read
+(\texttt{/etc/passwd}, \texttt{/etc/shadow}) belong to the minimal ephemeral guest
+rootfs, not to the host, and contain no credential material. Writes outside the
+workspace succeed only on ephemeral overlay disks that are destroyed at teardown.
+
+That teardown is confirmed by the persistence test (T3): after more than nine
+consecutive executions, the executor retains no Firecracker socket, no
+\texttt{rootfs-overlay}, \texttt{input}, \texttt{output}, or \texttt{application}
+\texttt{ext4} image, no residual loopback mount, and no leftover dataset or
+working directory. The \texttt{cleanup} trap removes the entire per-run working
+directory, so no ephemeral state survives to contaminate a later run.
+
+\subsection{Blast Radius and Lateral Movement}
+
+The clearest architectural difference between the two designs appears in the
+cross-plane reachability test (T4), shown in Table~\ref{tab:blast-radius}. From a
+hypothetically compromised executor in Environment~B, the asset-encryption key
+and the wallet private key are absent from the environment, and the IPFS
+repository, the wheel cache, and the executions store are absent from the
+filesystem. The same assets are, by construction of the centralized image,
+colocated in the single namespace of Environment~A: there the very secrets and
+stores that are unreachable in B sit beside the execution logic.
+
+We report one residual weakness honestly. In the single-host local deployment,
+all three roles share one Docker network, so the executor can still reach the
+control API (port~3001) and the blockchain RPC (port~8545) over that network,
+even though the IPFS API (port~5001), which would expose the encrypted blobs
+directly, is bound to loopback inside the control plane and is therefore
+unreachable. This substantiates---rather than contradicts---the limitation
+already stated in the threat model: internal service authentication and network
+segmentation (mutual TLS) remain future work. In a distributed deployment across
+separate virtual machines, reachability of ports~3001 and 8545 becomes a matter
+of inter-host network policy. The key point for the comparative argument stands:
+the secrets and persistent stores that define the blast radius are isolated in B
+and colocated in A.
+
+\subsection{Access Control}
+
+The access-control test (T5) confirms that execution is gated by the smart
+contract. After registering the synthetic dataset on chain---whose on-chain
+content hash matches the file's SHA-256, evidence of integrity binding---an
+execution request issued without a prior \texttt{purchaseAccess} call is rejected
+with \emph{access denied} by the \texttt{hasAccessByIds} check, before any
+execution bundle is prepared. The control plane therefore refuses to move data or
+code toward the executor for an unauthorized caller.
+
+\subsection{Operational Cost}
+
+Table~\ref{tab:performance} reports the cost of the isolation strategy on the
+execution path. Across six consecutive runs of the benign application over the
+synthetic dataset, the end-to-end execution latency averages 31.4~s
+(median 31.8~s, standard deviation 1.4~s, range 28.5--32.9~s). This time is
+dominated by the microVM life cycle---kernel boot, disk discovery, output-disk
+synchronization, and the guarded shutdown sequence---rather than by the
+application itself, whose computation over sixty rows completes in milliseconds.
+The roughly thirty-second fixed overhead per execution is the price of launching
+a fresh, networkless microVM for every run; it is the operational counterpart of
+the containment and persistence properties demonstrated above. Build-plane cost
+(latency with and without dependencies and artifact size) and the build-time
+supply-chain test (T2) require the builder image and are documented as a
+reproducible manual protocol in the artifact repository.
+
+\subsection{Threats to Validity}
+
+The measurements were taken on a single host with a Linux-backed container
+runtime; absolute latencies will vary with hardware, but the containment and
+exfiltration results are structural (absence of a network interface, absence of
+secrets) and do not depend on timing. The execution-plane tests bypass IPFS and
+the builder to isolate the microVM under study; the end-to-end path through the
+control plane is exercised separately by the access-control test. Finally, the
+baseline comparison for blast radius is derived from the deployment configuration
+rather than from a live intrusion, because both environments share the same
+execution sandbox and differ only in colocation of assets.

@@ -220,7 +220,7 @@ log "Tentando executar com IDs válidos mas sem acesso comprado..."
 log "Registrando dataset e app novos (sem purchaseAccess)..."
 DS_T5=$(register_dataset "$API_B")
 DS_ID_T5=$(echo "$DS_T5" | python3 -c "import sys,json; print(json.load(sys.stdin)['assetId'])")
-APP_T5=$(register_app "$API_B" "$ASSETS/apps/ap1.py" "t5-no-access-app")
+APP_T5=$(register_app "$API_B" "$ASSETS/apps/benign_stats.py" "t5-no-access-app")
 APP_ID_T5=$(echo "$APP_T5" | python3 -c "import sys,json; print(json.load(sys.stdin)['assetId'])")
 log "Dataset=$DS_ID_T5 App=$APP_ID_T5 (sem purchaseAccess)"
 

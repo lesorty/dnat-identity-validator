@@ -39,9 +39,16 @@ temp/
 .codex/
 
 # Generated project data
-assets/apps/
+# Aplicacoes: versionamos o codigo-fonte (.py) das aplicacoes de exemplo e de
+# avaliacao de seguranca; ignoramos caches e quaisquer outros artefatos.
+assets/apps/*
+!assets/apps/*.py
 assets/certs/
-assets/data/
+# Dados: ignoramos o diretorio (que contem PDFs de CNH reais com PII) e
+# versionamos apenas os datasets SINTETICOS usados na avaliacao.
+assets/data/*
+!assets/data/dataset_synthetic.csv
+!assets/data/teste1.csv
 smart-contract/manifests/
 smart-contract/uploads/
 smart-contract/executions/

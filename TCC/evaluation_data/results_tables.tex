@@ -1,0 +1,83 @@
+% =====================================================================
+% Tabelas de resultados da avaliacao DNAT — prontas para colar no main.tex
+% Requer no preambulo: \usepackage{booktabs}, \usepackage{tabularx} (ja presentes)
+% Dados reais medidos em 2026-06-11 (ver evaluation_data/results_raw.md).
+% Celulas marcadas com TODO dependem do builder/baseline construidos.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+% Tabela 1: Sintese dos testes de seguranca e mapeamento para as claims
+% ---------------------------------------------------------------------
+\begin{table*}[t]
+\centering
+\caption{Resultados dos testes de seguranca e o claim de projeto que cada um sustenta. ``Contido'' indica que o comportamento adverso foi confinado ao plano esperado.}
+\label{tab:security-results}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}p{0.8cm}p{3.2cm}p{2.0cm}X@{}}
+\toprule
+ID & Vetor testado & Claim & Resultado observado (medido) \\
+\midrule
+T1 & Exfiltracao de rede a partir da microVM de execucao & (ii) exfiltration resistance & 7/7 canais bloqueados; guest sem \texttt{eth0} (apenas \texttt{lo}/\texttt{sit0}); \texttt{Network is unreachable}. \\
+\addlinespace
+T1b & Leitura de segredos e escape de filesystem na execucao & (i) containment & Nenhum segredo do control plane no ambiente; guest so enxerga seus proprios discos; escritas confinadas a disco efemero. \\
+\addlinespace
+T2 & Dependencia maliciosa (codigo em build-time) & (i) containment & \emph{TODO: requer builder construido (ver MANUAL\_TESTS.md).} \\
+\addlinespace
+T3 & Persistencia de artefatos entre execucoes & (iii) persistence resistance & Nenhum socket, disco \texttt{.ext4}, mount ou dataset remanescente apos 9+ execucoes. \\
+\addlinespace
+T4 & Movimento lateral da CVM3 para ativos do control plane & (i) containment & Segredos e stores (IPFS, cache, execucoes) ausentes na CVM3; rede ainda alcanca API/RPC no modo host unico (risco residual). \\
+\addlinespace
+T5 & Execucao sem compra de acesso & access control & Negado pelo contrato (\texttt{hasAccessByIds}) antes de qualquer preparo de bundle. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+% ---------------------------------------------------------------------
+% Tabela 2: Matriz de alcance cross-CVM (blast radius) — B vs A
+% ---------------------------------------------------------------------
+\begin{table*}[t]
+\centering
+\caption{Alcance de um executor comprometido (CVM3) sobre ativos do control plane: arquitetura compartimentada (B) versus baseline centralizado (A). ``Isolado'' = inacessivel; ``Colocalizado'' = no mesmo namespace.}
+\label{tab:blast-radius}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}Xp{3.4cm}p{3.4cm}@{}}
+\toprule
+Ativo alcancavel a partir do executor & Ambiente B (DNAT) & Ambiente A (baseline) \\
+\midrule
+Chave de cifragem de ativos (\texttt{ASSET\_ENCRYPTION\_KEY}, env) & Isolado (ausente) & Colocalizado (presente) \\
+Chave privada da carteira (\texttt{PRIVATE\_KEY}, env) & Isolado (ausente) & Colocalizado (presente) \\
+Repositorio IPFS (\texttt{/data/ipfs}, FS) & Isolado (ausente) & Colocalizado (mesmo FS) \\
+Cache de wheels (\texttt{/var/dnat/wheel-cache}, FS) & Isolado (ausente) & Colocalizado (mesmo FS) \\
+Store de execucoes (FS) & Isolado (ausente) & Colocalizado (mesmo FS) \\
+API IPFS (porta 5001, rede) & Bloqueado (loopback na CVM1) & Alcancavel (127.0.0.1) \\
+API de controle (porta 3001, rede) & Alcancavel$^{\dagger}$ & Alcancavel (127.0.0.1) \\
+RPC blockchain (porta 8545, rede) & Alcancavel$^{\dagger}$ & Alcancavel (127.0.0.1) \\
+\bottomrule
+\end{tabularx}
+\par\smallskip
+{\footnotesize $^{\dagger}$ Risco residual no deployment local de host unico (rede Docker compartilhada). No modo distribuido em VMs separadas, sujeito a politica de rede entre hosts. Confirma a limitacao de mTLS/segmentacao ja declarada.}
+\end{table*}
+
+% ---------------------------------------------------------------------
+% Tabela 3: Latencia de execucao (medida) e custo de build (TODO)
+% ---------------------------------------------------------------------
+\begin{table}[t]
+\centering
+\caption{Custo operacional do isolamento por microVM efemera. Latencia de execucao medida com a aplicacao benigna sobre o dataset sintetico (60 linhas); n=6.}
+\label{tab:performance}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{}Xr@{}}
+\toprule
+Metrica & Valor \\
+\midrule
+Latencia de execucao --- media & 31{,}4 s \\
+Latencia de execucao --- mediana & 31{,}8 s \\
+Latencia de execucao --- min / max & 28{,}5 / 32{,}9 s \\
+Latencia de execucao --- desvio-padrao & 1{,}4 s \\
+\addlinespace
+Latencia de build (sem dependencias) & \emph{TODO} \\
+Latencia de build (com dependencias) & \emph{TODO} \\
+Tamanho do artefato \texttt{application.ext4} & \emph{TODO} \\
+\bottomrule
+\end{tabularx}
+\end{table}
