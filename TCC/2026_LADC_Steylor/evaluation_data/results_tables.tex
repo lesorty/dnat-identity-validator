@@ -1,0 +1,80 @@
+% =====================================================================
+% Evaluation tables (English). Sprint 1 consolidation:
+%   - tab:stride      : security results organized by STRIDE (maps T1-T5).
+%   - tab:comparison  : comparative matrix metric x architecture (M0/A/B/SGX).
+% The blast-radius table (tab:blast-radius, EN) and the live A/B cost table
+% (tab:ab-performance) live in section_results_ab.tex to avoid label clashes.
+% Requires booktabs + tabularx (added to the preamble of ladc.tex).
+% Measured data: results_raw.md and results_ab_campaign.md (2026-06-11).
+% Cells marked TBD are produced by the follow-up campaign (M0, boot breakdown,
+% AWS cost, blockchain gas) or cited from the original DNAT (SGX).
+% =====================================================================
+
+% ---------------------------------------------------------------------
+% Table 1: security results organized with STRIDE (maps each test T1-T5).
+% ---------------------------------------------------------------------
+\begin{table*}[t]
+\centering
+\caption{Security evaluation organized with the STRIDE model. For each threat
+category we give the mechanism in the layered design and the test that provides
+evidence. ``Contained'' means the adverse behavior stayed within the plane that
+ran it.}
+\label{tab:stride}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}p{2.3cm}Xp{1.0cm}X@{}}
+\toprule
+STRIDE category & Mechanism in the design & Test & Observed outcome (measured) \\
+\midrule
+Spoofing & On-chain access gate (\texttt{purchaseAccess}/\texttt{hasAccessByIds}) checked before any bundle is prepared & T5 & Unauthorized run rejected with \emph{access denied} at the control plane, before any data or code moves toward the executor. \\
+\addlinespace
+Tampering & SHA-256 content hash bound on chain; application artifact and wheel cache mounted read-only & T5, T2b & On-chain content hash equals the file SHA-256; a build-time write to the cache is denied (\texttt{Permission denied}, read-only mount). \\
+\addlinespace
+Repudiation & Distributed ledger records registration and access purchase & T5 & Registration and access actions are recorded on chain and auditable. \\
+\addlinespace
+Information disclosure & Execution microVM launched with no network interface; no control-plane secrets in the plane; sensitive stores in a separate namespace & T1, T1b, T4 & 7/7 outbound channels blocked (no \texttt{eth0}); no secrets in the environment; IPFS repository, wheel cache, and executions store absent from the executor. \\
+\addlinespace
+Denial of service & Per-run resource caps (1~vCPU/512~MiB) and ephemeral teardown of every run & T3 & No residual socket, \texttt{ext4} disk, mount, or dataset after 9+ runs. \emph{Not a primary focus (see Threats to Validity).} \\
+\addlinespace
+Elevation of privilege & Privilege separation across planes; dependency and build code run in an isolated builder or in a networkless executor, never in the control plane & T2, T2a, T2b, T4 & A compromised dependency's code executes but finds no secrets and no network route; build-time code starts inside the isolated builder rather than in the control plane. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+% ---------------------------------------------------------------------
+% Table 2: comparative matrix metric x architecture (M0 / A / B / SGX ref).
+% ---------------------------------------------------------------------
+\begin{table*}[t]
+\centering
+\caption{Comparative results across the isolation spectrum: a no-isolation
+monolith (M0), a centralized deployment that adds ephemeral microVMs but
+colocates all assets (A), the compartmentalized design that also separates the
+planes (B), and the SGX-based original DNAT as a cited reference. Execution
+latency and overhead are measured on the same host (2026-06-23); build
+sizes/latencies are from the live A/B campaign (2026-06-11); \emph{TBD} cells are
+produced by the follow-up campaign (blockchain gas) or cited from the original
+work (SGX).}
+\label{tab:comparison}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}Xllll@{}}
+\toprule
+Metric & M0 & A & B & SGX (ref.) \\
+\midrule
+Execution latency, benign app (s) & 0.07 & 25.2 & 25.2 & cite \\
+microVM boot/life-cycle overhead (s) & $\approx$0 & $\approx$25.1 & $\approx$25.1 & cite \\
+Build latency, no deps (s) & ---$^{\ddagger}$ & 30.2 & 30.1 & --- \\
+Build latency, \texttt{requests}\,+4 (s) & ---$^{\ddagger}$ & 34.9 & 38.2 & --- \\
+Artifact size, no deps / \texttt{requests} (MiB) & --- & 16.0 / 19.6 & 16.0 / 19.6 & --- \\
+Cost per register{+}purchase (gas) & \emph{TBD} & \emph{TBD} & \emph{TBD} & --- \\
+\addlinespace
+App reuse with deps, no recompile & yes & yes & yes & \textbf{no} \\
+\bottomrule
+\end{tabularx}
+\par\smallskip
+{\footnotesize The microVM adds $\approx$25~s over M0's $\approx$0.07~s, since the
+application's compute over 60 rows is sub-second; that fixed cost is the price of a
+fresh, networkless microVM per run. A$\approx$B by design, as both share the same
+Firecracker microVMs (live A/B cost in Table~\ref{tab:ab-performance}, blast radius
+in Table~\ref{tab:blast-radius}). $^{\ddagger}$M0 keeps the unchanged build microVM
+(only execution is direct), so its build cost equals A. The SGX column frames the
+reuse and dependency limitation of the original DNAT.}
+\end{table*}

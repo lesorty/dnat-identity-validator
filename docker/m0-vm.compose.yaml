@@ -1,0 +1,48 @@
+services:
+  dnat-m0:
+    build:
+      context: ..
+      dockerfile: Dockerfile.baseline
+    # M0 e exatamente o baseline centralizado (Dockerfile.baseline), porem SEM a
+    # microVM de execucao (DNAT_NO_MICROVM=1). E o ponto "sem isolamento" do
+    # espectro: isola o custo do microVM e expoe a contencao que ele provê.
+    # Tag propria para nao colidir com a imagem do Ambiente A (dnat-baseline).
+    image: dnat-m0:latest
+    container_name: dnat-m0
+    privileged: true
+    devices:
+      - /dev/kvm:/dev/kvm
+    environment:
+      # Toggle do M0: o executor roda vm/run-direct.sh em vez de vm/run-vm.sh.
+      DNAT_NO_MICROVM: "1"
+      # Tudo co-habita 127.0.0.1, como no Ambiente A (segredos e stores colocalizados).
+      WEB_PORT: ${WEB_PORT:-3001}
+      RPC_URL: http://127.0.0.1:8545
+      IPFS_API_URL: http://127.0.0.1:5001
+      EXECUTOR_URL: http://127.0.0.1:5000
+      BUILDER_URL: http://127.0.0.1:5100
+      PRIVATE_KEY: ${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
+      ASSET_ENCRYPTION_KEY: ${ASSET_ENCRYPTION_KEY:-dnat-dev-asset-key}
+      WHEEL_CACHE_SOURCE_DIR: /var/dnat/wheel-cache
+      WHEEL_CACHE_MAX_BYTES: ${WHEEL_CACHE_MAX_BYTES:-2147483648}
+      WHEEL_CACHE_MAX_FILE_BYTES: ${WHEEL_CACHE_MAX_FILE_BYTES:-262144000}
+    ports:
+      # Range 6xxx para coexistir com B (3xxx/5xxx/8545) e A (4xxx).
+      - "6001:3001"   # frontend / api-server
+      - "6501:5001"   # IPFS API
+      - "6480:8080"   # IPFS gateway
+      - "6545:8545"   # Hardhat RPC
+      - "6100:5100"   # builder API
+      - "6000:5000"   # executor API (execucao DIRETA, sem microVM)
+    volumes:
+      - dnat_m0_ipfs:/data/ipfs
+      - dnat_m0_wheel_cache:/var/dnat/wheel-cache
+      - dnat_m0_executions:/app/smart-contract/executions
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  dnat_m0_ipfs:
+  dnat_m0_wheel_cache:
+  dnat_m0_executions:

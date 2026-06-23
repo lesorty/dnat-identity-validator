@@ -12,7 +12,14 @@ that the security properties evaluated later can be traced to concrete mechanism
 rather than to design intent alone. The system is deployed as three containers on
 a shared runtime---\texttt{dnat-client} (CVM1), \texttt{dnat-builder} (CVM2), and
 \texttt{dnat-executor} (CVM3)---and is contrasted with a single-container
-baseline that colocates the same logic.
+baseline that colocates the same logic. Each plane is a container in the current
+prototype, standing in for a hardware-backed confidential
+VM~\cite{amd2020sevsnp} in a production deployment; because the planes interact
+only through their declared interfaces and isolation boundaries, this
+substitution changes the execution substrate but not the architecture or the
+security argument evaluated in Section~\ref{sec:evaluation}. We therefore do not
+report confidential-computing overheads, and the analysis that follows holds
+under a fully confidential deployment.
 
 \subsection{Control Plane (CVM1)}
 

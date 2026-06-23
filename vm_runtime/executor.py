@@ -8,6 +8,13 @@ import tempfile
 import os
 from pathlib import Path
 
+# M0 (no-isolation baseline): when DNAT_NO_MICROVM is set, /execute runs the same
+# workspace/run.sh contract directly in this container's namespace (no Firecracker,
+# no disk isolation, no network removal) via vm/run-direct.sh. Used to measure the
+# cost of the microVM and to expose the containment it otherwise provides.
+NO_MICROVM = os.environ.get("DNAT_NO_MICROVM", "").lower() in ("1", "true", "yes")
+RUNNER_SCRIPT = "run-direct.sh" if NO_MICROVM else "run-vm.sh"
+
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path != "/health":
@@ -17,6 +24,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         body = {
             "ok": True,
             "service": "dnat-executor",
+            "mode": "direct" if NO_MICROVM else "microvm",
         }
         encoded = json.dumps(body).encode()
         self.send_response(200)
@@ -40,14 +48,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             bundle_path = f.name
         
         try:
-            # Execute VM
+            # Execute via microVM (run-vm.sh) or, in M0 mode, directly (run-direct.sh).
             result = subprocess.run(
-                ["bash", str(Path(__file__).parent / "vm" / "run-vm.sh"), bundle_path],
+                ["bash", str(Path(__file__).parent / "vm" / RUNNER_SCRIPT), bundle_path],
                 capture_output=True,
                 text=True,
                 timeout=720,
             )
-            
+
             # Parse persisted result recovered by the host after the microVM shuts down.
             try:
                 output = json.loads(result.stdout)

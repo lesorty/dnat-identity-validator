@@ -1,0 +1,188 @@
+% =====================================================================
+% Evaluation: methodology + STRIDE security + operational cost + threats.
+% Sprint 1 (consolidation): security reorganized with STRIDE (per [AB]); the
+% four-architecture comparison (M0/A/B/SGX) is introduced and summarized in the
+% comparative matrix (Table~\ref{tab:comparison}). Cells marked TBD there are
+% measured/cited in the follow-up campaign (M0, boot breakdown, AWS cost, gas).
+% Language: English. Tables: results_tables.tex + section_results_ab.tex.
+% =====================================================================
+
+The architectural argument of this paper is comparative: the compartmentalized
+design should contain compromise better than less-separated alternatives while
+paying an acceptable operational cost. We evaluate the implementation along two
+axes. For \emph{security}, we organize the analysis with the STRIDE
+model~\cite{shostack2014threat} and show, category by category, how the design
+neutralizes---or explicitly fails to neutralize---each threat class, mapping
+every claim to a concrete test. For \emph{cost}, we measure the latency, build
+time, and resource price of the isolation strategy.
+
+The comparison spans up to four points on an isolation spectrum, summarized in
+Table~\ref{tab:comparison}: a no-isolation monolith (M0), a centralized
+deployment that adds ephemeral microVMs but colocates all assets (Environment~A),
+the compartmentalized design that also separates the planes (Environment~B), and,
+as a cited reference, the SGX-based original DNAT~\cite{nascimento2020dnat}.
+Because A and B share the same Firecracker microVMs, any cost or security
+difference between them isolates the effect of \emph{compartmentalization}; M0
+isolates the cost and the security delta of the \emph{microVM} primitive itself;
+and the SGX reference frames the reuse and dependency limitations that motivate
+our change of technology.
+
+\subsection{Methodology}
+
+We exercise the running prototype with a small suite of purpose-built
+applications, each designed to attack one STRIDE category, over a synthetic,
+PII-free dataset. Tests that target the execution plane submit an application
+bundle directly to the executor, reproducing the same execution contract the
+control plane generates, so that the variable under study---the execution
+microVM---is isolated from unrelated services; tests that target lateral movement
+inspect the executor environment, and the access-control test drives the
+marketplace API. Each adverse application emits machine-readable evidence markers
+that a harness collects, and each test is mapped to the STRIDE category it
+supports (Table~\ref{tab:stride}), so that every observation connects to a
+property rather than merely listing successful checks.
+
+Environments~A and~B were both measured live and end to end. The centralized
+baseline (Environment~A) keeps execution under the same Firecracker isolation as
+the compartmentalized design (Environment~B), so the only independent variable
+between the two is the separation of planes; any measured difference therefore
+reflects compartmentalization, not a weaker execution sandbox. The no-isolation
+baseline (M0)---which runs the application directly in the control namespace,
+without launching a microVM---and the boot-time, AWS-cost, and blockchain-gas
+measurements complete the comparative matrix in the follow-up campaign; the
+corresponding cells in Table~\ref{tab:comparison} are marked \emph{TBD}.
+
+\subsection{Security Evaluation with STRIDE}
+
+Table~\ref{tab:stride} maps each STRIDE category to the mechanism that addresses
+it and the test that provides evidence. We discuss each in turn.
+
+\textbf{Spoofing.} Execution is gated by the smart contract. After registering
+the synthetic dataset on chain, an execution request issued without a prior
+\texttt{purchaseAccess} call is rejected with \emph{access denied} by the
+\texttt{hasAccessByIds} check (T5), before any execution bundle is prepared. The
+control plane therefore refuses to move data or code toward the executor for an
+unauthorized caller.
+
+\textbf{Tampering.} Assets are bound to the chain by content hash: the on-chain
+content hash matches the file's SHA-256, so a consumer can detect tampering
+between storage and use (T5). The application artifact and the wheel cache are
+mounted read-only; a build-time attempt to write to the cache fails with
+\texttt{Permission denied} (T2b), so cached state cannot be silently poisoned by
+a build.
+
+\textbf{Repudiation.} Registration and access purchase are recorded on the
+distributed ledger (T5), making the provenance of a dataset and the fact of an
+access grant auditable rather than deniable.
+
+\textbf{Information disclosure} is where the execution plane gives the strongest,
+most direct evidence. For network exfiltration (T1), the malicious application
+observes only the loopback and \texttt{sit0} pseudo-devices inside the guest:
+there is no \texttt{eth0}, because the execution microVM is launched without a
+network interface. All seven outbound attempts---DNS resolution, raw UDP and TCP
+to public resolvers, HTTPS, plain HTTP, and an SMTP probe---fail with
+\texttt{Network is unreachable} or name-resolution errors. The channel is closed
+by construction rather than by a firewall rule that an attacker might disable,
+which is the strongest form the property can take. For filesystem containment
+(T1b), the execution code runs as root inside the disposable guest but finds no
+control-plane secrets in its environment (\texttt{ASSET\_ENCRYPTION\_KEY},
+\texttt{PRIVATE\_KEY}, and related variables are all absent), and it can
+enumerate only its own input and output disks; sibling execution disks are not
+present. The files it can read (\texttt{/etc/passwd}, \texttt{/etc/shadow})
+belong to the minimal ephemeral guest rootfs, not to the host, and contain no
+credential material. Finally, from a hypothetically compromised executor (T4),
+the asset-encryption key, the wallet private key, the IPFS repository, the wheel
+cache, and the executions store are all absent
+(Table~\ref{tab:blast-radius}); the same assets are colocated in the
+single namespace of Environment~A.
+
+\textbf{Denial of service.} Each run executes under fixed resource caps
+(1~vCPU/512~MiB) and is destroyed at teardown. The persistence test (T3)
+confirms this: after more than nine consecutive executions, the executor retains
+no Firecracker socket, no \texttt{rootfs-overlay}, \texttt{input},
+\texttt{output}, or \texttt{application} \texttt{ext4} image, no residual
+loopback mount, and no leftover dataset or working directory. The \texttt{cleanup}
+trap removes the entire per-run working directory, so no ephemeral state survives
+to contaminate or starve a later run. We do not claim broader DoS resistance
+(e.g., against a flood of requests); resource scheduling and admission control
+are out of scope (see Threats to Validity).
+
+\textbf{Elevation of privilege.} The supply-chain test (T2) connects the planes.
+We seeded a malicious package into the builder's wheel cache and registered an
+application that declares it as a dependency. The builder resolved and bundled the
+package (a build that reported the cache hit), and the package then ran its
+payload at import time inside the execution microVM (T2a). That payload is the
+interesting evidence: the dependency's code does execute, but it finds no
+control-plane secrets in the environment and reports its outbound probe to a
+public resolver as blocked, exactly mirroring the T1 and T1b results. A
+compromised dependency therefore inherits the containment of the plane that runs
+it. The complementary build-time vector (a source distribution whose
+\texttt{setup.py} runs during the build) begins executing inside the build
+microVM before failing under the read-only cache mount (T2b), which confirms that
+such code, when it does run, runs in the isolated builder rather than in the
+control plane.
+
+\subsection{Operational Cost}
+
+Table~\ref{tab:comparison} consolidates the cost of the isolation strategy
+across architectures, and Table~\ref{tab:ab-performance} reports the live A/B
+measurement in detail. End-to-end execution latency is indistinguishable between
+A and B ($\approx$25~s each, measured on the same host). This time is dominated by
+the microVM life cycle---kernel boot, disk discovery, output-disk synchronization,
+and the guarded shutdown sequence---rather than by the application itself, whose
+computation over sixty rows completes in milliseconds.
+
+The no-isolation baseline (M0) makes this concrete: running the same workload
+directly in the container's namespace---no Firecracker, no disk isolation, no
+network removal---the benign application completes in $\approx$0.07~s, so the
+microVM adds roughly 25~s of fixed per-execution overhead. That overhead is the
+price of launching a fresh, networkless microVM for every run, and it is exactly
+what buys the containment: in the same measurement, M0 exposes a working
+\texttt{eth0} and succeeds at network exfiltration, finds all six control-plane
+secrets in its environment, and persists its writes, whereas A and B (with the
+microVM) block exfiltration, expose no secret, and leave no residual state.
+Separating the planes (B vs A) adds nothing on top of this microVM cost. The
+remaining \emph{TBD} row of Table~\ref{tab:comparison}, the blockchain gas of
+registration and access purchase, is filled by the follow-up campaign.
+
+The build plane is more expensive, as expected from its heavier configuration
+(two vCPUs, more memory, network egress, and dependency resolution). A
+dependency-free build completes in about 30~s and produces a 16~MiB artifact; a
+build that pulls a real dependency tree (\texttt{requests} and four transitive
+packages) takes 35--38~s and grows the artifact to 19.6~MiB. The two designs
+produce byte-identical artifacts because they share the same builder microVM.
+Crucially, separating the planes (B) adds no measurable cost over the centralized
+baseline (A) on either path: the cost is paid by the microVM, which both designs
+share.
+
+\subsection{Threats to Validity}
+
+The measurements were taken on a single host with a Linux-backed container
+runtime; absolute latencies will vary with hardware (a colder first campaign saw
+a 31.4~s execution mean and 103--131~s builds, with the same A$\approx$B
+relationship), but the containment and exfiltration results are structural
+(absence of a network interface, absence of secrets) and do not depend on timing.
+The execution-plane tests bypass IPFS and the builder to isolate the microVM
+under study; the end-to-end path through the control plane is exercised
+separately by the access-control test. We report one residual weakness honestly:
+in the single-host deployment the three planes share one Docker network, so a
+compromised executor can still reach the control API and the blockchain RPC over
+that network, even though the secrets and stores that define the blast radius
+remain isolated; internal mutual TLS and network segmentation remain future work
+(Table~\ref{tab:blast-radius}). Finally, the DoS analysis covers only per-run
+state hygiene, not load-induced resource exhaustion, and the SGX column of
+Table~\ref{tab:comparison} is cited from the original DNAT rather than
+re-measured here.
+
+A more fundamental caveat concerns the execution substrate. The prototype runs
+each plane as a container with Firecracker microVMs rather than inside a
+hardware-backed confidential VM, so our measurements do not come from a genuinely
+confidential environment and we make no claim about confidential-computing
+overheads. This does not weaken the architectural argument: the properties we
+evaluate---privilege separation across planes, a networkless execution microVM,
+ephemeral teardown, and on-chain access control---are properties of the
+architecture, not of the memory-encryption substrate. Running the same planes
+inside confidential VMs (e.g., AMD SEV-SNP~\cite{amd2020sevsnp}) would change the
+implementation and add a hardware-attestation and memory-encryption cost, but
+would preserve the containment and blast-radius results demonstrated here. The
+analysis therefore remains valid, with confidential execution as a substrate
+substitution rather than an architectural change.

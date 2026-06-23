@@ -1,0 +1,252 @@
+\documentclass[runningheads]{llncs}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{makecell}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[disable]{todonotes}
+
+\renewcommand{\cellalign}{l}
+
+\begin{document}
+\title{Lightweight confidential and traceable multi-stakeholder data processing}
+
+\author{Steylor Barros\inst{1}\orcidID{?????} \and
+Eduardo Falcão\inst{2}\orcidID{0000-zzz-zzz-zzzz} \and Andrey Brito\inst{1}\orcidID{0000-0002-7350-8599}}
+\authorrunning{S. Barros et al.}
+
+\institute{Universidade Federal de Campina Grande, Campina Grande/PB, Brazil \and Universidade Federal do Rio Grande do Norte, Natal/RN, Brazil 
+\email{steylor.barros@ccc.ufcg.edu.br}\\
+\email{eduardo@dca.ufrn.br}\\
+\email{andrey@computacao.ufcg.edu.br}\\
+\url{https://www.lsd.ufcg.edu.br/}}
+
+\maketitle
+
+\begin{abstract}
+% [AB] Essa é uma primeira versão para organizar meus pensamentos. Ainda vai ser melhorada.
+We leverage technologies such as confidential computing and distributed ledgers to propose an architecture for multi-stakeholder, confidential data processing. Our approach aims to protect non-interactive data-processing applications in scenarios where multiple parties (e.g., data controllers, application developers, and infrastructure managers) distrust one another. We generalize previous results, describe the architecture and requirements of the involved components, and present an implementation focused on lightweight execution in the AWS cloud. Our implementation focuses on Python applications, showing overheads as low as $X\%$.
+
+% TODO: [AB] seria bom ter uma applicação realista. 
+
+\keywords{Device Attestation, User Authentication, Zero Trust Security,
+Virtual Private Network (VPN), Remote Attestation, SPIFFE, SPIRE,
+Multi-Factor Authentication (MFA)}
+\end{abstract}
+
+\section{Introduction}
+
+% [AB]: todo
+% Falar mais do aspecto de multi-stakeholder
+% Ele cita o DNAT mas deve comparar melhor, mostrando que tem limitações (ex., a execução em SGX dificulta o reuso de aplicações, que podem precisar serem recompiladas ou adaptadas, e também tem o problema das dependências).
+
+Confidential data marketplaces must simultaneously support asset
+exchange, access control, and third-party computation over sensitive
+inputs. That combination creates a difficult systems problem.
+A marketplace that accepts externally supplied applications cannot
+treat code execution as an isolated implementation detail, because
+the same platform also handles persistent metadata, payment and
+access logic, storage backends, and the datasets that motivate the
+marketplace in the first place. In practice, the problem is not merely
+how to ``run code safely,'' but how to prevent build-time and
+run-time compromise from expanding into a full platform compromise.
+
+The most direct implementation path would be a centralized
+confidential virtual machine~\cite{amd2020sevsnp} that hosts the
+marketplace-facing logic, local artifact storage, and the execution
+orchestrator in the same trust domain. That design is operationally
+attractive because it minimizes deployment complexity and avoids
+inter-service coordination. However, it also creates the wrong
+security shape for the problem: the same node that validates access
+and manages persistent sensitive state also becomes the place where
+untrusted or semi-trusted workloads are prepared and executed.
+
+This paper argues that such a concentration of privilege is
+fundamentally ill-suited for high-assurance marketplaces. It is
+proposed an architecture designed under the assumption that component
+compromise is an eventual certainty rather than a remote possibility.
+By decomposing the marketplace into distinct trust
+domains---control, build, and execution~\cite{nascimento2020dnat}---the
+system ensures that a failure or malicious exploit in one phase cannot
+propagate to the entire application. Our focus is on minimizing the
+``blast radius'' of errors and attacks, ensuring that even if the
+build or execution planes are corrupted, the platform's core sensitive
+assets and persistent state remain protected.
+
+
+% qual é o contexto do problema?
+
+% por que não é trivial?
+
+% O que existe por aí?
+%% menção rápida ao dnat e suas limitações 
+
+% Uma possível solução
+
+% Limitações 
+% - da arquitetura (ex. execução offline)
+% - da implementação (ex., uso de python)
+
+% organização do artigo
+
+\section{Background}\label{sec:background}
+
+% [AB] Aqui em background, deveríamos:
+% (1) explicar melhor o que é oportunidade trazida pela computação confidencial: não precisa copiar na infraestrutura e simplifica o papel de validação da aplicação. 
+% (2) explicar blockchain e como ela permite o rastreamento;
+% (3) explicar por que IPFS resolve limitações da blockchain.
+% Importante: agora que Steylor está avançado e já sabe o que vai implementar e o que não vai implementar, podemos evitar falar das coisas que ele não vai de fato usar. Por exemplo, será que precisa de IPFS? Não é melhor falar que precisa de um armazenamento distribuído compatível com os objetivos e depois dizer que IPFS é uma opção e que aqui estamos unsando ele de forma simplificada?
+
+\subsection{Confidential computing}
+
+%[AB] Acho que essa seção está abordando o ponto errado. Nossa ênfase não é computação confidencial, então podemos dizer o que de computação confidencial
+
+Confidential Computing~\cite{amd2020sevsnp} is a paradigm that focuses on protecting
+data while it is being processed. It leverages hardware-level memory encryption to make
+a process or an entire Virtual Machine inaccessible to the host hypervisor. By using an
+ASID (Address Space Identifier), the processor applies cryptography to a memory context;
+the ciphertext is decrypted transparently by a key stored directly in the memory
+controller when the VM that owns that context accesses the data. Confidential Virtual
+Machines are recognized by a special bit, called the C-bit, which instructs the CPU to
+restrict access to the corresponding memory pages. Any attempt by the hypervisor to map
+those pages into its own address space raises a processor exception, enforcing
+hardware-backed isolation even against a privileged adversary.
+
+\subsection{Blockchain}
+A blockchain~\cite{nakamoto2008bitcoin} is a peer-to-peer distributed system that
+records transactions with strong integrity guarantees. Transactions are grouped into
+blocks; each block contains a cryptographic hash of the previous block, creating a chain
+in which every entry implicitly attests to the entire preceding history. Altering any
+block invalidates all subsequent hashes, so corrupting the ledger requires recomputing
+more than fifty percent of the combined processing capacity of all participating
+peers---an effort generally considered computationally infeasible in practice.
+Blockchains also support Smart Contracts~\cite{buterin2014ethereum}, which are programs
+deployed and executed directly on the network. A Smart Contract can register and govern
+access to relevant data, such as the encryption keys and access permissions used in our
+system. The main drawback of blockchains is their inherent transaction cost: every write
+operation requires consensus among the majority of peers before a block is accepted,
+which introduces both financial cost and latency.
+
+\subsection{IPFS}
+The InterPlanetary File System (IPFS)~\cite{benet2014ipfs} addresses the challenge of
+storing large data volumes that do not integrate well with a blockchain due to the costs
+described above. IPFS is a structured distributed system that uses a Distributed Hash
+Table (DHT) to locate files across the network. Files are identified by their content
+hash---a deterministic, one-way function that produces a unique identifier for a given
+sequence of bytes; any modification to the content produces a different hash. The DHT
+ensures that data remains accessible to all peers by managing replication and routing
+efficiently across the network, making IPFS a practical complement to blockchain-based
+access control for large binary artifacts.
+
+
+
+% -------------------------------------------------------------
+\section{Problem definition and solution requirements}
+\label{sec:problem-definition}
+
+The core challenge addressed by the Dataset and Application Marketplace (DNAT) involves
+a transaction between two mutually distrusting parties: a \textit{data buyer}, who owns
+a confidential application, and a \textit{dataset provider}, who holds sensitive data.
+The objective is to enable a computation in which the buyer's application processes the
+provider's dataset without exposing either asset to the other party or to the underlying
+cloud infrastructure.
+
+A straightforward implementation would deploy a single Confidential Virtual Machine (CVM)
+responsible for all platform functions: receiving uploads, managing the IPFS storage layer,
+interacting with the Smart Contract, resolving and installing Python dependencies, and
+running the application against the dataset. While operationally simple, this monolithic
+design concentrates all privileges within one trust domain. The critical vulnerability
+emerges during dependency resolution: installing external packages to satisfy an
+application's requirements necessarily executes arbitrary third-party code with the same
+privileges as the marketplace layer, the IPFS node, and the blockchain client. A
+maliciously crafted package---or a compromised dependency in the supply chain---could
+exploit this phase to exfiltrate stored datasets, tamper with marketplace metadata, or
+establish a persistent backdoor affecting future executions. A build-time compromise thus
+propagates immediately into a full platform compromise, making dependency resolution a
+disproportionately dangerous entry point.
+
+This observation reframes the core problem. Secure execution of the application at runtime
+is necessary but not sufficient. An equally important concern is preventing a compromise
+during the build and dependency resolution phase from reaching the broader platform.
+The problem must therefore be treated as a \textit{privilege separation problem}: distinct
+operational phases---control, build, and execution---carry fundamentally different risk
+profiles and must occupy separate trust domains with different network-access policies,
+persistence rights, and failure blast radii.
+
+Three design consequences follow from this reframing. First, the component managing
+marketplace state, blockchain interaction, and IPFS operations must never directly execute
+dependency installation logic for user-supplied applications. Second, the build phase,
+where external network access is unavoidable, must be isolated from both persistent
+sensitive storage and the execution runtime. Third, the execution phase, during which the
+sensitive dataset is consumed, must operate without any outbound network interface,
+eliminating the primary exfiltration channel even under a complete runtime compromise.
+
+A secure solution must satisfy the following requirements:
+
+% Multi-stakeholder machine learning
+
+% Termina com uma lista de requisitos ou desafios.
+
+\section{Proposal}\label{sec:proposal}
+
+\subsection{Architecture}
+The DNAT platform is organized around three Confidential Virtual
+Machines, each assigned a distinct operational role and a distinct
+set of persistence rights. \textbf{CVM1} acts as the control plane,
+\textbf{CVM2} as the isolated build plane, and \textbf{CVM3} as the
+isolated execution plane. The central design principle is privilege
+separation: a compromise in one plane must not grant access to the
+assets of the others. (...)
+
+% conecta tecnologias-chave para resolver o problema
+
+% como cada tecnologia ajuda a resolver os desafios/requisitos
+
+\subsection{Implementation}
+The architecture described above is realized using Firecracker
+microVMs~\cite{agache2020firecracker} as the primary isolation
+primitive for both the build and execution environments. The current
+prototype instantiates each CVM as a containerized service for
+development purposes; in a production deployment, each service would
+run inside a hardware-backed Confidential VM~\cite{amd2020sevsnp}. (...)
+
+\input{evaluation_data/section_implementation}
+% fala de abordagem do build (forma de incorporar as dependências), de microVM e a execução (isolamento de rede, transferência de resultados),
+
+% ------------------------------------------------
+% ------------------------------------------------
+\section{Evaluation}
+\label{sec:evaluation}
+
+% [AB] sugeriu STRIDE para organizar a avaliacao de seguranca. Adotado: a
+% subsecao "Security Evaluation with STRIDE" em section_evaluation.tex mapeia
+% cada letra do STRIDE para um mecanismo do design e o teste que o evidencia.
+% A matriz comparativa entre arquiteturas (M0/A/B/SGX) esta em results_tables.tex
+% (Table~\ref{tab:comparison}); celulas TBD sao medidas/citadas no proximo ciclo.
+
+\input{evaluation_data/section_evaluation}
+\input{evaluation_data/results_tables}
+\input{evaluation_data/section_results_ab}
+\clearpage
+
+
+\section{Related Work}\label{sec:related-work}
+
+% mencionar o DNAT e suas limitações (ex., dependência de tecnologias limitadas)
+
+% ver os artigos que ele citou ou que citaram ele
+
+\section{Concluding Remarks}\label{sec:concluding-remarks}
+
+\input{evaluation_data/section_conclusion}
+
+% Repetir alguns pontos chave da motivação e como a arquitetura resolve. E colocar algo na linha de número de desempenho para mostrar que é viável.
+
+% Mencionar possíveis trabalhos futuros, ex.: que blockchain (custo, escalabilidade, atrasos)? IPFS? Outras linguagens? etc.
+
+\bibliographystyle{splncs04}
+\bibliography{sample}
+
+\end{document}
