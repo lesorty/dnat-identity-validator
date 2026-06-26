@@ -50,9 +50,9 @@ monolith (M0), a centralized deployment that adds ephemeral microVMs but
 colocates all assets (A), the compartmentalized design that also separates the
 planes (B), and the SGX-based original DNAT as a cited reference. Execution
 latency and overhead are measured on the same host (2026-06-23); build
-sizes/latencies are from the live A/B campaign (2026-06-11); \emph{TBD} cells are
-produced by the follow-up campaign (blockchain gas) or cited from the original
-work (SGX).}
+sizes/latencies are from the live A/B campaign (2026-06-11); on-chain gas is
+measured on Hardhat; the SGX column (\texttt{cite}/\,---) is cited from the
+original DNAT work.}
 \label{tab:comparison}
 \footnotesize
 \begin{tabularx}{\textwidth}{@{}Xllll@{}}
@@ -64,7 +64,7 @@ microVM boot/life-cycle overhead (s) & $\approx$0 & $\approx$25.1 & $\approx$25.
 Build latency, no deps (s) & ---$^{\ddagger}$ & 30.2 & 30.1 & --- \\
 Build latency, \texttt{requests}\,+4 (s) & ---$^{\ddagger}$ & 34.9 & 38.2 & --- \\
 Artifact size, no deps / \texttt{requests} (MiB) & --- & 16.0 / 19.6 & 16.0 / 19.6 & --- \\
-Cost per register{+}purchase (gas) & \emph{TBD} & \emph{TBD} & \emph{TBD} & --- \\
+On-chain gas, register / purchase (k)$^{\S}$ & 389 / 97 & 389 / 97 & 389 / 97 & --- \\
 \addlinespace
 App reuse with deps, no recompile & yes & yes & yes & \textbf{no} \\
 \bottomrule
@@ -75,6 +75,10 @@ application's compute over 60 rows is sub-second; that fixed cost is the price o
 fresh, networkless microVM per run. A$\approx$B by design, as both share the same
 Firecracker microVMs (live A/B cost in Table~\ref{tab:ab-performance}, blast radius
 in Table~\ref{tab:blast-radius}). $^{\ddagger}$M0 keeps the unchanged build microVM
-(only execution is direct), so its build cost equals A. The SGX column frames the
-reuse and dependency limitation of the original DNAT.}
+(only execution is direct), so its build cost equals A. On-chain gas is identical
+across M0/A/B because the contract is the shared control plane; an asset's optional
+bloom filter adds $\approx$185k gas per 256~B. $^{\S}$Gas is the EVM's unit of work
+(a plain transfer is 21k); on a representative layer-2 (0.03~gwei, ETH at
+US\$3,000) the cost is $\approx$US\$0.035 to register and $<$US\$0.01 to purchase.
+The SGX column frames the reuse and dependency limitation of the original DNAT.}
 \end{table*}

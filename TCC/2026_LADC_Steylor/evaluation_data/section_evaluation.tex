@@ -140,9 +140,20 @@ what buys the containment: in the same measurement, M0 exposes a working
 \texttt{eth0} and succeeds at network exfiltration, finds all six control-plane
 secrets in its environment, and persists its writes, whereas A and B (with the
 microVM) block exfiltration, expose no secret, and leave no residual state.
-Separating the planes (B vs A) adds nothing on top of this microVM cost. The
-remaining \emph{TBD} row of Table~\ref{tab:comparison}, the blockchain gas of
-registration and access purchase, is filled by the follow-up campaign.
+Separating the planes (B vs A) adds nothing on top of this microVM cost.
+
+The on-chain cost is likewise architecture-independent. Registering an asset on
+the marketplace contract costs $\approx$389k gas (a dataset with an empty bloom
+filter; an application $\approx$327k), and purchasing access costs $\approx$97k
+gas; a dataset's optional on-chain bloom filter adds $\approx$185k gas per 256
+bytes. These figures are identical for M0, A, and B because the registry is the
+shared control plane---isolation lives in the build and execution planes, not in
+the contract---so the blockchain cost of the user journey is unchanged by the
+isolation strategy. In concrete terms (a plain value transfer is 21k gas), on a
+representative layer-2 deployment at 0.03~gwei with ETH at US\$3,000 these amount
+to about US\$0.035 to register an asset and under US\$0.01 to purchase access, so
+the marketplace is inexpensive to operate where such applications realistically
+run.
 
 The build plane is more expensive, as expected from its heavier configuration
 (two vCPUs, more memory, network egress, and dependency resolution). A

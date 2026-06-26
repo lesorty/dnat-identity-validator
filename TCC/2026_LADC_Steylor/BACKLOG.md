@@ -100,10 +100,10 @@ simplificada).
 ### B7 — Evaluation  ·  dono Steylor · 🔴 · WIP  **(SUA PARTE PRINCIPAL)**
 Detalhado na Seção 3 deste backlog. Sub-itens:
 - B7.1 Definir e construir o **M0** (variante sem microVM). 🔴 · **DONE — medido 2026-06-23**: M0 executa em **0,07 s** vs A/B **25,2 s** (mesmo host); microVM custa **~25,1 s**. M0 falha exfiltração (eth0) e contenção (6 segredos achados). Dados em `results_m0_campaign.md`.
-- B7.2 Montar a **matriz comparativa "métrica × arquitetura"** (M0/A/B/SGX). 🟡 · **DONE** — `tab:comparison` em `results_tables.tex`; M0/A/B medidos; restam gas (B7.5) e coluna SGX (citar).
+- B7.2 Montar a **matriz comparativa "métrica × arquitetura"** (M0/A/B/SGX). 🟢 · **DONE** — `tab:comparison` em `results_tables.tex`; M0/A/B totalmente medidos (latência, overhead, gas); resta só a coluna **SGX** (citar do DNAT original).
 - B7.3 Instrumentar **boot breakdown**. 🔴 · **PARCIAL** — o overhead agregado do microVM já é conhecido (~25,1 s = A − M0); falta só a **decomposição por fase** (boot kernel / discovery / sync / shutdown).
 - B7.4 ~~Calcular **custo AWS/execução**~~. **REMOVIDO da matriz** (decisão 2026-06-23): não rodamos em VM realmente confidencial, então não há base realista p/ custo AWS SEV-SNP; coerente com a ressalva de substrato adicionada à evaluation/implementation.
-- B7.5 Medir **custo de blockchain (gas)**. 🟡 · TODO (Sprint 2) — única linha de custo que permanece na `tab:comparison`.
+- B7.5 Medir **custo de blockchain (gas)**. 🟢 · **DONE — medido 2026-06-23** (`smart-contract/scripts/measure-gas.js`): registerAsset dataset **388,7k** (bloom `0x`; +185k/256 B) / application **326,6k**; purchaseAccess **96,5k**. Idêntico p/ M0/A/B (contrato = control plane compartilhado). Dados em `results_gas.md`.
 - B7.8 ✅ **DONE** — ressalva de substrato confidencial: adicionada em *Threats to Validity* (`section_evaluation.tex`) e na abertura de `section_implementation.tex` (container é stand-in da CVM; muda só a implementação, não a arquitetura/análise).
 - B7.6 Reorganizar a segurança via **STRIDE** (mapear T1–T5). 🟢 · **DONE** — `tab:stride` + subseção "Security Evaluation with STRIDE" em `section_evaluation.tex`.
 - B7.7 (opcional) Adotar uma **aplicação realista** como workload (pedido do Abstract). · TODO
@@ -254,6 +254,7 @@ Hardhat → reportar como *projeção* sobre uma cadeia pública, não custo rea
 | `evaluation_data/results_raw.md` | Dados brutos campanha 1 (2026-06-11) |
 | `evaluation_data/results_ab_campaign.md` | Dados brutos campanha A/B (2026-06-11) |
 | `evaluation_data/results_m0_campaign.md` | Dados brutos campanha M0 vs A vs B, mesmo host (2026-06-23) |
+| `evaluation_data/results_gas.md` | Dados brutos de gas register/purchase (2026-06-23) |
 | `sample.bib` | Referências |
 
 **Código do M0 (no repo, fora de `TCC/`):**
