@@ -64,7 +64,7 @@ with both environments measured, not one measured and one argued.
 % Table: operational cost, A vs B (execution + build). English, drop-in.
 % Replaces/augments the single-column performance table.
 % ---------------------------------------------------------------------
-\begin{table}[t]
+\begin{table}[htbp]
 \centering
 \caption{Operational cost of the ephemeral-microVM isolation, measured live in
 both environments. Compartmentalization (B) adds no execution or build overhead
@@ -99,7 +99,7 @@ same A$\approx$B relationship).}
 % Use this in place of the Portuguese tab:blast-radius if the article is
 % English-only.
 % ---------------------------------------------------------------------
-\begin{table*}[t]
+\begin{table}[htbp]
 \centering
 \caption{Reach of a compromised execution plane over control-plane assets:
 compartmentalized DNAT (B) versus centralized baseline (A), from live inspection.
@@ -127,4 +127,4 @@ deployment across separate machines this is governed by inter-host network polic
 This substantiates the threat model's stated limitation: internal mutual TLS and
 network segmentation remain future work. The defining assets of the blast radius
 (secrets and persistent stores) are nonetheless isolated in B and colocated in A.}
-\end{table*}
+\end{table}

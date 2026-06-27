@@ -80,6 +80,35 @@ graceful shutdown, escalating to termination if needed. The host then mounts the
 output disk and derives the HTTP response solely from the persisted result. A
 \texttt{cleanup} trap unmounts every loop device and removes the entire per-run
 working directory on exit, which is what makes execution state ephemeral.
+Figure~\ref{fig:exec-lifecycle} summarizes this per-request lifecycle.
+
+\begin{figure}[htbp]
+\footnotesize
+\begin{verbatim}
+execute(bundle):                      # one /execute request [host]
+  workdir  = fresh per-run directory
+  rootfs   = copy-on-write overlay of the base image
+  in_disk  = new ext4, read-only, holding the bundle   # INPUT role
+  out_disk = new ext4, writable, tagged by a marker    # OUTPUT role
+  vm = Firecracker(rootfs, [in_disk, out_disk, app_disk?],
+                   vcpu=1, mem=512 MiB, NO network)     # no eth0
+  vm.start()
+  wait_serial(vm, "EXECUTION_COMPLETE")   # guest signals completion
+  vm.shutdown(graceful, then kill on timeout)
+  result = read(out_disk)                 # {rc, stdout, stderr}
+  on exit: umount loop devices; rm -rf workdir          # ephemeral
+
+guest (disk roles are discovered, not passed in):
+  find disks by marker; extract the bundle into /tmp/exec
+  run workspace/run.sh   (--dataset PATH, else positional)
+  write {rc, stdout, stderr} to OUTPUT; print EXECUTION_COMPLETE
+\end{verbatim}
+\caption{Per-request lifecycle of the execution plane (CVM3): a fresh,
+networkless Firecracker microVM per run, disk roles discovered by marker rather
+than passed in out of band, completion signaled over the serial console, and a
+cleanup trap that leaves no residual state.}
+\label{fig:exec-lifecycle}
+\end{figure}
 
 \subsection{Application Contract and Dependency Reuse}
 
