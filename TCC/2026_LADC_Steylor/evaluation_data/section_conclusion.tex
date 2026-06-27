@@ -6,7 +6,7 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper framed the DNAT implementation as a layered containment architecture
+This paper framed the proposed system as a layered containment architecture
 for a confidential data marketplace, and then tested that framing against the
 running prototype. The central design move---separating control, build, and
 execution into planes with different network and persistence properties---was
@@ -34,10 +34,11 @@ pending work on mutual TLS and internal network segmentation. Dataset
 confidentiality still depends on preparation and orchestration outside the
 encrypted-artifact path, and the system does not yet expose a remote-attestation
 flow that would let an external party verify the software identity of each
-confidential component before trusting a result. The remaining empirical gap is a
-full live intrusion comparison against the centralized baseline; the present
-blast-radius comparison is derived from the deployment configuration, since both
-environments share the same execution sandbox and differ only in colocation.
+confidential component before trusting a result. Both environments were measured live and end to end, so the
+blast-radius comparison rests on inspection of the running deployments rather
+than on inference from configuration: the two share the same execution sandbox
+and differ only in colocation, which is precisely the variable the comparison
+isolates.
 
 We therefore conclude that the compartmentalized design is justified as a
 credible high-assurance baseline for a confidential marketplace prototype: it

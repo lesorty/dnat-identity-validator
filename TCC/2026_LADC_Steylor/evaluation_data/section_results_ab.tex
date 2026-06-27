@@ -102,14 +102,14 @@ same A$\approx$B relationship).}
 \begin{table}[htbp]
 \centering
 \caption{Reach of a compromised execution plane over control-plane assets:
-compartmentalized DNAT (B) versus centralized baseline (A), from live inspection.
+the compartmentalized design (B) versus centralized baseline (A), from live inspection.
 ``Isolated'' = absent from the plane's namespace; ``Colocated'' = same namespace as
 the execution logic.}
 \label{tab:blast-radius}
 \footnotesize
 \begin{tabularx}{\textwidth}{@{}Xp{3.6cm}p{3.6cm}@{}}
 \toprule
-Control-plane asset reachable from the execution plane & Environment B (DNAT) & Environment A (baseline) \\
+Control-plane asset reachable from the execution plane & Environment B (proposed) & Environment A (baseline) \\
 \midrule
 Asset-encryption key (\texttt{ASSET\_ENCRYPTION\_KEY}, env) & Isolated (NOT SET) & Colocated (SET) \\
 Wallet private key (\texttt{PRIVATE\_KEY}, env) & Isolated (NOT SET) & Colocated (SET) \\
