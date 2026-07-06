@@ -4,6 +4,8 @@
 \usepackage[english]{babel}
 \usepackage{makecell}
 \usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,fit,arrows.meta}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage[disable]{todonotes}
@@ -313,57 +315,97 @@ is a dependency cache that is read-only at use. The execution plane
 in a microVM with no network interface and no persistent state, created
 fresh for each run and destroyed afterwards.
 
-Figure~\ref{fig:architecture} traces a single end-to-end request.
-(1)~The provider and the buyer register their assets; the control plane
-encrypts each artifact, publishes the ciphertext to the store, and
-records its content hash on the ledger. (2)~The buyer purchases access,
-which the contract records as a grant bound to the two asset hashes and
-the buyer's address. (3)~On an execution request the control plane first
-verifies that grant on chain; only then does it assemble a build bundle
-(source plus dependency manifest) and forward it to the build plane,
-which returns a read-only application artifact. (4)~The control plane
-provisions input and output disks, attaches the application artifact
-read-only, and launches the networkless execution microVM; the result is
-read back from the output disk and the working state torn down. Because
+Figure~\ref{fig:architecture} traces a single end-to-end request over
+the numbered interactions I1--I8, which also serve as the unit of
+analysis for the STRIDE evaluation in Section~\ref{sec:evaluation}.
+(1)~The provider and the buyer register their assets (I1); the control
+plane encrypts each artifact, publishes the ciphertext to the store
+(I3), and records its content hash on the ledger (I2). (2)~The buyer
+purchases access (I1), which the contract records as a grant bound to
+the two asset hashes and the buyer's address (I2). (3)~On an execution
+request the control plane first verifies that grant on chain (I2); only
+then does it assemble a build bundle (source plus dependency manifest)
+and forward it to the build plane (I4), which resolves dependencies
+against public package indexes through filtered egress (I5) and returns
+a read-only application artifact (I6). (4)~The control plane provisions
+input and output disks, attaches the application artifact read-only,
+and launches the networkless execution microVM (I7); the result is read
+back from the output disk (I8) and the working state torn down. Because
 each boundary crossing carries only what the next phase needs---a bundle
 to the builder, an artifact and disks to the executor---a compromise on
 either side of a boundary cannot widen into the privileges of the other.
 
 \begin{figure}[htbp]
-\footnotesize
-\begin{verbatim}
-   external parties (dataset provider, application buyer)
-        |  register assets / purchase access
-        v
-  +-------------------------------+      +--------------------------+
-  |    CVM1  --  Control plane     |<---->|  Distributed ledger      |
-  |  marketplace API, key custody, |      |  (access rights, hashes) |
-  |  ledger client, storage node   |      +--------------------------+
-  |                                |      +--------------------------+
-  |                                |<---->|  Distributed store       |
-  +-------------------------------+      |  (encrypted artifacts)   |
-        |   ^                             +--------------------------+
- build  |   |  application.ext4 (read-only)
- bundle |   |
-        v   |
-  +-------------------------------+
-  |    CVM2  --  Build plane       |   network egress, private
-  |  resolve deps in an ephemeral  |   ranges filtered
-  |  microVM                       |
-  +-------------------------------+
-        |   app.ext4 (read-only) + input / output disks
-        v
-  +-------------------------------+
-  |    CVM3  --  Execution plane   |   NO network; ephemeral;
-  |  runs app over dataset         |   fresh microVM per run
-  +-------------------------------+
-\end{verbatim}
-\caption{End-to-end request across the three planes. Each boundary
-crossing carries only what the next phase needs: a build bundle to the
-builder and a read-only artifact plus input/output disks to the
-networkless, ephemeral executor. The control plane is the only stateful,
-externally reachable component and mediates all ledger and storage
-access.}
+\centering
+\begin{tikzpicture}[
+    font=\scriptsize,
+    comp/.style={draw, semithick, rounded corners=1pt, align=center,
+                 inner sep=4pt},
+    external/.style={comp, fill=black!10},
+    infra/.style={comp, fill=black!4},
+    plane/.style={comp, fill=white},
+    tb/.style={draw, dashed, rounded corners=4pt, inner sep=2mm},
+    flow/.style={-{Stealth[length=2mm]}, semithick},
+    biflow/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}, semithick},
+    ilab/.style={font=\tiny, fill=white, inner sep=1.5pt, midway}
+]
+% --- nodes -----------------------------------------------------------
+\node[external] (parties) at (2.6,4.5)
+  {External parties\\[-1pt]\tiny dataset provider / application buyer};
+\node[infra] (ledger) at (9.6,4.7)
+  {Distributed ledger\\[-1pt]\tiny access rights, content hashes};
+\node[infra] (store) at (9.6,3.2)
+  {Distributed store\\[-1pt]\tiny encrypted artifacts};
+\node[plane, minimum width=5.2cm] (cvm1) at (4.0,2.3)
+  {\textbf{CVM1 --- Control plane}\\[-1pt]\tiny marketplace API, key
+   custody, ledger client, storage node};
+\node[plane, minimum width=3.6cm] (cvm2) at (1.8,-1.0)
+  {\textbf{CVM2 --- Build plane}\\[-1pt]\tiny resolves and bundles
+   dependencies\\[-1pt]\tiny in an ephemeral microVM};
+\node[plane, minimum width=3.6cm] (cvm3) at (7.6,-1.0)
+  {\textbf{CVM3 --- Execution plane}\\[-1pt]\tiny runs app over dataset;
+   no network\\[-1pt]\tiny interface; fresh microVM per run};
+\node[external] (pypi) at (1.8,-3.3)
+  {Package indexes\\[-1pt]\tiny e.g., PyPI};
+% --- trust boundaries -------------------------------------------------
+\node[tb, fit=(cvm1)] {};
+\node[tb, fit=(cvm2)] {};
+\node[tb, fit=(cvm3)] {};
+% --- interactions ------------------------------------------------------
+\draw[biflow] (parties.south) -- (parties.south |- cvm1.north)
+  node[ilab, right=1pt] {I1: register / purchase / execute};
+\draw[biflow] ([yshift=2mm]cvm1.east) -- (ledger.west)
+  node[ilab, above=1pt, sloped] {I2: grants \& hashes};
+\draw[biflow] ([yshift=-1mm]cvm1.east) -- (store.west)
+  node[ilab, below=1pt, sloped] {I3: encrypted artifacts};
+\draw[flow] ([xshift=-11mm]cvm1.south) -- ([xshift=-11mm]cvm1.south |- cvm2.north)
+  node[ilab, left=1pt] {I4: build bundle};
+\draw[flow] ([xshift=12mm]cvm2.north) -- ([xshift=12mm]cvm2.north |- cvm1.south)
+  node[ilab, right=1pt] {I6: app artifact (RO)};
+\draw[flow] (cvm2.south) -- (pypi.north)
+  node[ilab, right=1pt] {I5: dependency egress (filtered)};
+\draw[flow] ([xshift=21mm]cvm1.south) -- ([xshift=21mm]cvm1.south |- cvm3.north)
+  node[ilab, left=1pt] {I7: app + I/O disks};
+\draw[flow] ([xshift=12mm]cvm3.north) -- ([xshift=12mm]cvm3.north |- cvm1.south)
+  node[ilab, right=1pt] {I8: result};
+% reverse pivot: a compromised executor reaching back into the control plane
+% (attack path, not a legitimate flow) -- the residual analysed in the STRIDE.
+\draw[-{Stealth[length=2mm]}, dashed, black, semithick]
+  (cvm3.north west) to[bend right=22]
+  node[ilab, left=2pt] {reverse pivot (residual)} (cvm1.south east);
+\end{tikzpicture}
+\caption{The three planes and their numbered interactions (I1--I8).
+Dashed boxes mark trust boundaries: each plane is a separate trust
+domain with its own persistence rights and network policy. Each boundary
+crossing carries only what the next phase needs---a build bundle to the
+builder (I4), a read-only artifact plus input/output disks to the
+networkless, ephemeral executor (I7). The control plane is the only
+stateful, externally reachable component and mediates all ledger and
+storage access. The STRIDE analysis of
+Section~\ref{sec:evaluation} is performed over these elements and
+interactions; the dashed arrow marks the reverse pivot (a compromised
+executor reaching the control plane), the residual quantified in
+Table~\ref{tab:blast-radius}.}
 \label{fig:architecture}
 \end{figure}
 
@@ -439,9 +481,46 @@ run inside a hardware-backed Confidential VM~\cite{amd2020sevsnp}.
 
 \section{Related Work}\label{sec:related-work}
 
-% mencionar o DNAT e suas limitações (ex., dependência de tecnologias limitadas)
+% [placeholder minimo, 2026-07-05] Paragrafo de seguranca para (i) resolver as
+% remissoes da Evaluation (I8/verificabilidade) e (ii) posicionar contra o
+% VDDPI/DNAT. Eduardo expande depois com a taxonomia da secao VIII do VDDPI
+% (PrivacyGuard, PDO, TrustControl, MECT, ReGov, DUCE, OB-ABE, Lohmoller).
 
+% mencionar o DNAT e suas limitações (ex., dependência de tecnologias limitadas)
 % ver os artigos que ele citou ou que citaram ele
+
+A line of work uses trusted execution and distributed ledgers to control how
+sensitive data is used after it is handed to an untrusted consumer. The
+original DNAT~\cite{nascimento2020dnat} pioneered this combination for
+\emph{auditable traceability}, recording data-and-application usage in a
+tamper-evident ledger while executing the application over the data inside an
+SGX enclave; it assumes, however, that the application has been pre-verified as
+non-malicious by the data owner or a trusted third party. Systems such as
+PrivacyGuard~\cite{xiao2020privacyguard} similarly enforce usage contracts on
+chain and run the computation in an attested off-chain enclave, again taking the
+processing code as ratified in advance. The most recent and closest work,
+VDDPI~\cite{tokuda2026vddpi}, removes that assumption: it verifies the
+consumer's processing code \emph{mechanically}---through a mandatory template,
+an allow-listed function set, and static taint analysis executed by smart
+contracts on a permissioned ledger---so that a data provider can learn, before
+releasing data, whether the code discloses its inputs, and it binds the analysed
+code to the running enclave through the SGX measurement (\texttt{MRENCLAVE}).
+
+Our work is complementary to that verification axis rather than competing with
+it. VDDPI answers \emph{what} an authorized computation is allowed to reveal
+about its inputs---the disclosure-through-the-legitimate-result concern that we
+place out of scope (Section~\ref{sec:evaluation})---but pays for it with a
+restricted programming model: applications must fit the template and the
+allow-list, so arbitrary dependencies and unmodified code are, by construction,
+not supported. We instead target \emph{how} partially trusted code is run:
+privilege separation across control, build, and execution planes bounds the
+blast radius of a build- or run-time compromise, and treats dependency
+resolution (which VDDPI forbids outright) as a first-class supply-chain threat,
+while running unmodified applications with arbitrary declared dependencies. The
+two directions are composable: a code-verification stage in the spirit of VDDPI
+could be attached to our control plane without altering the plane boundaries,
+combining processing verification with the containment guarantees evaluated
+here.
 
 \input{evaluation_data/section_conclusion}
 

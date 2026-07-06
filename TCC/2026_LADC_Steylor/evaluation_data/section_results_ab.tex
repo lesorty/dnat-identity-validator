@@ -23,18 +23,11 @@ Firecracker execution and build microVMs, we expect---and observe---that the
 microVM-level properties and the operational cost are identical, while the
 architectural variable surfaces only in the blast radius.
 
-\textbf{The per-microVM guarantees are a constant.} Network-exfiltration
-resistance (T1), filesystem containment (T1b), and persistence resistance (T3)
-produce byte-for-byte equivalent evidence in A and B: the execution guest exposes
-no usable network interface (all seven outbound channels fail at the syscall level
-with \texttt{ENOSYS}/\emph{name resolution} errors), carries no control-plane
-secret in its environment, sees no sibling tenant disk, and---verified through the
-container's read-write layer after the campaign's runs---leaves behind no
-Firecracker socket, no per-run \texttt{ext4} disk, and no working directory; only
-the static, read-only rootfs template persists. Access control (T5) likewise holds
-in both: an execution request issued without a prior \texttt{purchaseAccess} is
-rejected with \emph{access denied} by the on-chain \texttt{hasAccessByIds} check in
-A and in B alike, since that gate lives at the control plane, above the split.
+\textbf{The per-microVM guarantees are a constant.} The security results of
+Section~\ref{sec:evaluation} (T1, T1b, T3, T5) reproduce byte-for-byte in both A
+and B, since the two share the same Firecracker execution and build microVMs and
+the same control-plane access gate. The architectural variable is therefore
+isolated to the blast radius below.
 
 \textbf{Compartmentalization adds no measurable cost.}
 Table~\ref{tab:ab-performance} reports the operational cost on both paths. Across

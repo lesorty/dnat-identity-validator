@@ -308,3 +308,78 @@ EXECUTOR_PORT=6000 bash assets/tests/run_execution_plane_tests.sh
   M0/A/B; mede-se uma vez.
 - M0 não roda em VM confidencial (coerente com a ressalva de substrato já no
   artigo); serve como ponto de comparação de custo/contenção, não de CC.
+
+---
+
+## 8. Sprint 3 — Revisão pós-VDDPI + e-mail Andrey 2026-07-03
+
+> Origem: análise do artigo VDDPI (Tokuda et al., IEEE TDSC 23(3), 2026,
+> DOI 10.1109/TDSC.2026.3658309 — texto extraído em `TCC/vddpi_text.txt`)
+> e e-mail do Andrey de 2026-07-03 (STRIDE por componente/interação +
+> diagramas + related work inspirado no VDDPI).
+>
+> Decisões fechadas (2026-07-05): diagrama em TikZ; tabela STRIDE só com
+> ameaças não triviais (triviais despachadas no texto); ProVerif fica como
+> future work nesta versão (modelo mínimo só se sobrar tempo).
+
+| # | Task | Onde | Status |
+|---|------|------|--------|
+| F1 | Diagrama TikZ da arquitetura com fronteiras de confiança e interações numeradas I1–I8 (substitui a figura ASCII) | `ladc.tex` fig:architecture | **feito** (validar compilação no Overleaf) |
+| F2 | Reestruturar STRIDE: declarar nível de abstração (elementos + I1–I8), tabela por interação (só não triviais), texto despacha as triviais, mapear ameaças → R1–R6 | `evaluation_data/section_evaluation.tex` §STRIDE | **feito** (revisar) |
+| F3a | Declarar fora de escopo: vazamento pelo canal legítimo de resultado (citar VDDPI como linha complementar) | `ladc.tex` §4.1 threat model | pendente |
+| F3b | Limitações: verificação de código (taint/PS) como extensão acoplável; usage control (contagem/expiração) no contrato como future work | Threats to Validity / Conclusion | pendente |
+| F3c | Atestação: SEV-SNP cumpre em produção o papel do MRENCLAVE no DNAT/VDDPI; não-CC não invalida a análise (reforçar no threat model) | `ladc.tex` §4.1 | pendente |
+| F4 | Related Work usando a taxonomia da §VIII do VDDPI; citar VDDPI como trabalho mais próximo; bib: VDDPI, PrivacyGuard, PDO, TrustControl, MECT, ReGov, DUCE, OB-ABE, Lohmöller | `ladc.tex` §Related Work + `sample.bib` | pendente |
+| F5a | Linha TCB na tab:generalization: Firecracker ~50 KLOC vs Gramine-SGX 1.348 KLOC + CPython 858 KLOC (VDDPI Fig. 12) — menção breve | `ladc.tex` tab:generalization | pendente |
+| F5b | Ancorar custos em números do VDDPI (init enclave ~5,9 s Gramine / ~1,1 s SGX SDK; registro ~12,3 s; aplicação de uso ~6,9 s) como contexto externo | `section_evaluation.tex` §Operational Cost | pendente |
+| F6 | ProVerif: parágrafo de future work (queries: secrecy do dataset; correspondência compra→execução); modelo .pv mínimo só se sobrar tempo | Conclusion / future work | pendente |
+
+### Sprint 3b — Correções pós-revisão detalhada (2026-07-05)
+
+> Revisão detalhada apontou contradição interna (TLS interno), células STRIDE
+> descobertas, e inconsistências numéricas. Todas resolvidas sem nova medição.
+
+| # | Task | Onde | Status |
+|---|------|------|--------|
+| C-A | Corrigir contradição do TLS interno: canais internos não têm mTLS → spoofing/alcance é residual (não trivial) | `section_evaluation.tex` §triviais | **feito** |
+| C-B | Cobrir células descobertas (I@build/I4-I5, T@I8, I@I3-encriptação) + matriz de completude 6×interações (●/○/⊙/—) `tab:stride-matrix` | `section_evaluation.tex` §STRIDE | **feito** |
+| C-C | Reconciliar 25,2 s (23/06) vs 26,8 s (11/06): duas campanhas, A≈B invariante | `section_evaluation.tex` §Operational Cost | **feito** |
+| C-D | Unificar erro de rede: `ENOSYS` → `Network is unreachable` (factual per findings T1) | `section_results_ab.tex` | **feito** |
+| C-E | Remover placeholders `cite` da coluna SGX (→ `n/a`, coluna qualitativa) | `section_evaluation.tex` tab:comparison | **feito** |
+| C-F | De-dup: remover linhas build/artifact da tab:comparison (ficam na tab:ab-performance) + enxugar prosa de build | `section_evaluation.tex` | **feito** |
+| C-G | Declarar n=3 e dispersão na legenda da tab:comparison (aponta p/ tab:ab-performance) | `section_evaluation.tex` | **feito** |
+| C-H | Seta de pivô reverso CVM3→CVM1 (tracejada) no diagrama + nota na legenda | `ladc.tex` fig:architecture | **feito** (validar posição no Overleaf) |
+
+### Sprint 3c — Segunda revisão detalhada (2026-07-05)
+
+> Revisão da versão pós-3b. 9 achados, todos procedentes (sem falso positivo).
+> 1–8 e 9a aplicados; 9b (Related Work) aguarda decisão de escopo.
+
+| # | Task | Onde | Status |
+|---|------|------|--------|
+| D1 | Âncora textual p/ células ○ sem justificativa: I1-E (correção de contrato/API, assumption) e I6-I (control já detém o artefato) | `section_evaluation.tex` §triviais | **feito** |
+| D2 | I7-T classificada de 3 formas → convenção única: matriz I7-T=● (RO mount, T2b); rótulo tab:stride `I6`→`I6, I7`; parágrafo já dizia `(I6,I7)` | `section_evaluation.tex` | **feito** |
+| D3 | "Three cells" → "Three residuals" (eram ~11 células em 3 grupos) | `section_evaluation.tex` §triviais | **feito** |
+| D4 | Residual de mTLS mencionava só spoofing; adicionado tampering em trânsito no I4 (ancora I4-T=⊙; I8-T já no 3º ponto) | `section_evaluation.tex` §triviais | **feito** |
+| D5 | Ordem das tabelas: matriz movida para ANTES da tab:stride (varredura→detalhe; numeração bate com as referências) | `section_evaluation.tex` §STRIDE | **feito** |
+| D6 | Frase estale na Threats to Validity: coluna SGX agora "qualitativa" (não "citada/re-medida") | `section_evaluation.tex` §ToV | **feito** |
+| D7 | Células "--" de DoS (I2–I8) e I7-E: legenda redefinida (disponibilidade de infra externa fora de escopo; escape de VMM excluído por assumption) | `section_evaluation.tex` tab:stride-matrix | **feito** |
+| D8 | Dispersão dos 25,2 s: nota corrigida (comparador de execução limpa 23/06, apps 25,2–25,8 s; dispersão nas campanhas n=3/n=6) | `section_evaluation.tex` tab:comparison | **feito** |
+| D9a | Seta de pivô `red!55!black` → `black` (LNCS imprime P&B; tracejado mantém distinção) | `ladc.tex` fig:architecture | **feito** |
+| D9b | Related Work vazia + avaliação aponta p/ ela 2× (I8/verificabilidade) → parágrafo mínimo de segurança (DNAT origem + PrivacyGuard + VDDPI complementar); bib: `tokuda2026vddpi`, `xiao2020privacyguard` | `ladc.tex` §Related Work + `sample.bib` | **feito** (placeholder p/ Eduardo expandir — F4) |
+| D9c | (opcional) T2c dedicado: provar `application.ext4` read-only no executor (hoje T2b prova só a wheel cache no build) | `assets/tests/` + `section_evaluation.tex` | pendente (opcional) |
+
+### Sprint 3d — Corte de páginas da Evaluation (2026-07-05)
+
+> Orçamento de páginas: Evaluation renderizava ~8 págs (alvo 4–5). Jogada do
+> revisor: resgatar a coluna de outcome da tab STRIDE antiga e cortar a prosa
+> por categoria (divisão tabela/texto que o Andrey pediu no e-mail).
+
+| # | Task | Onde | Status |
+|---|------|------|--------|
+| E1 | tab:stride ganha coluna "Outcome (measured)" (absorve a evidência dos testes) | `section_evaluation.tex` tab:stride | **feito** (\scriptsize; validar largura no Overleaf) |
+| E2 | 6 parágrafos por categoria (S/T/R/I/D/E) → 1 parágrafo "Reading the evidence" (só o que a tabela não comporta: closed-by-construction, code-size, T2 supply-chain) | `section_evaluation.tex` §STRIDE | **feito** |
+| E3 | Colapsar §A/B "per-microVM guarantees are a constant" (repetia T1/T1b/T3/T5 do STRIDE) → 1 frase | `section_results_ab.tex` | **feito** |
+| E4 | (opcional, se precisar mais) tab:ab-performance → 2–3 frases; fundir mais da §6.5 nas subseções de STRIDE/custo | `section_results_ab.tex` | pendente (opcional) |
+
+
