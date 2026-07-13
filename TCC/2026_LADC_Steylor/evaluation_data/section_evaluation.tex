@@ -7,119 +7,79 @@
 % Language: English. Tables: results_tables.tex + section_results_ab.tex.
 % =====================================================================
 
-The architectural argument of this paper is comparative: the compartmentalized
-design should contain compromise better than less-separated alternatives while
-paying an acceptable operational cost. We evaluate the implementation along two
-axes. For \emph{security}, we organize the analysis with the STRIDE
-model~\cite{shostack2014threat}, applied per interaction over the elements of
-Figure~\ref{fig:architecture}, and show how the design neutralizes---or
-explicitly fails to neutralize---each non-trivial threat, mapping every claim
-to a concrete test. For \emph{cost}, we measure the latency, build
-time, and resource price of the isolation strategy.
-
-The comparison spans up to four points on an isolation spectrum, summarized in
-Table~\ref{tab:comparison}: a no-isolation monolith (M0), a centralized
-deployment that adds ephemeral microVMs but colocates all assets (Environment~A),
-the compartmentalized design that also separates the planes (Environment~B), and,
-as a cited reference, the SGX-based original DNAT~\cite{nascimento2020dnat}.
-Because A and B share the same Firecracker microVMs, any cost or security
-difference between them isolates the effect of \emph{compartmentalization}; M0
-isolates the cost and the security delta of the \emph{microVM} primitive itself;
-and the SGX reference frames the reuse and dependency limitations that motivate
-our change of technology.
+The architectural argument of this paper is comparative: the compartmentalized design should
+contain compromise better than less-separated alternatives while paying an acceptable
+operational cost. We evaluate it along two axes. For \emph{security}, we organize the
+analysis with the STRIDE model~\cite{shostack2014threat}, applied per interaction over the
+elements of Figure~\ref{fig:architecture}, showing how the design neutralizes---or
+explicitly fails to neutralize---each non-trivial threat, and mapping every claim to a
+concrete test. For \emph{cost}, we measure execution and build latency. The comparison spans
+up to four points on an isolation spectrum (Table~\ref{tab:comparison}): a no-isolation
+monolith (M0), a centralized deployment with ephemeral microVMs but colocated assets
+(Environment~A), the compartmentalized design that also separates the planes
+(Environment~B), and, as a cited reference, the SGX-based original
+DNAT~\cite{nascimento2020dnat}. Because A and B share the same Firecracker microVMs, any
+difference between them isolates the effect of \emph{compartmentalization}; M0 isolates the
+cost and the security delta of the \emph{microVM} primitive itself; and the SGX reference
+frames the reuse limitation that motivates our change of technology.
 
 \subsection{Methodology}
 
-We exercise the running prototype with a small suite of purpose-built
-applications, each designed to attack one STRIDE category, over a synthetic,
-PII-free dataset. Tests that target the execution plane submit an application
-bundle directly to the executor, reproducing the same execution contract the
-control plane generates, so that the variable under study---the execution
-microVM---is isolated from unrelated services; tests that target lateral movement
-inspect the executor environment, and the access-control test drives the
-marketplace API. Each adverse application emits machine-readable evidence markers
-that a harness collects, and each test is mapped to the interaction and STRIDE
-category it supports (Table~\ref{tab:stride}), so that every observation
-connects to a property of a specific boundary crossing rather than merely
-listing successful checks.
+We exercise the running prototype with a small suite of purpose-built applications, each
+designed to attack one STRIDE category, over a synthetic, PII-free dataset of sixty rows.
+Tests targeting the execution plane submit an application bundle directly to the executor,
+reproducing the contract the control plane generates, so that the variable under study---the
+execution microVM---is isolated from unrelated services; tests targeting lateral movement
+inspect the executor environment, and the access-control test drives the marketplace API.
+Each adverse application emits machine-readable evidence markers that a harness collects,
+and each test is mapped to the interaction and STRIDE category it supports
+(Table~\ref{tab:stride}), so that every observation connects to a specific boundary
+crossing rather than merely listing successful checks.
 
-Environments~A and~B were both measured live and end to end. The centralized
-baseline (Environment~A) keeps execution under the same Firecracker isolation as
-the compartmentalized design (Environment~B), so the only independent variable
-between the two is the separation of planes; any measured difference therefore
-reflects compartmentalization, not a weaker execution sandbox. The no-isolation
-baseline (M0)---which runs the application directly in the control namespace,
-without launching a microVM---was measured on the same host, and the on-chain gas
-cost was measured on Hardhat; together these complete the comparative matrix
-(Table~\ref{tab:comparison}), leaving only the SGX reference column, which is
-cited from the original DNAT work.
+The suite comprises eight probes, referred to by code throughout this section so that every
+``T$n$'' entry in Tables~\ref{tab:stride} and~\ref{tab:blast-radius} traces back to a
+concrete, reproducible adversarial application. \textbf{T1} and \textbf{T1b} drive the
+execution plane (I7): the first attempts outbound network exfiltration of the dataset, the
+second scans the environment and the disks for control-plane secrets and sibling data.
+\textbf{T2} declares a malicious dependency whose import-time payload runs inside the
+execution microVM (I4/I5), with two variants---\textbf{T2a}, which retries exfiltration
+from that payload at run time (I7), and \textbf{T2b}, whose build-time \texttt{setup.py}
+tries to poison the read-only wheel cache and artifact (I6/I7). \textbf{T3} repeats
+executions to probe the executor for residual sockets, disks, and mounts. \textbf{T4} has a
+compromised executor pivot toward the control plane's secrets and stores. \textbf{T5}, the
+only end-to-end test, drives the marketplace API (I1--I3): it requests an execution without
+\texttt{purchaseAccess} and audits that the actions were recorded on chain and that the
+on-chain hash matches the artifact. All three environments were measured live on the same
+host, and the gas cost on Hardhat; only the SGX column of Table~\ref{tab:comparison} is
+cited rather than measured.
 
 \subsection{Security Evaluation with STRIDE}
 
-STRIDE is an analysis of components and their interactions, not of a system
-taken as a whole: a claim such as ``the design resists tampering'' is only
-meaningful relative to a stated element. We therefore fix the level of
-abstraction first. The analysis is performed over the elements of
-Figure~\ref{fig:architecture}---the external parties, the three planes (each a
-separate trust domain), the ledger, the store, and the package indexes---and
-over the numbered interactions I1--I8 that cross their trust boundaries.
-Following STRIDE-per-element practice~\cite{shostack2014threat}, each threat
-category was examined against every element and boundary-crossing interaction;
-flows internal to a single trust domain are not analyzed.
-Table~\ref{tab:stride-matrix} records the full sweep---every category against
-every interaction---classifying each cell as actively countered, trivially
-handled, or an acknowledged residual, so that the coverage can be audited
-rather than taken on trust. Table~\ref{tab:stride} then concentrates on the
-non-trivial threats---those the architecture must actively counter---naming for
-each the exact interaction where it arises, the countering mechanism, and the
-test that provides evidence. The trivial and residual cells are discussed in
-the text at the end of this subsection.
-
-\begin{table}[htbp]
-\centering
-\caption{Completeness matrix: every STRIDE category against every interaction
-of Figure~\ref{fig:architecture} (last two rows are element-level attack
-surfaces, not legitimate flows). $\bullet$~countered by a design mechanism
-(detailed in Table~\ref{tab:stride} or the text); $\circ$~trivial---standard
-TLS/HTTPS or a trust assumption of Section~\ref{sec:proposal};
-$\odot$~acknowledged residual or out of scope, discussed in the text and
-Threats to Validity; ``--''~not applicable to that element or flow, or the
-availability of external infrastructure (ledger, package indexes) assumed out
-of scope. MicroVM/VMM escape at I7 is excluded by the trusted-VMM assumption of
-Section~\ref{sec:proposal}; the reverse-pivot row captures what a plane
-compromise reaches despite it.}
-\label{tab:stride-matrix}
-\footnotesize
-\begin{tabular}{@{}lcccccc@{}}
-\toprule
-Interaction / element & S & T & R & I & D & E \\
-\midrule
-I1\quad external party $\leftrightarrow$ control & $\bullet$ & $\circ$ & $\bullet$ & $\circ$ & $\odot$ & $\circ$ \\
-I2\quad control $\leftrightarrow$ ledger & $\circ$ & $\circ$ & $\bullet$ & $\circ$ & -- & -- \\
-I3\quad control $\leftrightarrow$ store & $\circ$ & $\bullet$ & -- & $\bullet$ & -- & -- \\
-I4\quad control $\rightarrow$ builder & $\odot$ & $\odot$ & -- & $\odot$ & -- & $\bullet$ \\
-I5\quad builder $\rightarrow$ package index & $\circ$ & $\circ$ & -- & $\odot$ & -- & $\bullet$ \\
-I6\quad builder $\rightarrow$ control & $\odot$ & $\bullet$ & -- & $\circ$ & -- & -- \\
-I7\quad control $\rightarrow$ executor & $\odot$ & $\bullet$ & -- & $\bullet$ & -- & -- \\
-I8\quad executor $\rightarrow$ control & $\odot$ & $\odot$ & -- & $\odot$ & -- & -- \\
-\addlinespace
-CVM3 $\rightarrow$ CVM1 (reverse pivot) & -- & -- & -- & -- & -- & $\bullet$ \\
-CVM3 (per-run hygiene) & -- & -- & -- & -- & $\bullet$ & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
+STRIDE analyzes components and their interactions, not a system taken as a whole---a claim
+such as ``the design resists tampering'' is meaningful only relative to a stated
+element---so we fix the level of abstraction first. The analysis is performed over the
+elements of Figure~\ref{fig:architecture} and over the numbered interactions I1--I8 that
+cross their trust boundaries. Following STRIDE-per-element
+practice~\cite{shostack2014threat}, each of the six threat categories was examined against
+every element and boundary-crossing interaction; flows internal to a single trust domain are
+not analyzed, and microVM or VMM escape at I7 is excluded by the trusted-VMM assumption of
+Section~\ref{sec:proposal}. Every cell of that sweep falls into one of four groups: actively
+countered by a design mechanism, trivially handled by standard TLS or by a trust assumption,
+an acknowledged residual, or not applicable. Table~\ref{tab:stride} concentrates on the
+first group---the non-trivial threats the architecture must actively counter---naming for
+each the interaction where it arises, the countering mechanism, and the test that provides
+evidence. The other three groups are enumerated at the end of this subsection, so that the
+coverage can be audited rather than taken on trust.
 
 \begin{table}[htbp]
 \centering
 \caption{Non-trivial STRIDE threats, per interaction of
 Figure~\ref{fig:architecture} (S/T/R/I/D/E = spoofing, tampering, repudiation,
-information disclosure, denial of service, elevation of privilege). Each row
-names the interaction where the threat arises, the countering mechanism, the
-measured outcome, and the test providing it; trivial or assumption-covered
-cells are discussed in the text.}
+information disclosure, denial of service, elevation of privilege). Trivial and
+assumption-covered cells are discussed in the text.}
 \label{tab:stride}
 \scriptsize
-\begin{tabularx}{\textwidth}{@{}p{1.15cm}cXXp{0.8cm}@{}}
+\begin{tabularx}{\textwidth}{@{}p{1.6cm}cXXp{0.8cm}@{}}
 \toprule
 Interaction & Cat. & Threat \& countering mechanism & Outcome (measured) & Test \\
 \midrule
@@ -131,113 +91,90 @@ I3 & T & Artifact modified between storage and use; SHA-256 content hash bound o
 \addlinespace
 I4, I5 & E & Malicious dependency runs at build time; ephemeral builder, filtered egress, no dataset & Payload runs in builder only---no secrets, no dataset; cache write denied & T2, T2b \\
 \addlinespace
-I6, I7 & T & Poisoned cache or modified artifact; mounted read-only at use & Build-time write denied (\texttt{Permission denied}) & T2b \\
+I6, I7 & T & Poisoned cache or modified artifact; mounted read-only at use & Build-time write denied (\texttt{Permission denied}); \emph{residual:} wheels built from a malicious sdist are still cached & T2b \\
 \addlinespace
 I7 & I & Dataset exfiltration over the network; execution microVM has no interface & 7/7 outbound channels fail, no \texttt{eth0} & T1, T2a \\
 \addlinespace
 I7 & I & Reads control-plane secrets or sibling data; no secrets, own disks only & Secrets absent from env; only own I/O disks visible & T1b, T4 \\
 \addlinespace
-CVM3\,$\to$\,CVM1 & E & Executor pivots into the control plane; secrets and stores absent & Keys, IPFS, cache, executions absent (\emph{residual:} shared net) & T4 \\
+CVM3\,$\to$ CVM1 & E & Executor pivots into the control plane; secrets and stores absent & Keys, IPFS, cache, executions absent (\emph{residual:} shared net) & T4 \\
 \addlinespace
 CVM3 & D & Residual state starves later runs; per-run caps (1~vCPU/512~MiB) and teardown & No socket, disk, or mount after 9+ runs & T3 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\textbf{Reading the evidence.} Table~\ref{tab:stride} carries the
-per-interaction outcomes; two points deserve emphasis beyond the data. First,
-the containment of the execution plane is \emph{structural} rather than
-policy-based: the plane that consumes the dataset has no network interface at
-all, so the seven outbound probes fail with \texttt{Network is unreachable}
-because there is no route to disable, not because a firewall rule denies
-them---the strongest form the property can take. This is reinforced by code
-size: the execution plane that runs untrusted code is also the smallest
-first-party codebase (about 365 lines, against roughly 590 in the builder and
-1{,}500 in the secret-holding control plane), so the boundary an attacker
-reaches first is the least code to audit and holds none of the control-plane
-logic. Second, the supply-chain test (T2) is the paper's thesis in miniature: a
-package seeded into the builder's cache is resolved, bundled, and runs its
-payload at import time inside the execution microVM---yet finds no secrets and a
-blocked network, exactly mirroring T1 and T1b, while its build-time
-\texttt{setup.py} variant executes in the isolated builder and fails against the
-read-only cache. Malicious code, whether at build or execution time, inherits
-the containment of the plane that runs it rather than reaching the control
-plane.
+\textbf{Reading the evidence.} Two points deserve emphasis beyond Table~\ref{tab:stride}.
+First, the containment of the execution plane is \emph{structural} rather than
+policy-based---the seven outbound probes fail because no network interface exists, not
+because a firewall rule denies them---and the plane that runs untrusted code is also the
+smallest first-party codebase (about 365 lines, against roughly 590 in the builder and
+1{,}500 in the secret-holding control plane), so the boundary an attacker reaches first is
+the least code to audit. Second, the supply-chain test (T2) is the paper's thesis in
+miniature: a package seeded into the builder's cache is resolved, bundled, and runs its
+payload inside the execution microVM---yet finds no secrets and a blocked network. Malicious
+code inherits the containment of the plane that runs it.
 
-\textbf{Trivial, assumption-covered, and residual cells.} The remaining cells
-of the sweep in Table~\ref{tab:stride-matrix} fall into three groups.
-\emph{Trivial.} On the external-facing interaction I1, tampering and
-information disclosure in transit are handled by standard TLS. Interactions
-with the ledger and the store (I2, I3) reduce to the trust assumptions of
-Section~\ref{sec:proposal}: the ledger is assumed to execute correctly and the
-store to be content-addressed, so spoofing and tampering there are outside the
-design's control, and the access rights and content hashes they carry are
-public by construction. One store cell is a mitigation we do claim rather than
-assume: the artifacts are encrypted by the control plane before publication, so
-information disclosure at the store (I3) is countered by that encryption.
-Spoofing or tampering of a package index (I5) is the classic supply-chain
-vector; the design does not authenticate the index beyond standard HTTPS and
-instead contains what its packages can do once resolved (the I4/I5 row of
-Table~\ref{tab:stride}). Two further trivial cells close the group: information
-disclosure of the returned artifact (I6) is immaterial because the control plane
-commissioned and already holds it, and elevation of privilege through the
-marketplace API itself (I1) is a matter of contract and API implementation
-correctness---an assumption outside the architectural analysis rather than a
-property the planes enforce. \emph{Acknowledged residuals and out of scope.}
-Three residuals are neither trivial nor fully closed in the prototype, and we
-mark them as such rather than claim them. First, the internal service channels
-(I4, I6--I8) are not mutually authenticated: server-side TLS does not by itself
-stop a compromised plane from impersonating a legitimate internal caller, so
-spoofing on these channels, in-transit tampering on the build bundle to the
-builder (I4), and reach to services that should be unreachable are a
-residual that internal mutual TLS and network segmentation would close, the same
-network-reach residual already visible in Table~\ref{tab:blast-radius} and
-revisited under Threats to Validity. Second, a
-malicious dependency running in the builder could exfiltrate the buyer's own
-application source over the filtered egress (I4/I5, information disclosure); the
-damage is bounded because the provider's dataset never enters the build plane,
-so only the buyer's own asset---not the sensitive data---is at risk, but we
-record this as an accepted residual rather than a closed threat. Third, the
-result returned to the buyer (I8) is out of scope in two senses: this work
-bounds what a malicious application can \emph{reach}, not what an authorized
-computation \emph{reveals} about its inputs (information disclosure), nor
-whether a compromised executor returned a faithful result (tampering);
-verifying the processing itself is a complementary line of work discussed in
-Section~\ref{sec:related-work}. Denial of service beyond per-run state hygiene
-(e.g., request flooding at I1) is likewise out of scope (Threats to Validity),
-and repudiation is meaningful only for the ledger-recorded marketplace actions
-already covered by the I1/I2 row.
+\textbf{Trivial, assumption-covered, and residual cells.} \emph{Trivial.} In-transit
+tampering and disclosure on I1 are handled by standard TLS; the ledger and store
+interactions (I2, I3) reduce to the trust assumptions of Section~\ref{sec:proposal}, and the
+rights and hashes they carry are public by construction; disclosure of the returned artifact
+(I6) is immaterial because the control plane commissioned it; and elevation of privilege
+through the marketplace API itself (I1) is an API-correctness assumption rather than a
+property the planes enforce. Two cells deserve a remark: disclosure at the store (I3) is a
+mitigation we claim rather than assume---artifacts are encrypted before publication---and
+the design does not authenticate the package index (I5) beyond HTTPS, containing instead
+what its packages can do once resolved. \emph{Acknowledged residuals and out of scope.} Four
+residuals are neither trivial nor fully closed, and we mark rather than claim them. First,
+the internal service channels (I4, I6--I8) are neither mutually authenticated nor segmented,
+so a compromised plane can impersonate an internal caller or tamper with the build bundle in
+transit; Section~\ref{sec:ab-results} measures what this actually grants an attacker, and
+internal mutual TLS would close it. Second, the read-only mount prevents a dependency's
+\texttt{setup.py} from writing to the wheel cache (T2b), but it does not make the cache
+\emph{trustworthy}: a wheel legitimately built from a malicious sdist is persisted by design
+and may be reused by a later build of another buyer. What such a wheel reaches is still
+bounded by the plane that runs it---the builder, which holds no dataset and no secrets, and
+the networkless executor (T2, T2a)---so the residual is one of cache integrity rather than
+of dataset confidentiality; per-buyer partitioning and wheel provenance would close it.
+Third, a malicious dependency could exfiltrate the buyer's own application source over the
+filtered egress (I4/I5), but the provider's dataset never enters the build plane. Fourth,
+the result returned to the buyer (I8) is out of scope in two senses: this work bounds what a
+malicious application can \emph{reach}, not what an authorized computation \emph{reveals}
+about its inputs, nor whether a compromised executor returned a faithful result
+(Section~\ref{sec:related-work}). Denial of service beyond per-run state hygiene, and
+repudiation beyond the ledger-recorded actions of the I1/I2 row, are likewise out of scope.
 
-Read against the requirements of Section~\ref{sec:problem-definition}, the
-per-interaction analysis exercises R5 (rows I1 and I1/I2 and I3), R3 (rows
-I4/I5 and I6), R1 and R4 (both I7 rows and the D row), and R2 (the
-CVM3\,$\to$\,CVM1 row); R6 is not a threat-facing property and is exercised
-instead by the cross-architecture comparison (Table~\ref{tab:comparison}).
+Read against the requirements of Section~\ref{sec:problem-definition}, the per-interaction
+analysis exercises R5 (rows I1, I1/I2, and I3), R3 (rows I4/I5 and I6), R4 (both I7 rows
+and the D row), and R2 (the CVM3\,$\to$\,CVM1 row); R6 is not threat-facing and is
+exercised instead by Table~\ref{tab:comparison}. R1 is only partly measured, and we
+separate its two halves. Confidentiality against the \emph{code the platform runs}---the
+adversary of our threat model---is what the I7 rows test: a malicious application finds no
+route out and no secret to take. Confidentiality against the \emph{infrastructure
+operator} is not tested here; it rests on the confidential-computing substrate that the
+prototype substitutes away (Section~\ref{sec:proposal}), and artifact encryption protects
+assets at rest in the store but not the dataset as the control plane prepares it. That half
+of R1 is an assumption of the design, not a result of this evaluation.
 
 \subsection{Operational Cost}
 
-Table~\ref{tab:comparison} consolidates the cost of the isolation strategy
-across architectures, and Table~\ref{tab:ab-performance} reports an earlier
-live A/B campaign in detail. End-to-end execution latency is indistinguishable
-between A and B; its absolute value tracks host warmth---26.8~s on the
-2026-06-11 A/B campaign and 25.2~s on the warmer 2026-06-23 host used here for
-the M0 comparison---but the A$\approx$B equality is invariant across both
-campaigns. This time is dominated by
-the microVM life cycle---kernel boot, disk discovery, output-disk synchronization,
-and the guarded shutdown sequence---rather than by the application itself, whose
-computation over sixty rows completes in milliseconds.
+Table~\ref{tab:comparison} consolidates the cost of the isolation strategy across
+architectures, drawing on two live campaigns. Execution latency does not separate A from B:
+the two differ by 67~ms in the 2026-06-11 campaign and by 11~ms on the benign comparator of
+the 2026-06-23 campaign, against a run-to-run standard deviation of 1.4~s measured over six
+repetitions of the same application. The A--B gap is thus two orders of magnitude below the
+noise of the measurement itself, so the data support the absence of a systematic cost from
+compartmentalization rather than an exact equality. The absolute value tracks host
+warmth---26.8~s on the first campaign, 25.2~s on the warmer M0 host---and is dominated by
+the microVM life cycle (kernel boot, disk discovery, output-disk synchronization, guarded
+shutdown) rather than by the application, whose compute over sixty rows takes milliseconds.
 
 \begin{table}[htbp]
 \centering
-\caption{Comparative results across the isolation spectrum: a no-isolation
-monolith (M0), a centralized deployment that adds ephemeral microVMs but
-colocates all assets (A), the compartmentalized design that also separates the
-planes (B), and the SGX-based original DNAT as a cited reference. Execution
-latency and overhead are measured on the same host (2026-06-23); on-chain gas
-is measured on Hardhat; build and artifact figures, identical across A and B,
-are reported with the live A/B campaign (Table~\ref{tab:ab-performance}); the
-SGX column is a qualitative reference (its enclave latencies are not
-re-measured here).}
+\caption{Comparative cost across the isolation spectrum: a no-isolation monolith (M0), a
+centralized deployment that adds ephemeral microVMs but colocates all assets (A), the
+compartmentalized design that also separates the planes (B), and the SGX-based original
+DNAT as a cited, qualitative reference.}
 \label{tab:comparison}
 \footnotesize
 \begin{tabularx}{\textwidth}{@{}Xllll@{}}
@@ -245,89 +182,45 @@ re-measured here).}
 Metric & M0 & A & B & SGX (ref.) \\
 \midrule
 Execution latency, benign app (s)$^{\P}$ & 0.07 & 25.2 & 25.2 & n/a \\
-microVM boot/life-cycle overhead (s) & $\approx$0 & $\approx$25.1 & $\approx$25.1 & n/a \\
-On-chain gas, register / purchase (k)$^{\S}$ & 389 / 97 & 389 / 97 & 389 / 97 & --- \\
+microVM boot/life-cycle overhead (s)$^{\P}$ & $\approx$0 & $\approx$25.1 & $\approx$25.1 & n/a \\
+\addlinespace
+Execution latency, suite mean (s)$^{\ddagger}$ & --- & 26.8 & 26.8 & n/a \\
+Build latency, no dependencies (s)$^{\ddagger}$ & --- & 30.2 & 30.1 & n/a \\
+Build latency, \texttt{requests} $+4$ transitive (s)$^{\ddagger}$ & --- & 34.9 & 38.2 & n/a \\
+Artifact size, no deps / \texttt{requests} (MiB)$^{\ddagger}$ & --- & 16.0 / 19.6 & 16.0 / 19.6 & n/a \\
+\addlinespace
+On-chain gas, register / purchase (k)$^{\S}$ & 389/97 & 389/97 & 389/97 & --- \\
 \addlinespace
 App reuse with deps, no recompile & yes & yes & yes & \textbf{no} \\
 \bottomrule
 \end{tabularx}
 \par\smallskip
-{\footnotesize The microVM adds $\approx$25~s over M0's $\approx$0.07~s, since the
-application's compute over 60 rows is sub-second; that fixed cost is the price of a
-fresh, networkless microVM per run. A$\approx$B by design, as both share the same
-Firecracker microVMs (build detail in Table~\ref{tab:ab-performance}, blast radius
-in Table~\ref{tab:blast-radius}). $^{\P}$The execution figures are the clean-execution comparator (benign app)
-from the 2026-06-23 same-host campaign; that campaign's three test apps spanned
-25.2--25.8~s. Run-to-run dispersion is characterized in the earlier campaigns
-(the $n{=}3$ A/B campaign at 26.8~s in Table~\ref{tab:ab-performance}, and a
-colder $n{=}6$ campaign at 31.4~s, sd 1.4~s). On-chain gas is identical
-across M0/A/B because the contract is the shared control plane; an asset's optional
-bloom filter adds $\approx$185k gas per 256~B. $^{\S}$Gas is the EVM's unit of work
-(a plain transfer is 21k); on a representative layer-2 (0.03~gwei, ETH at
-US\$3,000) the cost is $\approx$US\$0.035 to register and $<$US\$0.01 to purchase.
-The SGX column frames the reuse and dependency limitation of the original DNAT.}
+\parbox{\textwidth}{\footnotesize The microVM adds $\approx$25~s over M0's $\approx$0.07~s,
+since the application's compute over 60 rows is sub-second; that fixed cost is the price of
+a fresh, networkless microVM per run. A and B share the same Firecracker microVMs, so no
+cost difference is expected between them; the blast radius is where they diverge
+(Table~\ref{tab:blast-radius}). Latencies are single runs; the repeated-run spread of one
+application is 1.4~s (sd, $n{=}6$), which bounds how finely A and B can be told apart---the
+build gap in particular ($n{=}1$ per cell, and dependent on a public index) is not
+resolvable, and we draw no architectural conclusion from it. $^{\P}$2026-06-23 same-host
+campaign. $^{\ddagger}$2026-06-11 A/B campaign (3 apps, warm host; M0 not included).
+$^{\S}$Gas is the EVM's unit of work (a plain transfer is 21k).}
 \end{table}
 
-The no-isolation baseline (M0) makes this concrete: running the same workload
-directly in the container's namespace---no Firecracker, no disk isolation, no
-network removal---the benign application completes in $\approx$0.07~s, so the
-microVM adds roughly 25~s of fixed per-execution overhead. That overhead is the
-price of launching a fresh, networkless microVM for every run, and it is exactly
-what buys the containment: in the same measurement, M0 exposes a working
-\texttt{eth0} and succeeds at network exfiltration, finds all six control-plane
-secrets in its environment, and persists its writes, whereas A and B (with the
-microVM) block exfiltration, expose no secret, and leave no residual state.
-Separating the planes (B vs A) adds nothing on top of this microVM cost.
+What that fixed overhead buys is visible in the same measurement: the no-isolation baseline
+(M0) exposes a working \texttt{eth0} and succeeds at network exfiltration, finds all six
+control-plane secrets in its environment, and persists its writes, whereas A and B block
+exfiltration, expose no secret, and leave no residual state.
 
-The on-chain cost is likewise architecture-independent. Registering an asset on
-the marketplace contract costs $\approx$389k gas (a dataset with an empty bloom
-filter; an application $\approx$327k), and purchasing access costs $\approx$97k
-gas; a dataset's optional on-chain bloom filter adds $\approx$185k gas per 256
-bytes. These figures are identical for M0, A, and B because the registry is the
-shared control plane---isolation lives in the build and execution planes, not in
-the contract---so the blockchain cost of the user journey is unchanged by the
-isolation strategy. In concrete terms (a plain value transfer is 21k gas), on a
-representative layer-2 deployment at 0.03~gwei with ETH at US\$3,000 these amount
-to about US\$0.035 to register an asset and under US\$0.01 to purchase access, so
-the marketplace is inexpensive to operate where such applications realistically
-run.
+The on-chain cost is likewise architecture-independent. Registering an asset costs
+$\approx$389k gas (a dataset with an empty bloom filter; an application $\approx$327k) and
+purchasing access $\approx$97k gas; a dataset's optional bloom filter adds $\approx$185k gas
+per 256 bytes. These figures are identical for M0, A, and B because the registry is the
+shared control plane---isolation lives in the build and execution planes, not in the
+contract. On a representative layer-2 deployment at 0.03~gwei with ETH at US\$3,000, and
+setting aside the data-availability fee the rollup pays to its settlement layer, they amount
+to about US\$0.035 to register an asset and under US\$0.01 to purchase access---illustrative
+figures that float with the network, but that leave the marketplace inexpensive to operate.
 
-The build plane is more expensive, as expected from its heavier configuration
-(two vCPUs, network egress, and dependency resolution), but that cost is
-identical across the two designs, which share the same builder microVM. The
-per-path build latencies and artifact sizes are reported in detail with the
-live A/B campaign in Section~\ref{sec:ab-results}
-(Table~\ref{tab:ab-performance}).
-
-\subsection{Threats to Validity}
-
-The measurements were taken on a single host with a Linux-backed container
-runtime; absolute latencies will vary with hardware (a colder first campaign saw
-a 31.4~s execution mean and 103--131~s builds, with the same A$\approx$B
-relationship), but the containment and exfiltration results are structural
-(absence of a network interface, absence of secrets) and do not depend on timing.
-The execution-plane tests bypass IPFS and the builder to isolate the microVM
-under study; the end-to-end path through the control plane is exercised
-separately by the access-control test. We report one residual weakness honestly:
-in the single-host deployment the three planes share one Docker network, so a
-compromised executor can still reach the control API and the blockchain RPC over
-that network, even though the secrets and stores that define the blast radius
-remain isolated; internal mutual TLS and network segmentation remain future work
-(Table~\ref{tab:blast-radius}). Finally, the DoS analysis covers only per-run
-state hygiene, not load-induced resource exhaustion, and the SGX column of
-Table~\ref{tab:comparison} is qualitative---it restates the original DNAT's
-reuse limitation rather than re-measuring enclave latencies here.
-
-A more fundamental caveat concerns the execution substrate. The prototype runs
-each plane as a container with Firecracker microVMs rather than inside a
-hardware-backed confidential VM, so our measurements do not come from a genuinely
-confidential environment and we make no claim about confidential-computing
-overheads. This does not weaken the architectural argument: the properties we
-evaluate---privilege separation across planes, a networkless execution microVM,
-ephemeral teardown, and on-chain access control---are properties of the
-architecture, not of the memory-encryption substrate. Running the same planes
-inside confidential VMs (e.g., AMD SEV-SNP~\cite{amd2020sevsnp}) would change the
-implementation and add a hardware-attestation and memory-encryption cost, but
-would preserve the containment and blast-radius results demonstrated here. The
-analysis therefore remains valid, with confidential execution as a substrate
-substitution rather than an architectural change.
+% "Threats to Validity" agora fecha a secao: movida (texto intacto) para o fim
+% de section_results_ab.tex, depois da subsecao A/B (6.4 A/B -> 6.5 TtV).

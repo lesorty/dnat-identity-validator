@@ -6,46 +6,27 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper framed the proposed system as a layered containment architecture
-for a confidential data marketplace, and then tested that framing against the
-running prototype. The central design move---separating control, build, and
-execution into planes with different network and persistence properties---was
-evaluated not as an abstract claim of trustlessness but as a measurable reduction
-in blast radius relative to a centralized baseline that differs only in the
-colocation of assets.
+This paper framed the proposed system as a layered containment architecture for a
+confidential data marketplace and tested that framing against the running prototype. The
+central design move---separating control, build, and execution into planes with different
+network and persistence properties---was evaluated not as an abstract claim of trustlessness
+but as a measurable reduction in blast radius relative to a centralized baseline differing
+only in the colocation of assets.
 
-The experimental results support the comparative argument. Execution-time code
-cannot open outbound channels because the execution microVM is launched without a
-network interface; every probed channel failed with a structural
-network-unreachable error rather than a defeatable policy. Ephemeral state does
-not survive: after repeated executions the executor retained no disks, mounts,
-sockets, or datasets. The assets that define the blast radius---the
-asset-encryption key, the wallet key, the IPFS repository, the wheel cache, and
-the executions store---are absent from the compromised executor in the
-compartmentalized design, whereas they are colocated in the baseline. Execution
-is gated on chain, and the isolation is bought at a fixed operational cost of
-roughly thirty seconds of microVM life cycle per run.
+The experimental results support that argument. Execution-time code cannot open outbound
+channels: the probed channels failed in the network stack itself---unimplemented socket
+calls and failed name resolution---rather than at a policy that could be switched off.
+Ephemeral state does not survive, and the assets that define the blast radius (the
+encryption and wallet keys, the IPFS repository, the wheel cache, and the executions store)
+are absent from the compromised executor in the compartmentalized design, whereas they are
+colocated in the baseline. Execution is gated on chain, and the isolation costs roughly
+twenty-five seconds per run---a cost compartmentalization itself does not increase.
 
-At the same time, the evaluation makes the limitations concrete rather than
-rhetorical. In a single-host deployment the planes share one network, so a
-compromised executor can still reach the control API and the blockchain RPC even
-though the secrets and stores remain isolated; this directly motivates the
-pending work on mutual TLS and internal network segmentation. Dataset
-confidentiality still depends on preparation and orchestration outside the
-encrypted-artifact path, and the system does not yet expose a remote-attestation
-flow that would let an external party verify the software identity of each
-confidential component before trusting a result. Both environments were measured live and end to end, so the
-blast-radius comparison rests on inspection of the running deployments rather
-than on inference from configuration: the two share the same execution sandbox
-and differ only in colocation, which is precisely the variable the comparison
-isolates.
-
-We therefore conclude that the compartmentalized design is justified as a
-credible high-assurance baseline for a confidential marketplace prototype: it
-demonstrably narrows what a single compromise can reach and what it can leave
-behind, while leaving a clearly bounded set of properties---service identity,
-dataset confidentiality, and attestation---as the next steps. Future work will
-close the network-segmentation gap between planes, extend artifact-grade
-encryption and provenance to datasets and cached wheels, and add attestation so
-that the containment demonstrated here can be verified remotely rather than
-assumed.
+The limitations are equally concrete: the planes share one network and do not authenticate
+each other, so a compromised executor can still drive the control API as a confused
+deputy---though never obtaining the keys to decrypt artifacts or sign transactions; the
+wheel cache is not yet a trustworthy artifact store; dataset confidentiality depends on
+preparation outside the encrypted-artifact path; and no attestation flow yet verifies each
+component's software identity. The design is nonetheless a credible high-assurance baseline,
+and future work---internal mutual TLS, wheel and dataset provenance, and attestation---will
+let the containment shown here be verified remotely rather than assumed.

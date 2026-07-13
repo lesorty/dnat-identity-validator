@@ -40,6 +40,71 @@
 - [ ] **Floats `table*` → `table[htbp]`** (4 tabelas). · **Seção:** Evaluation · **Onde:** `section_evaluation.tex`, `section_results_ab.tex` · **Verificar:** nenhuma tabela de largura-dupla sendo adiada.
 - [ ] **Pseudo-código do ciclo de execução** (`fig:exec-lifecycle`). · **Seção:** Implementation › Execution Plane · **Onde:** `section_implementation.tex` · **Verificar:** fiel ao `executor.py`/`run-vm.sh`; mostra sem-rede, descoberta de disco por marker, handshake serial, cleanup efêmero.
 
+## Rodada 6 — Corte para 15 páginas + rigor da avaliação · *a commitar*
+
+> **Resultado:** corpo (Introdução → Conclusão) agora termina **na p. 15**; total 16 pp
+> (p. 16 = Declaração de IA + Referências). Antes: corpo em 17 pp, total 18.
+> Compilado localmente com `tectonic` (mesmo layout do Overleaf).
+
+**Referências (`sample.bib`)**
+- [ ] **URL do Ethereum** corrigida: `whitepublication` → `whitepaper`.
+- [ ] **DNAT (`nascimento2020dnat`)**: autores em `Sobrenome, Nome`; agora renderiza
+  "Nascimento Jr., J.R." (antes saía "Jr, J.R.N.").
+
+**Validade dos testes (pontos levantados na revisão)**
+- [ ] **Estatística (Operational Cost + nota da `tab:comparison`).** Removidas as
+  afirmações não sustentadas ("indistinguishable", "within run-to-run variance").
+  Agora: A−B = 67 ms / 11 ms contra **sd = 1,4 s (n=6)** de execuções repetidas → o gap é
+  2 ordens de grandeza abaixo do ruído; build é **n=1 por célula** e explicitamente *não*
+  resolvível (nenhuma conclusão arquitetural tirada dele).
+- [ ] **Escopo do R1 (§6.2, fim).** Separadas as duas metades: confidencialidade contra o
+  *código executado* é medida (linhas I7); contra o *operador* é **assumida** (substrato CC),
+  não demonstrada. Reforçado em Threats to Validity.
+- [ ] **Explorabilidade da control API (§6.4, novo parágrafo + nota da `tab:blast-radius`).**
+  Os endpoints internos **não são autenticados** (verificado em `api-server.js`: sem
+  middleware de auth; `GET /api/executions/:id` devolve stdout/stderr de execuções
+  anteriores). O executor comprometido em B pode usar a API como **confused deputy**
+  (enumerar assets, ler saídas, pedir ao control plane que assine com a carteira dele),
+  mas **não obtém as chaves** → não decifra artefatos nem assina transações próprias; o
+  gate on-chain continua barrando execução sem compra. Em A as chaves estão no próprio
+  namespace. O argumento vira "não é a existência do resíduo, é o seu **teto**".
+- [ ] **Cache de wheels (§6.2 residuais + linha I6/I7 da `tab:stride`).** Explicitado que o
+  read-only só barra escrita direta pelo `setup.py`; um wheel **legitimamente construído a
+  partir de um sdist malicioso é persistido por design** e pode ser reusado no build de
+  outro comprador. Resíduo de **integridade de cache** (não de confidencialidade do dataset);
+  mitigação: particionamento por comprador + procedência.
+- [ ] **Contradições removidas.** Conclusão dizia "network-unreachable error" — os dados
+  brutos mostram `ENOSYS` / falha de resolução de nome; texto alinhado. Custo L2 agora diz
+  explicitamente que **exclui a taxa de dados da L1**. TtV agora diz que rodar em CVM
+  **preserva contenção mas não os números de custo**. TtV ganhou a ressalva de workload
+  pequeno (60 linhas: não fala de amortização nem dos tetos 1 vCPU/512 MiB).
+
+**Cortes de página (nenhuma alegação removida)**
+- [ ] **Layout:** `microtype` + `enumitem`, `\textfloatsep`/`\intextsep`/`\floatsep` reduzidos,
+  figura em `scale=0.92`. Margens, fontes e o layout do `llncs` **não** foram tocados. (≈1 p)
+- [ ] **`tab:planes` (antiga Tabela 1) removida** — duplicava a Figura 1 + prosa; o conteúdo
+  ("holds/persists") foi absorvido em 3 frases da §4.2.
+- [ ] **`tab:blast-radius` compactada** — células "Isolated (NOT SET)" quebravam em 2 linhas;
+  agora "Isolated"/"Colocated" com a explicação na legenda; portas 3001/8545 fundidas
+  numa linha (valores idênticos). Sozinha, liberou ~10 linhas.
+- [ ] **§5.4 + §5.5 fundidas** em "Application Contract, Asset Integrity, and Baselines".
+- [ ] **Prosa comprimida** em §2, §3, §4.1–4.3, §5, §6.1–6.5, §7 e Conclusão (redundâncias:
+  o monólito CVM aparecia na Intro e na §3; a Tabela 1 era re-narrada; a história do T2 e o
+  "A≈B" apareciam 3×; §4.3 duplicava o Related Work).
+- [ ] **`\titlerunning`** adicionado: o cabeçalho estourava a margem em **49 pt** em toda
+  página ímpar (defeito pré-existente, agora 0 overfull).
+
+**Verificação automática**
+- [x] `\ref`→`\label`, `\cite`→`.bib`, labels órfãos: **0 problemas**; 9 citações, todas resolvidas.
+- [x] Overfull do cabeçalho: **0** (era 49 pt/página). Restam 3 overfulls de 6–9 pt (normais).
+- [ ] **Conferir no Overleaf** (o tectonic reproduziu o layout, mas confirme antes de submeter).
+
+**Ainda pendente (do seu lado)**
+- [ ] **Abstract** ainda tem `X\%`, diz "AWS cloud" (a avaliação é single-host) e promete
+  "overhead baixo em %" quando o resultado é **custo fixo ~25 s/execução**.
+- [ ] **ORCIDs** `?????` e `0000-zzz-zzz-zzzz`.
+- [ ] Só 9 referências — o Related Work ainda espera a taxonomia do VDDPI (Eduardo).
+
 ---
 
 ## Pendências conhecidas (a fazer, não são mudanças ainda)

@@ -7,145 +7,89 @@
 \section{Implementation}
 \label{sec:implementation}
 
-This section describes how the three planes are realized in the prototype, so
-that the security properties evaluated later can be traced to concrete mechanisms
-rather than to design intent alone. The system is deployed as three containers on
-a shared runtime---\texttt{dnat-client} (CVM1), \texttt{dnat-builder} (CVM2), and
-\texttt{dnat-executor} (CVM3)---and is contrasted with two baselines: a
-single-container deployment that colocates the same assets (A) and a no-isolation
-variant that removes the microVM entirely (M0). Each plane is a container in the current
-prototype, standing in for a hardware-backed confidential
-VM~\cite{amd2020sevsnp} in a production deployment; because the planes interact
-only through their declared interfaces and isolation boundaries, this
-substitution changes the execution substrate but not the architecture or the
-security argument evaluated in Section~\ref{sec:evaluation}. We therefore do not
-report confidential-computing overheads, and the analysis that follows holds
-under a fully confidential deployment.
+This section describes how the three planes are realized, so that the security properties
+evaluated later can be traced to concrete mechanisms rather than to design intent alone. The
+system is deployed as three containers on a shared runtime---\texttt{dnat-client} (CVM1),
+\texttt{dnat-builder} (CVM2), and \texttt{dnat-executor} (CVM3)---each standing in for the
+hardware-backed confidential VM~\cite{amd2020sevsnp} of a production deployment, and is
+contrasted with two baselines: a single-container deployment that colocates the same assets
+(A) and a no-isolation variant that removes the microVM entirely (M0). The consequences of
+that substrate substitution are examined in Section~\ref{sec:evaluation}.
 
 \subsection{Control Plane (CVM1)}
 
-The control plane hosts the marketplace API, a local IPFS node, and the
-blockchain client. Application and dataset registration, access checks, and
-execution orchestration are exposed through a small HTTP API. On application
-registration, CVM1 does not install dependencies itself: it assembles a build
-bundle (the source file plus a manifest of declared dependencies) and forwards it
-to the builder. When the builder returns an \texttt{application.ext4} artifact,
-CVM1 encrypts it before publication. The encryption uses AES-256-GCM over a
-gzip-compressed artifact, with a versioned binary envelope (magic header, length
-prefix, JSON header carrying the IV, authentication tag, and metadata). Only the
-resulting encrypted blob and a manifest are published to IPFS; the plaintext
-artifact never leaves the control plane. Access control is enforced on chain: an
-execution request first calls \texttt{hasAccessByIds}, and the workflow aborts
-with \emph{access denied} if the caller has not purchased access to both the
-dataset and the application. A purchased right is recorded under the key
-\texttt{keccak256(encryptedDatasetHash, encryptedApplicationHash, buyer)}, bound
-to the encrypted IPFS CIDs of the two assets and the buyer's address rather than
-to mutable asset identifiers, so the grant is stable under off-chain re-indexing
-and is verified before any bundle is assembled.
+The control plane hosts the marketplace API, a local IPFS node, and the blockchain client,
+exposing registration, access checks, and execution orchestration through a small HTTP API.
+On registration, CVM1 does not install dependencies itself: it assembles a build bundle (the
+source plus a manifest of declared dependencies) and forwards it to the builder. When the
+builder returns an \texttt{application.ext4} artifact, CVM1 encrypts it with AES-256-GCM
+over a gzip-compressed image, in a versioned envelope carrying the IV, authentication tag,
+and metadata. Only the encrypted blob and a manifest are published to IPFS; the plaintext
+artifact never leaves the control plane. Access control is enforced on chain: an execution
+request first calls \texttt{hasAccessByIds}, and the workflow aborts with \emph{access
+denied} if the caller has not purchased access to both assets. A purchased right is recorded
+under the key \texttt{keccak256(encryptedDatasetHash, encryptedApplicationHash,
+buyer)}---bound to the encrypted IPFS CIDs of the two assets and the buyer's address rather
+than to mutable identifiers, so the grant is stable under off-chain re-indexing---and is
+verified before any bundle is assembled.
 
 \subsection{Build Plane (CVM2)}
 
-The builder exposes a single \texttt{/build} endpoint that accepts a bundle and
-launches an ephemeral Firecracker microVM to resolve dependencies. Unlike the
-executor, the build microVM is given a network interface, because resolving and
-compiling Python wheels may require egress to package indexes. Egress is
-constrained on the host side: a TAP device is created and iptables rules
-\texttt{REJECT} traffic from the guest toward private ranges
+The builder exposes a single \texttt{/build} endpoint that accepts a bundle and launches an
+ephemeral Firecracker microVM to resolve dependencies. Unlike the executor, the build
+microVM is given a network interface, because resolving and compiling Python wheels may
+require egress to package indexes. Egress is constrained on the host side: a TAP device is
+created and iptables rules \texttt{REJECT} traffic from the guest toward private ranges
 (\texttt{10.0.0.0/8}, \texttt{172.16.0.0/12}, \texttt{192.168.0.0/16},
-\texttt{127.0.0.0/8}, \texttt{169.254.0.0/16}, and the host TAP address) while
-allowing the remaining outbound traffic via masquerading. Inside the guest, an
-artifact builder produces a read-only \texttt{ext4} image containing the
-application source under \texttt{/app}, its \texttt{site-packages}, a lock file of
-resolved dependencies, and a marker file used later for disk discovery.
-Dependencies are first wheel-built and then installed with \texttt{--no-index}
-from the local wheelhouse, and reusable wheels are persisted in a size-pruned
-cache that is the builder's only durable state. After the build, the host returns
-only the artifact and build metadata; the per-request build state is discarded.
+\texttt{127.0.0.0/8}, \texttt{169.254.0.0/16}, and the host TAP address), while the
+remaining outbound traffic is masqueraded. Inside the guest, an artifact builder produces a
+read-only \texttt{ext4} image holding the application source, its \texttt{site-packages}, a
+lock file of resolved dependencies, and a marker file used later for disk discovery.
+Dependencies are first wheel-built and then installed with \texttt{--no-index} from the
+local wheelhouse; reusable wheels are persisted in a size-pruned cache that is the builder's
+only durable state---and, as Section~\ref{sec:evaluation} notes, its only cross-request
+channel. After the build, the host returns only the artifact and its metadata; the
+per-request build state is discarded.
 
 \subsection{Execution Plane (CVM3)}
 
-The executor exposes a single \texttt{/execute} endpoint. For each request it
-copies a fresh root overlay, creates new input and output \texttt{ext4} disks,
-optionally attaches the application artifact disk read-only, and launches a
-Firecracker microVM with one vCPU and 512~MiB of memory and---crucially---no
-network interface. The guest does not receive disk roles out of band; it
-discovers them by scanning candidate block devices for marker files, then
-extracts the workspace and runs \texttt{workspace/run.sh}. The launcher script
-tries a small, fixed set of invocation strategies so that applications can accept
-the dataset either as \texttt{--dataset data/dataset.csv} or as a positional
-argument; standard output and error are captured and persisted to the output
-disk. Synchronization between host and guest uses the serial console: the guest
-writes an \texttt{EXECUTION\_COMPLETE} marker, after which the host issues a
-graceful shutdown, escalating to termination if needed. The host then mounts the
-output disk and derives the HTTP response solely from the persisted result. A
-\texttt{cleanup} trap unmounts every loop device and removes the entire per-run
-working directory on exit, which is what makes execution state ephemeral.
-Figure~\ref{fig:exec-lifecycle} summarizes this per-request lifecycle.
+The executor exposes a single \texttt{/execute} endpoint. For each request it copies a fresh
+root overlay, creates new input and output \texttt{ext4} disks, optionally attaches the
+application artifact read-only, and launches a Firecracker microVM with one vCPU, 512~MiB of
+memory and---crucially---no network interface. The guest does not receive disk roles out of
+band; it discovers them by scanning candidate block devices for marker files, then extracts
+the workspace and runs \texttt{workspace/run.sh}, whose output is persisted to the output
+disk. Host and guest synchronize over the serial console: the guest writes an
+\texttt{EXECUTION\_COMPLETE} marker, after which the host issues a graceful shutdown,
+escalating to termination if needed, then mounts the output disk and derives the HTTP
+response solely from the persisted result. A \texttt{cleanup} trap unmounts every loop device
+and removes the per-run working directory on exit, which is what makes execution state
+ephemeral.
 
-\begin{figure}[htbp]
-\footnotesize
-\begin{verbatim}
-execute(bundle):                      # one /execute request [host]
-  workdir  = fresh per-run directory
-  rootfs   = copy-on-write overlay of the base image
-  in_disk  = new ext4, read-only, holding the bundle   # INPUT role
-  out_disk = new ext4, writable, tagged by a marker    # OUTPUT role
-  vm = Firecracker(rootfs, [in_disk, out_disk, app_disk?],
-                   vcpu=1, mem=512 MiB, NO network)     # no eth0
-  vm.start()
-  wait_serial(vm, "EXECUTION_COMPLETE")   # guest signals completion
-  vm.shutdown(graceful, then kill on timeout)
-  result = read(out_disk)                 # {rc, stdout, stderr}
-  on exit: umount loop devices; rm -rf workdir          # ephemeral
+\subsection{Application Contract, Asset Integrity, and Baselines}
 
-guest (disk roles are discovered, not passed in):
-  find disks by marker; extract the bundle into /tmp/exec
-  run workspace/run.sh   (--dataset PATH, else positional)
-  write {rc, stdout, stderr} to OUTPUT; print EXECUTION_COMPLETE
-\end{verbatim}
-\caption{Per-request lifecycle of the execution plane (CVM3): a fresh,
-networkless Firecracker microVM per run, disk roles discovered by marker rather
-than passed in out of band, completion signaled over the serial console, and a
-cleanup trap that leaves no residual state.}
-\label{fig:exec-lifecycle}
-\end{figure}
+An application is registered as unmodified source together with a manifest of its
+third-party dependencies, which the builder resolves and bundles into the read-only
+\texttt{application.ext4} artifact. Because dependencies are shipped as ordinary
+\texttt{site-packages} inside that artifact---rather than linked into a trusted-execution
+enclave at build time---an application that follows this contract runs with arbitrary
+declared dependencies, unchanged across all three environments and without recompilation or
+enclave-specific adaptation (R6). This is the reuse property that
+Section~\ref{sec:evaluation} contrasts with the enclave-based original DNAT.
 
-\subsection{Application Contract and Dependency Reuse}
+Assets are bound to the chain by content hash: registration records the SHA-256 of the
+artifact, which lets a consumer detect tampering between IPFS and the contract. The first
+baseline (environment~A) runs the identical control, build, and execution logic, including
+Firecracker isolation for both microVMs, but inside a single container whose filesystem
+holds the IPFS repository, the wheel cache, and the executions store, and whose environment
+holds the asset-encryption key and the wallet private key. Its only structural difference
+from the compartmentalized deployment is the colocation of these assets---exactly the
+variable the security evaluation isolates.
 
-An application is registered as unmodified source together with a manifest that
-declares its third-party dependencies. The builder (CVM2) resolves those
-dependencies and bundles them, with the source, into the read-only
-\texttt{application.ext4} artifact, and the executor (CVM3) runs the application
-through the fixed \texttt{workspace/run.sh} entry point, passing the dataset by a
-small set of conventions (a \texttt{--dataset} flag or a positional path). Because
-dependencies are shipped as ordinary \texttt{site-packages} inside the artifact---
-rather than linked into a trusted-execution enclave at build time---an application
-that follows this simple contract runs with arbitrary declared dependencies, and
-runs unchanged across all three environments, without recompilation or
-enclave-specific adaptation. This is the reuse property that
-Section~\ref{sec:evaluation} contrasts with the enclave-based original DNAT, where
-third-party dependencies require recompilation or adaptation.
-
-\subsection{Asset Integrity and Baselines}
-
-Assets are bound to the chain by content hash: registration records the SHA-256
-of the artifact, which lets a consumer detect tampering between IPFS and the
-contract. The first baseline
-(\texttt{docker/baseline-vm.compose.yaml}, environment~A) runs the identical control, build, and
-execution logic, including Firecracker isolation for the build and execution
-microVMs, but inside a single container whose filesystem holds the IPFS
-repository, the wheel cache, and the executions store, and whose environment
-holds the asset-encryption key and the wallet private key. The only structural
-difference from the compartmentalized deployment is therefore the colocation of
-these assets, which is exactly the variable the security evaluation isolates.
-
-A second baseline removes isolation altogether. With \texttt{DNAT\_NO\_MICROVM}
-set, the executor runs \texttt{vm/run-direct.sh}, which executes the identical
-\texttt{workspace/run.sh} contract directly in the container's namespace---no
-Firecracker, no per-run input and output disks, and no network removal---while
-emitting the same \texttt{\{returncode, stdout, stderr\}} result so the request
-path is otherwise unchanged. This no-isolation variant (M0) is the lower endpoint
-of the spectrum in Section~\ref{sec:evaluation}: the application inherits the
-container's network, environment (including the control-plane secrets), and
-persistent filesystem, which lets the evaluation separate the microVM's
-operational cost from the containment it provides.
+The second baseline removes isolation altogether. With \texttt{DNAT\_NO\_MICROVM} set, the
+executor runs the same \texttt{workspace/run.sh} contract directly in the container's
+namespace---no Firecracker, no per-run disks, no network removal---while emitting the same
+result, so the request path is otherwise unchanged. In this variant (M0) the application
+inherits the container's network, environment (including the control-plane secrets), and
+persistent filesystem, which is what lets the evaluation separate the microVM's operational
+cost from the containment it provides.

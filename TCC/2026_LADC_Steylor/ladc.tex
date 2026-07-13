@@ -9,11 +9,31 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage[disable]{todonotes}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% Space recovery for the page budget: tighter float separation and list spacing.
+% Margins, font sizes, and the llncs body layout are untouched.
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+
+% Float placement: discourage half-empty float pages (the Evaluation carries
+% several full-width tables). A float page must now be >=85% full, and text
+% pages accept larger top/bottom floats before deferring them.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{5}
 
 \renewcommand{\cellalign}{l}
 
 \begin{document}
 \title{Lightweight confidential and traceable multi-stakeholder data processing}
+% llncs needs a short running title: the full one overflows the page head.
+\titlerunning{Lightweight confidential multi-stakeholder data processing}
 
 \author{Steylor Barros\inst{1}\orcidID{?????} \and
 Eduardo Falcão\inst{2}\orcidID{0000-zzz-zzz-zzzz} \and Andrey Brito\inst{1}\orcidID{0000-0002-7350-8599}}
@@ -44,38 +64,49 @@ Distributed ledger \and Traceability \and Supply-chain security}
 % Falar mais do aspecto de multi-stakeholder
 % Ele cita o DNAT mas deve comparar melhor, mostrando que tem limitações (ex., a execução em SGX dificulta o reuso de aplicações, que podem precisar serem recompiladas ou adaptadas, e também tem o problema das dependências).
 
-Confidential data marketplaces must simultaneously support asset
-exchange, access control, and third-party computation over sensitive
-inputs. That combination creates a difficult systems problem.
-A marketplace that accepts externally supplied applications cannot
-treat code execution as an isolated implementation detail, because
-the same platform also handles persistent metadata, payment and
-access logic, storage backends, and the datasets that motivate the
-marketplace in the first place. In practice, the problem is not merely
-how to ``run code safely,'' but how to prevent build-time and
-run-time compromise from expanding into a full platform compromise.
+Confidential data marketplaces must simultaneously support asset exchange,
+access control, and third-party computation over sensitive inputs---a
+combination that creates a difficult systems problem. A marketplace that
+accepts externally supplied applications cannot treat code execution as an
+isolated implementation detail, because the same platform also handles
+persistent metadata, payment and access logic, storage backends, and the
+datasets that motivate the marketplace in the first place. The problem is
+therefore not merely how to ``run code safely,'' but how to prevent build-time
+and run-time compromise from expanding into a full platform compromise.
 
-The most direct implementation path would be a centralized
-confidential virtual machine~\cite{amd2020sevsnp} that hosts the
-marketplace-facing logic, local artifact storage, and the execution
-orchestrator in the same trust domain. That design is operationally
-attractive because it minimizes deployment complexity and avoids
-inter-service coordination. However, it also creates the wrong
-security shape for the problem: the same node that validates access
-and manages persistent sensitive state also becomes the place where
-untrusted or semi-trusted workloads are prepared and executed.
+The most direct implementation path would be a centralized confidential
+virtual machine~\cite{amd2020sevsnp} hosting the marketplace-facing logic,
+local artifact storage, and the execution orchestrator in one trust domain.
+That design minimizes deployment complexity and avoids inter-service
+coordination, but it creates the wrong security shape for the problem: the
+same node that validates access and manages persistent sensitive state also
+becomes the place where untrusted or semi-trusted workloads are prepared and
+executed.
 
-This paper argues that such a concentration of privilege is
-fundamentally ill-suited for high-assurance marketplaces. It is
-proposed an architecture designed under the assumption that component
-compromise is an eventual certainty rather than a remote possibility.
-By decomposing the marketplace into distinct trust
-domains---control, build, and execution~\cite{nascimento2020dnat}---the
-system ensures that a failure or malicious exploit in one phase cannot
-propagate to the entire application. Our focus is on minimizing the
-``blast radius'' of errors and attacks, ensuring that even if the
-build or execution planes are corrupted, the platform's core sensitive
-assets and persistent state remain protected.
+This paper argues that such a concentration of privilege is fundamentally
+ill-suited for high-assurance marketplaces, and proposes an architecture
+designed under the assumption that component compromise is an eventual
+certainty rather than a remote possibility. By decomposing the marketplace
+into distinct trust domains---control, build, and
+execution~\cite{nascimento2020dnat}---a failure or malicious exploit in one
+phase cannot propagate to the whole platform. The focus is on minimizing the
+``blast radius'' of errors and attacks: even if the build or execution planes
+are corrupted, the core sensitive assets and persistent state remain
+protected.
+
+The paper proceeds as follows. Section~\ref{sec:background} introduces the
+three building blocks the architecture rests on---lightweight isolation,
+distributed ledgers, and distributed storage---each by the property it
+contributes, and Section~\ref{sec:problem-definition} defines the problem and
+derives the requirements R1--R6 a secure solution must satisfy.
+Section~\ref{sec:proposal} presents the three-plane architecture, its threat
+model, and how it generalizes the SGX-based DNAT;
+Section~\ref{sec:implementation} describes the prototype that realizes the
+planes. Section~\ref{sec:evaluation} evaluates the design for security (a
+STRIDE analysis mapped to reproducible tests) and cost (a live A/B comparison
+against a centralized baseline). Section~\ref{sec:related-work} positions the
+work against related trusted-execution and ledger-based systems, and
+Section~\ref{sec:conclusion} concludes.
 
 
 % qual é o contexto do problema?
@@ -105,65 +136,43 @@ assets and persistent state remain protected.
 % (4) IPFS generalizado: "armazenamento distribuido compativel com os objetivos";
 %     IPFS e uma opcao, usada aqui de forma simplificada.
 
-The architecture in this paper combines three building blocks, each
-introduced here by the property it contributes rather than by its
-internal mechanics: lightweight isolation for running partially trusted
-code in separate trust domains, a distributed ledger for tamper-evident
-traceability of who is allowed to do what, and a distributed store for
-the large artifacts that the ledger cannot hold economically.
+The architecture combines three building blocks, each introduced here by the property it
+contributes rather than by its internal mechanics.
 
 \subsection{Lightweight isolation with microVMs}
-The platform must execute application code and resolve third-party
-dependencies---both only partially trusted---without letting a compromise
-spread across trust domains. Operating-system containers share the host
-kernel and therefore offer a comparatively weak boundary for this
-purpose, whereas full virtual machines impose a startup and memory cost
-that is hard to justify when isolation is required per task. MicroVMs
-such as Firecracker~\cite{agache2020firecracker} occupy the middle
-ground: each workload runs behind a virtualization boundary with its own
-kernel, but with a minimal device model that keeps startup time and
-memory footprint low. This makes two levers practical at the granularity
-of a single execution. First, ephemerality: a fresh microVM per task
-leaves no residual state for a later run to inherit. Second, network
-confinement: the environment that consumes the sensitive dataset can be
-launched with no network interface at all, removing the primary
-exfiltration channel even under a complete runtime compromise. In this
-setting the cloud host and the virtual-machine monitor are trusted; the
-boundary being defended is the one between the planes, not the one
-against the operator.
+The platform must execute application code and resolve third-party dependencies---both only
+partially trusted---without letting a compromise spread across trust domains.
+Operating-system containers share the host kernel and offer a comparatively weak boundary
+for this purpose, whereas full virtual machines impose a startup and memory cost hard to
+justify per task. MicroVMs such as Firecracker~\cite{agache2020firecracker} occupy the
+middle ground: each workload runs behind a virtualization boundary with its own kernel, but
+with a minimal device model that keeps startup time and memory footprint low. Two levers
+thus become practical at the granularity of a single execution. \emph{Ephemerality}: a
+fresh microVM per task leaves no residual state for a later run to inherit. \emph{Network
+confinement}: the environment that consumes the sensitive dataset can be launched with no
+network interface at all, removing the primary exfiltration channel even under a complete
+runtime compromise.
 
 \subsection{Distributed ledgers and traceability}
-A distributed ledger~\cite{nakamoto2008bitcoin} provides a tamper-evident,
-append-only record shared among parties that do not trust one another:
-entries are chained by cryptographic hash, so rewriting past history is
-computationally infeasible without controlling most of the network.
-Beyond integrity, this is what yields traceability. Every consequential
-action---registering an asset, purchasing access, granting a
-permission---is recorded as a transaction that no single party can later
-repudiate or rewrite, producing an auditable provenance trail over the
-lifecycle of each asset. Smart contracts~\cite{buterin2014ethereum} push
-this further by turning the access policy itself into an executable,
-publicly verifiable program: in our system the ledger holds the access
-rights and the integrity bindings---the content hashes of the registered
-assets---so any stakeholder can later verify what was authorized and
-which artifact was actually used. The cost of these guarantees is that
-every write requires consensus, adding a transaction fee and latency,
-which is precisely why the large assets must live off the ledger.
+A distributed ledger~\cite{nakamoto2008bitcoin} provides a tamper-evident, append-only
+record shared among parties that do not trust one another. This is what yields
+traceability: every consequential action---registering an asset, purchasing access,
+granting a permission---is recorded as a transaction that no single party can later
+repudiate or rewrite. Smart contracts~\cite{buterin2014ethereum} turn the access policy
+itself into an executable, publicly verifiable program: the ledger holds the access rights
+and the content hashes of the registered assets, so any stakeholder can verify what was
+authorized and which artifact was used. The cost is that every write requires consensus,
+adding a fee and latency---which is precisely why the large assets must live off the ledger.
 
 \subsection{Distributed storage}
-The assets themselves---encrypted application and dataset artifacts---are
-far too large to place on the ledger. They require an off-chain store
-that is, first, content-addressed, so that the identifier of an artifact
-is a deterministic hash of its bytes and can be bound to the integrity
-record kept on the ledger; and second, distributed, so that the data
-stays available to the participating parties without a single trusted
-custodian. Any storage layer that meets these two objectives is
-compatible with the architecture. The InterPlanetary File System
-(IPFS)~\cite{benet2014ipfs} is one such option: it identifies files by a
-content hash and locates them through a distributed hash table. We use
-IPFS in a deliberately simplified form---a node co-located with the
-control plane rather than a public swarm---as a concrete stand-in for any
-backend that provides content addressing and distributed availability.
+Those assets---encrypted application and dataset artifacts---require an off-chain store
+that is \emph{content-addressed}, so that the identifier of an artifact is a deterministic
+hash of its bytes and can be bound to the integrity record on the ledger, and
+\emph{distributed}, so that the data stays available without a single trusted custodian. Any
+storage layer meeting these two objectives is compatible with the architecture. We use the
+InterPlanetary File System (IPFS)~\cite{benet2014ipfs} in a deliberately simplified form---a
+node co-located with the control plane rather than a public swarm---as a stand-in for any
+such backend.
 
 
 
@@ -171,66 +180,48 @@ backend that provides content addressing and distributed availability.
 \section{Problem definition and solution requirements}
 \label{sec:problem-definition}
 
-The core challenge addressed by the proposed architecture involves
-a transaction between two mutually distrusting parties: a \textit{data buyer}, who owns
-a confidential application, and a \textit{dataset provider}, who holds sensitive data.
-The objective is to enable a computation in which the buyer's application processes the
-provider's dataset without exposing either asset to the other party or to the underlying
+The core challenge involves a transaction between two mutually distrusting parties: a
+\textit{data buyer}, who owns a confidential application, and a \textit{dataset provider},
+who holds sensitive data. The objective is a computation in which the buyer's application
+processes the provider's dataset without exposing either asset to the other party or to the
 cloud infrastructure.
 
-A straightforward implementation would deploy a single Confidential Virtual Machine (CVM)
-responsible for all platform functions: receiving uploads, managing the IPFS storage layer,
-interacting with the Smart Contract, resolving and installing Python dependencies, and
-running the application against the dataset. While operationally simple, this monolithic
-design concentrates all privileges within one trust domain. The critical vulnerability
-emerges during dependency resolution: installing external packages to satisfy an
-application's requirements necessarily executes arbitrary third-party code with the same
-privileges as the marketplace layer, the IPFS node, and the blockchain client. A
-maliciously crafted package---or a compromised dependency in the supply chain---could
-exploit this phase to exfiltrate stored datasets, tamper with marketplace metadata, or
-establish a persistent backdoor affecting future executions. A build-time compromise thus
-propagates immediately into a full platform compromise, making dependency resolution a
-disproportionately dangerous entry point.
+In the monolithic CVM sketched above---one trust domain receiving uploads, managing the
+storage layer, driving the smart contract, resolving dependencies, and running the
+application---the critical vulnerability emerges during dependency resolution: installing
+external packages necessarily executes arbitrary third-party code with the same privileges
+as the marketplace layer, the IPFS node, and the blockchain client. A maliciously crafted
+package---or a compromised dependency in the supply chain---could exploit this phase to
+exfiltrate stored datasets, tamper with marketplace metadata, or establish a persistent
+backdoor affecting future executions. A build-time compromise thus propagates immediately
+into a full platform compromise, making dependency resolution a disproportionately
+dangerous entry point.
 
-This observation reframes the core problem. Secure execution of the application at runtime
-is necessary but not sufficient. An equally important concern is preventing a compromise
-during the build and dependency resolution phase from reaching the broader platform.
-The problem must therefore be treated as a \textit{privilege separation problem}: distinct
-operational phases---control, build, and execution---carry fundamentally different risk
-profiles and must occupy separate trust domains with different network-access policies,
-persistence rights, and failure blast radii.
+This reframes the core problem. Securing the application at runtime is necessary but not
+sufficient: a compromise during build and dependency resolution must also be prevented from
+reaching the broader platform. The problem must therefore be treated as a \textit{privilege
+separation problem}: the operational phases---control, build, and execution---carry
+fundamentally different risk profiles and must occupy separate trust domains with different
+network-access policies, persistence rights, and failure blast radii. A secure solution must
+satisfy the following requirements.
 
-Three design consequences follow from this reframing. First, the component managing
-marketplace state, blockchain interaction, and IPFS operations must never directly execute
-dependency installation logic for user-supplied applications. Second, the build phase,
-where external network access is unavoidable, must be isolated from both persistent
-sensitive storage and the execution runtime. Third, the execution phase, during which the
-sensitive dataset is consumed, must operate without any outbound network interface,
-eliminating the primary exfiltration channel even under a complete runtime compromise.
-
-A secure solution must satisfy the following requirements.
-
-\begin{itemize}
-\item \textbf{R1 (Asset confidentiality).} Neither the buyer's
-  application nor the provider's dataset is revealed to the other party
-  or to the infrastructure operator.
-\item \textbf{R2 (Privilege separation).} No single component holds the
-  privileges of all phases; a compromise of one plane must not extend to
-  the assets of the others.
-\item \textbf{R3 (Build isolation).} Dependency resolution---which runs
-  partially trusted third-party code with network access---must be
-  isolated from persistent sensitive storage and from the execution
-  runtime.
-\item \textbf{R4 (Execution containment).} The plane that consumes the
-  dataset must have no outbound network and must keep no state across
-  runs, so that a runtime compromise can neither exfiltrate nor persist.
-\item \textbf{R5 (Traceability and access control).} Asset registration,
-  access grants, and artifact integrity must be recorded on a
-  tamper-evident, auditable ledger, and execution must be gated by a
-  verifiable access check.
-\item \textbf{R6 (Application generality).} The platform must run
-  unmodified application code with arbitrary declared dependencies,
-  without recompilation or enclave-specific adaptation.
+\begin{itemize}[leftmargin=*,itemsep=1pt,topsep=2pt,parsep=0pt]
+\item \textbf{R1 (Asset confidentiality).} Neither the buyer's application nor the
+  provider's dataset is revealed to the other party or to the infrastructure operator.
+\item \textbf{R2 (Privilege separation).} No single component holds the privileges of all
+  phases; a compromise of one plane must not extend to the assets of the others.
+\item \textbf{R3 (Build isolation).} Dependency resolution---which runs partially trusted
+  third-party code with network access---must be isolated from persistent sensitive storage
+  and from the execution runtime.
+\item \textbf{R4 (Execution containment).} The plane that consumes the dataset must have no
+  outbound network and keep no state across runs, so that a runtime compromise can neither
+  exfiltrate nor persist.
+\item \textbf{R5 (Traceability and access control).} Asset registration, access grants, and
+  artifact integrity must be recorded on a tamper-evident ledger, and execution must be
+  gated by a verifiable access check.
+\item \textbf{R6 (Application generality).} The platform must run unmodified application
+  code with arbitrary declared dependencies, without recompilation or enclave-specific
+  adaptation.
 \end{itemize}
 
 \noindent Section~\ref{sec:evaluation} returns to these requirements:
@@ -239,105 +230,60 @@ R6 by the cross-architecture comparison (Table~\ref{tab:comparison}).
 
 \section{Proposal}\label{sec:proposal}
 
-This section presents the architecture as a response to requirements
-R1--R6. We first state the threat model and trust assumptions, then
-describe the three-plane architecture and its end-to-end workflow, and
-finally make explicit how the design generalizes the SGX-based DNAT.
+This section presents the architecture as a response to requirements R1--R6.
 
 \subsection{Threat model and trust assumptions}
-The system mediates between mutually distrusting parties: a dataset
-provider, an application buyer, and the marketplace operator that runs
-the platform. We assume an adversary that can submit a malicious
-application, declare a malicious or compromised dependency, or take
-control of an individual plane at runtime; the design goal is to bound
-what such an adversary reaches. Three capabilities are therefore in
-scope: malicious code at execution time, malicious code at build time
-(supply chain), and a fully compromised plane.
+The system mediates between mutually distrusting parties: a dataset provider, an application
+buyer, and the marketplace operator. We assume an adversary that can submit a malicious
+application, declare a malicious or compromised dependency, or take control of an individual
+plane at runtime; the design goal is to bound what such an adversary reaches. Three
+capabilities are therefore in scope: malicious code at execution time, malicious code at
+build time (supply chain), and a fully compromised plane.
 
-We treat the following as trusted. The distributed ledger is assumed to
-execute its smart contracts correctly and to be tamper-evident, so that
-recorded access rights and content hashes are authoritative. The
-virtual-machine monitor and the host are trusted to enforce the microVM
-boundary; in the lightweight model targeted by the prototype this
-extends to trusting the cloud operator. A production deployment removes
-the operator from the trusted base by running each plane inside a
-confidential VM (e.g., AMD SEV-SNP~\cite{amd2020sevsnp}), which adds
-memory encryption and remote attestation without changing the
-architecture or the properties evaluated in
-Section~\ref{sec:evaluation}. Out of scope are micro-architectural side
-channels, load-induced denial of service, and---in the single-host
-prototype---the shared control network among planes, which we report as
-a residual weakness in Section~\ref{sec:evaluation}.
+We treat the following as trusted. The distributed ledger executes its smart contracts
+correctly and is tamper-evident, so that recorded access rights and content hashes are
+authoritative. The virtual-machine monitor and the host enforce the microVM boundary; in the
+lightweight model targeted by the prototype this extends to trusting the cloud operator, so
+the boundary being defended is the one between the planes, not the one against the operator.
+A production deployment removes the operator from the trusted base by running each plane
+inside a confidential VM (e.g., AMD SEV-SNP~\cite{amd2020sevsnp}), which adds memory
+encryption and remote attestation without changing the architecture. Out of scope are
+micro-architectural side channels, load-induced denial of service, and---in the single-host
+prototype---the shared control network among planes, reported as a residual in
+Section~\ref{sec:evaluation}.
 
 \subsection{Architecture}
-The architecture composes the building blocks of
-Section~\ref{sec:background} into three planes, each a separate trust
-domain with its own persistence rights and network policy. The planes
-correspond to the operational phases identified in
-Section~\ref{sec:problem-definition}---control, build, and
-execution---so that the different risk profiles of those phases are
-matched by different containment. Table~\ref{tab:planes} summarizes the
-division; the principle throughout is that a plane holds only what it
-needs and reaches only what it must.
+The architecture composes the building blocks of Section~\ref{sec:background} into three
+planes, each a separate trust domain matching one of the operational phases of
+Section~\ref{sec:problem-definition}---control, build, and execution---so that the different
+risk profiles of those phases are met by different containment. The principle throughout is
+that a plane holds only what it needs and reaches only what it must, and the division of
+state follows from it. The control plane (CVM1) is the only stateful, externally reachable
+component---it holds the encryption and wallet keys, the storage repository, and the
+marketplace state---and it never resolves dependencies nor runs user code. The build plane
+(CVM2) is the only plane with general network egress, because resolving dependencies
+requires reaching package indexes, and its only durable state is a dependency cache that is
+read-only at use. The execution plane (CVM3), which consumes the dataset, is the most
+constrained: no network interface and no persistent state, a fresh microVM per run.
 
-\begin{table}[htbp]
-\centering
-\caption{The three planes. Each is a separate trust domain with its own
-persistence rights and network policy; ``Holds / persists'' lists the
-sensitive state resident in the plane.}
-\label{tab:planes}
-\footnotesize
-\begin{tabularx}{\textwidth}{@{}p{2.2cm}p{3.0cm}p{2.7cm}X@{}}
-\toprule
-Plane & Role & Network & Holds / persists \\
-\midrule
-CVM1 Control & Marketplace API, key custody, ledger client, storage node & Clients and ledger RPC & Encryption and wallet keys, storage repository, marketplace state \\
-\addlinespace
-CVM2 Build & Resolve and bundle dependencies & Egress to package indexes; private ranges filtered & Dependency cache only (read-only at use) \\
-\addlinespace
-CVM3 Execution & Run the application over the dataset & None & Nothing (ephemeral; fresh microVM per run) \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-The control plane (CVM1) is the only stateful, externally reachable
-component: it exposes the marketplace API, custodies the encryption and
-wallet keys, runs the ledger client, and hosts the storage node. It
-never resolves dependencies and never runs user code. On registration it
-encrypts each artifact and publishes only the encrypted blob and a
-manifest to the distributed store, recording the artifact's content hash
-and the access metadata on the ledger. The build plane (CVM2) is the
-only plane with general network egress, because resolving dependencies
-requires reaching package indexes; that egress is filtered so the
-builder cannot reach private address ranges, and its only durable state
-is a dependency cache that is read-only at use. The execution plane
-(CVM3) is the most constrained: it runs the application over the dataset
-in a microVM with no network interface and no persistent state, created
-fresh for each run and destroyed afterwards.
-
-Figure~\ref{fig:architecture} traces a single end-to-end request over
-the numbered interactions I1--I8, which also serve as the unit of
-analysis for the STRIDE evaluation in Section~\ref{sec:evaluation}.
-(1)~The provider and the buyer register their assets (I1); the control
-plane encrypts each artifact, publishes the ciphertext to the store
-(I3), and records its content hash on the ledger (I2). (2)~The buyer
-purchases access (I1), which the contract records as a grant bound to
-the two asset hashes and the buyer's address (I2). (3)~On an execution
-request the control plane first verifies that grant on chain (I2); only
-then does it assemble a build bundle (source plus dependency manifest)
-and forward it to the build plane (I4), which resolves dependencies
-against public package indexes through filtered egress (I5) and returns
-a read-only application artifact (I6). (4)~The control plane provisions
-input and output disks, attaches the application artifact read-only,
-and launches the networkless execution microVM (I7); the result is read
-back from the output disk (I8) and the working state torn down. Because
-each boundary crossing carries only what the next phase needs---a bundle
-to the builder, an artifact and disks to the executor---a compromise on
-either side of a boundary cannot widen into the privileges of the other.
+Figure~\ref{fig:architecture} traces a single end-to-end request over the numbered
+interactions I1--I8, which also serve as the unit of analysis for the STRIDE evaluation.
+Registration and purchase go through the control plane, which encrypts each artifact,
+publishes the ciphertext to the store (I3) and records its content hash and the resulting
+grant on the ledger (I1--I2). An execution request is first checked against that grant on
+chain (I2); only then is a build bundle assembled and forwarded to the build plane (I4),
+which resolves dependencies through filtered egress (I5) and returns a read-only artifact
+(I6). The control plane then provisions input and output disks, attaches the artifact
+read-only, and launches the networkless execution microVM (I7), reading the result back from
+the output disk (I8) before tearing the working state down. Because each boundary crossing
+carries only what the next phase needs---a bundle to the builder, an artifact and disks to
+the executor---a compromise on either side of a boundary cannot widen into the privileges of
+the other.
 
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
+    scale=0.92, transform shape,
     font=\scriptsize,
     comp/.style={draw, semithick, rounded corners=1pt, align=center,
                  inner sep=4pt},
@@ -350,22 +296,22 @@ either side of a boundary cannot widen into the privileges of the other.
     ilab/.style={font=\tiny, fill=white, inner sep=1.5pt, midway}
 ]
 % --- nodes -----------------------------------------------------------
-\node[external] (parties) at (2.6,4.5)
+\node[external] (parties) at (2.6,3.7)
   {External parties\\[-1pt]\tiny dataset provider / application buyer};
-\node[infra] (ledger) at (9.6,4.7)
+\node[infra] (ledger) at (9.6,3.9)
   {Distributed ledger\\[-1pt]\tiny access rights, content hashes};
-\node[infra] (store) at (9.6,3.2)
+\node[infra] (store) at (9.6,2.5)
   {Distributed store\\[-1pt]\tiny encrypted artifacts};
-\node[plane, minimum width=5.2cm] (cvm1) at (4.0,2.3)
+\node[plane, minimum width=5.2cm] (cvm1) at (4.0,1.9)
   {\textbf{CVM1 --- Control plane}\\[-1pt]\tiny marketplace API, key
    custody, ledger client, storage node};
-\node[plane, minimum width=3.6cm] (cvm2) at (1.8,-1.0)
+\node[plane, minimum width=3.6cm] (cvm2) at (1.9,-1.3)
   {\textbf{CVM2 --- Build plane}\\[-1pt]\tiny resolves and bundles
    dependencies\\[-1pt]\tiny in an ephemeral microVM};
-\node[plane, minimum width=3.6cm] (cvm3) at (7.6,-1.0)
+\node[plane, minimum width=3.6cm] (cvm3) at (7.7,-1.3)
   {\textbf{CVM3 --- Execution plane}\\[-1pt]\tiny runs app over dataset;
    no network\\[-1pt]\tiny interface; fresh microVM per run};
-\node[external] (pypi) at (1.8,-3.3)
+\node[external] (pypi) at (1.9,-3.2)
   {Package indexes\\[-1pt]\tiny e.g., PyPI};
 % --- trust boundaries -------------------------------------------------
 \node[tb, fit=(cvm1)] {};
@@ -374,90 +320,50 @@ either side of a boundary cannot widen into the privileges of the other.
 % --- interactions ------------------------------------------------------
 \draw[biflow] (parties.south) -- (parties.south |- cvm1.north)
   node[ilab, right=1pt] {I1: register / purchase / execute};
-\draw[biflow] ([yshift=2mm]cvm1.east) -- (ledger.west)
-  node[ilab, above=1pt, sloped] {I2: grants \& hashes};
-\draw[biflow] ([yshift=-1mm]cvm1.east) -- (store.west)
-  node[ilab, below=1pt, sloped] {I3: encrypted artifacts};
-\draw[flow] ([xshift=-11mm]cvm1.south) -- ([xshift=-11mm]cvm1.south |- cvm2.north)
-  node[ilab, left=1pt] {I4: build bundle};
-\draw[flow] ([xshift=12mm]cvm2.north) -- ([xshift=12mm]cvm2.north |- cvm1.south)
-  node[ilab, right=1pt] {I6: app artifact (RO)};
+\draw[biflow] ([yshift=3mm]cvm1.east) -- (ledger.west)
+  node[ilab, sloped, above=1pt, pos=0.4] {I2: grants \& hashes};
+\draw[biflow] ([yshift=-3mm]cvm1.east) -- (store.west)
+  node[ilab, sloped, below=1pt, pos=0.5] {I3: enc.\ artifacts};
+\draw[flow] ([xshift=-20mm]cvm1.south) -- ([xshift=-20mm]cvm1.south |- cvm2.north)
+  node[ilab, left=1pt, pos=0.5] {I4: build bundle};
+\draw[flow] ([xshift=14mm]cvm2.north) -- ([xshift=14mm]cvm2.north |- cvm1.south)
+  node[ilab, right=1pt, pos=0.26] {I6: app (RO)};
 \draw[flow] (cvm2.south) -- (pypi.north)
   node[ilab, right=1pt] {I5: dependency egress (filtered)};
 \draw[flow] ([xshift=21mm]cvm1.south) -- ([xshift=21mm]cvm1.south |- cvm3.north)
-  node[ilab, left=1pt] {I7: app + I/O disks};
+  node[ilab, left=1pt, pos=0.58] {I7: app + I/O disks};
 \draw[flow] ([xshift=12mm]cvm3.north) -- ([xshift=12mm]cvm3.north |- cvm1.south)
-  node[ilab, right=1pt] {I8: result};
+  node[ilab, right=1pt, pos=0.5] {I8: result};
 % reverse pivot: a compromised executor reaching back into the control plane
 % (attack path, not a legitimate flow) -- the residual analysed in the STRIDE.
 \draw[-{Stealth[length=2mm]}, dashed, black, semithick]
   (cvm3.north west) to[bend right=22]
-  node[ilab, left=2pt] {reverse pivot (residual)} (cvm1.south east);
+  node[ilab, sloped, pos=0.35, right=1pt] {reverse pivot} (cvm1.south east);
 \end{tikzpicture}
-\caption{The three planes and their numbered interactions (I1--I8).
-Dashed boxes mark trust boundaries: each plane is a separate trust
-domain with its own persistence rights and network policy. Each boundary
-crossing carries only what the next phase needs---a build bundle to the
-builder (I4), a read-only artifact plus input/output disks to the
-networkless, ephemeral executor (I7). The control plane is the only
-stateful, externally reachable component and mediates all ledger and
-storage access. The STRIDE analysis of
+\caption{The three planes and their numbered interactions (I1--I8). Dashed
+boxes mark trust boundaries; the STRIDE analysis of
 Section~\ref{sec:evaluation} is performed over these elements and
-interactions; the dashed arrow marks the reverse pivot (a compromised
-executor reaching the control plane), the residual quantified in
+interactions. The dashed arrow marks the reverse pivot (a compromised executor
+reaching the control plane), the residual quantified in
 Table~\ref{tab:blast-radius}.}
 \label{fig:architecture}
 \end{figure}
 
 \subsection{From DNAT to a generalized architecture}
-The original DNAT~\cite{nascimento2020dnat} addresses the same
-marketplace problem but binds it to a single substrate: applications run
-inside SGX enclaves, which constrains both the threat model and the kind
-of code that can run. Our contribution is to restate the problem as one
-of privilege separation across operational phases---independent of the
-isolation technology---and to instantiate it on a substrate that relaxes
-those constraints. Table~\ref{tab:generalization} contrasts the two
-along the axes that matter for this generalization.
-
-\begin{table}[htbp]
-\centering
-\caption{Axes along which this work generalizes the SGX-based DNAT.}
-\label{tab:generalization}
-\footnotesize
-\begin{tabularx}{\textwidth}{@{}p{2.9cm}XX@{}}
-\toprule
-Axis & DNAT (original, SGX) & This work \\
-\midrule
-Isolation primitive & SGX enclave (process-level TEE) & microVM (Firecracker), targeting a confidential VM (SEV-SNP) in production \\
-\addlinespace
-Application \& dependency model & Dependencies recompiled or adapted into the enclave & Unmodified source with arbitrary declared dependencies, shipped as ordinary packages in a read-only artifact \\
-\addlinespace
-Trust model & Minimizes trust in the platform, including the operator & Trusts a confidential-computing root (the cloud, in the lightweight prototype), which is what enables dependency freedom and lightweight execution \\
-\addlinespace
-Architectural decomposition & Enclave-centric & Explicit control / build / execution planes, with blast radius bounded per plane \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-Two consequences are worth highlighting. First, by shipping dependencies
-as ordinary packages inside a read-only artifact rather than linking them
-into an enclave, the platform runs unmodified applications with arbitrary
-declared dependencies (R6), which the enclave model does not (the reuse
-row of Table~\ref{tab:comparison}). Second, because the architecture is
-defined over roles rather than over a specific trusted-execution
-technology, the same design admits different instantiations: the
-prototype uses microVMs and trusts the cloud, while a confidential-VM
-deployment removes the operator from the trusted base without altering
-the planes or their boundaries. DNAT is thus one point in a design space
-that this architecture makes explicit.
-
-\subsection{Implementation}
-The architecture described above is realized using Firecracker
-microVMs~\cite{agache2020firecracker} as the primary isolation
-primitive for both the build and execution environments. The current
-prototype instantiates each plane as a containerized service for
-development purposes; in a production deployment, each service would
-run inside a hardware-backed Confidential VM~\cite{amd2020sevsnp}.
+The original DNAT~\cite{nascimento2020dnat} addresses the same marketplace problem but binds
+it to a single substrate: applications run inside SGX enclaves, a process-level TEE that
+constrains both the threat model and the kind of code that can run. Our contribution is to
+restate the problem as one of privilege separation across operational
+phases---independent of the isolation technology---replacing the enclave-centric
+decomposition with explicit control, build, and execution planes whose blast radius is
+bounded per plane. Two consequences follow. By shipping dependencies as ordinary packages
+inside a read-only artifact rather than recompiling them into an enclave, the platform runs
+unmodified applications with arbitrary declared dependencies (R6), which the enclave model
+does not. And because the architecture is defined over roles rather than over a specific
+trusted-execution technology, it admits different instantiations: the prototype trusts a
+confidential-computing root (the cloud), which is what buys the dependency freedom, whereas
+DNAT minimizes trust in the platform---including the operator---at the cost of that freedom.
+DNAT is thus one point in a design space that this architecture makes explicit.
 
 \input{evaluation_data/section_implementation}
 % fala de abordagem do build (forma de incorporar as dependências), de microVM e a execução (isolamento de rede, transferência de resultados),
@@ -472,11 +378,10 @@ run inside a hardware-backed Confidential VM~\cite{amd2020sevsnp}.
 % cada letra do STRIDE para um mecanismo do design e o teste que o evidencia.
 % Tabelas tab:stride e tab:comparison vivem dentro de section_evaluation.tex,
 % cada uma logo apos o paragrafo que a cita (6.2 STRIDE e 6.3 Operational Cost);
-% tab:ab-performance e tab:blast-radius ficam em section_results_ab.tex (6.5).
+% tab:blast-radius fica em section_results_ab.tex.
 
 \input{evaluation_data/section_evaluation}
 \input{evaluation_data/section_results_ab}
-\clearpage
 
 
 \section{Related Work}\label{sec:related-work}
@@ -489,38 +394,30 @@ run inside a hardware-backed Confidential VM~\cite{amd2020sevsnp}.
 % mencionar o DNAT e suas limitações (ex., dependência de tecnologias limitadas)
 % ver os artigos que ele citou ou que citaram ele
 
-A line of work uses trusted execution and distributed ledgers to control how
-sensitive data is used after it is handed to an untrusted consumer. The
-original DNAT~\cite{nascimento2020dnat} pioneered this combination for
-\emph{auditable traceability}, recording data-and-application usage in a
-tamper-evident ledger while executing the application over the data inside an
-SGX enclave; it assumes, however, that the application has been pre-verified as
-non-malicious by the data owner or a trusted third party. Systems such as
-PrivacyGuard~\cite{xiao2020privacyguard} similarly enforce usage contracts on
-chain and run the computation in an attested off-chain enclave, again taking the
-processing code as ratified in advance. The most recent and closest work,
-VDDPI~\cite{tokuda2026vddpi}, removes that assumption: it verifies the
-consumer's processing code \emph{mechanically}---through a mandatory template,
-an allow-listed function set, and static taint analysis executed by smart
-contracts on a permissioned ledger---so that a data provider can learn, before
-releasing data, whether the code discloses its inputs, and it binds the analysed
-code to the running enclave through the SGX measurement (\texttt{MRENCLAVE}).
+A line of work uses trusted execution and distributed ledgers to control how sensitive data
+is used after it is handed to an untrusted consumer. The original
+DNAT~\cite{nascimento2020dnat} pioneered this combination for \emph{auditable traceability},
+recording data-and-application usage in a tamper-evident ledger while executing the
+application inside an SGX enclave; it assumes, however, that the application has been
+pre-verified as non-malicious by the data owner or a trusted third party.
+PrivacyGuard~\cite{xiao2020privacyguard} similarly enforces usage contracts on chain and
+runs the computation in an attested off-chain enclave, again taking the processing code as
+ratified in advance. The closest work, VDDPI~\cite{tokuda2026vddpi}, removes that
+assumption: it verifies the consumer's code \emph{mechanically}---through a mandatory
+template, an allow-listed function set, and static taint analysis executed by smart
+contracts---so that a provider can learn, before releasing data, whether the code discloses
+its inputs, and it binds the analysed code to the running enclave through the SGX
+measurement.
 
-Our work is complementary to that verification axis rather than competing with
-it. VDDPI answers \emph{what} an authorized computation is allowed to reveal
-about its inputs---the disclosure-through-the-legitimate-result concern that we
-place out of scope (Section~\ref{sec:evaluation})---but pays for it with a
-restricted programming model: applications must fit the template and the
-allow-list, so arbitrary dependencies and unmodified code are, by construction,
-not supported. We instead target \emph{how} partially trusted code is run:
-privilege separation across control, build, and execution planes bounds the
-blast radius of a build- or run-time compromise, and treats dependency
-resolution (which VDDPI forbids outright) as a first-class supply-chain threat,
-while running unmodified applications with arbitrary declared dependencies. The
-two directions are composable: a code-verification stage in the spirit of VDDPI
-could be attached to our control plane without altering the plane boundaries,
-combining processing verification with the containment guarantees evaluated
-here.
+Our work is complementary to that verification axis rather than competing with it. VDDPI
+answers \emph{what} an authorized computation may reveal about its inputs---the concern we
+place out of scope (Section~\ref{sec:evaluation})---but pays for it with a restricted
+programming model: applications must fit the template and the allow-list, so arbitrary
+dependencies and unmodified code are not supported. We instead target \emph{how} partially
+trusted code is run, treating dependency resolution (which VDDPI forbids outright) as a
+first-class supply-chain threat. The two are composable: a code-verification stage in the
+spirit of VDDPI could be attached to our control plane without altering the plane
+boundaries.
 
 \input{evaluation_data/section_conclusion}
 
@@ -530,13 +427,11 @@ here.
 
 \section*{Declaration on the Use of Generative AI}
 
-During the preparation of this work, the authors used generative AI
-tools (large language models) to assist with drafting and editing parts
-of the manuscript text and with the development and debugging of the
-prototype implementation and evaluation code. After using these tools,
-the authors reviewed, verified, and edited all resulting content as
-needed and take full responsibility for the entire content of this
-paper. No AI tool is listed as an author, and no AI tool was used to
+During the preparation of this work, the authors used generative AI tools (large language
+models) to assist with drafting and editing parts of the manuscript and with the
+development and debugging of the prototype implementation and evaluation code. The authors
+reviewed, verified, and edited all resulting content and take full responsibility for the
+entire content of this paper. No AI tool is listed as an author, and no AI tool was used to
 generate or fabricate experimental data, results, or scientific claims.
 
 \bibliographystyle{splncs04}

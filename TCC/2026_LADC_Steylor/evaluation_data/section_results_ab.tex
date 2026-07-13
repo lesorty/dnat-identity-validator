@@ -14,110 +14,98 @@
 \subsection{A/B Comparison: Live Measurement of Both Environments}
 \label{sec:ab-results}
 
-To remove any inference from the comparison, we ran the full suite against both
-deployments live and end to end: the compartmentalized system (Environment~B,
-three containers \texttt{dnat-client}/\texttt{dnat-builder}/\texttt{dnat-executor})
-and the centralized baseline (Environment~A, a single \texttt{dnat-baseline}
-container that colocates the same logic). Because both environments share the same
-Firecracker execution and build microVMs, we expect---and observe---that the
-microVM-level properties and the operational cost are identical, while the
-architectural variable surfaces only in the blast radius.
+To remove any inference from the comparison, we ran the full suite against both deployments
+live and end to end: the compartmentalized system (Environment~B) and the centralized
+baseline (Environment~A, a single container colocating the same logic). Because both share
+the same Firecracker microVMs and the same access gate, the per-microVM guarantees are a
+constant---T1, T1b, T3 and T5 reproduce in both, and so does the operational cost---so the
+architectural variable surfaces only in the blast radius. That is where A and B diverge
+(Table~\ref{tab:blast-radius}, populated from live inspection rather than configuration):
+in B, the executor and the builder carry \emph{none} of the control-plane secrets, and the
+sensitive stores (IPFS repository, wheel cache, executions store) are absent from their
+namespace, whereas in A those same secrets and stores sit in the single namespace that also
+runs the execution logic. The supply-chain test (T2) inherits the split: a compromised
+dependency's code executes, but in B inside a plane that holds neither secrets nor a route
+to them.
 
-\textbf{The per-microVM guarantees are a constant.} The security results of
-Section~\ref{sec:evaluation} (T1, T1b, T3, T5) reproduce byte-for-byte in both A
-and B, since the two share the same Firecracker execution and build microVMs and
-the same control-plane access gate. The architectural variable is therefore
-isolated to the blast radius below.
-
-\textbf{Compartmentalization adds no measurable cost.}
-Table~\ref{tab:ab-performance} reports the operational cost on both paths. Across
-three applications per environment, end-to-end execution latency is
-indistinguishable between A and B (mean $\approx$26.8~s each), and a dependency-free
-build (30.1 vs 30.2~s) and a build that pulls \texttt{requests} with its transitive
-tree (38.2 vs 34.9~s) match within run-to-run variance, producing byte-identical
-artifacts (16.0 and 19.6~MiB). The cost is paid by the microVM life cycle, which
-both designs share; separating the planes does not add to it.
-
-\textbf{Plane separation changes only the blast radius.} The single place where A
-and B diverge is cross-plane reach (Table~\ref{tab:blast-radius}, now populated
-from live inspection rather than configuration). In B, the executor and the builder
-carry \emph{none} of the control-plane secrets
-(\texttt{ASSET\_ENCRYPTION\_KEY}, \texttt{PRIVATE\_KEY}, the service URLs) in their
-environment, and the sensitive stores (IPFS repository, wheel cache, executions
-store) are absent from their namespace; the secrets live only in the control plane,
-where they belong. In A, the very same secrets and stores sit in the single
-namespace that also runs the execution logic. The supply-chain test (T2) inherits
-this split: a compromised dependency's code executes, but in B it executes inside a
-plane (build or execution) that holds neither secrets nor a route to them, whereas
-in A the same code lands beside every sensitive asset. This is the paper's
-comparative thesis---\emph{containment, not absolute security}---now demonstrated
-with both environments measured, not one measured and one argued.
-
-% ---------------------------------------------------------------------
-% Table: operational cost, A vs B (execution + build). English, drop-in.
-% Replaces/augments the single-column performance table.
-% ---------------------------------------------------------------------
-\begin{table}[htbp]
-\centering
-\caption{Operational cost of the ephemeral-microVM isolation, measured live in
-both environments. Compartmentalization (B) adds no execution or build overhead
-over the centralized baseline (A); both share the same Firecracker microVMs.}
-\label{tab:ab-performance}
-\footnotesize
-\begin{tabularx}{\columnwidth}{@{}Xrr@{}}
-\toprule
-Metric & Env.~B & Env.~A \\
-\midrule
-Execution latency --- \texttt{t1\_network\_exfil} & 27.3 s & 27.4 s \\
-Execution latency --- \texttt{t1b\_fs\_escape} & 26.6 s & 26.5 s \\
-Execution latency --- \texttt{benign\_stats} & 26.5 s & 26.6 s \\
-Execution latency --- \textbf{mean} ($n{=}3$) & \textbf{26.8 s} & \textbf{26.8 s} \\
-\addlinespace
-Build latency --- no dependencies & 30.1 s & 30.2 s \\
-Build latency --- \texttt{requests} ($+4$ transitive) & 38.2 s & 34.9 s \\
-\addlinespace
-Artifact \texttt{application.ext4} --- no deps & \multicolumn{2}{c}{16.0 MiB (identical)} \\
-Artifact \texttt{application.ext4} --- \texttt{requests} & \multicolumn{2}{c}{19.6 MiB (identical)} \\
-\bottomrule
-\end{tabularx}
-\par\smallskip
-{\footnotesize Wall-clock from the test host (warm), measured 2026-06-11. The
-A$\approx$B equality is the structural result; absolute values track host warmth (a
-colder first campaign saw a 31.4~s execution mean and 103--131~s builds, with the
-same A$\approx$B relationship).}
-\end{table}
+\textbf{What the network residual still grants.} Reachability is not exploitability, so we
+state what a compromised executor can \emph{do} with the two ports it still reaches in B.
+The prototype does not authenticate its internal endpoints, so the control API can be driven
+as a confused deputy: an attacker on the executor can enumerate registered assets, read the
+stored output of previous executions, and ask the control plane to act with its wallet
+through the fixed set of operations the API exposes. This is a real residual, and it is why
+internal mutual TLS heads our future work. What it does \emph{not} give is the platform: the
+encryption and wallet keys are never returned by any endpoint and remain in CVM1's
+environment, so the attacker can neither decrypt artifacts pulled from the store nor sign
+transactions of its own choosing, and the on-chain gate still refuses an execution for which
+no access was purchased (T5). In A the same attacker needs no network hop at all---both keys
+sit in its own environment and the stores on its filesystem---so it can decrypt every
+archived artifact and sign arbitrary transactions directly. The difference is therefore not
+the presence of a residual but its ceiling: a bounded, mediated set of API calls in B
+against unmediated custody of the platform's keys in A---\emph{containment, not absolute
+security}.
 
 % ---------------------------------------------------------------------
 % Table: blast radius B vs A — English version, live-measured wording.
-% Use this in place of the Portuguese tab:blast-radius if the article is
-% English-only.
+% A/B cost figures live in tab:comparison (section_evaluation.tex).
 % ---------------------------------------------------------------------
 \begin{table}[htbp]
 \centering
-\caption{Reach of a compromised execution plane over control-plane assets:
-the compartmentalized design (B) versus centralized baseline (A), from live inspection.
-``Isolated'' = absent from the plane's namespace; ``Colocated'' = same namespace as
-the execution logic.}
+\caption{Reach of a compromised execution plane over control-plane assets: the
+compartmentalized design (B) versus the centralized baseline (A), from live inspection.
+``Isolated'' = absent from the plane's namespace (the environment variable is not set, the
+store is not mounted); ``Colocated'' = same namespace as the execution logic.}
 \label{tab:blast-radius}
 \footnotesize
-\begin{tabularx}{\textwidth}{@{}Xp{3.6cm}p{3.6cm}@{}}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{2.4cm}@{}}
 \toprule
-Control-plane asset reachable from the execution plane & Environment B (proposed) & Environment A (baseline) \\
+Control-plane asset reachable from the execution plane & Env.~B (proposed) & Env.~A (baseline) \\
 \midrule
-Asset-encryption key (\texttt{ASSET\_ENCRYPTION\_KEY}, env) & Isolated (NOT SET) & Colocated (SET) \\
-Wallet private key (\texttt{PRIVATE\_KEY}, env) & Isolated (NOT SET) & Colocated (SET) \\
-Service URLs (\texttt{RPC\_URL}, \texttt{IPFS\_API\_URL}, \texttt{BUILDER\_URL}, \texttt{EXECUTOR\_URL}, env) & Isolated (NOT SET) & Colocated (SET) \\
-IPFS repository, wheel cache, executions store (filesystem) & Isolated (separate namespace) & Colocated (same filesystem) \\
-IPFS API (port 5001, network) & Blocked (loopback in CVM1) & Reachable (127.0.0.1) \\
-Control API (port 3001, network) & Reachable$^{\dagger}$ & Reachable (127.0.0.1) \\
-Blockchain RPC (port 8545, network) & Reachable$^{\dagger}$ & Reachable (127.0.0.1) \\
+Asset-encryption key (env) & Isolated & Colocated \\
+Wallet private key (env) & Isolated & Colocated \\
+Service URLs: RPC, IPFS, builder, executor (env) & Isolated & Colocated \\
+IPFS repository, wheel cache, executions store (filesystem) & Isolated & Colocated \\
+IPFS API (port 5001, network) & Blocked & Reachable \\
+Control API (3001) and blockchain RPC (8545), network & Reachable$^{\dagger}$ & Reachable \\
 \bottomrule
 \end{tabularx}
 \par\smallskip
-{\footnotesize $^{\dagger}$ Residual risk in the single-host deployment (the three
-containers share one Docker network, \texttt{dnat-runtime}). In a distributed
-deployment across separate machines this is governed by inter-host network policy.
-This substantiates the threat model's stated limitation: internal mutual TLS and
-network segmentation remain future work. The defining assets of the blast radius
-(secrets and persistent stores) are nonetheless isolated in B and colocated in A.}
+\parbox{\textwidth}{\footnotesize $^{\dagger}$Residual risk in the single-host deployment:
+the three containers share one Docker network and the internal endpoints are
+unauthenticated, so a compromised executor can invoke the control API as a confused deputy
+(enumerate assets, read stored execution outputs) without ever holding its keys---see the
+discussion above. The defining assets of the blast radius---secrets and persistent
+stores---are nonetheless isolated in B and colocated in A.}
 \end{table}
+
+% ---------------------------------------------------------------------
+% Threats to Validity: movida de section_evaluation.tex (texto intacto)
+% para fechar a secao de Evaluation depois da subsecao A/B.
+% ---------------------------------------------------------------------
+\subsection{Threats to Validity}
+
+The measurements were taken on a single host; absolute latencies will vary with hardware (a
+colder first campaign saw a 31.4~s execution mean and 103--131~s builds, with A and B again
+indistinguishable), and each cost figure is a single run, so we read them as orders of
+magnitude rather than precise separations. The containment and exfiltration results, by
+contrast, are structural---absence of a network interface, absence of secrets---and do not
+depend on timing. Our workload is also deliberately small: a 60-row dataset isolates the
+fixed microVM cost, but says nothing about how that cost amortizes over a long-running job,
+nor about where the per-run caps (1~vCPU, 512~MiB, fixed disk sizes) begin to bind. The
+network-reach residual bounds the blast-radius claim, with the consequences and limits set
+out above, and confidentiality against the infrastructure operator (the second half of R1)
+is assumed rather than shown, for the substrate reason given next. Finally, the DoS analysis
+covers only per-run state hygiene, and the SGX column of Table~\ref{tab:comparison} is
+qualitative rather than re-measured.
+
+A more fundamental caveat concerns the execution substrate. The prototype runs each plane as
+a container with Firecracker microVMs rather than inside a hardware-backed confidential VM,
+so our measurements do not come from a genuinely confidential environment and we make no
+claim about confidential-computing overheads. This does not weaken the architectural
+argument: the properties we evaluate---privilege separation across planes, a networkless
+execution microVM, ephemeral teardown, and on-chain access control---belong to the
+architecture, not to the memory-encryption substrate. Running the same planes inside
+confidential VMs (e.g., AMD SEV-SNP~\cite{amd2020sevsnp}) would add attestation and
+memory-encryption costs---so the cost figures above would not carry over unchanged---but
+would preserve the containment and blast-radius results, which is why we treat confidential
+execution as a substrate substitution rather than an architectural change.
