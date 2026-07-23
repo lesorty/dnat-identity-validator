@@ -17,9 +17,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_error(404)
             return
 
+        # `mode` espelha o do executor: e a evidencia, colhida em tempo de
+        # campanha, de que o plano rodou o caminho pretendido. Uma celula
+        # rotulada como confidencial que reportasse "microvm" estaria mentindo.
         body = {
             "ok": True,
             "service": "dnat-builder",
+            "mode": "direct" if os.getenv("DNAT_NO_MICROVM", "").lower() in ("1", "true", "yes") else "microvm",
         }
         encoded = json.dumps(body).encode()
         self.send_response(200)
