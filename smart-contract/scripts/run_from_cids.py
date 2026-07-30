@@ -32,6 +32,10 @@ def normalize_executor_url(raw_url: str) -> str:
     return f"{value}/execute"
 
 
+# Prefixo do envelope AES-256-GCM escrito pelo plano de controle (api-server.js).
+ENCRYPTED_ENVELOPE_MAGIC = b"DNATENC2"
+
+
 def download_from_ipfs(ipfs_api_url: str, cid_or_uri: str) -> bytes:
     cid = normalize_cid(cid_or_uri)
     if not cid:
@@ -296,6 +300,13 @@ def main() -> int:
             dataset_bytes = pathlib.Path(args.local_dataset_path).resolve().read_bytes()
         else:
             dataset_bytes = download_from_ipfs(args.ipfs_api_url, args.dataset_cid)
+            # A chave de cifra vive so no plano de controle, entao o runner nao decifra:
+            # falha alto em vez de entregar ciphertext como se fosse o dataset.
+            if dataset_bytes.startswith(ENCRYPTED_ENVELOPE_MAGIC):
+                raise SystemExit(
+                    "Dataset is encrypted; fetch it through the control plane "
+                    "(which passes --local-dataset-path) instead of --dataset-cid."
+                )
 
         script_bytes = None
         application_artifact_path = None

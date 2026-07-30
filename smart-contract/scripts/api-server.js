@@ -6,7 +6,6 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const zlib = require("node:zlib");
 const { spawn } = require("node:child_process");
 
 const RPC_URL = process.env.RPC_URL || "http://127.0.0.1:8545";
@@ -20,9 +19,13 @@ const PORT = Number(process.env.WEB_PORT || "3001");
 const EXECUTIONS_ROOT = path.resolve(__dirname, "..", "executions");
 const RUNNER_PATH = path.resolve(__dirname, "run_from_cids.py");
 const BUILDER_URL = process.env.BUILDER_URL || "http://dnat-builder:5100";
-const ASSET_ENCRYPTION_KEY = process.env.ASSET_ENCRYPTION_KEY || "dnat-dev-asset-key";
-const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
-const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
+const {
+  APP_ARTIFACT_FORMAT,
+  DATASET_FORMAT,
+  encryptBuffer,
+  decryptBufferEnvelope,
+  hasEncryptedEnvelope,
+} = require("./asset_envelope");
 
 const abi = [
   "function registerAsset(uint8 assetType, string title, string description, string encryptedUri, string manifestUri, bytes32 contentHash, uint256 price, bytes bloomFilter) returns (uint256)",
@@ -174,69 +177,6 @@ function normalizeCid(cidOrUri) {
     return value.slice("ipfs://".length);
   }
   return value;
-}
-
-function deriveAssetEncryptionKey() {
-  return crypto.createHash("sha256").update(String(ASSET_ENCRYPTION_KEY)).digest();
-}
-
-function encryptBuffer(buffer, metadata = {}) {
-  const compressed = zlib.gzipSync(buffer, { level: 9 });
-  const iv = crypto.randomBytes(12);
-  const key = deriveAssetEncryptionKey();
-  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-  const ciphertext = Buffer.concat([cipher.update(compressed), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  const header = Buffer.from(
-    JSON.stringify({
-      version: 2,
-      format: APP_ARTIFACT_FORMAT,
-      cipher: "aes-256-gcm",
-      iv: iv.toString("base64"),
-      tag: tag.toString("base64"),
-      compression: "gzip",
-      metadata,
-    }),
-    "utf8",
-  );
-  const headerLength = Buffer.alloc(4);
-  headerLength.writeUInt32BE(header.length, 0);
-  return Buffer.concat([APP_ARTIFACT_ENVELOPE_MAGIC, headerLength, header, ciphertext]);
-}
-
-function decryptBufferEnvelope(buffer) {
-  let parsed;
-  let ciphertext;
-
-  if (buffer.subarray(0, APP_ARTIFACT_ENVELOPE_MAGIC.length).equals(APP_ARTIFACT_ENVELOPE_MAGIC)) {
-    const headerLength = buffer.readUInt32BE(APP_ARTIFACT_ENVELOPE_MAGIC.length);
-    const headerStart = APP_ARTIFACT_ENVELOPE_MAGIC.length + 4;
-    const headerEnd = headerStart + headerLength;
-    parsed = JSON.parse(buffer.subarray(headerStart, headerEnd).toString("utf8"));
-    ciphertext = buffer.subarray(headerEnd);
-  } else {
-    parsed = JSON.parse(buffer.toString("utf8"));
-    ciphertext = Buffer.from(parsed.ciphertext, "base64");
-  }
-
-  if (parsed.format !== APP_ARTIFACT_FORMAT) {
-    throw new Error(`Unsupported application artifact format: ${parsed.format || "unknown"}`);
-  }
-  if (parsed.cipher !== "aes-256-gcm") {
-    throw new Error(`Unsupported cipher: ${parsed.cipher || "unknown"}`);
-  }
-
-  const iv = Buffer.from(parsed.iv, "base64");
-  const tag = Buffer.from(parsed.tag, "base64");
-  const key = deriveAssetEncryptionKey();
-  const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
-  decipher.setAuthTag(tag);
-  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
-  const plaintext = parsed.compression === "gzip" ? zlib.gunzipSync(decrypted) : decrypted;
-  return {
-    plaintext,
-    metadata: parsed.metadata || {},
-  };
 }
 
 function runCommand(command, args, options = {}) {
@@ -544,9 +484,10 @@ async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
   }
 }
 
-async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest = {} }) {
+async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest = {}, encrypt = false }) {
   const uploadedInput = materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer });
   const resolvedPath = uploadedInput.localPath;
+  let encryptedTempPath = null;
 
   try {
     const stats = fs.statSync(resolvedPath);
@@ -571,7 +512,19 @@ async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, m
 
     fs.writeFileSync(manifestPath, manifestYaml, "utf8");
 
-    const assetParsed = await uploadLocalFileToIpfs(resolvedPath);
+    // O ativo sobe cifrado; o hash on-chain continua sendo o do conteudo em claro,
+    // porque o CID e hash do ciphertext e o IV e aleatorio a cada cifra.
+    let assetUploadPath = resolvedPath;
+    if (encrypt) {
+      encryptedTempPath = path.join(os.tmpdir(), `dnat-asset-${crypto.randomUUID()}.enc`);
+      fs.writeFileSync(
+        encryptedTempPath,
+        encryptBuffer(fs.readFileSync(resolvedPath), { sourceFileName: defaultName }, DATASET_FORMAT),
+      );
+      assetUploadPath = encryptedTempPath;
+    }
+
+    const assetParsed = await uploadLocalFileToIpfs(assetUploadPath);
     const manifestParsed = await uploadLocalFileToIpfs(manifestPath);
 
     const assetCid = assetParsed && assetParsed.Hash ? assetParsed.Hash : null;
@@ -593,6 +546,7 @@ async function addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, m
     };
   } finally {
     uploadedInput.cleanup();
+    if (encryptedTempPath && fs.existsSync(encryptedTempPath)) fs.unlinkSync(encryptedTempPath);
   }
 }
 
@@ -702,7 +656,7 @@ async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBu
       if (encryptedPath && fs.existsSync(encryptedPath)) fs.unlinkSync(encryptedPath);
     }
   } else {
-    uploaded = await addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest });
+    uploaded = await addFileToIpfsFlow({ filePath, fileName, fileBase64, fileBuffer, manifest, encrypt: true });
   }
 
   const title = String(manifest?.name || path.basename(uploaded.localPath || fileName || filePath || "Untitled asset")).trim();
@@ -858,7 +812,13 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
 
   try {
     const datasetBytes = await downloadFromIpfsBytes(dataset.encryptedUri, ipfsApiUrl || IPFS_API_URL);
-    fs.writeFileSync(datasetPath, datasetBytes);
+    // Datasets registrados antes da cifra estao em claro no IPFS; o envelope distingue os novos.
+    fs.writeFileSync(
+      datasetPath,
+      hasEncryptedEnvelope(datasetBytes)
+        ? decryptBufferEnvelope(datasetBytes, [DATASET_FORMAT]).plaintext
+        : datasetBytes,
+    );
 
     const encryptedApplicationBytes = await downloadFromIpfsBytes(application.encryptedUri, ipfsApiUrl || IPFS_API_URL);
     const decryptedApplication = decryptBufferEnvelope(encryptedApplicationBytes);
