@@ -1,7 +1,7 @@
 # Brainstorm 01 — Direções para fortalecer a contribuição
 
 **Origem:** conversa de 2026-10-12, após o feedback do LADC 2026 (submissão #33941).
-**Status:** direções 1, 2 e 3 **aceitas como candidatas** (D-002); a escolha da tese fica para a E4.
+**Status:** direções 1, 2 e 3 **aceitas como candidatas** (D-002); a escolha da tese fica para a E5.
 **Relacionados:** [E1 — auditoria do código](../resultados/E1_auditoria_codigo.md) ·
 [plano de ressubmissão](../../PLANO_RESSUBMISSAO.md)
 

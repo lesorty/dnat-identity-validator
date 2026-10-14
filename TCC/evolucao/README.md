@@ -28,4 +28,8 @@ ressubmissão (`../PLANO_RESSUBMISSAO.md`), que trata do que entra no SAC em out
 - [ETAPAS.md](ETAPAS.md)
 - [DECISOES.md](DECISOES.md)
 - [brainstorm/01_direcoes_contribuicao.md](brainstorm/01_direcoes_contribuicao.md)
+- [brainstorm/02_build_oci.md](brainstorm/02_build_oci.md)
+- [brainstorm/03_agentes_verificacao.md](brainstorm/03_agentes_verificacao.md)
 - [resultados/E1_auditoria_codigo.md](resultados/E1_auditoria_codigo.md)
+- [resultados/E2_isolamento_confidencial.md](resultados/E2_isolamento_confidencial.md)
+- [resultados/E2b_build_oci.md](resultados/E2b_build_oci.md)
