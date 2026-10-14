@@ -1,7 +1,10 @@
 # E2 — Isolamento confidencial por job (o problema do Firecracker)
 
-**Status:** PARCIAL (rascunho de 2026-10-12). E2.1–E2.3 discutidos; falta medir (E2.4).
-**Decisões relacionadas:** D-005 (CVM por job, sem aninhamento), D-006 (warm pool de uso único).
+**Status:** DECISÕES FECHADAS (2026-10-14); falta só medir (E2.4, adiada por D-007).
+**Decisões relacionadas:** D-005 (CVM por job, sem aninhamento), D-006 (warm pool de uso único),
+D-010 (contrato OCI), D-011 (container sem rede), D-017 (fechamento da E2; peer pods descartados).
+**Escopo:** a atestação é tratada como implícita em todo uso de computação confidencial e fica
+fora desta etapa por ora (D-017).
 **Pré-requisito lido:** [E1 — auditoria](E1_auditoria_codigo.md), achados A13 e A14.
 
 ## E2.1 — O problema
@@ -16,8 +19,6 @@ isolamento entre jobs. O Firecracker não roda na CVM por falta de virtualizaç�
   paginação aninhada, então observa um fluxo de eventos mais rico. O paper Nested SEV
   reconhece que o L0 observa as interações L1↔L2 e os padrões de acesso, e deixa canais
   laterais fora de escopo (Takiguchi & Kourai, OSDI'26, seção de modelo de ameaça).
-- **Não verificado:** que a reconstrução de informação fica mais fácil com o tempo de execução
-  no caso aninhado. É inferência plausível; falta referência.
 - Consequência: tratar o aninhamento como algo a evitar, não como lacuna a fechar.
 
 **O que existe hoje em termos de suporte (verificado em fontes):**
@@ -46,11 +47,13 @@ isolamento entre jobs. O Firecracker não roda na CVM por falta de virtualizaç�
 
 **Hipótese de trabalho:** A + E (CVM por job, com sandbox interno como defesa em profundidade).
 
-### Desenho de rede da opção A (a especificar)
+### Desenho de rede da opção A (decidido, D-017)
 Três fases no guest: (1) com rede, para atestar e buscar ativos e chaves; (2) **sem rede**, com
 a aplicação rodando; (3) com rede, só para devolver o resultado cifrado. Se a aplicação chegar a
 root no guest, pode religar a rede; por isso o sandbox interno é defesa em profundidade, e a
-imagem medida deve impedir a reconfiguração de rede pela aplicação.
+imagem medida deve impedir a reconfiguração de rede pela aplicação. A rede é cortada **dentro do
+guest**, porque o firewall da nuvem pertence ao operador: o container roda em namespace de rede
+vazio, sem capacidade de rede, e as regras ficam fora do alcance da aplicação.
 
 ### Build plane
 O código do desenvolvedor também é segredo (E1, A10), e o Firecracker também não roda na CVM de
@@ -68,7 +71,10 @@ build. A decisão de E2 vale para os dois planos.
 8. Esforço de implementação no protótipo
 9. Portabilidade entre nuvens
 
-## CoCo peer pods — o que é (verificado nas fontes)
+## CoCo peer pods — DESCARTADO (D-017); mantido como registro
+
+_O contrato da D-010 (builder entrega o OCI, executor próprio executa) dispensa peer pods e
+Kubernetes. O texto abaixo documenta por que foram avaliados e o que pesava contra._
 
 **Ideia:** um pod do Kubernetes roda dentro de **uma VM própria, criada pela API da nuvem**,
 em vez de rodar num container do nó ou numa microVM aninhada. A VM é irmã do nó (primeiro
@@ -110,7 +116,7 @@ virtualização aninhada nem de bare metal.
 Confidential Containers no ACI (grupo de containers numa *utility VM* SNP), citados no plano de
 ressubmissão; ainda não verifiquei esse caminho, que dispensa Kubernetes.
 
-## Critérios de equivalência de segurança para adotar peer pods + OCI (D-008)
+## Propriedades P1–P8 (nascidas como critérios da D-008; agora requisitos do executor próprio)
 
 "Sem perda significativa" precisa ser definido antes de medir. Propriedades que o desenho novo
 deve manter em relação ao atual (microVM sem rede, artefato ext4 somente leitura):
@@ -159,15 +165,14 @@ desligamento corrigido (o ~25 s atual é em grande parte artificial, E1 do plano
 **Hipótese a testar (não medida):** o provisionamento da nuvem domina o ciclo e o boot do kernel
 pesa pouco; o *warm pool* tira o provisionamento do caminho crítico ao custo de CVMs ociosas.
 
-### Salvaguardas do warm pool (D-006), a especificar
-- atestação com nonce fresco no momento do claim
-- claim de uso único imposto pelo guest (a CVM aceita um job e se destrói)
+### Salvaguardas do warm pool (D-006, decididas em D-017)
+- claim de uso único **imposto pelo guest** (a CVM aceita um job e se destrói); o operador não
+  consegue reutilizá-la
 - sem disco persistente; nenhum dado de job antes do claim
-- idade máxima de uma CVM ociosa
-- dimensionamento do pool e custo por job
+- idade máxima de uma CVM ociosa **(valor a definir na medição)**
+- dimensionamento do pool e custo por job **(a definir na medição)**
+- atestação com nonce no claim: implícita, fora do escopo por ora
 
 ## Perguntas abertas
 1. Em quais nuvens há conta e crédito para medir (Azure, GCP, AWS)? Define SNP × TDX.
 2. Medir só a opção A, ou também B/C?
-3. Referência para o efeito do tempo de execução sobre a reconstrução via canal lateral
-   (nested e não nested).

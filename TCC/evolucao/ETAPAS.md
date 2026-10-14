@@ -9,10 +9,11 @@ confidencial. Cada etapa termina com um documento em `resultados/`.
 |---|---|---|---|---|
 | E0 | Organização | Onde e como registrar ideias e decisões? | Este diretório, `README.md`, `DECISOES.md` | ✅ concluída (2026-10-12) |
 | E1 | Auditoria do código | O que o código realmente garante hoje, frente às direções 1–3? | `resultados/E1_auditoria_codigo.md` | ✅ concluída (2026-10-12) |
-| E2 | Isolamento confidencial por job | Como substituir ou complementar o Firecracker para ter isolamento por job **e** confidencialidade frente ao operador? | `resultados/E2_isolamento_confidencial.md` | 🔄 em andamento: E2.1–E2.3 em rascunho; falta medir (E2.4) |
-| E2b | Build seguro de imagens OCI | Como construir imagens OCI de código não confiável sem perder as garantias do build atual (ext4)? | `resultados/E2b_build_oci.md` | ⏳ próxima (D-012); ideias em `brainstorm/02_build_oci.md` |
+| E2 | Isolamento confidencial por job | Como substituir ou complementar o Firecracker para ter isolamento por job **e** confidencialidade frente ao operador? | `resultados/E2_isolamento_confidencial.md` | ✅ decisões fechadas (D-017); falta só medir (E2.4, depois das decisões) |
+| E2b | Build seguro de imagens OCI | Como construir imagens OCI de código não confiável sem perder as garantias do build atual (ext4)? | `resultados/E2b_build_oci.md` | 🔄 decisões fechadas (D-012 a D-015); duas fases e assinatura especificadas em rascunho; faltam verificações (a verificar) |
 | E3 | Descentralização | Distribuir o sistema entre operadores e provedores aumenta a confiança de fato? O que vale e o que não vale fazer? | `resultados/E3_descentralizacao.md` | ⏳ |
-| E4 | Síntese | Qual é a arquitetura-alvo v2, a tese e o roteiro (SAC → DSN)? | `resultados/E4_arquitetura_alvo.md` + decisões em `DECISOES.md` | ⏳ |
+| E4 | Verificação por agentes de IA | Como verificar, com agentes, que uma aplicação de código conhecido não vaza dados privados (D-016)? | `resultados/E4_verificacao_agentes.md` | ⏳ futura, só planejamento; ideias em `brainstorm/03_agentes_verificacao.md` |
+| E5 | Síntese | Qual é a arquitetura-alvo v2, a tese e o roteiro (SAC → DSN), considerando E1–E4? | `resultados/E5_arquitetura_alvo.md` + decisões em `DECISOES.md` | ⏳ |
 
 ## Escopo de cada etapa pendente
 
@@ -39,8 +40,13 @@ confidencial. Cada etapa termina com um documento em `resultados/`.
 - Saída: o que realmente melhora a confiança (e o que só adiciona custo), com prós, contras
   e dificuldade técnica.
 
-### E4 — Síntese
-- Arquitetura-alvo v2 combinando E1–E3 com as direções 1–3.
+### E4 — Verificação por agentes de IA
+- Caso: código conhecido e dados privados; o código é verificável, mas o esforço é proibitivo.
+- Propriedades de segurança declaradas pelo usuário (não vazar dados, direta ou indiretamente).
+- Evolui a varredura de saída da E2b. Só planejamento por ora; perguntas em `brainstorm/03_agentes_verificacao.md`.
+
+### E5 — Síntese
+- Arquitetura-alvo v2 combinando E1–E4 com as direções 1–3.
 - Nova formulação de tese e de contribuições.
 - O que entra no SAC (texto) e no DSN (código + medição), com estimativa de esforço.
 - Decisões a aprovar, registradas em `DECISOES.md`.
