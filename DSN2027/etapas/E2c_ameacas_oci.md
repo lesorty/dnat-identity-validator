@@ -1,6 +1,6 @@
 # E2c — Build e execução OCI: problemas de segurança e soluções
 
-**Status:** RASCUNHO (2026-10-18). Consolida o que está espalhado em E1, E2 e E2b e acrescenta
+**Status:** decisões fechadas em 2026-10-18 (§10); nada medido. Consolida o que está espalhado em E1, E2 e E2b e acrescenta
 três frentes novas: **garantia de execução sem rede**, **apps que precisam de rede** e **o Juiz
 apontando tentativas de acesso externo**. Nada aqui foi medido.
 **Decisões relacionadas:** D3, D4 ([DECISOES.md](../DECISOES.md)); Juiz em D2 ([JUIZ_IA.md](../JUIZ_IA.md)).
@@ -156,8 +156,11 @@ que vazam pela saída.
 | **Desejável** | gVisor (R3), R5(a–c), R6, R7, J2 com sinkhole, build em duas fases (B1–B3), B4, B6 |
 | **Discussão / limitação** | R5(d), N1(b,c), S3–S5, reprodução com N builders (B5, B7), canais laterais |
 
-## 10. Pendências
-1. Rede no MVP: só opção (a), ou já desenhar o broker da opção (b)?
-2. Tentativa de rede sem tag: reprova direto ou vira "aprovado com portão"?
-3. Sinkhole (J2-ii) entra no MVP ou só o log do seccomp (J2-i)?
-4. Verificar no Azure: derrubar a NIC em execução e religar, hvsock, lockdown do kernel.
+## 10. Decidido em 2026-10-18 (D2, D4)
+1. Rede no MVP: **opção (a)**, rede zero; o broker (b) entra só na discussão.
+2. Tentativa de rede sem tag: **reprovado**; sinal só estático e fraco: inconclusivo.
+3. L2 detecta por **seccomp em modo log** (J2-i); o sinkhole (J2-ii) fica desejável.
+4. Obrigatórias na D4: **R1–R4**; R5–R7 desejáveis.
+
+## 11. Pendências
+- Verificar no Azure: derrubar a NIC com o job rodando e religar; hvsock; lockdown do kernel.
