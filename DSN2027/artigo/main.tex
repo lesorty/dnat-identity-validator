@@ -1,0 +1,53 @@
+% DSN 2027 — Research Track, Regular Paper (11 páginas com tudo; só as referências ficam de fora).
+% Double-blind: sem nomes, afiliações ou agradecimentos identificáveis.
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+
+% Notas de trabalho (desligar antes de submeter: \renewcommand{\todo}[1]{})
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\begin{document}
+
+\title{TODO: título (congela em 25/nov junto com o resumo)}
+
+\author{\IEEEauthorblockN{Anonymous Authors}
+\IEEEauthorblockA{\textit{Regular Paper}}}
+
+\maketitle
+
+\begin{abstract}
+\todo{Até 150 palavras. Problema: verificar se uma aplicação vaza dados privados pelo canal
+legítimo de saída, de forma eficaz e barata. Proposta: Juiz de IA em camadas, executado como
+aplicação do próprio sistema confidencial. Resultado principal da batalha atacante $\times$ defensor.}
+\end{abstract}
+
+\begin{IEEEkeywords}
+\todo{confidential computing, LLM-based code analysis, data leakage, trusted execution}
+\end{IEEEkeywords}
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_threat_model}
+\input{sections/04_design}
+\input{sections/05_judge}
+\input{sections/06_benchmark}
+\input{sections/07_evaluation}
+\input{sections/08_related}
+\input{sections/09_discussion}
+\input{sections/10_conclusion}
+
+% Exigido pelo CFP quando há conteúdo gerado por IA; não conta no limite de páginas.
+\section*{AI Tool Usage}
+\todo{1--2 parágrafos descrevendo onde ferramentas de IA foram usadas (texto, código, referências)
+e como o conteúdo foi verificado.}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}
