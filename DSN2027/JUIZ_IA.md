@@ -215,7 +215,10 @@ defensor nunca vê o decodificador. Tudo é checado rodando, sem julgamento huma
   motivos, evidencias}`, cacheado por `(hash da fonte, tags, versão do Juiz)`.
 
 ### 9.6 Batalha
-Modelos **mistos** (D-035): atacantes caros por API; defensores baratos abertos (locais) e por API.
+Modelos **mistos** (D-035, D-036): atacantes de ponta de Anthropic, OpenAI, Google e abertos
+grandes; defensores baratos abertos (GPU na nuvem) e baratos por API; **no máximo um defensor
+caro**. Orçamento de API ≤ US$ 100: estimar no piloto (S3) o custo por geração de ataque e por
+veredito, usar cache de prompt e cortar repetições antes de cortar células da matriz.
 Atacantes (caros) × defensores (baratos e caros); defensor **com e sem** o relatório de L2;
 métricas: detecção, falsos positivos, custo por veredito, taxa de recusa do atacante.
 

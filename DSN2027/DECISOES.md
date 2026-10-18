@@ -35,7 +35,13 @@ referência estilo CTF**: o atacante entrega a app e um decodificador; o ataque 
 cumprida e o canário é recuperado só da saída; (iii) **L2 inclui a variação do segredo** (n
 execuções com canários aleatórios); (iv) batalha com **modelos mistos**: atacantes caros por
 API, defensores baratos abertos e por API.
-**Pendente:** lista de modelos, orçamento de API e GPU disponível.
+**Pendente:** lista exata de modelos (D-036 define provedores e orçamento).
+
+### D-036 · ACEITA · 2026-10-18
+Recursos da batalha: (i) atacantes de **Anthropic, OpenAI, Google e modelos abertos grandes**;
+(ii) orçamento de API **até US$ 100**; (iii) defensores abertos rodam em **GPU na nuvem**
+(custo à parte do orçamento de API). Consequência: matriz enxuta, no máximo um defensor caro,
+piloto em S3 para calibrar o custo por veredito antes da batalha completa.
 
 ## Execução
 

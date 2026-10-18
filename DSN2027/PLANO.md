@@ -71,6 +71,6 @@ evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 
 ## 5. Decisões pendentes
 
-1. Quais modelos atacantes e defensores, e qual orçamento de API?
-2. Há crédito na Azure para rodar em CVM?
+1. Lista exata dos modelos (provedores e orçamento já definidos, D-036).
+2. Há crédito na Azure para rodar em CVM e para a GPU dos defensores abertos?
 3. Datas de revisão dos coautores.
