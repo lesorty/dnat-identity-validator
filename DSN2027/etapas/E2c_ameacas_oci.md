@@ -148,7 +148,7 @@ que vazam pela saída.
 |---|---|---|
 | B1 | Dependência maliciosa exfiltra o **código** durante o build (A10) | Duas fases (E2b.3): o código só chega na fase sem rede |
 | B2 | Rede da fase de fetch aberta para a internet inteira | Egress só por um **proxy com lista de registries** (PyPI, registry das imagens-base) que registra o que foi baixado; o registro vira `materials` da proveniência |
-| B3 | Escape do container na fase de fetch alcança chave e agente | Opção A (mesma CVM, entrega tardia do código e da chave) ou B (CVM de fetch separada) (E2b.3) |
+| B3 | Escape do container na fase de fetch alcança chave e agente | **Opção B** (E2b.3): CVM de fetch própria, que fala só com o proxy e o DNAT e nunca vê código nem chave; a CVM de assemble tem o desenho da execução (§2: só DNAT, R5–R8, gVisor) e confere as dependências recebidas pelos hashes. A opção A (cortar a rede depois do fetch) foi descartada pelo mesmo motivo da R4: root religa |
 | B4 | Pacote trocado (typosquatting, *dependency confusion*, versão mutável) | Lockfile com hashes recomendado; `FROM` por digest; SBOM gerado no builder (ex.: syft) e varredura de vulnerabilidades conhecidas (ex.: osv-scanner/grype) **(ferramentas a escolher)**; SBOM vai para o Juiz |
 | B5 | Dependência adultera o artefato na fase sem rede | Integridade, não sigilo: assinatura + reprodução por N builders (E2b.4) |
 | B6 | Segredo do desenvolvedor (token de repositório privado) fica numa camada | Montagem de segredo do motor de build, nunca `ARG`/`ENV`; varredura de segredos antes de assinar |
@@ -186,7 +186,10 @@ que vazam pela saída.
 4. Rede da execução (revisto no mesmo dia): **a CVM só fala com o DNAT**: modelo de puxar,
    regra no boot + remoção de capacidades, lockdown, gVisor e sub-rede/NSG obrigatórios;
    derrubar a interface (R4) rebaixado a desejável, porque root a religa.
+5. Build (B3): **opção B**, uma CVM de fetch (só proxy e DNAT, sem código nem chave) e uma de
+   assemble com o desenho da execução (só DNAT). A opção A cai pelo mesmo motivo da R4.
 
 ## 11. Pendências
 - Os três itens **(a verificar)** do §2.
+- Medir o custo da opção B do build (CVM extra e transferência das dependências).
 - Verificar no Azure: sub-rede privada sem saída padrão, NSG só para o DNAT, console serial desabilitado.

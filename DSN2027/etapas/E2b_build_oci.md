@@ -19,6 +19,7 @@ com o código do desenvolvedor presente.
 | 1 | Dockerfile livre, sem gabaritos fixos (D4) | aceita |
 | 2 | `FROM` fixado por digest, sem curadoria nossa | aceita, por validar, prioridade menor |
 | 3 | Build em duas fases: fetch (rede, sem código) e assemble (sem rede) | aceita, especificada em E2b.3 |
+| 3b | Cada fase na sua CVM (opção B): fetch fala só com o proxy; assemble só com o DNAT | aceita em 2026-10-18, E2b.3 |
 | 4 | Build em CVM de uso único | aceita |
 | 5 | Motor de build rootless | rejeitada (a VM descartável é a fronteira; se houver motor, evitar Kaniko, arquivado) |
 | 6 | Imagem assinada pelo builder atestado | aceita, especificada em E2b.4 |
@@ -57,7 +58,7 @@ Execução pelo builder, na CVM de build (uso único):
 
 | Fase | Comando (esboço, a verificar nas flags do motor) | Contexto | Rede |
 |---|---|---|---|
-| 1. fetch | build `--target deps` | **só os arquivos declarados** como de dependência (lockfile, manifesto) | sim, com as faixas privadas bloqueadas como hoje (`build-vm.sh:174-186`) |
+| 1. fetch | build `--target deps` | **só os arquivos declarados** como de dependência (lockfile, manifesto) | só o **proxy de registries** (E2c B2); hoje o protótipo só bloqueia as faixas privadas (`build-vm.sh:174-186`) |
 | 2. assemble | build `--target app --network=none` | contexto completo (código + dependências já baixadas) | **nenhuma** |
 
 Por que fecha A10: na fase 1 o código **não existe** no contexto. Um `COPY . /app` ali falha ou
@@ -68,16 +69,29 @@ que rode em `setup.py` não tem para onde exfiltrar.
 vaza o código pelo contexto (ele não existe ali), mas pode **escapar do container** e cair na
 CVM de build, que tem rede e pode conter código, agente e chave de assinatura. A atestação mede
 o boot, não o estado em execução; um agente adulterado poderia assinar uma declaração forjada.
-Por isso o desenho precisa dizer **quando o código e a chave chegam à CVM**. Duas opções, ambas
-em consideração:
+Por isso o desenho precisa dizer **quando o código e a chave chegam à CVM**. Duas opções foram
+consideradas:
 
 | Opção | Descrição | Prós | Contras |
 |---|---|---|---|
 | **A. Mesma CVM, entrega tardia** | Fase 1 roda sem código e sem chave na CVM. Ao terminar, a rede da CVM é cortada; só então chegam o código e a chave de assinatura (gerada depois) e roda a fase 2 | Uma CVM por build; simples | Um escape na fase 1 ainda cai na CVM que depois assinará: o agente pode ter sido adulterado. Reduz a exposição do código, **não** elimina a falsificação de assinatura |
 | **B. CVM de fetch separada** | A fase 1 roda numa CVM própria, de uso único, que nunca vê código nem chave. Entrega só as dependências (wheelhouse/camadas), verificadas por hash, à CVM de assemble, que é quem recebe o código e assina | Um escape na fase 1 não alcança código nem chave; o assemble é limpo | Uma CVM a mais por build; transferência das dependências entre CVMs; hashes das dependências precisam ser conhecidos ou registrados |
 
-Recomendação provisória: **A como base** e **B como reforço** quando a integridade da assinatura
-for crítica. Decisão final depois das medições de custo.
+**Decidido em 2026-10-18: opção B.** A opção A corta a rede *depois* que código de terceiros já
+rodou com rede; root obtido por escape na fase 1 pode religá-la ou adulterar o agente que vai
+receber o código e a chave. É o mesmo defeito da R4 da execução (E2c §2), e contraria a regra
+"configurar no boot e jogar fora o poder de mudar". Com B, cada CVM é configurada no boot para
+um único destino:
+
+| CVM (uso único, do *warm pool*) | Fala com | Vê código? | Tem a chave? |
+|---|---|---|---|
+| **Fetch** | só o proxy de registries (PyPI, imagens-base), que registra o que foi baixado, e o DNAT, para entregar as dependências | não | não |
+| **Assemble** | só o DNAT, com o mesmo desenho da CVM de execução (E2c §2: R5 regra no boot + remoção de capacidades, R6 lockdown, R7 mTLS fixado, R8 sub-rede/NSG; gVisor no container do build) | sim | sim, gerada nela |
+
+Passagem entre elas: a CVM de fetch entrega o wheelhouse/camadas **ao DNAT**, que repassa à de
+assemble; a de assemble confere cada pacote contra os hashes do lockfile e o registro do proxy
+antes de usar. Escape na fase 1 não alcança código nem chave. Custo: uma CVM a mais por build e
+a transferência das dependências **(a medir)**.
 
 **O que o desenvolvedor declara:** a lista de arquivos de dependência (p.ex.
 `requirements.lock`, `package-lock.json`). Todo o resto é código e só entra na fase 2.
@@ -166,7 +180,7 @@ O executor **não confia** na imagem nem na varredura do builder:
 
 ## E2b.6 — Pendências e próximo passo
 
-- Escolher entre as opções A e B da fase 1 (entrega tardia na mesma CVM ou CVM de fetch separada).
+- Medir o custo da opção B (CVM extra e transferência das dependências).
 - Validar `FROM` por digest (D4) e a viabilidade do build reproduzível.
 - Verificar as flags do motor de build (E2b.3) e o estado das ferramentas (Kaniko arquivado).
 - Medições (tempo de build em duas fases, custo da reprodução) ficam para depois das decisões.
