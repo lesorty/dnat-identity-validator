@@ -191,8 +191,8 @@ que vazam pela saída.
    assemble com o desenho da execução (só DNAT). A opção A cai pelo mesmo motivo da R4.
 6. Imagens: **qualquer imagem-base e qualquer registry**, sem lista de aprovadas. O proxy do
    fetch só anota (não filtra destinos públicos); o builder fixa o digest e o registra.
-7. Imagem OCI pronta do desenvolvedor (B12): **aceita como nível 0**, proposta na E2b.7; padrão
-   de nível mínimo por dataset a confirmar.
+7. Imagem OCI pronta do desenvolvedor (B12): **aceita como nível 0** (E2b.7). Padrão do
+   dataset: nível 0, qualquer imagem; o dono pode exigir nível 1 ou 2.
 
 ## 11. Pendências
 - Os três itens **(a verificar)** do §2.

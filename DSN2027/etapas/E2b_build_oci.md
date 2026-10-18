@@ -27,7 +27,7 @@ com o código do desenvolvedor presente.
 | 8 | Varredura de saída básica antes de assinar (D4) | aceita; evolui para agentes (E4) |
 | 9 | Cache particionado por dono | baixa prioridade |
 | 10 | X8 fora de escopo; X7 limitação declarada (D3) | aceita |
-| 11 | Imagem OCI pronta do desenvolvedor aceita como origem nível 0 | proposta em 2026-10-18, E2b.7 |
+| 11 | Imagem OCI pronta do desenvolvedor aceita como origem nível 0 | aceita em 2026-10-18 (padrão nível 0), E2b.7 |
 
 Os ataques de uma imagem comprometida contra o executor (X1–X6) viram
 **requisitos do executor** (E2b.5).
@@ -190,7 +190,7 @@ O executor **não confia** na imagem nem na varredura do builder:
 - Verificar as flags do motor de build (E2b.3) e o estado das ferramentas (Kaniko arquivado).
 - Medições (tempo de build em duas fases, custo da reprodução) ficam para depois das decisões.
 
-## E2b.7 — Imagem OCI pronta enviada pelo desenvolvedor (REABERTA, proposta de 2026-10-18)
+## E2b.7 — Imagem OCI pronta enviada pelo desenvolvedor (ACEITA em 2026-10-18)
 
 **Pergunta:** se o desenvolvedor já tem o código, por que não envia a imagem pronta?
 **Resposta curta:** pode. A imagem pronta entra como **origem nível 0**, ao lado do build atestado.
@@ -214,8 +214,8 @@ Juiz consegue ver) e a **proveniência** (quem garante como a imagem foi feita).
 - **1:** build atestado (duas CVMs, E2b.3/E2b.4).
 - **2:** N ≥ 2 builders concordantes (reprodução, E2b.4 §3).
 
-O dono do dataset escolhe o mínimo; **padrão proposto: 0** (aceitar qualquer imagem), e o
-recibo sempre informa o nível. **(padrão a confirmar)**
+**Padrão: 0** (qualquer imagem é aceita, decidido em 2026-10-18). O dono do dataset pode exigir
+nível 1 ou 2; o recibo sempre informa o nível.
 
 ### 3. Fluxo de ingestão (CVM de ingestão)
 
@@ -252,7 +252,6 @@ imagem sobe para nível 1 (ou 2 com N builders). Depende de reprodutibilidade (B
 Dockerfile livre; sem ela a imagem fica no nível 0.
 
 ### 6. Pendências
-- Confirmar o padrão de nível mínimo (0 proposto).
 - Juiz sobre imagem sem fonte: como apresentar o sistema de arquivos (lista de arquivos,
   scripts legíveis, binários marcados como opacos) e taxa esperada de inconclusivos.
 - Ferramentas de normalização e SBOM sobre imagem pronta **(a escolher)**.

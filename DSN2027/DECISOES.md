@@ -49,7 +49,7 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
 - **Imagem OCI pronta** do desenvolvedor também é aceita, como **origem nível 0** (E2b §E2b.7):
   CVM de ingestão (só o DNAT) normaliza, varre e assina; não muda o sigilo do dataset, só a
   transparência para o Juiz. O dono do dataset escolhe o nível mínimo (0 pronta, 1 build
-  atestado, 2 N builders); padrão proposto 0, a confirmar.
+  atestado, 2 N builders); **padrão 0**, qualquer imagem aceita.
 - **A CVM só fala com o DNAT** ([E2c](etapas/E2c_ameacas_oci.md) §2): a app roda sem rede (namespace
   vazio, seccomp sem sockets de rede, gVisor, sem root); a CVM **puxa** o job e nunca escuta; o
   PID 1 carrega no boot a regra "saída só para o DNAT, sem DNS" e **remove de todos os processos
