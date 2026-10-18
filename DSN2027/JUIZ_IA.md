@@ -77,6 +77,7 @@ conflito entre tags; a app também declara sua finalidade e o Juiz confere se el
 | P9 | **Falso positivo** barra app legítima (U2) | Tags e veredito com condições |
 | P10 | **Juiz como app**: quem o aciona, quem paga, quem julga o Juiz | Bootstrap da whitelist |
 | P11 | **Verificação prévia não cobre a execução** | Portão de saída em tempo de execução |
+| P12 | **Tentativa de acesso externo** (rede) | Sem finalidade de rede, tentar conectar é evidência forte; L1 (imports, URLs) + L2 (seccomp em log, sinkhole com canário no tráfego); apps que usam rede só com tag do dono ([E2c](etapas/E2c_ameacas_oci.md) §5–6) |
 
 ## 5. Abordagens
 
