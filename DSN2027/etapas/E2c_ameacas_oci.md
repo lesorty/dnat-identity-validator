@@ -1,8 +1,8 @@
 # E2c — Build e execução OCI: problemas de segurança e soluções
 
-**Status:** decisões fechadas em 2026-10-18 (§10); nada medido. Consolida o que está espalhado em E1, E2 e E2b e acrescenta
-três frentes novas: **garantia de execução sem rede**, **apps que precisam de rede** e **o Juiz
-apontando tentativas de acesso externo**. Nada aqui foi medido.
+**Status:** decisões fechadas em 2026-10-18 (§10); nada medido. Consolida o que está espalhado
+em E1, E2 e E2b e acrescenta três frentes novas: **CVM que só fala com o DNAT**, **apps que
+precisam de rede** e **o Juiz apontando tentativas de acesso externo**.
 **Decisões relacionadas:** D3, D4 ([DECISOES.md](../DECISOES.md)); Juiz em D2 ([JUIZ_IA.md](../JUIZ_IA.md)).
 **Convenção:** cada problema tem um ID (R = rede na execução, X = outros da execução, S = canais
 de saída, N = apps com rede, J = Juiz, B = build). Itens não conferidos levam **(a verificar)**.
@@ -29,46 +29,68 @@ de saída, N = apps com rede, J = Juiz, B = build). Itens não conferidos levam 
 | B1 Build: fetch | sim, restrita | lockfile, imagens-base; **sem código, sem chave** | dependência maliciosa, escape do container de build (B1–B4) |
 | B2 Build: assemble | **não** | código + dependências baixadas + chave de assinatura | adulteração do artefato, segredo nas camadas (B5–B8) |
 | Entrega | canal mTLS | imagem cifrada + proveniência | imagem trocada, código lido em trânsito ou em repouso (B9, B10) |
-| E1 Execução: preparação | sim, só o agente | agente, chaves, imagem, dataset | nenhum código não confiável rodando ainda |
-| E2 Execução: app | **não** | app + dataset decifrado | exfiltração por rede (R1–R7), escape (X1), canais de saída (S1–S5) |
-| E3 Execução: devolução | sim, só o agente | resultado cifrado | processo residual da app usando a rede (R5) |
+| E1 Execução: preparação | CVM: **só o DNAT**, de saída | agente puxa imagem, dataset e chaves | nenhum código não confiável rodando ainda |
+| E2 Execução: app | app: **nenhuma**; CVM: só o DNAT | app + dataset decifrado | exfiltração por rede (R1–R8), escape (X1), canais de saída (S1–S5) |
+| E3 Execução: devolução | CVM: **só o DNAT** | resultado cifrado | app que virou root tentando outro destino (R5–R8) |
 
-## 2. Garantia de execução sem rede (R)
+## 2. Execução: a CVM só fala com o DNAT (R)
 
-Objetivo: **nenhum byte sai da CVM durante a execução da app**, mesmo se a app chegar a root
-no convidado, e a ausência de rede ser **verificável** pelo dono do dataset.
-A solução é em camadas; cada uma cobre a falha da anterior.
+**Objetivo:** a app não alcança **nada** fora do DNAT, mesmo que vire root no espaço de
+usuário da CVM, e o dono do dataset consegue conferir a política aplicada.
+
+**Duas ideias de base**
+- **Modelo de puxar:** a CVM de execução **nunca recebe requisição**. O agente sobe, abre uma
+  conexão de saída por mTLS ao DNAT e **puxa** o job (imagem e dataset cifrados, chaves). Não há
+  porta aberta na CVM em nenhum momento.
+- **Configurar no boot e jogar fora o poder de mudar:** uma regra de firewall sozinha não
+  basta, porque root a apaga. A regra "só o DNAT" é carregada pelo PID 1 da imagem medida e,
+  em seguida, **ninguém na CVM mantém a capacidade de alterá-la**.
+
+**Por que tirar o terminal não basta:** escapar do container é um exploit de kernel ou de
+runtime executado pelo código da própria app (Python faz qualquer syscall; a imagem traz o
+binário que quiser). Tirar shell, SSH e console da CVM é endurecimento (R6), não impede o escape.
 
 | # | Problema | Solução | Camada |
 |---|---|---|---|
-| R1 | A app abre um socket para a internet | Container em **namespace de rede vazio** (`--network none`): só `lo` | Container |
-| R2 | A app usa `lo` ou um socket Unix para falar com o agente ou outro serviço local que tenha rede | Agente **não escuta** em `lo` durante E2; nenhum socket Unix montado no container; namespace de IPC e PID próprios | Container |
-| R3 | Falha do kernel do convidado alcançável por syscalls de rede (escape via pilha de rede) | **seccomp** negando `socket()` para `AF_INET`, `AF_INET6`, `AF_PACKET`, `AF_NETLINK`, `AF_VSOCK` (só `AF_UNIX`); **gVisor (runsc)** com rede desligada, que tira a pilha de rede do kernel do caminho; Landlock com regras de TCP como reforço (Linux ≥ 6.7, **a verificar** no kernel da CVM) | Syscall |
-| R4 | Escape do container vira root na CVM e usa a NIC | **Corte temporal:** o agente derruba a interface (ou desassocia o driver) **antes** de iniciar a app e só a religa **depois** que o cgroup do job estiver vazio (`cgroup.events: populated 0`). Enquanto existe processo da app, não existe rede | CVM |
-| R5 | Root obtido em E2 deixa um processo escondido esperando a rede voltar em E3 | (a) imagem da CVM com **kernel lockdown**, sem carga de módulos, rootfs somente leitura e sem disco persistente; (b) em E3, **nftables com egress só para o plano de controle**, regra por cgroup/UID do agente, com mTLS; (c) a CVM é destruída logo após E3; (d) **opção forte (a avaliar):** a devolução sai por outra via que não a NIC da CVM de execução (ver nota abaixo) | CVM |
-| R6 | Rotas fora da NIC: IMDS da nuvem (`169.254.169.254`), vsock/hvsock, porta serial, dispositivos virtio | Sem dispositivos no container; IMDS bloqueado no nftables da CVM; `AF_VSOCK` negado no seccomp; desabilitar hvsock/vsock no convidado se não for usado **(a verificar no Azure)** | CVM |
-| R7 | App sem conluio com o operador manda dado para um servidor qualquer | Egress da CVM restrito também **no firewall da nuvem** (NSG) ao plano de controle. Não protege contra operador em conluio, mas fecha o caso comum de graça | Nuvem |
-| R8 | O dono do dataset precisa **confiar** que tudo isso foi aplicado | A política (perfil seccomp, flags do runtime, regras nftables, script do agente) faz parte da **imagem medida** da CVM; o recibo de execução carrega o hash da política; contadores da NIC (`tx_bytes`) antes/depois de E2 entram no recibo como evidência (não como prova, pois root os altera). Atestação implícita (D3) | Prova |
+| R1 | A app abre um socket para fora | Container em **namespace de rede vazio** (`--network none`): só `lo` | Container |
+| R2 | A app fala com algum serviço local que tenha rede | Modelo de puxar: nada escuta na CVM; nenhum socket Unix montado no container; namespaces de IPC e PID próprios | Container |
+| R3 | A app vira root (escape do container) | **Ninguém é root no container:** usuário comum, namespace de usuário, `no-new-privileges`, sem setuid, sem capacidades; **seccomp** mínimo, negando `socket()` para `AF_INET`, `AF_INET6`, `AF_PACKET`, `AF_NETLINK`, `AF_VSOCK`; **gVisor (runsc)**: a app fala com um kernel em espaço de usuário, e o "root" dela é root no sandbox; para chegar à CVM precisa quebrar o gVisor **e** o kernel, passando pelo filtro de syscalls do gVisor | Container |
+| R4 | *(rebaixada a desejável)* Derrubar a interface enquanto houver processo da app | Root a religa; com R5 deixa de ser necessária. Fica só como camada extra | CVM |
+| R5 | Root em espaço de usuário na CVM muda firewall ou interface | **PID 1 no boot**, antes de qualquer outro processo: nftables com saída só para `IP_DO_DNAT:443` (IP fixo, **sem DNS**, que é canal clássico de exfiltração), IMDS (`169.254.169.254`) e vsock/hvsock bloqueados, entrada fechada. Em seguida **remove do bounding set** de todos os processos `CAP_NET_ADMIN`, `CAP_NET_RAW`, `CAP_BPF`, `CAP_SYS_MODULE` e `CAP_SYS_RAWIO`. O bounding set nunca cresce de volta: root em espaço de usuário não mexe mais em interface, firewall, BPF ou módulos. O agente não precisa delas (TLS de saída não exige) | CVM |
+| R6 | Root altera o kernel ou persiste algo | **Kernel lockdown** (modo confidencialidade), carga de módulos desligada, rootfs somente leitura com **dm-verity**, sem disco persistente; imagem mínima **sem shell, SSH nem console serial** (console serial da nuvem desabilitado) | CVM |
+| R7 | A app usa a chave do agente para mandar dados ao próprio DNAT | mTLS com **certificado do DNAT fixado** na imagem (só o DNAT verdadeiro); o DNAT trata **tudo** o que recebe da CVM como saída, que passa pelo portão e pelo Juiz. Mandar ao DNAT não vaza nada além do canal legítimo | DNAT |
+| R8 | App com **exploit de kernel** desfaz R5 e R6 por dentro | A mesma regra repetida **fora da CVM**: sub-rede privada sem IP público, sem NAT e sem saída padrão para a internet (sub-rede privada do Azure **a verificar**); NSG liberando só o DNAT | Nuvem |
+| R9 | O dono do dataset precisa confiar que tudo foi aplicado | Regras, perfil seccomp, flags do runtime e lista de capacidades fazem parte da **imagem medida**; o recibo de execução leva o hash da política. Atestação implícita (D3) | Prova |
 
-**Nota sobre R5(d).** Se o resultado sair por outra CVM, a CVM de execução nunca religa a
-rede depois de rodar código não confiável. Caminhos possíveis: disco efêmero cifrado
-transferido para uma CVM de devolução, ou a CVM só se desliga e o agente da plataforma lê o
-volume de saída **(viabilidade a verificar no Azure)**. Custo: mais uma peça no ciclo. Para o
-MVP basta R1–R4 + R5(a–c); R5(d) fica como reforço.
+**Quem consegue o quê**
 
-**O que sobra (limitação declarada):** canais laterais da CVM observáveis por um operador em
-conluio (uso de CPU, padrão de acesso à memória, tempo), já fora do escopo (D3).
+| Atacante | Resultado |
+|---|---|
+| App dentro do container | Sem rede (R1–R3) |
+| App que vira root em espaço de usuário na CVM | **Sem rede além do DNAT**: não muda firewall nem interface (R5, R6); o que mandar ao DNAT vira saída (R7) |
+| App com execução de código no kernel da CVM | Desfaz tudo dentro da CVM; segura só a rede da nuvem (R8) |
+| Operador em conluio com a app | Abre a rede da nuvem; **limitação declarada** |
+
+**O que sobra (limitação declarada):** exploit de kernel somado a conluio do operador, e os
+canais laterais da CVM observáveis pelo operador (CPU, memória, tempo), já fora do escopo (D3).
+
+**(a verificar)**
+- O runtime, ao criar o namespace de usuário do container, não recupera capacidades que
+  alcancem a rede principal da CVM (`CAP_NET_ADMIN` no namespace do container só vale para a
+  rede vazia dele).
+- O gVisor com `--network=none` roda sem as capacidades removidas em R5.
+- Lockdown, dm-verity e desligamento de hvsock na imagem de CVM do Azure.
 
 ## 3. Outros problemas da execução (X), a partir de E2b.5
 
 | # | Problema | Solução |
 |---|---|---|
-| X1 | Escape de container | gVisor ou runc/crun rootless atualizado; **usuário sem root** dentro do container; namespace de usuário; CVM de uso único |
+| X1 | Escape de container | R3 (gVisor, usuário sem root, namespace de usuário, seccomp); CVM de uso único |
 | X2 | Camadas maliciosas (links, caminhos `../`, bombas de descompressão) | Desempacotar com ferramenta atual fora do container, validar caminhos, limitar tamanho e número de camadas |
 | X3 | Imagem pede privilégios (caps, volumes, dispositivos, usuário root) | O agente **ignora a config da imagem**, exceto `Entrypoint/Cmd/WorkingDir/Env`; impõe sem capacidades, `no-new-privileges`, rootfs somente leitura, `/tmp` em tmpfs limitado, sem dispositivos |
 | X4 | Saída como arquivo hostil (links, FIFOs, tamanho enorme) | Ler a saída como dado: só arquivos regulares, sem seguir links, limite de tamanho e de quantidade |
 | X5 | Esgotamento de recursos | Limites de cgroup (memória, CPU, PIDs), disco e tempo; abortar o job |
-| X6 | Movimento lateral entre planos | mTLS entre planos (fecha A9); agente sem porta aberta durante E2 |
+| X6 | Movimento lateral entre planos | mTLS entre planos (fecha A9); CVM sem porta aberta (modelo de puxar, R2) |
 | X7 | Imagem e dataset legíveis pelo operador | Imagem e dataset cifrados em repouso e em trânsito; chave liberada só para a CVM (atestação implícita, D3); disco só em tmpfs ou cifrado |
 | X8 | Executor roda uma imagem diferente da julgada | Verificação de proveniência e digest (E2b.4); veredito do Juiz vinculado ao digest (JUIZ_IA §1) |
 
@@ -141,8 +163,9 @@ que vazam pela saída.
 | Teste | Problemas cobertos | Resultado esperado |
 |---|---|---|
 | T1 exfiltração de rede (`t1_network_exfil`) | R1, R3, J2 | Conexão negada; tentativa no recibo; Juiz reprova |
-| T1-root: app com escape simulado (root na CVM) tenta a NIC em E2 e espera E3 | R4, R5 | Interface derrubada em E2; egress de E3 só para o plano de controle |
-| T1-IMDS / vsock | R6 | Negado |
+| T1-root: processo root em espaço de usuário na CVM tenta apagar o nftables, subir interface, carregar módulo e conectar fora do DNAT | R5, R6 | Todas as operações negadas (`EPERM`) |
+| T1-kernel (simulado): regra da CVM removida por fora, conexão a destino externo | R8 | Barrada pela sub-rede/NSG |
+| T1-IMDS / vsock / DNS | R5 | Negado |
 | T1b escape de filesystem (`t1b_fs_escape`) | X2, X3, X4 | Contido |
 | T2 dependência maliciosa (`t2_malicious_dep`) no build | B1, B2 | Fase com rede não tem código; fase com código não tem rede |
 | T3 limpeza / T4 entre CVMs | X1, P3 | Nada sobrevive ao job |
@@ -152,15 +175,18 @@ que vazam pela saída.
 
 | Prioridade | Itens |
 |---|---|
-| **Obrigatório (executor mínimo)** | R1, R2, R3 (seccomp), R4, S1, S2, X3, X4, X5; J1 e J2 (modo seccomp) no Juiz |
-| **Desejável** | gVisor (R3), R5(a–c), R6, R7, J2 com sinkhole, build em duas fases (B1–B3), B4, B6 |
-| **Discussão / limitação** | R5(d), N1(b,c), S3–S5, reprodução com N builders (B5, B7), canais laterais |
+| **Obrigatório (executor mínimo)** | R1–R3 (com gVisor), R5, R6 (lockdown, sem módulos, imagem mínima), R7, R8, S1, S2, X3, X4, X5; J1 e J2 (modo seccomp) no Juiz |
+| **Desejável** | R4, dm-verity (R6), J2 com sinkhole, build em duas fases (B1–B3), B4, B6 |
+| **Discussão / limitação** | N1(b,c), S3–S5, reprodução com N builders (B5, B7), exploit de kernel + conluio, canais laterais |
 
 ## 10. Decidido em 2026-10-18 (D2, D4)
 1. Rede no MVP: **opção (a)**, rede zero; o broker (b) entra só na discussão.
 2. Tentativa de rede sem tag: **reprovado**; sinal só estático e fraco: inconclusivo.
 3. L2 detecta por **seccomp em modo log** (J2-i); o sinkhole (J2-ii) fica desejável.
-4. Obrigatórias na D4: **R1–R4**; R5–R7 desejáveis.
+4. Rede da execução (revisto no mesmo dia): **a CVM só fala com o DNAT**: modelo de puxar,
+   regra no boot + remoção de capacidades, lockdown, gVisor e sub-rede/NSG obrigatórios;
+   derrubar a interface (R4) rebaixado a desejável, porque root a religa.
 
 ## 11. Pendências
-- Verificar no Azure: derrubar a NIC com o job rodando e religar; hvsock; lockdown do kernel.
+- Os três itens **(a verificar)** do §2.
+- Verificar no Azure: sub-rede privada sem saída padrão, NSG só para o DNAT, console serial desabilitado.

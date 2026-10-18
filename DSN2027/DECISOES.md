@@ -42,9 +42,13 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
 - **Build:** o builder entrega a **imagem OCI pronta**; o executor só a recebe com o dataset, sem
   registry. O **dataset nunca entra no build**. Dockerfile livre; imagem **assinada** e
   **varrida** antes de sair do builder; o executor revalida.
-- **Rede zero na execução** (obrigatório, [E2c](etapas/E2c_ameacas_oci.md) R1–R4): namespace de rede
-  vazio, nada escutando para o container, seccomp sem sockets de rede, e a NIC da CVM derrubada
-  enquanto houver processo da app. gVisor, lockdown, nftables/NSG ficam desejáveis.
+- **A CVM só fala com o DNAT** ([E2c](etapas/E2c_ameacas_oci.md) §2): a app roda sem rede (namespace
+  vazio, seccomp sem sockets de rede, gVisor, sem root); a CVM **puxa** o job e nunca escuta; o
+  PID 1 carrega no boot a regra "saída só para o DNAT, sem DNS" e **remove de todos os processos
+  as capacidades de mudar rede, BPF e módulos**; kernel em lockdown, imagem sem shell nem console;
+  mTLS com o certificado do DNAT fixado, e o DNAT trata tudo o que recebe como saída. Fora da
+  CVM, sub-rede sem saída para a internet e NSG só para o DNAT (cobre exploit de kernel). Derrubar
+  a interface durante o job fica só desejável. Exploit de kernel + conluio do operador: limitação.
   App que precisa de rede: **proibida no MVP**; o *broker* por socket Unix fica como extensão.
 - Detalhes: [E2](etapas/E2_isolamento_confidencial.md), [E2b](etapas/E2b_build_oci.md) e [E2c](etapas/E2c_ameacas_oci.md).
 
