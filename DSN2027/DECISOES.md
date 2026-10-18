@@ -41,9 +41,10 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
   leitura, sem capacidades nem dispositivos); só o agente da CVM usa a rede, antes e depois.
 - **Build:** o builder entrega a **imagem OCI pronta**; o executor só a recebe com o dataset, sem
   registry. O **dataset nunca entra no build**. Dockerfile livre; imagem **assinada** e
-  **varrida** antes de sair do builder; o executor revalida. Duas fases em **duas CVMs de uso
+  **varrida** antes de sair do builder; o executor revalida. **Qualquer imagem-base, de qualquer
+  registry**, sem lista de aprovadas: o builder resolve a tag para digest e o registra. Duas fases em **duas CVMs de uso
   único** (E2b §3, opção B): a de **fetch** baixa as dependências falando só com o proxy de
-  registries e o DNAT, sem nunca ver código nem chave; a de **assemble** recebe código e
+  registro (aberto a qualquer registry público, anota cada download) e o DNAT, sem nunca ver código nem chave; a de **assemble** recebe código e
   dependências (conferidas por hash), monta sem rede e assina, com o mesmo desenho de rede da
   execução (só o DNAT, abaixo).
 - **A CVM só fala com o DNAT** ([E2c](etapas/E2c_ameacas_oci.md) §2): a app roda sem rede (namespace

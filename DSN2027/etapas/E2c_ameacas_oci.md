@@ -147,12 +147,12 @@ que vazam pela saída.
 | # | Problema | Solução |
 |---|---|---|
 | B1 | Dependência maliciosa exfiltra o **código** durante o build (A10) | Duas fases (E2b.3): o código só chega na fase sem rede |
-| B2 | Rede da fase de fetch aberta para a internet inteira | Egress só por um **proxy com lista de registries** (PyPI, registry das imagens-base) que registra o que foi baixado; o registro vira `materials` da proveniência |
+| B2 | Rede da fase de fetch aberta para a internet inteira | **Sem lista de imagens ou registries aprovados**: a CVM de fetch não tem código nem chave, então pode buscar em qualquer registry ou índice público. Toda a saída passa por um **proxy de registro** que anota cada download (vira `materials` da proveniência) e bloqueia só faixas privadas, IMDS e a rede interna da plataforma |
 | B3 | Escape do container na fase de fetch alcança chave e agente | **Opção B** (E2b.3): CVM de fetch própria, que fala só com o proxy e o DNAT e nunca vê código nem chave; a CVM de assemble tem o desenho da execução (§2: só DNAT, R5–R8, gVisor) e confere as dependências recebidas pelos hashes. A opção A (cortar a rede depois do fetch) foi descartada pelo mesmo motivo da R4: root religa |
-| B4 | Pacote trocado (typosquatting, *dependency confusion*, versão mutável) | Lockfile com hashes recomendado; `FROM` por digest; SBOM gerado no builder (ex.: syft) e varredura de vulnerabilidades conhecidas (ex.: osv-scanner/grype) **(ferramentas a escolher)**; SBOM vai para o Juiz |
+| B4 | Pacote trocado (typosquatting, *dependency confusion*, versão mutável) | Lockfile com hashes recomendado; qualquer `FROM` aceito, com tag resolvida para digest pelo builder e registrada; SBOM gerado no builder (ex.: syft) e varredura de vulnerabilidades conhecidas (ex.: osv-scanner/grype) **(ferramentas a escolher)**; SBOM vai para o Juiz |
 | B5 | Dependência adultera o artefato na fase sem rede | Integridade, não sigilo: assinatura + reprodução por N builders (E2b.4) |
 | B6 | Segredo do desenvolvedor (token de repositório privado) fica numa camada | Montagem de segredo do motor de build, nunca `ARG`/`ENV`; varredura de segredos antes de assinar |
-| B7 | Imagem não reprodutível impede conferir o digest | Timestamps fixos (`SOURCE_DATE_EPOCH`), ordem fixa, bases por digest; `reproducible: não` declarado quando falhar |
+| B7 | Imagem não reprodutível impede conferir o digest | Timestamps fixos (`SOURCE_DATE_EPOCH`), ordem fixa, bases pelo digest registrado no fetch; `reproducible: não` declarado quando falhar |
 | B8 | Cache compartilhado envenenado (A12) | Cache por dono, ou sem cache entre donos no MVP |
 | B9 | Imagem trocada entre builder e executor | Proveniência assinada + digest no ledger, verificados pelo executor (E2b.4) |
 | B10 | Código do desenvolvedor legível em trânsito ou em repouso (IPFS) | Imagem cifrada com chave por ativo, como o dataset (fecha A2 para a app) |
@@ -188,6 +188,8 @@ que vazam pela saída.
    derrubar a interface (R4) rebaixado a desejável, porque root a religa.
 5. Build (B3): **opção B**, uma CVM de fetch (só proxy e DNAT, sem código nem chave) e uma de
    assemble com o desenho da execução (só DNAT). A opção A cai pelo mesmo motivo da R4.
+6. Imagens: **qualquer imagem-base e qualquer registry**, sem lista de aprovadas. O proxy do
+   fetch só anota (não filtra destinos públicos); o builder fixa o digest e o registra.
 
 ## 11. Pendências
 - Os três itens **(a verificar)** do §2.

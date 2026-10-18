@@ -17,7 +17,7 @@ com o código do desenvolvedor presente.
 | # | Decisão | Status |
 |---|---|---|
 | 1 | Dockerfile livre, sem gabaritos fixos (D4) | aceita |
-| 2 | `FROM` fixado por digest, sem curadoria nossa | aceita, por validar, prioridade menor |
+| 2 | **Qualquer imagem-base, de qualquer registry**, sem lista de aprovadas nem curadoria; o builder resolve a tag para digest no fetch e registra | aceita em 2026-10-18 |
 | 3 | Build em duas fases: fetch (rede, sem código) e assemble (sem rede) | aceita, especificada em E2b.3 |
 | 3b | Cada fase na sua CVM (opção B): fetch fala só com o proxy; assemble só com o DNAT | aceita em 2026-10-18, E2b.3 |
 | 4 | Build em CVM de uso único | aceita |
@@ -58,7 +58,7 @@ Execução pelo builder, na CVM de build (uso único):
 
 | Fase | Comando (esboço, a verificar nas flags do motor) | Contexto | Rede |
 |---|---|---|---|
-| 1. fetch | build `--target deps` | **só os arquivos declarados** como de dependência (lockfile, manifesto) | só o **proxy de registries** (E2c B2); hoje o protótipo só bloqueia as faixas privadas (`build-vm.sh:174-186`) |
+| 1. fetch | build `--target deps` | **só os arquivos declarados** como de dependência (lockfile, manifesto) | só o **proxy de registro** (E2c B2), aberto a qualquer registry ou índice público; hoje o protótipo só bloqueia as faixas privadas (`build-vm.sh:174-186`) |
 | 2. assemble | build `--target app --network=none` | contexto completo (código + dependências já baixadas) | **nenhuma** |
 
 Por que fecha A10: na fase 1 o código **não existe** no contexto. Um `COPY . /app` ali falha ou
@@ -85,7 +85,7 @@ um único destino:
 
 | CVM (uso único, do *warm pool*) | Fala com | Vê código? | Tem a chave? |
 |---|---|---|---|
-| **Fetch** | só o proxy de registries (PyPI, imagens-base), que registra o que foi baixado, e o DNAT, para entregar as dependências | não | não |
+| **Fetch** | só o proxy de registro (que deixa passar **qualquer** registry ou índice público e anota cada download) e o DNAT, para entregar as dependências | não | não |
 | **Assemble** | só o DNAT, com o mesmo desenho da CVM de execução (E2c §2: R5 regra no boot + remoção de capacidades, R6 lockdown, R7 mTLS fixado, R8 sub-rede/NSG; gVisor no container do build) | sim | sim, gerada nela |
 
 Passagem entre elas: a CVM de fetch entrega o wheelhouse/camadas **ao DNAT**, que repassa à de
@@ -105,7 +105,10 @@ a transferência das dependências **(a medir)**.
 **Limites (declarados)**
 - Dependências maliciosas ainda podem **adulterar o resultado do build**: isso é integridade,
   não confidencialidade, e é tratado por assinatura e reprodução (E2b.4).
-- Imagens-base são baixadas na fase 1 (fixadas por digest) e usadas offline na fase 2.
+- Imagens-base: **qualquer uma**. O desenvolvedor pode usar tag; o builder resolve para digest na
+  fase 1, baixa e registra o digest na proveniência; a fase 2 usa só esse digest, offline.
+  Imagem-base maliciosa é o mesmo caso de dependência maliciosa: integridade, não sigilo
+  (escape na fase 1 não alcança código nem chave; na fase 2 não há rede).
 - Não impomos `--require-hashes` num Dockerfile livre; só recomendamos. O ganho é para a
   reprodutibilidade, não para A10.
 
@@ -181,7 +184,7 @@ O executor **não confia** na imagem nem na varredura do builder:
 ## E2b.6 — Pendências e próximo passo
 
 - Medir o custo da opção B (CVM extra e transferência das dependências).
-- Validar `FROM` por digest (D4) e a viabilidade do build reproduzível.
+- Validar a resolução tag → digest no fetch e a viabilidade do build reproduzível.
 - Verificar as flags do motor de build (E2b.3) e o estado das ferramentas (Kaniko arquivado).
 - Medições (tempo de build em duas fases, custo da reprodução) ficam para depois das decisões.
 
