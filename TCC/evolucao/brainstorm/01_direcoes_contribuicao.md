@@ -1,7 +1,9 @@
 # Brainstorm 01 — Direções para fortalecer a contribuição
 
 **Origem:** conversa de 2026-10-12, após o feedback do LADC 2026 (submissão #33941).
-**Status:** direções 1, 2 e 3 **aceitas como candidatas** (D-002); a escolha da tese fica para a E5.
+**Status:** direções 1, 2 e 3 aceitas como candidatas (D-002). **Atualização 2026-10-17 (D-031,
+D-032):** direção 2 **fora**; direção 3 fora do foco; direção 1 compatível, fora do foco. A
+contribuição principal passa a ser o Juiz de IA ([ARTIGO.md](../ARTIGO.md)).
 **Relacionados:** [E1 — auditoria do código](../resultados/E1_auditoria_codigo.md) ·
 [plano de ressubmissão](../../PLANO_RESSUBMISSAO.md)
 

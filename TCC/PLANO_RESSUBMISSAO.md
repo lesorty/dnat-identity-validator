@@ -1,5 +1,8 @@
 # Plano de Ressubmissão — pós-LADC 2026 (submissão #33941)
 
+> **SUBSTITUÍDO em 2026-10-18 (D-033)** por [PLANO_DSN2027.md](PLANO_DSN2027.md). O alvo passa a ser
+> só o DSN 2027, com o Juiz de IA como contribuição principal. Mantido como registro.
+
 > Decisões fechadas em 2026-10-08:
 > - **Estratégia:** SAC 2027 (16/out) → se rejeitar, DSN 2027 (02/dez) → se rejeitar cedo, SBRC 2027.
 > - **Fio condutor:** *separação de privilégios com o build tratado como ameaça de supply chain*.

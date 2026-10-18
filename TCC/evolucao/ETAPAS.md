@@ -5,15 +5,19 @@ avaliar tornar o sistema distribuído para remover a confiança em um operador o
 único; e resolver o problema do Firecracker, que hoje não roda dentro de computação
 confidencial. Cada etapa termina com um documento em `resultados/`.
 
+**Mudança de rumo (2026-10-17, D-031, D-032):** com o orientador, decidiu-se **não distribuir**
+o sistema (E3 arquivada). O foco passa a ser OCI (E2, E2b) e, como contribuição principal, o
+**Juiz de IA** (E4). Pretensões do artigo em [ARTIGO.md](ARTIGO.md).
+
 | # | Etapa | Pergunta que responde | Entregável | Status |
 |---|---|---|---|---|
 | E0 | Organização | Onde e como registrar ideias e decisões? | Este diretório, `README.md`, `DECISOES.md` | ✅ concluída (2026-10-12) |
 | E1 | Auditoria do código | O que o código realmente garante hoje, frente às direções 1–3? | `resultados/E1_auditoria_codigo.md` | ✅ concluída (2026-10-12) |
 | E2 | Isolamento confidencial por job | Como substituir ou complementar o Firecracker para ter isolamento por job **e** confidencialidade frente ao operador? | `resultados/E2_isolamento_confidencial.md` | ✅ decisões fechadas (D-017); falta só medir (E2.4, depois das decisões) |
 | E2b | Build seguro de imagens OCI | Como construir imagens OCI de código não confiável sem perder as garantias do build atual (ext4)? | `resultados/E2b_build_oci.md` | 🔄 decisões fechadas (D-012 a D-015); duas fases e assinatura especificadas em rascunho; faltam verificações (a verificar) |
-| E3 | Descentralização | Distribuir o sistema entre operadores e provedores aumenta a confiança de fato? O que vale e o que não vale fazer? | `resultados/E3_descentralizacao.md` | ⏳ |
-| E4 | Verificação por agentes de IA | Como verificar, com agentes, que uma aplicação de código conhecido não vaza dados privados (D-016)? | `resultados/E4_verificacao_agentes.md` | ⏳ futura, só planejamento; ideias em `brainstorm/03_agentes_verificacao.md` |
-| E5 | Síntese | Qual é a arquitetura-alvo v2, a tese e o roteiro (SAC → DSN), considerando E1–E4? | `resultados/E5_arquitetura_alvo.md` + decisões em `DECISOES.md` | ⏳ |
+| E3 | Descentralização | Distribuir o sistema entre operadores e provedores aumenta a confiança de fato? O que vale e o que não vale fazer? | `resultados/E3_descentralizacao.md` | 🗄️ arquivada (D-031): desenho concluído, **não será seguido** |
+| E4 | Juiz de IA (verificação por agentes) | Como um Juiz de IA, executado como aplicação do sistema, verifica de forma eficaz e barata se uma aplicação é segura e não vaza dados (D-016, D-032)? | `resultados/E4_verificacao_agentes.md` | 🔄 **contribuição principal** (D-032); trabalho centralizado em `JUIZ_IA.md` |
+| E5 | Síntese | Qual é a arquitetura-alvo v2, a tese e o roteiro (SAC → DSN), considerando E1, E2, E2b e E4? | `resultados/E5_arquitetura_alvo.md` + decisões em `DECISOES.md` | ⏳ |
 
 ## Escopo de cada etapa pendente
 

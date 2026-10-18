@@ -162,6 +162,11 @@ limpeza, T4 isolamento entre CVMs, T5 controle de acesso), que mapeia diretament
 conforme a nuvem. **Baseline:** o modo direto atual e o Firecracker em VM comum, ambos com o
 desligamento corrigido (o ~25 s atual é em grande parte artificial, E1 do plano de ressubmissão).
 
+**Acréscimo da E3 (D-030):** medir também a atestação e sua verificação pelo comitê, o nonce no
+claim, o sorteio do executor, a liberação das chaves (t de N) e o custo e a latência das
+transações na Ethereum L1 por execução (pedido, sorteio, recibo, liquidação). Ver
+[E3.9](E3_descentralizacao.md).
+
 **Hipótese a testar (não medida):** o provisionamento da nuvem domina o ciclo e o boot do kernel
 pesa pouco; o *warm pool* tira o provisionamento do caminho crítico ao custo de CVMs ociosas.
 

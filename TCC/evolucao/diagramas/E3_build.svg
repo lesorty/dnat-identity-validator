@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1020" height="885" viewBox="0 0 680 590" role="img">
+<title>DNAT distribuído: build confidencial</title>
+<desc>O desenvolvedor cifra o código e o publica no IPFS, pede o build na Ethereum, que sorteia os builders. A CVM de fetch baixa as dependências da internet sem ver o código e as publica no IPFS. O desenvolvedor envia a chave do código direto às CVMs de assemble sorteadas, que montam a imagem sem rede. O líder cifra a imagem com uma chave nova, divide essa chave com o comitê, e os builders assinam o mesmo digest na Ethereum.</desc>
+<style>
+text{font-family:Helvetica,Arial,sans-serif}
+.t{font-size:14px;fill:#2C2C2A}.th{font-size:14px;font-weight:600;fill:#2C2C2A}.ts{font-size:12px;fill:#5F5E5A}
+.box{fill:#FFFFFF;stroke:#B4B2A9}
+.c-purple>rect,rect.c-purple{fill:#EEEDFE;stroke:#534AB7}.c-purple .th{fill:#3C3489}.c-purple .ts{fill:#534AB7}
+.c-teal>rect,rect.c-teal{fill:#E1F5EE;stroke:#0F6E56}.c-teal .th{fill:#085041}.c-teal .ts{fill:#0F6E56}
+.c-gray>rect,rect.c-gray{fill:#F1EFE8;stroke:#5F5E5A}.c-gray .th{fill:#444441}.c-gray .ts{fill:#5F5E5A}
+.c-coral>circle{fill:#FAECE7;stroke:#993C1D}.c-coral .th{fill:#712B13}
+.flow{stroke:#D85A30;stroke-width:2;fill:none}
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#D85A30" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="0" y="0" width="680" height="590" fill="#FFFFFF"/>
+<g class="c-gray"><rect x="30" y="34" width="150" height="60" rx="8" stroke-width="0.5"/><text class="th" x="105" y="54" text-anchor="middle" dominant-baseline="central">Desenvolvedor</text><text class="ts" x="105" y="74" text-anchor="middle" dominant-baseline="central">Cifra com K_code</text></g>
+<g class="c-purple"><rect x="210" y="24" width="440" height="80" rx="12" stroke-width="0.5"/><text class="th" x="430" y="50" text-anchor="middle" dominant-baseline="central">Ethereum L1: pedido de build</text><text class="ts" x="430" y="72" text-anchor="middle" dominant-baseline="central">Sorteia N builders e um líder, por stake</text></g>
+<g class="c-gray"><rect x="30" y="150" width="150" height="250" rx="12" stroke-width="0.5"/><text class="th" x="105" y="172" text-anchor="middle" dominant-baseline="central">Rede IPFS</text><text class="ts" x="105" y="190" text-anchor="middle" dominant-baseline="central">Cifrado ou público</text></g>
+<rect class="box" x="45" y="210" width="120" height="40" rx="8" stroke-width="0.5"/><text class="ts" x="105" y="230" text-anchor="middle" dominant-baseline="central">Código cifrado</text>
+<rect class="box" x="45" y="262" width="120" height="40" rx="8" stroke-width="0.5"/><text class="ts" x="105" y="282" text-anchor="middle" dominant-baseline="central">Dependências</text>
+<rect class="box" x="45" y="314" width="120" height="40" rx="8" stroke-width="0.5"/><text class="ts" x="105" y="334" text-anchor="middle" dominant-baseline="central">Imagem cifrada</text>
+<g class="c-teal"><rect x="215" y="150" width="170" height="110" rx="12" stroke-width="0.5"/><text class="th" x="300" y="186" text-anchor="middle" dominant-baseline="central">CVM de fetch</text><text class="ts" x="300" y="206" text-anchor="middle" dominant-baseline="central">Fase 1: com rede</text><text class="ts" x="300" y="226" text-anchor="middle" dominant-baseline="central">Nunca vê o código</text></g>
+<g class="c-gray"><rect x="215" y="290" width="170" height="56" rx="8" stroke-width="0.5"/><text class="th" x="300" y="310" text-anchor="middle" dominant-baseline="central">Internet</text><text class="ts" x="300" y="328" text-anchor="middle" dominant-baseline="central">PyPI, registries</text></g>
+<g class="c-teal"><rect x="410" y="150" width="240" height="250" rx="12" stroke-width="0.5"/><text class="th" x="530" y="172" text-anchor="middle" dominant-baseline="central">CVMs de assemble</text><text class="ts" x="530" y="190" text-anchor="middle" dominant-baseline="central">Fase 2: sem rede, N sorteadas</text><text class="ts" x="530" y="378" text-anchor="middle" dominant-baseline="central">Todas conferem o mesmo digest</text></g>
+<rect class="box" x="430" y="206" width="200" height="40" rx="8" stroke-width="0.5"/><text class="t" x="530" y="226" text-anchor="middle" dominant-baseline="central">Builder 1 (líder)</text>
+<rect class="box" x="430" y="258" width="200" height="40" rx="8" stroke-width="0.5"/><text class="t" x="530" y="278" text-anchor="middle" dominant-baseline="central">Builder 2</text>
+<rect class="box" x="430" y="310" width="200" height="40" rx="8" stroke-width="0.5"/><text class="t" x="530" y="330" text-anchor="middle" dominant-baseline="central">Builder N</text>
+<g class="c-purple"><rect x="30" y="440" width="350" height="90" rx="12" stroke-width="0.5"/><text class="th" x="205" y="474" text-anchor="middle" dominant-baseline="central">Ethereum L1: app ativada</text><text class="ts" x="205" y="496" text-anchor="middle" dominant-baseline="central">N assinaturas iguais de (digest, CID)</text></g>
+<g class="c-purple"><rect x="410" y="440" width="240" height="90" rx="12" stroke-width="0.5"/><text class="th" x="530" y="474" text-anchor="middle" dominant-baseline="central">Comitê de chaves</text><text class="ts" x="530" y="496" text-anchor="middle" dominant-baseline="central">Recebe partes de K_app</text></g>
+<line class="flow" x1="105" y1="96" x2="105" y2="146" marker-end="url(#arrow)"/>
+<line class="flow" x1="182" y1="64" x2="206" y2="64" marker-end="url(#arrow)"/>
+<line class="flow" x1="300" y1="106" x2="300" y2="146" marker-end="url(#arrow)"/>
+<line class="flow" x1="530" y1="106" x2="530" y2="146" marker-end="url(#arrow)"/>
+<line class="flow" x1="300" y1="288" x2="300" y2="264" marker-end="url(#arrow)"/>
+<line class="flow" x1="213" y1="205" x2="184" y2="205" marker-end="url(#arrow)"/>
+<path class="flow" d="M105 32 L105 12 L666 12 L666 226 L654 226" marker-end="url(#arrow)"/>
+<line class="flow" x1="184" y1="372" x2="406" y2="372" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<line class="flow" x1="530" y1="402" x2="530" y2="436" marker-end="url(#arrow)"/>
+<path class="flow" d="M408 390 L395 390 L395 485 L384 485" marker-end="url(#arrow)"/>
+<g class="c-coral"><circle cx="125" cy="121" r="10" stroke-width="0.5"/><text class="th" x="125" y="121" text-anchor="middle" dominant-baseline="central">1</text></g>
+<g class="c-coral"><circle cx="194" cy="42" r="10" stroke-width="0.5"/><text class="th" x="194" y="42" text-anchor="middle" dominant-baseline="central">2</text></g>
+<g class="c-coral"><circle cx="318" cy="126" r="10" stroke-width="0.5"/><text class="th" x="318" y="126" text-anchor="middle" dominant-baseline="central">3</text></g>
+<g class="c-coral"><circle cx="548" cy="126" r="10" stroke-width="0.5"/><text class="th" x="548" y="126" text-anchor="middle" dominant-baseline="central">3</text></g>
+<g class="c-coral"><circle cx="198" cy="184" r="10" stroke-width="0.5"/><text class="th" x="198" y="184" text-anchor="middle" dominant-baseline="central">4</text></g>
+<g class="c-coral"><circle cx="400" cy="12" r="10" stroke-width="0.5"/><text class="th" x="400" y="12" text-anchor="middle" dominant-baseline="central">5</text></g>
+<g class="c-coral"><circle cx="198" cy="356" r="10" stroke-width="0.5"/><text class="th" x="198" y="356" text-anchor="middle" dominant-baseline="central">6</text></g>
+<g class="c-coral"><circle cx="548" cy="419" r="10" stroke-width="0.5"/><text class="th" x="548" y="419" text-anchor="middle" dominant-baseline="central">7</text></g>
+<g class="c-coral"><circle cx="395" cy="430" r="10" stroke-width="0.5"/><text class="th" x="395" y="430" text-anchor="middle" dominant-baseline="central">8</text></g>
+<rect class="c-purple" x="30" y="559" width="10" height="10" rx="2" stroke-width="0.5"/><text class="ts" x="46" y="564" dominant-baseline="central">Blockchain e chaves</text>
+<rect class="c-teal" x="195" y="559" width="10" height="10" rx="2" stroke-width="0.5"/><text class="ts" x="211" y="564" dominant-baseline="central">CVM atestada</text>
+<rect class="c-gray" x="320" y="559" width="10" height="10" rx="2" stroke-width="0.5"/><text class="ts" x="336" y="564" dominant-baseline="central">Pessoas e redes</text>
+<line class="flow" x1="460" y1="564" x2="476" y2="564"/><text class="ts" x="482" y="564" dominant-baseline="central">Fluxo</text>
+</svg>

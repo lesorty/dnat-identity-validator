@@ -168,7 +168,10 @@ O executor **não confia** na imagem nem na varredura do builder:
 
 ## E2b.6 — Pendências e próximo passo
 
-- Escolher entre as opções A e B da fase 1 (entrega tardia na mesma CVM ou CVM de fetch separada).
+- ~~Escolher entre as opções A e B da fase 1~~ → **B (CVM de fetch separada) é o padrão** com
+  builders abertos (D-027, E3).
+- Pontos abertos da E2b.4 respondidos na E3: lista de medições = D9 (D-026); o segundo builder
+  recebe o código pela opção B (D-029).
 - Validar `FROM` por digest (D-013 ii) e a viabilidade do build reproduzível.
 - Verificar as flags do motor de build (E2b.3) e o estado das ferramentas (Kaniko arquivado).
 - Medições (tempo de build em duas fases, custo da reprodução) ficam para depois das decisões (D-007).
