@@ -1,0 +1,18 @@
+% Resumo: até 150 palavras (CFP). Contagem atual: ~140. Números entram quando houver resultados.
+\begin{abstract}
+Confidential computing lets data owners rent their datasets to third-party code without
+revealing them to the operator. It does not, however, stop the code itself from smuggling data
+out through its legitimate result. Reviewing every application by hand is too expensive, and
+large language models (LLMs) alone are unreliable code reviewers. We present an \emph{AI Judge}
+that decides, before release, whether an application may run on a dataset. The Judge combines a
+declared contract, mechanical relational tests (canaries, one-record swaps and secret variation),
+an LLM that reasons over this evidence, and a runtime output gate. The Judge is itself an
+application of the confidential platform, which runs every job as an attested OCI image inside a
+single-use confidential VM with no network. We also release the first benchmark of data-processing
+applications with hidden leaks and evaluate frontier attacker models against low-cost defenders.
+\todo{resultado principal da batalha em uma frase}
+\end{abstract}
+
+\begin{IEEEkeywords}
+confidential computing, data leakage, LLM-based code analysis, AI control, trusted execution
+\end{IEEEkeywords}

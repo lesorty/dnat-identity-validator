@@ -1,3 +1,121 @@
-\section{System Design}\label{sec:design}
-\todo{DNAT com aplicações OCI: builder entrega a imagem; executor roda em container sem rede numa
-CVM de uso único (D4). Juiz como aplicação da whitelist (D2).}
+\section{Confidential Execution of OCI Applications}\label{sec:design}
+
+Figure~\ref{fig:arch} shows the life cycle of an application: an attested build turns source code
+into a signed image; the Judge decides whether the image may run on a dataset; a single-use CVM
+runs it with no network; and an output gate checks the result before release. Every confidential
+component is a flat CVM drawn from a \emph{warm pool} of never-used machines and destroyed after
+one job.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  box/.style={draw, rounded corners=2pt, align=center, minimum height=7mm, inner sep=2pt},
+  cvm/.style={box, fill=blue!6},
+  ctl/.style={box, fill=gray!12},
+  arr/.style={-{Latex[length=1.6mm]}},
+  ]
+  \node[ctl, minimum width=78mm] (dnat) {\textbf{\sys\ control plane} (ledger, encrypted assets, job queue, output gate L4)};
+  \node[cvm, below left=7mm and -8mm of dnat] (fetch) {Fetch CVM\\deps only};
+  \node[cvm, right=3mm of fetch] (asm) {Assemble CVM\\no network\\signs image};
+  \node[cvm, right=3mm of asm] (judge) {Judge\\(an app)};
+  \node[cvm, right=3mm of judge] (exec) {Exec CVM\\container,\\no network};
+  \node[box, below=6mm of fetch] (reg) {any public\\registry (proxy)};
+  \draw[arr] (fetch) -- (reg);
+  \draw[arr] (fetch.north) -- node[left]{deps} (fetch.north|-dnat.south);
+  \draw[arr] (asm.north) -- node[left]{image} (asm.north|-dnat.south);
+  \draw[arr] (judge.north) -- node[left]{verdict} (judge.north|-dnat.south);
+  \draw[arr] (exec.north) -- node[left]{output} (exec.north|-dnat.south);
+\end{tikzpicture}
+\caption{Life cycle of an application. Each CVM is single-use, pulls its job from the control
+plane over mutually authenticated TLS and can reach nothing else; only the fetch CVM, which never
+sees code or keys, also reaches public registries through a logging proxy.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Execution: a CVM that only talks to the platform}\label{sec:design-net}
+
+Removing the application's network is easy; keeping it removed when the application may gain
+root inside the CVM is not, because root can bring an interface back. Our principle is
+\emph{configure at boot, then discard the power to change it}. The execution CVM enforces:
+\begin{itemize}
+  \item \textbf{No network for the application.} The container runs in an empty network
+  namespace, under gVisor, as a non-root user in a user namespace, with no capabilities, no
+  devices, \texttt{no-new-privileges}, a read-only root file system, and a seccomp filter that
+  denies \texttt{socket()} for IP, packet, netlink and vsock families. The configuration stored
+  in the image (user, capabilities, volumes, ports) is ignored.
+  \item \textbf{Pull, never listen.} The CVM's agent opens an outbound mutually authenticated TLS
+  connection, with the platform certificate pinned in the image, and pulls the job. Nothing
+  listens inside the CVM.
+  \item \textbf{Boot-time egress rule.} PID~1 installs a firewall that allows egress only to the
+  platform's address (no DNS; the cloud metadata service and host sockets blocked) and then
+  drops \texttt{CAP\_NET\_ADMIN}, \texttt{CAP\_NET\_RAW}, \texttt{CAP\_BPF},
+  \texttt{CAP\_SYS\_MODULE} and \texttt{CAP\_SYS\_RAWIO} from the bounding set of every process.
+  The kernel runs in lockdown mode with module loading disabled, and the image has no shell, SSH
+  or serial console.
+  \item \textbf{Everything sent is output.} Even if an attacker steals the agent's credentials,
+  the only reachable peer is the platform, which treats any byte received from the CVM as output
+  and passes it through the gate and the Judge.
+  \item \textbf{Outside the CVM.} The CVM sits in a private subnet with no public address and a
+  security group that only admits the platform. This layer is controlled by the operator, so it
+  does not protect against the operator; it covers the case in which the application obtains a
+  kernel exploit and bypasses everything above.
+\end{itemize}
+Table~\ref{tab:who} summarizes who can reach the outside world under this design.
+
+\begin{table}[t]
+\centering
+\caption{What each attacker position can do in the execution CVM.}
+\label{tab:who}
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Attacker position & Stopped by & Result \\
+\midrule
+Code in container & netns, seccomp, gVisor & no socket \\
+Root in CVM & capability drop, lockdown & rules fixed \\
+Stolen agent keys & pinned TLS & becomes output \\
+Kernel exploit & subnet, security group & no route \\
+Kernel exploit + operator & --- & limitation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Secondary output channels}\label{sec:design-channels}
+The buyer receives only the output file, a success or failure flag and the execution time
+rounded to a coarse bucket; application logs are never returned. Output size is bounded, and
+repeated executions of the same application on the same dataset are counted against a budget
+enforced by the gate (\S\ref{sec:judge-l4}).
+
+\subsection{Attested two-phase build}\label{sec:design-build}
+
+An OCI build executes arbitrary \texttt{RUN} steps, and a malicious dependency can exfiltrate the
+developer's code while the build has network access. We impose two phases with the build engine
+rather than trusting the Dockerfile, which remains unrestricted: a \emph{fetch} stage sees only
+the declared dependency files (e.g., the lockfile) and has network access, and an
+\emph{assemble} stage sees the full source and has none. The two phases run in two separate
+single-use CVMs:
+\begin{itemize}
+  \item The \textbf{fetch CVM} never sees code or keys. It can reach any public registry or
+  package index through a proxy that records every download, and the platform. Any base image
+  from any registry is accepted; tags are resolved to digests and recorded.
+  \item The \textbf{assemble CVM} has exactly the network design of the execution CVM. It checks
+  the received dependencies against the lockfile hashes and the proxy log, builds offline,
+  scans the image (secrets, setuid binaries, suspicious links, layer count and size), generates a
+  software bill of materials, encrypts the image with a per-asset key and signs a provenance
+  statement with a key generated inside the CVM and bound to its attestation report.
+\end{itemize}
+Running both phases in one CVM and cutting the network afterwards would not suffice: a dependency
+that escapes its container during the fetch phase could re-enable the network or tamper with the
+agent that later receives the code and the signing key. Every image is built this way:
+developers cannot upload pre-built images, so the Judge always sees the source the image came
+from. A data owner may additionally require $N \geq 2$ independent builders to agree on the image
+digest, which detects a compromised builder when the build is reproducible.
+
+\subsection{The Judge as an application}\label{sec:design-judge}
+The Judge is an application of the platform, on an allow list by construction, whose input is
+another application (its source, the image digest and SBOM), the dataset tags and the report of
+the dynamic tests. Because the Judge must not execute untrusted code inside its own container, the
+\emph{platform} runs the target application on synthetic data in ordinary execution CVMs and feeds
+the results to the Judge. The verdict is bound to the image digest that the executor will run and
+cached by (source hash, tags, Judge version).

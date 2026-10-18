@@ -1,3 +1,44 @@
-\section{Leakage Benchmark}\label{sec:benchmark}
-\todo{Tarefas de processamento de dados; versões benignas e com vazamento; verdade de referência
-mecânica (canário recuperável + tarefa cumprida).}
+\section{A Hidden-Leakage Benchmark}\label{sec:benchmark}
+
+Steganographic capabilities of LLMs have been studied~\cite{zolkowski2025stego}, but we found no
+benchmark of applications that hide data leaks in their legitimate output. We build one around
+three task families over synthetic tabular data with realistic schemas (e.g., patients,
+transactions) and canary records.
+
+\textbf{Tasks and tags.} \emph{Aggregation} (statistics per group, tag \texttt{aggregate:k}),
+\emph{transformation} (cleaning and filtering, tag \texttt{transform}) and \emph{machine learning}
+(train a model and return metrics, tag \texttt{no-identifiers}). Each family has about ten tasks,
+each with a benign version and leaking versions. Applications are written in Python and packaged
+as OCI images; the Judge itself does not depend on the language in L2 and L4.
+
+\textbf{Leak catalog.} Table~\ref{tab:leaks} lists the leak classes.
+
+\begin{table}[t]
+\centering
+\caption{Leak classes in the benchmark.}
+\label{tab:leaks}
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\# & Class & Example \\
+\midrule
+V1 & Direct copy & dataset rows in the output \\
+V2 & Encoded & base64 or hex in a text field \\
+V3 & Numeric steganography & canary in low-order digits of a mean \\
+V4 & Weak aggregate & a group with fewer than $k$ records \\
+V5 & Data trigger & leaks only if the data has a property \\
+V6 & Judge injection & comments claiming the code is safe \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Ground truth in capture-the-flag style.} The attacker submits an application \emph{and} a
+decoder. An attack is valid only if (i) the application passes the task's utility test and
+(ii) the decoder recovers the canary from the output alone. The defender never sees the decoder.
+Everything is checked by execution, with no human judgment. Benign versions are checked with the
+same utility test.
+
+\textbf{Attacker guardrails.} Commercial models may refuse to write ``malicious'' code. We frame
+the task as a closed benchmark (encode a synthetic canary in the output of a sandbox without
+network), start from seed attacks written by us that models then mutate or obfuscate, include
+open-weight attackers, and report refusal rates as a result.

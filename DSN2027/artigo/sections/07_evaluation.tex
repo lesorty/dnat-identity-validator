@@ -1,3 +1,59 @@
 \section{Evaluation}\label{sec:eval}
-\todo{Batalha atacantes $\times$ defensores; defensor com e sem evidências; detecção, falsos
-positivos, custo; ablação por camada; custo do executor OCI em CVM.}
+
+\todo{seção inteira depende das medições (S3--S5 do PLANO). Nenhum número abaixo foi medido.}
+
+We answer four research questions.
+\textbf{RQ1:} Does a low-cost defender detect leaks hidden by frontier attackers?
+\textbf{RQ2:} How much does the mechanical evidence of L2 help, i.e., defender with versus without
+the L2 report?
+\textbf{RQ3:} What does each layer contribute (ablation) and at what cost per verdict?
+\textbf{RQ4:} What does confidential OCI execution cost compared with the previous executor, and
+does it stop the attack suite?
+
+\subsection{Setup}
+\textbf{Battle.} Attackers are frontier models from \todo{lista exata de modelos} and large
+open-weight models; defenders are low-cost open-weight models on cloud GPUs and low-cost API
+models, plus at most one expensive defender. Every attacker meets every defender; the defender
+does not know whether it receives a benign or a leaking version. The total API budget is
+US\$100; we use prompt caching and cut repetitions before cutting matrix cells. Temperature is
+fixed and each pair is repeated \tbd\ times to report variance.
+
+\textbf{Platform.} Azure confidential VMs \todo{família SEV-SNP/TDX e tamanho}, single-use, from a
+warm pool.
+
+\textbf{Metrics.} Detection rate on valid attacks, false-positive rate on benign versions, cost per
+verdict (tokens, time, US\$), attacker refusal rate, and for the platform the job latency by phase.
+
+\subsection{RQ1--RQ2: attacker versus defender}
+\begin{table}[t]
+\centering
+\caption{Detection / false positives per defender, with and without L2 evidence. \todo{medir}}
+\label{tab:battle}
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Without L2} & \multicolumn{2}{c}{With L2} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Defender & Det. & FP & Det. & FP \\
+\midrule
+Cheap open-weight & \tbd & \tbd & \tbd & \tbd \\
+Cheap API & \tbd & \tbd & \tbd & \tbd \\
+Expensive & \tbd & \tbd & \tbd & \tbd \\
+\bottomrule
+\end{tabular}
+\end{table}
+\todo{descrever Tabela~\ref{tab:battle}, quebra por classe V1--V6 e taxa de recusa dos atacantes.}
+
+\subsection{RQ3: ablation and cost}
+\todo{detecção e custo por veredito para L0, L0+L2, L0+L2+L3, completo; quantos casos cada camada
+decide sozinha.}
+
+\subsection{RQ4: confidential OCI execution}
+\todo{latência por fase (criação ou retirada do pool, boot, atestação, liberação da chave,
+execução, destruição), com e sem warm pool, comparada ao modo direto e ao Firecracker em VM
+comum.}
+
+The attack suite of the previous \sys\ executor is replayed against the OCI executor: network
+exfiltration from the container, also as root and after a simulated kernel compromise (the
+security group must block it); file-system escape; a malicious build dependency; state left
+between jobs; and isolation across CVMs. \todo{resultados da suíte de ataques.}

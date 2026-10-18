@@ -1,3 +1,27 @@
 \section{Discussion and Limitations}\label{sec:discussion}
-\todo{Operador como ponto único de disponibilidade (D3); canais laterais; guardrails dos
-atacantes; não determinismo do LLM; destilação no caso de pesos de modelo.}
+
+\textbf{No proof of absence.} The Judge does not prove that an application is leak-free. L2 bounds
+what synthetic runs reveal, L3 adds judgment, and L4 checks the real output; an application whose
+leak is triggered only by real data and evades the gate's checks is possible. The verdict
+\emph{inconclusive} exists so that uncertainty is not silently approved.
+
+\textbf{Non-determinism and trust in the Judge.} LLM verdicts vary between runs. We pin model,
+prompt and temperature by hash, repeat runs and report variance. Who judges the Judge is a
+governance question: as an allow-listed application, its version is public and its verdicts are
+reproducible from cached inputs.
+
+\textbf{Confidentiality of the judged code.} When the Judge calls an external API, the provider
+sees the application's source. Running an open-weight model inside the CVM, with the weights'
+hash in the measurement, would allow judging secret code over private data; we leave it as future
+work.
+
+\textbf{Platform limitations.} The operator remains a single point of availability and censorship.
+A kernel exploit inside the CVM combined with operator collusion on the network breaks the
+no-network guarantee. Side channels and the precise attestation workflow are out of scope.
+Applications that legitimately need the network (e.g., calling an AI API) are forbidden here; a
+broker that holds the platform's key and only forwards tagged requests is a possible extension.
+
+\textbf{Beyond tabular data.} Private model weights are a natural asset: architecture public,
+weights kept by the platform and released only to attested CVMs. There, fine-tuning and
+guardrail removal can share the same code, so judging the resulting model rather than only the
+code becomes necessary, and distillation through many queries is a leak the gate must budget.

@@ -37,5 +37,4 @@ do sistema**.
 - Distribuição entre operadores (D3): o operador segue como ponto único de disponibilidade e censura.
 - Atestação detalhada (implícita, D3).
 - Canais encobertos e laterais (D3).
-- Imagem OCI pronta enviada pelo desenvolvedor (D3).
 - Pesos de modelo privados (U1 do Juiz): **só como motivação** (D3).

@@ -1,4 +1,29 @@
-\section{Threat Model}\label{sec:threat}
-\todo{Adversário: desenvolvedor de app maliciosa que esconde vazamento na saída legítima (X8).
-Container sem rede: a saída é o único canal. Fora de escopo: canais laterais (X7), distribuição
-entre operadores; atestação implícita.}
+\section{System and Threat Model}\label{sec:threat}
+
+\textbf{Actors.} A \emph{data owner} registers an encrypted dataset and attaches \emph{usage tags}
+that state what outputs are acceptable (\S\ref{sec:judge}). An \emph{application developer}
+submits source code, a Dockerfile and a lockfile. A \emph{buyer} pays to run an application on a
+dataset and receives the output. The \emph{operator} runs the cloud infrastructure and the
+control plane (\sys).
+
+\textbf{Adversaries.} We consider two adversaries at once.
+(i)~A \emph{malicious application developer}, possibly colluding with the buyer, who wants
+dataset content beyond what the tags allow. The developer controls the source, the Dockerfile and
+every dependency, can obfuscate code and address the Judge through comments and strings, and can
+make the leak depend on properties of the real data.
+(ii)~An \emph{operator} who wants to read datasets or application code. The operator controls the
+hypervisor, the cloud network and storage, but not the inside of an attested CVM.
+
+\textbf{Channels.} By design (\S\ref{sec:design}) the application has no network, no persistent
+storage and runs in a fresh CVM per job. Its only intended channel to the buyer is the
+\emph{legitimate output}. Secondary channels that the platform still exposes (exit status,
+execution time, output size and repeated executions) are reduced to coarse values and budgeted
+(\S\ref{sec:design-channels}). The Judge's task is therefore a well-defined information-flow
+question: \emph{does the output reveal more about the dataset than the tags allow?}
+
+\textbf{Out of scope.} Micro-architectural and other side channels against the CVM; a kernel
+exploit inside the CVM \emph{combined with} collusion of the operator's network (each alone is
+covered, \S\ref{sec:design-net}); availability and censorship by the operator, who remains a
+single point of failure; and the details of remote attestation, which we treat as an implicit
+property of every confidential component. Private model weights as an asset are a motivation
+(\S\ref{sec:discussion}), not an evaluated case.

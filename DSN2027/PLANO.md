@@ -49,7 +49,7 @@ evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 | Semana | Implementação | Escrita |
 |---|---|---|
 | **S0** 18–19/out | Fechar escopo; limpar o repositório ✅; integrar a branch `feat/cvm-direct-mode-deploy` ✅ | Esqueleto LaTeX ✅ |
-| **S1** 20–26/out | Especificar tarefas, canários e tags; executor OCI mínimo; escolher modelos e orçamento | Esqueleto no template IEEE |
+| **S1** 20–26/out | Especificar tarefas, canários e tags; executor OCI mínimo; escolher modelos e orçamento | Rascunho completo no template IEEE ✅ (2026-10-18; avaliação com TBD) |
 | **S2** 27/out–02/nov | L2 + L4; gerador de apps (sementes + mutação pelos atacantes); versões benignas | Threat model, problema |
 | **S3** 03–09/nov | L3 com evidências; rodador da batalha; **piloto**; Juiz como app no DNAT | Design |
 | **S4** 10–16/nov | Batalha completa; ablação (com/sem evidência, por camada); custo | Implementação |

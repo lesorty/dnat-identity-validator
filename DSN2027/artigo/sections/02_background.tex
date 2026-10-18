@@ -1,2 +1,29 @@
 \section{Background}\label{sec:background}
-\todo{CVMs (SEV-SNP/TDX), imagens OCI, DNAT~\cite{nascimento2020dnat}, LLMs para análise de código.}
+
+\textbf{Confidential VMs.} AMD SEV-SNP~\cite{amd2020sevsnp} and Intel TDX run whole virtual
+machines with encrypted, integrity-protected memory. The hypervisor and the cloud operator cannot
+read guest memory, and a hardware-signed attestation report binds a measurement of the boot chain
+to data chosen by the guest. Nested virtualization inside a CVM is either unsupported or limited
+to research prototypes and, where available, gives the outer hypervisor a richer view of guest
+events~\cite{takiguchi2026nestedsev}. We therefore use \emph{flat} CVMs only.
+
+\textbf{OCI images.} The Open Container Initiative (OCI) image format packages an application
+with its dependencies as content-addressed layers identified by a digest. Images are typically
+built from a Dockerfile whose \texttt{RUN} steps execute arbitrary code, often with network access,
+which makes the build itself part of the attack surface. Provenance frameworks such as
+in-toto~\cite{torresarias2019intoto} describe how an artifact was produced and by whom.
+
+\textbf{DNAT.} The Data and Application Trading platform (\sys)~\cite{nascimento2020dnat} is a
+marketplace in which owners register encrypted datasets and applications, buyers purchase the
+right to run an application over a dataset, and executions happen inside confidential machines
+while a ledger records purchases. Earlier versions ran Python applications as file-system images
+inside Firecracker microVMs~\cite{agache2020firecracker}, which cannot run inside a CVM without
+nested virtualization. This paper replaces that execution model (\S\ref{sec:design}).
+
+\textbf{LLMs as code analyzers.} LLMs can follow data flow in code without compiling
+it~\cite{wang2024llmdfa} and become much stronger when combined with classic static analysis,
+for example by inferring taint sources and sinks for CodeQL~\cite{li2025iris}. Alone, they are
+weak and easily misled~\cite{ding2025primevul}. AI control~\cite{greenblatt2024aicontrol} studies
+exactly our setting: an untrusted, capable model writes code that may contain a hidden backdoor,
+and a weaker, trusted model monitors it; resampling suspicious actions further helps weak
+monitors~\cite{bhatt2025ctrlz}.

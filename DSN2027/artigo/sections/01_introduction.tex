@@ -1,5 +1,52 @@
 \section{Introduction}\label{sec:intro}
-\todo{Motivação: marketplace de dados e aplicações em computação confidencial. Caso que falta:
-código conhecido e dados privados; verificar o código é possível, mas caro. Pergunta central:
-um Juiz barato, com evidências mecânicas, detecta vazamentos escondidos por atacantes caros?
-Contribuições C1--C4 (ver DSN2027/ARTIGO.md).}
+
+Data marketplaces built on confidential computing promise that a data owner can let a buyer run
+an analysis over a private dataset without handing the dataset to anyone: the data is decrypted
+only inside a hardware-protected confidential virtual machine (CVM), and the platform operator
+sees ciphertext~\cite{nascimento2020dnat,tokuda2026vddpi,xiao2020privacyguard}. This protects
+the data \emph{from the operator}. It does not protect the data \emph{from the application}.
+An application that computes the promised statistics can also hide individual records in the
+low-order digits of a mean, in a base64 field, or in a group too small to be anonymous, and the
+platform will dutifully deliver that output to the buyer.
+
+The problem is sharpest in a common case: \emph{the code is known and the data is private}. When
+the code is secret and the data is public, nobody is at risk. When the code is public, it can in
+principle be audited, but auditing every application that every buyer submits is prohibitively
+expensive, and the data owner is left with no practical guarantee. Using an LLM as the auditor is
+tempting, yet LLMs alone detect vulnerabilities close to chance on rigorous
+benchmarks~\cite{ding2025primevul}, and an adversarial application can address the reviewer
+directly through comments and strings.
+
+This paper asks a single question:
+\emph{can a low-cost judge, armed with mechanical evidence, detect leaks hidden by expensive attacker models?}
+We answer it with an \emph{AI Judge} that combines cheap, language-agnostic dynamic tests with an
+LLM that reasons over their results, and we evaluate it in an attacker-versus-defender battle in
+the style of AI control evaluations~\cite{greenblatt2024aicontrol}.
+
+\textbf{Contributions.}
+\begin{itemize}
+  \item \textbf{C1: a layered AI Judge} (\S\ref{sec:judge}) that decides whether an application
+  may run on a dataset given the owner's usage tags. Its core is a relational dynamic layer
+  (canaries, one-record swaps and secret variation with black-box leakage
+  estimation~\cite{cherubin2019fbleau}) whose findings become evidence for an LLM, followed by an
+  output gate at real execution time.
+  \item \textbf{C2: the Judge as a platform application} (\S\ref{sec:design}). The Judge runs
+  through the same confidential pipeline as any other application and receives another
+  application as input. Model, prompt and version are pinned by hash, so verdicts are
+  reproducible and the Judge can be upgraded without changing the platform.
+  \item \textbf{C3: a hidden-leakage benchmark} (\S\ref{sec:benchmark}) of aggregation,
+  transformation and machine-learning tasks with benign and leaking variants and a
+  capture-the-flag ground truth: an attack counts only if the task is solved \emph{and} a
+  decoder recovers the canary from the output alone. To our knowledge no such benchmark exists.
+  \item \textbf{C4: confidential execution of arbitrary OCI images} (\S\ref{sec:design}): attested
+  two-phase builds and single-use flat CVMs that only talk to the platform, so that the
+  legitimate output is the only remaining channel and the Judge's job is well defined.
+\end{itemize}
+
+\todo{parágrafo de resultados: detecção do defensor barato com e sem evidências, falsos positivos,
+custo por veredito, custo do executor OCI em CVM.}
+
+The rest of the paper is organized as follows. \S\ref{sec:background} reviews the building
+blocks, \S\ref{sec:threat} defines the threat model, \S\ref{sec:design} presents the platform,
+\S\ref{sec:judge} the Judge, \S\ref{sec:benchmark} the benchmark and \S\ref{sec:eval} the
+evaluation. \S\ref{sec:related} and \S\ref{sec:discussion} cover related work and limitations.

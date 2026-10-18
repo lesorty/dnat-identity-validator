@@ -1,36 +1,38 @@
 % DSN 2027 — Research Track, Regular Paper (11 páginas com tudo; só as referências ficam de fora).
+% Base: IEEE conference template (versão 6/27/2024, IEEE-conference-template-062824).
 % Double-blind: sem nomes, afiliações ou agradecimentos identificáveis.
+% Compilar: pdflatex main && bibtex main && pdflatex main && pdflatex main   (ou: latexmk -pdf main)
 \documentclass[conference]{IEEEtran}
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
-\usepackage{booktabs}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{booktabs}
 \usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 % Notas de trabalho (desligar antes de submeter: \renewcommand{\todo}[1]{})
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+% Valores ainda não medidos
+\newcommand{\tbd}{\textcolor{red}{TBD}}
+\newcommand{\sys}{DNAT}
 
 \begin{document}
 
-\title{TODO: título (congela em 25/nov junto com o resumo)}
+\title{Judging the Code You Cannot Trust:\\
+A Low-Cost AI Judge for Hidden Data Leakage in Confidential Data Marketplaces
+\todo{título congela em 25/nov junto com o resumo}}
 
 \author{\IEEEauthorblockN{Anonymous Authors}
 \IEEEauthorblockA{\textit{Regular Paper}}}
 
 \maketitle
 
-\begin{abstract}
-\todo{Até 150 palavras. Problema: verificar se uma aplicação vaza dados privados pelo canal
-legítimo de saída, de forma eficaz e barata. Proposta: Juiz de IA em camadas, executado como
-aplicação do próprio sistema confidencial. Resultado principal da batalha atacante $\times$ defensor.}
-\end{abstract}
-
-\begin{IEEEkeywords}
-\todo{confidential computing, LLM-based code analysis, data leakage, trusted execution}
-\end{IEEEkeywords}
-
+\input{sections/00_abstract}
 \input{sections/01_introduction}
 \input{sections/02_background}
 \input{sections/03_threat_model}
@@ -44,8 +46,7 @@ aplicação do próprio sistema confidencial. Resultado principal da batalha ata
 
 % Exigido pelo CFP quando há conteúdo gerado por IA; não conta no limite de páginas.
 \section*{AI Tool Usage}
-\todo{1--2 parágrafos descrevendo onde ferramentas de IA foram usadas (texto, código, referências)
-e como o conteúdo foi verificado.}
+\input{sections/11_ai_usage}
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}

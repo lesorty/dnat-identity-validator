@@ -1,3 +1,74 @@
 \section{The AI Judge}\label{sec:judge}
-\todo{Camadas L0--L4 (JUIZ\_IA.md \S8): contrato e tags; estática; dinâmica relacional
-(canários, troca de um registro, cópia); LLM com evidências; portão de saída.}
+
+The Judge answers, before release: \emph{may this application run on this dataset without
+violating what the owner allows?} Its verdict is one of \emph{approved}, \emph{approved with gate},
+\emph{rejected} or \emph{inconclusive}. The Judge is organized as layers ordered from cheap to
+expensive (Table~\ref{tab:layers}); each layer either decides or produces evidence for the next.
+
+\begin{table}[t]
+\centering
+\caption{Layers of the Judge.}
+\label{tab:layers}
+\footnotesize
+\begin{tabular}{@{}llll@{}}
+\toprule
+Layer & What it does & Language & Cost \\
+\midrule
+L0 Contract & declared purpose vs.\ tags & any & $\approx$0 \\
+L1 Static & hidden text, imports, taint & per lang. & low \\
+L2 Dynamic & canaries, swaps, secret variation & any & low/med. \\
+L3 LLM & code + L1/L2 evidence & any & medium \\
+L4 Gate & checks the real output & any & low \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{L0: usage tags and contract}
+The data owner labels the dataset with tags from a closed, checkable catalog. In this paper we use
+three: \texttt{aggregate:k} (only statistics over groups of at least $k$ records),
+\texttt{transform} with an allowed column list (transformed records may leave, but not copies of
+protected columns) and \texttt{no-identifiers}. The application declares its purpose and output
+schema; L0 rejects declarations that contradict the tags. An application that needs the network
+must carry a matching network tag; none is granted in this paper.
+
+\subsection{L1: cheap static checks}
+L1 flags hidden text (Unicode tricks, very large comment blocks), obfuscation, network imports and
+literal URLs or addresses, and dependency risks from the SBOM. For Python, taint analysis with the
+mounted dataset as source and the output directory as sink is optional; L1 findings are evidence,
+never a verdict on their own, because a weak static signal alone yields \emph{inconclusive}.
+
+\subsection{L2: relational dynamic tests (the mechanical core)}\label{sec:judge-l2}
+L2 runs the application image, unchanged, in ordinary execution CVMs on synthetic datasets that
+share the real schema and contain \emph{canary} records. It is language-agnostic because it only
+observes inputs and outputs.
+\begin{enumerate}
+  \item \textbf{Direct canary search.} Looks for canary values in the output, raw and under common
+  encodings (base64, hex, digit splitting).
+  \item \textbf{Differential test.} Runs on $D$ and $D'$, which differ in one record, and checks
+  whether the change in the output respects the tag, e.g., that no output cell depends on fewer
+  than $k$ records.
+  \item \textbf{Secret variation.} Runs the application $n$ times ($n \approx 20$--$50$) with
+  random values in the canary fields and estimates whether the output determines the secret
+  using a nearest-neighbor black-box leakage estimator in the spirit of
+  F-BLEAU~\cite{cherubin2019fbleau}. This catches arbitrary encodings without knowing them, and is
+  grounded in multi-execution non-interference~\cite{rafnsson2016sme}.
+  \item \textbf{Network attempts.} The container runs with seccomp in \emph{log} mode for network
+  system calls. Without a network tag, any observed attempt makes the verdict \emph{rejected}.
+\end{enumerate}
+L2 emits a JSON report (findings, estimated bits, cost) that becomes evidence for L3.
+
+\subsection{L3: an LLM that reasons over evidence}
+L3 receives the source, the L1 and L2 reports and the tags, and returns a verdict, a suspicion
+score and reasons that cite evidence. We do not strip comments, since removing them hurts weak
+models~\cite{thornton2026fool}; instead, L1 marks hidden text and L2 provides ground facts that a
+prompt injection cannot change. L3 may also propose adversarial synthetic datasets for L2 and may
+resample when uncertain~\cite{bhatt2025ctrlz}. Model, prompt and temperature are pinned by hash.
+
+\subsection{L4: output gate at run time}\label{sec:judge-l4}
+L2 runs on synthetic data, so an application that leaks only on a property of the real data
+(a trigger) can pass it. L4 therefore repeats the cheap checks on the real output before release:
+owner-inserted canaries in the real dataset, minimum group size, near-copy similarity between
+input and output rows and identifier detection. It also enforces a budget across repeated
+executions against difference attacks, a case that existing semi-automated output checkers for
+secure research environments do not cover~\cite{green2022acro}. Approved-with-gate verdicts
+rely on L4.

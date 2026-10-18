@@ -1,4 +1,31 @@
 \section{Related Work}\label{sec:related}
-\todo{Análise de código com LLM e neuro-simbólica~\cite{li2025iris,wang2024llmdfa}; AI Control;
-checagem de saída (SDC); não interferência e QIF~\cite{rafnsson2016sme,cherubin2019fbleau};
-uso controlado de dados~\cite{tokuda2026vddpi,xiao2020privacyguard}.}
+
+\textbf{Confidential data processing and usage control.} \sys~\cite{nascimento2020dnat} tracks
+sensitive data and confidential executions with a ledger; VDDPI~\cite{tokuda2026vddpi} and
+PrivacyGuard~\cite{xiao2020privacyguard} enforce data usage control with attested off-chain
+execution. These systems protect data from the operator and enforce \emph{who} may run \emph{what};
+they do not check whether an allowed application leaks data through its own result, which is the
+gap the Judge fills.
+
+\textbf{LLM and neuro-symbolic code analysis.} LLMDFA~\cite{wang2024llmdfa} performs data-flow
+analysis with LLMs, and IRIS~\cite{li2025iris} combines LLM-inferred specifications with CodeQL.
+PrimeVul~\cite{ding2025primevul} shows that LLMs alone are weak vulnerability detectors under
+rigorous evaluation. Our Judge follows the neuro-symbolic direction but replaces static
+analysis, which is language-specific, with language-agnostic dynamic evidence.
+
+\textbf{AI control.} Control evaluations pit an untrusted strong model that may insert backdoors
+against a trusted weak monitor~\cite{greenblatt2024aicontrol}, and resampling strengthens weak
+monitors~\cite{bhatt2025ctrlz}. Our battle is a control evaluation specialized to data leakage
+through legitimate outputs, with a mechanical ground truth.
+
+\textbf{Information flow and output checking.} Secure multi-execution~\cite{rafnsson2016sme}
+enforces non-interference by running a program with different secrets; black-box leakage
+estimation~\cite{cherubin2019fbleau} quantifies leaked bits from input-output pairs. Statistical
+disclosure control in trusted research environments relies on trained humans and semi-automated
+checkers~\cite{green2022acro}. L2 applies the first two ideas as tests, and L4 automates the third
+for the tags a data owner declares.
+
+\textbf{Isolation.} Firecracker~\cite{agache2020firecracker} and gVisor~\cite{young2019gvisor}
+isolate untrusted workloads; nested confidential virtualization~\cite{takiguchi2026nestedsev}
+remains limited. We use single-use flat CVMs with gVisor inside, and in-toto style
+provenance~\cite{torresarias2019intoto} for builds.
