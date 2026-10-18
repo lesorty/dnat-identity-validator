@@ -1,6 +1,6 @@
 # Plano DSN 2027 (Berlim)
 
-**Criado:** 2026-10-18 (D-033) · **Rumo:** [ARTIGO.md](ARTIGO.md) · **Juiz:** [JUIZ_IA.md](JUIZ_IA.md) · **Artigo LaTeX:** [artigo/](artigo/)
+**Criado:** 2026-10-18 (D1) · **Rumo:** [ARTIGO.md](ARTIGO.md) · **Juiz:** [JUIZ_IA.md](JUIZ_IA.md) · **Artigo LaTeX:** [artigo/](artigo/)
 
 ## 0. Datas e regras ([CFP](https://dsn2027-berlin.github.io/call-for-contributions/))
 
@@ -21,7 +21,7 @@
 
 ## 1. Tese e contribuições
 
-**Contribuição principal: o Juiz de IA** (D-032). Pergunta central: **um Juiz barato, com
+**Contribuição principal: o Juiz de IA** (D1). Pergunta central: **um Juiz barato, com
 evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 
 | # | Contribuição | Prova no artigo |
@@ -42,7 +42,7 @@ evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 | **Obrigatório** | Juiz como app no DNAT: app-alvo como entrada, veredito registrado |
 | Desejável | Build OCI em duas fases (E2b); L1 (taint para Python); rodada adaptativa; reamostragem (Ctrl-Z) |
 | Desejável | Custo do executor OCI em CVM (reaproveitar as campanhas da branch `feat/cvm-direct-mode-deploy`) |
-| **Fora** | Distribuição (D-031); atestação real (D-017); Firecracker; U1 (pesos de modelo) só como motivação (D-034) |
+| **Fora** | Distribuição (D3); atestação real (D3); Firecracker; U1 (pesos de modelo) só como motivação (D3) |
 
 ## 3. Cronograma
 
@@ -69,8 +69,10 @@ evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 | Prazo | Escrita em paralelo desde S1; piloto em S3 decide o tamanho da batalha |
 | 11 páginas com tudo | Planejar figuras e tabelas cedo; sem apêndice |
 
+**Método:** decidir antes de medir; nuvem de testes: **Azure**.
+
 ## 5. Decisões pendentes
 
-1. Lista exata dos modelos (provedores e orçamento já definidos, D-036).
+1. Lista exata dos modelos (provedores e orçamento já definidos, D2).
 2. Há crédito na Azure para rodar em CVM e para a GPU dos defensores abertos?
 3. Datas de revisão dos coautores.

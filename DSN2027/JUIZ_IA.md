@@ -1,6 +1,6 @@
 # Juiz de IA — documento central
 
-**Atualizado:** 2026-10-17 · **Status:** em discussão; nada decidido além da D-032.
+**Atualizado:** 2026-10-17 · **Status:** desenho base e MVP decididos (D2); o resto em discussão.
 Rumo do artigo em [ARTIGO.md](ARTIGO.md) · decisões em [DECISOES.md](DECISOES.md) · prazos em [PLANO.md](PLANO.md).
 
 ## 1. Problema
@@ -8,7 +8,7 @@ Rumo do artigo em [ARTIGO.md](ARTIGO.md) · decisões em [DECISOES.md](DECISOES.
 Decidir, antes de liberar um ativo, se uma aplicação **pode rodar sobre ele sem violar o que o dono
 permite** (vazar dados, remover proteções), de forma **eficaz e barata**.
 
-**Desenho base (D-032):** o Juiz é uma aplicação do sistema, na whitelist, que recebe outra
+**Desenho base (D2):** o Juiz é uma aplicação do sistema, na whitelist, que recebe outra
 aplicação como entrada e devolve um veredito.
 
 **Por que o Juiz:** com código secreto e dados públicos, ninguém corre risco. Com **código
@@ -31,7 +31,7 @@ o dono dos dados fica sem garantia. O Juiz cobre esse caso.
 | U3 | **Saúde** | Dado sensível na saída (identificadores, diagnóstico por pessoa) | Estatísticas, dados anonimizados |
 | U4 | **Estatística agregada** (`assets/apps/benign_stats.py`) | Saída com registros individuais | Médias, contagens com mínimo de k registros |
 
-**U1, pontos que mudam o problema** (no artigo, U1 entra **só como motivação**, D-034)
+**U1, pontos que mudam o problema** (no artigo, U1 entra **só como motivação**, D3)
 - Pesos = ativo como um dataset; script do usuário = aplicação julgada. Mesmo modelo do DNAT.
 - **Fine-tuning legítimo e abliteration podem ter o mesmo código**; o dano está nos dados de
   treino ou no resultado. Ler o código não basta (P5). Avaliar o modelo resultante (A4) fica
@@ -171,7 +171,7 @@ com um atacante caro, enquanto o mesmo defensor sem evidências perde? Testável
 a **plataforma** (jobs app-alvo × dataset sintético), e o Juiz recebe os resultados como entrada,
 para não rodar código não confiável dentro do próprio container.
 
-## 9. MVP para o DSN (decidido em 2026-10-18, D-035)
+## 9. MVP para o DSN (decidido em 2026-10-18, D2)
 
 **Escopo:** apps em Python empacotadas em imagem OCI; dados tabulares (CSV). O Juiz é
 agnóstico de linguagem em L2/L4; Python só simplifica o benchmark.
@@ -215,7 +215,7 @@ defensor nunca vê o decodificador. Tudo é checado rodando, sem julgamento huma
   motivos, evidencias}`, cacheado por `(hash da fonte, tags, versão do Juiz)`.
 
 ### 9.6 Batalha
-Modelos **mistos** (D-035, D-036): atacantes de ponta de Anthropic, OpenAI, Google e abertos
+Modelos **mistos** (D2): atacantes de ponta de Anthropic, OpenAI, Google e abertos
 grandes; defensores baratos abertos (GPU na nuvem) e baratos por API; **no máximo um defensor
 caro**. Orçamento de API ≤ US$ 100: estimar no piloto (S3) o custo por geração de ataque e por
 veredito, usar cache de prompt e cortar repetições antes de cortar células da matriz.

@@ -28,12 +28,12 @@ decisões vigentes, etapas e o LaTeX.
 | E2b | Build seguro de imagens OCI | 🔄 rascunho; duas fases são desejáveis no MVP | [E2b](etapas/E2b_build_oci.md) |
 | E4 | **Juiz de IA** (contribuição principal) | 🔄 em desenho | [JUIZ_IA.md](JUIZ_IA.md) |
 
-A E3 (descentralização) foi concluída e **descartada** com o orientador (D-031). O histórico
+A E3 (descentralização) foi concluída e **descartada** com o orientador (D3). O histórico
 completo, com o material do LADC 2026, está na tag git `ladc-2026`.
 
 ## Convenções
 
-- Uma ideia só vira decisão em [DECISOES.md](DECISOES.md), com ID e data.
+- Uma ideia só vira decisão em [DECISOES.md](DECISOES.md) (D1–D4); manter poucas e relevantes.
 - Afirmações sobre código citam `arquivo:linha`; sobre literatura, a fonte. O que não foi
   conferido leva **(a verificar)**.
 
