@@ -27,7 +27,7 @@ com o código do desenvolvedor presente.
 | 8 | Varredura de saída básica antes de assinar (D4) | aceita; evolui para agentes (E4) |
 | 9 | Cache particionado por dono | baixa prioridade |
 | 10 | X8 fora de escopo; X7 limitação declarada (D3) | aceita |
-| 11 | Imagem OCI pronta do desenvolvedor aceita como origem nível 0 | aceita em 2026-10-18 (padrão nível 0), E2b.7 |
+| 11 | Imagem OCI pronta do desenvolvedor | rejeitada em 2026-10-18: todo build é atestado (E2b.7) |
 
 Os ataques de uma imagem comprometida contra o executor (X1–X6) viram
 **requisitos do executor** (E2b.5).
@@ -139,8 +139,8 @@ e lockfile conhecidos, e qualquer um pode conferir que o build foi fiel.
 | **Relatório de atestação** | Com `REPORT_DATA = hash(chave pública ‖ declaração)`, o que vincula chave, declaração e medição |
 
 **2. O que o executor verifica, na ordem, antes de desempacotar**
-1. Relatório de atestação válido e medição do builder **ou da CVM de ingestão** (imagem pronta,
-   E2b.7) na **lista permitida**; nível de origem ≥ mínimo do dataset.
+1. Relatório de atestação válido e medição do builder na **lista permitida** (não há outra
+   origem de imagem, E2b.7).
 2. Assinatura da declaração com a chave vinculada ao relatório.
 3. O digest do arquivo OCI recebido é o `subject` da declaração.
 4. A varredura passou (e é refeita pelo executor, ver E2b.5).
@@ -190,68 +190,21 @@ O executor **não confia** na imagem nem na varredura do builder:
 - Verificar as flags do motor de build (E2b.3) e o estado das ferramentas (Kaniko arquivado).
 - Medições (tempo de build em duas fases, custo da reprodução) ficam para depois das decisões.
 
-## E2b.7 — Imagem OCI pronta enviada pelo desenvolvedor (ACEITA em 2026-10-18)
+## E2b.7 — Imagem OCI pronta enviada pelo desenvolvedor (REJEITADA em 2026-10-18)
 
 **Pergunta:** se o desenvolvedor já tem o código, por que não envia a imagem pronta?
-**Resposta curta:** pode. A imagem pronta entra como **origem nível 0**, ao lado do build atestado.
+**Decisão:** não. **Todo build é atestado** (E2b.3/E2b.4); o desenvolvedor envia fonte,
+Dockerfile e lockfile, nunca a imagem. Escolhido por simplicidade.
 
-### 1. O que muda e o que não muda
+**Por quê:** a imagem pronta não mudaria o sigilo do dataset (a execução já trata toda imagem
+como hostil), mas exigiria um segundo caminho de entrada (CVM de ingestão, declaração de
+ingestão, níveis de origem na política) e deixaria o Juiz sem fonte, julgando binários opacos.
+Com só o build atestado, o Juiz sempre julga a fonte de que a imagem veio e o recibo sempre traz
+a medição do builder.
 
-| Aspecto | Imagem do builder (nível 1–2) | Imagem pronta (nível 0) |
-|---|---|---|
-| Sigilo do dataset | Isolamento da execução (E2c §2) | **Igual.** A execução já trata toda imagem como hostil (X1–X6, R1–R9); imagem maliciosa = app maliciosa, o caso que o desenho já cobre |
-| Vínculo fonte → imagem | Proveniência assinada pelo builder | **Nenhum.** O que roda é o que o desenvolvedor enviou |
-| O Juiz julga | Fonte + imagem | **A própria imagem** (sistema de arquivos extraído); binário compilado opaco tende a **inconclusivo**; L2 (dinâmico) funciona igual |
-| Supply chain da máquina do desenvolvedor | Coberta pelas duas fases | Risco do desenvolvedor (declarado) |
-| Recibo | Medição do builder + digest | Digest + `origem: desenvolvedor` |
+**O que continua livre:** Dockerfile sem gabaritos e **qualquer imagem-base de qualquer
+registry** (decisão 2). O único reforço opcional é a reprodução por N ≥ 2 builders (E2b.4 §3),
+que o dono do dataset pode exigir.
 
-Ou seja, o nível 0 não enfraquece o sigilo do dataset; enfraquece a **transparência** (o que o
-Juiz consegue ver) e a **proveniência** (quem garante como a imagem foi feita).
-
-### 2. Política: nível de origem mínimo por dataset
-
-- **0:** imagem enviada pelo desenvolvedor.
-- **1:** build atestado (duas CVMs, E2b.3/E2b.4).
-- **2:** N ≥ 2 builders concordantes (reprodução, E2b.4 §3).
-
-**Padrão: 0** (qualquer imagem é aceita, decidido em 2026-10-18). O dono do dataset pode exigir
-nível 1 ou 2; o recibo sempre informa o nível.
-
-### 3. Fluxo de ingestão (CVM de ingestão)
-
-A ingestão substitui o builder; não executa nada da imagem, só a desempacota e examina.
-
-1. **Entrega:** upload ao DNAT por mTLS (arquivo OCI layout ou `docker save`), ou referência
-   `registry/repo@sha256:…` de **qualquer** registry, baixada pelo mesmo caminho da CVM de fetch
-   (proxy de registro, E2c B2). Credencial de registry privado só como montagem de segredo (B6).
-2. **CVM de ingestão de uso único**, com o desenho de rede da execução (só o DNAT, E2c §2): a
-   imagem contém o código do desenvolvedor, que é sigiloso (B10).
-3. **Normalização:** aceita OCI e Docker v2; índice multiplataforma → escolhe o manifesto da
-   arquitetura do executor; confere digests de todas as camadas; limites de tamanho e número de
-   camadas (X2, X5).
-4. **Varredura** (a mesma de E2b.4 §4): setuid, links e caminhos suspeitos, segredos (aviso ao
-   desenvolvedor), SBOM e vulnerabilidades conhecidas (B4); SBOM e sistema de arquivos vão para
-   o Juiz.
-5. **Config da imagem:** só `Entrypoint`/`Cmd`/`WorkingDir`/`Env` são lidos; usuário,
-   capacidades, volumes e portas são ignorados (X3).
-6. **Cifra** com a chave do ativo (B10) e **declaração de ingestão** assinada pela CVM de
-   ingestão (chave gerada nela, vinculada ao relatório de atestação): `subject` = digest,
-   `origem: desenvolvedor`, `scan`, SBOM. Assinatura do desenvolvedor (ex.: cosign) é opcional e
-   só identifica o autor; não prova nada sobre o build.
-
-### 4. Executor
-
-E2b.4 §2 passo 1 passa a aceitar **declaração de builder ou de ingestão**, desde que o nível de
-origem atenda ao mínimo do dataset. Os demais passos (assinatura, digest, varredura refeita,
-`contentHash` no ledger) são iguais.
-
-### 5. Promoção de nível
-
-Se o desenvolvedor também enviar fonte + Dockerfile e o builder reproduzir **o mesmo digest**, a
-imagem sobe para nível 1 (ou 2 com N builders). Depende de reprodutibilidade (B7), difícil com
-Dockerfile livre; sem ela a imagem fica no nível 0.
-
-### 6. Pendências
-- Juiz sobre imagem sem fonte: como apresentar o sistema de arquivos (lista de arquivos,
-  scripts legíveis, binários marcados como opacos) e taxa esperada de inconclusivos.
-- Ferramentas de normalização e SBOM sobre imagem pronta **(a escolher)**.
+**Desenho descartado (para referência):** imagem pronta como "origem nível 0", com CVM de
+ingestão que normalizava, varria e assinava, e nível mínimo escolhido pelo dono do dataset.

@@ -46,10 +46,9 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
   registro (aberto a qualquer registry público, anota cada download) e o DNAT, sem nunca ver código nem chave; a de **assemble** recebe código e
   dependências (conferidas por hash), monta sem rede e assina, com o mesmo desenho de rede da
   execução (só o DNAT, abaixo).
-- **Imagem OCI pronta** do desenvolvedor também é aceita, como **origem nível 0** (E2b §E2b.7):
-  CVM de ingestão (só o DNAT) normaliza, varre e assina; não muda o sigilo do dataset, só a
-  transparência para o Juiz. O dono do dataset escolhe o nível mínimo (0 pronta, 1 build
-  atestado, 2 N builders); **padrão 0**, qualquer imagem aceita.
+- **Todo build é atestado:** o desenvolvedor envia fonte, Dockerfile e lockfile, **nunca a
+  imagem pronta** (E2b §E2b.7, por simplicidade). O dono do dataset pode exigir reprodução por
+  N ≥ 2 builders.
 - **A CVM só fala com o DNAT** ([E2c](etapas/E2c_ameacas_oci.md) §2): a app roda sem rede (namespace
   vazio, seccomp sem sockets de rede, gVisor, sem root); a CVM **puxa** o job e nunca escuta; o
   PID 1 carrega no boot a regra "saída só para o DNAT, sem DNS" e **remove de todos os processos

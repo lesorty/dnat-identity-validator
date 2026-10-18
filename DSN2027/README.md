@@ -25,7 +25,7 @@ decisões vigentes, etapas e o LaTeX.
 |---|---|---|---|
 | E1 | Auditoria do código | ✅ concluída; achados A1–A16 valem como retrato do código | [E1](etapas/E1_auditoria_codigo.md) |
 | E2 | Isolamento confidencial por job | ✅ decidida; falta medir | [E2](etapas/E2_isolamento_confidencial.md) |
-| E2b | Build seguro de imagens OCI | 🔄 rascunho; duas fases em duas CVMs; imagem pronta aceita (nível 0 padrão) | [E2b](etapas/E2b_build_oci.md) |
+| E2b | Build seguro de imagens OCI | 🔄 rascunho; duas fases em duas CVMs; todo build atestado, sem imagem pronta | [E2b](etapas/E2b_build_oci.md) |
 | E2c | Ameaças do build e da execução OCI (problemas → soluções; rede zero; Juiz e rede) | ✅ decidida; falta verificar no Azure | [E2c](etapas/E2c_ameacas_oci.md) |
 | E4 | **Juiz de IA** (contribuição principal) | 🔄 em desenho | [JUIZ_IA.md](JUIZ_IA.md) |
 

@@ -156,7 +156,7 @@ que vazam pela saída.
 | B8 | Cache compartilhado envenenado (A12) | Cache por dono, ou sem cache entre donos no MVP |
 | B9 | Imagem trocada entre builder e executor | Proveniência assinada + digest no ledger, verificados pelo executor (E2b.4) |
 | B10 | Código do desenvolvedor legível em trânsito ou em repouso (IPFS) | Imagem cifrada com chave por ativo, como o dataset (fecha A2 para a app) |
-| B12 | Imagem pronta do desenvolvedor: sem vínculo fonte → imagem | Aceita como **origem nível 0** (E2b.7): CVM de ingestão (só DNAT) normaliza, varre, gera SBOM e assina uma declaração de ingestão; o Juiz julga o sistema de arquivos (binário opaco ⇒ tende a inconclusivo); dono do dataset define o nível mínimo; sigilo do dataset não muda |
+| B12 | Imagem pronta do desenvolvedor: sem vínculo fonte → imagem | **Não aceita** (E2b.7): todo build é atestado; o desenvolvedor envia fonte, nunca a imagem |
 | B11 | Motor de build com rede por fase | BuildKit aceita `--network=none` no build e `RUN --network=none` por instrução; Buildah tem `--network none`; Kaniko arquivado. **(a verificar nas versões usadas)** |
 
 ## 8. Como provar (suíte de ataques)
@@ -191,8 +191,8 @@ que vazam pela saída.
    assemble com o desenho da execução (só DNAT). A opção A cai pelo mesmo motivo da R4.
 6. Imagens: **qualquer imagem-base e qualquer registry**, sem lista de aprovadas. O proxy do
    fetch só anota (não filtra destinos públicos); o builder fixa o digest e o registra.
-7. Imagem OCI pronta do desenvolvedor (B12): **aceita como nível 0** (E2b.7). Padrão do
-   dataset: nível 0, qualquer imagem; o dono pode exigir nível 1 ou 2.
+7. Imagem OCI pronta do desenvolvedor (B12): **rejeitada** por simplicidade (revisto no mesmo
+   dia); todo build é atestado. Reprodução por N builders segue como reforço opcional.
 
 ## 11. Pendências
 - Os três itens **(a verificar)** do §2.

@@ -211,8 +211,8 @@ defensor nunca vê o decodificador. Tudo é checado rodando, sem julgamento huma
 
 ### 9.5 Contrato do Juiz como app
 - **Entrada:** fonte da app-alvo + digest da imagem + tags do dataset + relatório de L2 (L2 é
-  executado pela plataforma, não pelo Juiz). Imagem pronta sem fonte (nível 0, E2b.7): o
-  sistema de arquivos extraído e o SBOM no lugar da fonte; binário opaco ⇒ tende a inconclusivo.
+  executado pela plataforma, não pelo Juiz). Sempre há fonte: todo build é atestado e não
+  se aceita imagem pronta (E2b.7).
 - **Saída:** `{veredito: aprovado | aprovado_com_portao | reprovado | inconclusivo, nota,
   motivos, evidencias}`, cacheado por `(hash da fonte, tags, versão do Juiz)`.
 
