@@ -26,6 +26,17 @@ implementação nem avaliação.
 que justifique o custo. Consequência a declarar no artigo: o operador continua sendo ponto único
 de disponibilidade e censura; o sigilo frente a ele depende da CVM.
 
+## Juiz de IA (MVP)
+
+### D-035 · ACEITA · 2026-10-18
+MVP do Juiz ([JUIZ_IA.md](JUIZ_IA.md) §9): (i) benchmark com as famílias **agregação,
+transformação e ML** sobre dados tabulares sintéticos com registros canário; (ii) **verdade de
+referência estilo CTF**: o atacante entrega a app e um decodificador; o ataque vale se a tarefa é
+cumprida e o canário é recuperado só da saída; (iii) **L2 inclui a variação do segredo** (n
+execuções com canários aleatórios); (iv) batalha com **modelos mistos**: atacantes caros por
+API, defensores baratos abertos e por API.
+**Pendente:** lista de modelos, orçamento de API e GPU disponível.
+
 ## Execução
 
 ### D-005 · ACEITA
