@@ -2,9 +2,11 @@ const { ethers } = require("hardhat");
 const readline = require("node:readline/promises");
 const { stdin: input, stdout: output } = require("node:process");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { spawn } = require("node:child_process");
+const { DATASET_FORMAT, encryptBuffer } = require("./asset_envelope");
 
 const RPC_URL = process.env.RPC_URL || "http://127.0.0.1:8545";
 const PRIVATE_KEY =
@@ -115,7 +117,8 @@ async function promptAssetId(rl, label) {
 }
 
 async function registerAsset(rl, assetType) {
-  const uploaded = await addFileToIpfsFlow(rl);
+  // assetType 0 = dataset. Aplicacoes pelo CLI seguem o caminho antigo, sem envelope.
+  const uploaded = await addFileToIpfsFlow(rl, { encrypt: assetType === 0 });
   if (!uploaded) return;
 
   const priceWei = await prompt(rl, "Price in wei");
@@ -413,7 +416,7 @@ function computeSha256Hex(localPath) {
   return `0x${crypto.createHash("sha256").update(fileBuffer).digest("hex")}`;
 }
 
-async function addFileToIpfsFlow(rl) {
+async function addFileToIpfsFlow(rl, { encrypt = false } = {}) {
   const filePathInput = await prompt(rl, "File path to upload");
   if (!filePathInput) {
     console.log("File path is required.");
@@ -464,8 +467,21 @@ async function addFileToIpfsFlow(rl) {
 
   console.log("Manifest created:", manifestPath);
 
+  // O ativo sobe cifrado; assetContentHash continua sendo o hash do conteudo em claro.
+  let assetUploadPath = resolvedPath;
+  let encryptedTempPath = null;
+  if (encrypt) {
+    encryptedTempPath = path.join(os.tmpdir(), `dnat-asset-${crypto.randomUUID()}.enc`);
+    fs.writeFileSync(
+      encryptedTempPath,
+      encryptBuffer(fs.readFileSync(resolvedPath), { sourceFileName: defaultName }, DATASET_FORMAT),
+    );
+    assetUploadPath = encryptedTempPath;
+    console.log("Asset encrypted before upload (AES-256-GCM).");
+  }
+
   try {
-    const assetParsed = await uploadLocalFileToIpfs(resolvedPath);
+    const assetParsed = await uploadLocalFileToIpfs(assetUploadPath);
     const manifestParsed = await uploadLocalFileToIpfs(manifestPath);
 
     const assetCid = assetParsed && assetParsed.Hash ? assetParsed.Hash : null;
@@ -496,6 +512,8 @@ async function addFileToIpfsFlow(rl) {
   } catch (e) {
     console.log("IPFS upload failed:", e instanceof Error ? e.message : e);
     return null;
+  } finally {
+    if (encryptedTempPath && fs.existsSync(encryptedTempPath)) fs.unlinkSync(encryptedTempPath);
   }
 }
 

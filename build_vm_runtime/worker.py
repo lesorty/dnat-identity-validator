@@ -12,6 +12,13 @@ import tempfile
 from pathlib import Path
 
 
+# Espelha o toggle do plano de execucao (`vm_runtime/executor.py`): a MESMA
+# variavel comuta os dois planos para o modo sem microVM, de modo que um
+# deployment em VM confidencial — onde nao ha virtualizacao aninhada — seja
+# configurado por um unico ajuste em vez de dois.
+NO_MICROVM = os.getenv("DNAT_NO_MICROVM", "").lower() in ("1", "true", "yes")
+BUILD_SCRIPT = "build-direct.sh" if NO_MICROVM else "build-vm.sh"
+
 WHEEL_CACHE_DIR = Path(os.getenv("WHEEL_CACHE_SOURCE_DIR", "/var/dnat/wheel-cache")).resolve()
 WHEEL_CACHE_MAX_BYTES = int(os.getenv("WHEEL_CACHE_MAX_BYTES", str(2 * 1024 * 1024 * 1024)))
 WHEEL_CACHE_MAX_FILE_BYTES = int(os.getenv("WHEEL_CACHE_MAX_FILE_BYTES", str(250 * 1024 * 1024)))
@@ -115,7 +122,7 @@ def run_worker(input_bundle: Path, output_bundle: Path) -> int:
         shutil.copyfile(input_bundle, worker_input)
 
         result = subprocess.run(
-            ["bash", str(Path(__file__).parent / "vm" / "build-vm.sh"), str(worker_input), str(worker_output)],
+            ["bash", str(Path(__file__).parent / "vm" / BUILD_SCRIPT), str(worker_input), str(worker_output)],
             capture_output=True,
             text=True,
             timeout=2400,
