@@ -4,7 +4,7 @@
 > seções sobre "direções" (1: cadeia verificável; 2: distribuição; 3: build reproduzido) são de
 > uma fase anterior e estão **fora do foco** do DSN (D-031, D-032). A10 e A14 seguem relevantes
 > (build com rede e código presentes; sem isolamento por job na CVM). A16 (dataset em claro) foi
-> achado depois e já está corrigido na branch `feat/cvm-direct-mode-deploy` (D-018).
+> achado depois e já está corrigido na `main` (D-018).
 
 **Data:** 2026-10-12 · **Base auditada:** `main` @ `1dfd94a` e `origin/feat/cvm-direct-mode-deploy` @ `a668d0b`
 **Pergunta:** o que o código garante hoje, e o que falta para as direções 1–3

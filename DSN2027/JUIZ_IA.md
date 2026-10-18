@@ -31,7 +31,7 @@ o dono dos dados fica sem garantia. O Juiz cobre esse caso.
 | U3 | **Saúde** | Dado sensível na saída (identificadores, diagnóstico por pessoa) | Estatísticas, dados anonimizados |
 | U4 | **Estatística agregada** (`assets/apps/benign_stats.py`) | Saída com registros individuais | Médias, contagens com mínimo de k registros |
 
-**U1, pontos que mudam o problema**
+**U1, pontos que mudam o problema** (no artigo, U1 entra **só como motivação**, D-034)
 - Pesos = ativo como um dataset; script do usuário = aplicação julgada. Mesmo modelo do DNAT.
 - **Fine-tuning legítimo e abliteration podem ter o mesmo código**; o dano está nos dados de
   treino ou no resultado. Ler o código não basta (P5). Avaliar o modelo resultante (A4) fica

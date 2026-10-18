@@ -31,11 +31,11 @@ do sistema**.
 
 ## Escopo
 
-**Dentro:** build e execução de OCI em CVM; Juiz como app whitelisted; dataset cifrado (D-018).
+**Dentro:** build e execução de OCI em CVM; Juiz como app whitelisted; dataset cifrado (D-018, feito).
 
 **Fora, declarado como limitação ou trabalho futuro**
 - Distribuição entre operadores (D-031): o operador segue como ponto único de disponibilidade e censura.
 - Atestação detalhada (implícita, D-017).
 - Canais encobertos e laterais (D-014).
 - Imagem OCI pronta enviada pelo desenvolvedor (D-029).
-- Pesos de modelo privados (U1 do Juiz): no máximo como motivação.
+- Pesos de modelo privados (U1 do Juiz): **só como motivação** (D-034).

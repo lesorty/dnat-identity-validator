@@ -28,5 +28,7 @@ IA** que verifica se uma aplicação vaza dados. Plano, decisões e LaTeX em [DS
 - A CVM1 recebe app e dataset, fala com IPFS e contrato e nunca instala dependências externas.
 - O build roda numa microVM efêmera na CVM2, que devolve `application.ext4` e persiste só `.whl`.
 - A CVM3 executa a aplicação sem rede e devolve o resultado por um disco de saída.
-- Dentro de uma CVM o Firecracker não roda (sem virtualização aninhada); o modo direto e a
-  migração para OCI estão em andamento (branch `feat/cvm-direct-mode-deploy`, `DSN2027/`).
+- Dataset e aplicação ficam cifrados (AES-256-GCM) no IPFS; teste: `cd smart-contract && npm run test:envelope`.
+- Dentro de uma CVM o Firecracker não roda (sem virtualização aninhada): existe um **modo direto**
+  sem microVM (`build_vm_runtime/vm/build-direct.sh`, `vm_runtime/vm/run-direct.sh`), e a migração
+  para OCI está em andamento (`DSN2027/`).

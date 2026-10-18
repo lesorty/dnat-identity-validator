@@ -42,13 +42,13 @@ evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 | **Obrigatório** | Juiz como app no DNAT: app-alvo como entrada, veredito registrado |
 | Desejável | Build OCI em duas fases (E2b); L1 (taint para Python); rodada adaptativa; reamostragem (Ctrl-Z) |
 | Desejável | Custo do executor OCI em CVM (reaproveitar as campanhas da branch `feat/cvm-direct-mode-deploy`) |
-| **Fora** | Distribuição (D-031); atestação real (D-017 iii); Firecracker; U1 (pesos de modelo) só como motivação ou discussão |
+| **Fora** | Distribuição (D-031); atestação real (D-017); Firecracker; U1 (pesos de modelo) só como motivação (D-034) |
 
 ## 3. Cronograma
 
 | Semana | Implementação | Escrita |
 |---|---|---|
-| **S0** 18–19/out | Fechar escopo; limpar o repositório ✅; integrar a branch `feat/cvm-direct-mode-deploy` | Esqueleto LaTeX ✅ |
+| **S0** 18–19/out | Fechar escopo; limpar o repositório ✅; integrar a branch `feat/cvm-direct-mode-deploy` ✅ | Esqueleto LaTeX ✅ |
 | **S1** 20–26/out | Especificar tarefas, canários e tags; executor OCI mínimo; escolher modelos e orçamento | Esqueleto no template IEEE |
 | **S2** 27/out–02/nov | L2 + L4; gerador de apps (sementes + mutação pelos atacantes); versões benignas | Threat model, problema |
 | **S3** 03–09/nov | L3 com evidências; rodador da batalha; **piloto**; Juiz como app no DNAT | Design |
@@ -74,4 +74,3 @@ evidências mecânicas, detecta vazamentos escondidos por atacantes caros?**
 1. Quais modelos atacantes e defensores, e qual orçamento de API?
 2. Há crédito na Azure para rodar em CVM?
 3. Datas de revisão dos coautores.
-4. U1 (pesos de modelo) aparece no artigo?

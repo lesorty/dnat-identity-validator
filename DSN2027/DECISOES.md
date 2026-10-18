@@ -17,6 +17,10 @@ segura e se vaza dados. O Juiz é **uma aplicação do próprio sistema**, na wh
 que recebe outra aplicação como entrada. Dificuldade central: ser eficaz e barato.
 Trabalho centralizado em [JUIZ_IA.md](JUIZ_IA.md).
 
+### D-034 · ACEITA · 2026-10-18
+O caso dos **pesos de modelo privados** (U1 do Juiz) entra no artigo **só como motivação**: sem
+implementação nem avaliação.
+
 ### D-031 · ACEITA · 2026-10-17 (com o orientador)
 **Não distribuir o sistema.** Executar em CVM, em tese atestável, não deixa ganho de confiança
 que justifique o custo. Consequência a declarar no artigo: o operador continua sendo ponto único
@@ -76,8 +80,9 @@ Análise em [etapas/E2b_build_oci.md](etapas/E2b_build_oci.md) §E2b.7.
 resultado (X8):** deixa de estar fora de escopo; **é o alvo do Juiz** (D-032).
 
 ### D-018 · ACEITA
-Cifrar o dataset no IPFS (A16): **feito na branch `feat/cvm-direct-mode-deploy`** (commit
-`a668d0b`), falta integrar na `main`. Ledger em memória (A17) não é problema agora.
+Cifrar o dataset no IPFS (A16): **feito** (`a668d0b`, integrado na `main` em 2026-10-18; envelope
+AES-256-GCM em `smart-contract/scripts/asset_envelope.js`). Ledger em memória (A17) não é
+problema agora.
 
 ## Método
 
