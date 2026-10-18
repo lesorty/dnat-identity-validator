@@ -3,7 +3,7 @@
 **Status:** DECISÕES FECHADAS (2026-10-14); falta só medir (E2.4, adiada: decidir antes de medir).
 **Decisões relacionadas:** D4 (arquitetura OCI: CVM de uso único, container sem rede) e D3 (atestação implícita).
 **Escopo:** a atestação é tratada como implícita em todo uso de computação confidencial e fica
-fora desta etapa por ora (D4).
+fora desta etapa por ora (D3).
 **Pré-requisito lido:** [E1 — auditoria](E1_auditoria_codigo.md), achados A13 e A14.
 
 ## E2.1 — O problema
