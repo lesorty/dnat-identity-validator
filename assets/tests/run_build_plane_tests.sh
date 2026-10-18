@@ -8,7 +8,6 @@
 #
 # Uso:
 #   bash run_build_plane_tests.sh                       # builder :5100 (Ambiente B)
-#   BUILDER_PORT=4100 bash run_build_plane_tests.sh     # baseline (Ambiente A)
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

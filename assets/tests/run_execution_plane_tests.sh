@@ -10,7 +10,6 @@
 #
 # Uso:
 #   bash run_execution_plane_tests.sh                 # Ambiente B (executor :5000)
-#   EXECUTOR_PORT=4000 bash run_execution_plane_tests.sh   # Ambiente A (baseline)
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

@@ -1,26 +1,32 @@
 # DNAT Identity Validator
 
-O fluxo operacional suportado neste repositório é o stack via `docker compose`.
+Marketplace confidencial de dados e aplicações: o dono do dataset e o dono da aplicação negociam
+o direito de executar uma sobre o outro, e a execução acontece isolada, sem rede.
 
-Use [RUN_COMPOSE.md](RUN_COMPOSE.md) como fonte principal de execução para:
-- subir a `CVM1` com frontend/API/IPFS/contrato
-- subir a `CVM3` com builder Firecracker e cache de `.whl`
-- subir a `CVM2` com executor Firecracker
-- configurar `BUILDER_URL` e `EXECUTOR_URL`
-- consultar o fluxo de testes operacionais
+**Trabalho em andamento:** artigo para o **DSN 2027** — aplicações em imagem OCI e um **Juiz de
+IA** que verifica se uma aplicação vaza dados. Plano, decisões e LaTeX em [DSN2027/](DSN2027/).
 
 ## Estrutura
 
-- `docker/`: arquivos Compose ativos
-- `smart-contract/`: contrato, API e interface web da CVM1
-- `build_vm_runtime/`: builder isolado da CVM3
-- `vm_runtime/`: executor isolado da CVM2
+| Caminho | O que é |
+|---|---|
+| `smart-contract/` | Contrato, API, CLI e interface web (CVM1, plano de controle) |
+| `build_vm_runtime/` | Builder: worker efêmero e microVM de build, cache de `.whl` (CVM2) |
+| `vm_runtime/` | Executor: microVM sem rede que roda a aplicação (CVM3) |
+| `docker/` | Composes de cada plano e entrypoint da CVM1 |
+| `assets/` | Apps de exemplo e de ataque, datasets sintéticos, suíte de testes T1–T5 |
+| `DSN2027/` | Página de trabalho do artigo |
+
+## Como rodar
+
+- Subir os planos e testar o fluxo: [RUN_COMPOSE.md](RUN_COMPOSE.md).
+- Arquitetura implementada hoje: [ARCHITECTURE.md](ARCHITECTURE.md).
+- Testes de segurança: [assets/tests/EVALUATION_PROTOCOL.md](assets/tests/EVALUATION_PROTOCOL.md).
 
 ## Observações
 
-- A CVM1 recebe app e dataset, fala com IPFS/contrato e nunca instala dependências Python externas.
-- O registro de aplicação agora passa pela CVM3, que cria um `worker` efêmero por build, sobe uma `microVM` de build, devolve `application.ext4` e persiste apenas `.whl`.
-- O cache de dependências fica somente na CVM3 e guarda apenas arquivos `.whl`.
-- A CVM2 executa a aplicação sem rede e devolve o resultado via disco persistente anexado ao guest.
-- Resultados de execução, uploads, manifests e artefatos locais ficam fora do versionamento.
-- A explicação detalhada da arquitetura atual implementada fica em [ARCHITECTURE.md](ARCHITECTURE.md).
+- A CVM1 recebe app e dataset, fala com IPFS e contrato e nunca instala dependências externas.
+- O build roda numa microVM efêmera na CVM2, que devolve `application.ext4` e persiste só `.whl`.
+- A CVM3 executa a aplicação sem rede e devolve o resultado por um disco de saída.
+- Dentro de uma CVM o Firecracker não roda (sem virtualização aninhada); o modo direto e a
+  migração para OCI estão em andamento (branch `feat/cvm-direct-mode-deploy`, `DSN2027/`).

@@ -13,7 +13,6 @@
 # Uso:
 #   bash seed_cache.sh            # default: SDIST (build-time)
 #   MODE=WHEEL bash seed_cache.sh # apenas wheel (import-time)
-#   BUILDER_CONTAINER=dnat-baseline bash seed_cache.sh   # para o Ambiente A
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

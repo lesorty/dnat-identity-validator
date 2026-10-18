@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Orquestrador completo dos testes T1-T5 para o paper DNAT.
-# Executa nos dois ambientes (B=DNAT compartimentado, A=baseline centralizado)
-# e registra evidências para a seção 5.1 (Security Evaluation).
+# Orquestrador dos testes de segurança T1-T5 do DNAT (arquitetura compartimentada).
+# Registra as evidências em assets/test-results/<timestamp>/.
 #
 # Pré-requisitos: containers rodando (ver RUN_COMPOSE.md)
 # Uso: bash run_all_tests.sh
@@ -13,8 +12,7 @@ ASSETS="$REPO/assets"
 RESULTS_DIR="$ASSETS/test-results/$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$RESULTS_DIR"
 
-API_B="http://127.0.0.1:3001"   # Ambiente B (DNAT)
-API_A="http://127.0.0.1:4001"   # Ambiente A (baseline)
+API_B="http://127.0.0.1:3001"   # DNAT
 
 PASS=0
 FAIL=0
@@ -79,13 +77,12 @@ execute() {
 # ──────────────────────────────────────────
 section "Verificando ambientes"
 wait_api "$API_B" "Ambiente B (DNAT)"
-wait_api "$API_A" "Ambiente A (baseline)"
 
 # ──────────────────────────────────────────
 # T1 — Network Exfiltration
 # ──────────────────────────────────────────
 section "T1: Network Exfiltration via socket"
-log "Registrando dataset e aplicação em AMBOS os ambientes..."
+log "Registrando dataset e aplicação..."
 
 # --- Ambiente B ---
 log "[B] Registrando dataset..."
@@ -107,36 +104,13 @@ echo "$EXEC_B" > "$RESULTS_DIR/t1_dnat_execution.json"
 STDOUT_B=$(echo "$EXEC_B" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('stdout',''))" 2>/dev/null || true)
 log "[B] stdout: $STDOUT_B"
 
-# --- Ambiente A ---
-log "[A] Registrando dataset..."
-DS_A=$(register_dataset "$API_A")
-DS_ID_A=$(echo "$DS_A" | python3 -c "import sys,json; print(json.load(sys.stdin)['assetId'])")
-
-log "[A] Registrando aplicação T1..."
-APP_A=$(register_app "$API_A" "$ASSETS/apps/t1_network_exfil.py" "t1-network-exfil")
-APP_ID_A=$(echo "$APP_A" | python3 -c "import sys,json; print(json.load(sys.stdin)['assetId'])")
-
-log "[A] Comprando acesso..."
-purchase "$API_A" "$DS_ID_A" "$APP_ID_A" > /dev/null
-
-log "[A] Executando T1 no baseline..."
-EXEC_A=$(execute "$API_A" "$DS_ID_A" "$APP_ID_A")
-echo "$EXEC_A" > "$RESULTS_DIR/t1_baseline_execution.json"
-STDOUT_A=$(echo "$EXEC_A" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('stdout',''))" 2>/dev/null || true)
-log "[A] stdout: $STDOUT_A"
-
 # --- Avaliação T1 ---
 log ""
 log "--- Evidências T1 ---"
 DNAT_BLOCKED=$(echo "$STDOUT_B" | grep -c "EXFILTRATION FAILED" || true)
-BASELINE_BLOCKED=$(echo "$STDOUT_A" | grep -c "EXFILTRATION FAILED" || true)
-BASELINE_SUCCEEDED=$(echo "$STDOUT_A" | grep -c "EXFILTRATION SUCCEEDED" || true)
 
 echo "DNAT stdout:" >> "$RESULTS_DIR/t1_evidence.txt"
 echo "$STDOUT_B" >> "$RESULTS_DIR/t1_evidence.txt"
-echo "" >> "$RESULTS_DIR/t1_evidence.txt"
-echo "Baseline stdout:" >> "$RESULTS_DIR/t1_evidence.txt"
-echo "$STDOUT_A" >> "$RESULTS_DIR/t1_evidence.txt"
 
 if [ "$DNAT_BLOCKED" -gt 0 ]; then
     pass "T1 DNAT: exfiltração bloqueada pela ausência de rede na microVM"
@@ -144,12 +118,6 @@ else
     fail "T1 DNAT: exfiltração NÃO foi bloqueada — revisar configuração do kernel"
 fi
 
-if [ "$BASELINE_SUCCEEDED" -gt 0 ]; then
-    pass "T1 Baseline: exfiltração SUCEDEU — confirma vulnerabilidade no modelo centralizado"
-elif [ "$BASELINE_BLOCKED" -gt 0 ]; then
-    log "  [INFO] T1 Baseline: também bloqueou — host pode ter firewall. Verificar $RESULTS_DIR/t1_baseline_execution.json"
-    SKIP=$((SKIP+1))
-fi
 
 # ──────────────────────────────────────────
 # T3 — Ephemeral Cleanup (roda após T1 que já fez uma execução)
