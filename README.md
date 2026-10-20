@@ -16,6 +16,7 @@ IA** que verifica se uma aplicação vaza dados. Plano, decisões e LaTeX em [DS
 | `docker/` | Composes de cada plano e entrypoint da CVM1 |
 | `assets/` | Apps de exemplo e de ataque, datasets sintéticos, suíte de testes T1–T5 |
 | `DSN2027/` | Página de trabalho do artigo |
+| `pesquisa/` | Levantamentos de literatura (Juiz; transparência de execução de LLMs) |
 
 ## Como rodar
 
