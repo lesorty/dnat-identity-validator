@@ -22,9 +22,10 @@ marcados como tal. Não entrou nenhum workshop (DSN-W).
    Nada foi baixado do IEEE Xplore nem de sites de pirataria.
 5. **PDFs:** cada um foi conferido com `pdfinfo` e pela primeira página.
 
-**Contagem.** 54 artigos listados. 29 PDFs baixados: 28 do próprio artigo e 1 tese de mestrado
-que é a versão estendida (Torpedo). 25 estão pendentes, com o status "instituição". Dois desses
-têm link aberto conhecido, mas o servidor não respondeu na coleta (ConfBench e lazypoline).
+**Contagem.** 54 artigos listados. 33 PDFs baixados: 32 do próprio artigo (4 deles de 2024
+vieram dos anais oficiais do DSN 2024, por decisão do grupo em 2026-10-26) e 1 tese de mestrado
+que é a versão estendida (Torpedo). 21 estão pendentes, com o status "instituição". Um desses
+tem link aberto conhecido, mas o servidor não respondeu na coleta (ConfBench).
 
 Contribuições e números vêm dos resumos e das primeiras páginas. Só seis artigos foram lidos
 além da primeira página (Mutiny, KubeFence, AnBridge, prefill, SBOM e Reentrancy-LLM), e só
@@ -205,14 +206,14 @@ Pôst = pôster (DSN-S).
 | 29 | 2021 | Plinius | Treino de ML em SGX | RT | B, base | 2021_yuhala_plinius.pdf |
 | 30 | 2022 | Treaty | Transações seguras com TEE | RT | base | instituição |
 | 31 | 2023 | SGX Switchless configless | Desempenho de SGX | RT (PER) | base | 2023_yuhala_switchless.pdf |
-| 32 | 2024 | CVM × contadores de desempenho | Canal lateral em CVM | RT | base, Juiz | instituição |
+| 32 | 2024 | CVM × contadores de desempenho | Canal lateral em CVM | RT | base, Juiz | 2024_lou_cvm-hpc-side-channels.pdf |
 | 33 | 2025 | ConfBench | Avaliação de CVMs (TDX/SEV-SNP) | RT | base | instituição |
 | 34 | 2025 | Keylime | Atestação contínua | RT | base | instituição |
 | 35 | 2025 | Triad (tempo confiável em TEE) | TEE | Ind | base | 2025_bettinger_triad-tee-time.pdf |
 | 36 | 2026 | AnBridge | IA em VM protegida (Android) | RT | B, base | 2026_farina_anbridge.pdf |
 | 37 | 2022 | Torpedo | Fuzzing de containers | RT | base | 2022_mcdonough_torpedo-tese.pdf (tese) |
 | 38 | 2023 | Rewind & Discard | Compartimentalização | RT (REG) | base | 2023_gulmez_rewind-discard.pdf |
-| 39 | 2024 | lazypoline (interposição de syscalls) | Sandbox e monitoração | RT | base, Juiz | instituição |
+| 39 | 2024 | lazypoline (interposição de syscalls) | Sandbox e monitoração | RT | base, Juiz | 2024_jacobs_lazypoline.pdf |
 | 40 | 2024 | Mutiny (falhas do Kubernetes) | Injeção de falhas em orquestrador | RT | base | 2024_barletta_kubernetes.pdf |
 | 41 | 2025 | KubeFence | Superfície de ataque do K8s | RT | base | 2025_cesarano_kubefence.pdf |
 | 42 | 2025 | KubeChecker | Configuração de orquestração | Ind | base | instituição |
@@ -224,8 +225,8 @@ Pôst = pôster (DSN-S).
 | 48 | 2025 | BProm | Backdoor em modelo caixa-preta | RT | B | 2025_huang_backdoor-prompting.pdf |
 | 49 | 2023 | Rowhammer no backdoor de DNN | Backdoor por falha de hardware | RT (REG) | B | 2023_tol_rowhammer-backdoor.pdf |
 | 50 | 2026 | LymphNode | Controle de acesso a DNN | RT | B | 2026_pei_lymphnode.pdf |
-| 51 | 2024 | Vazamento por logits | Vazamento pela saída do modelo | RT | Juiz | instituição |
-| 52 | 2024 | Owl | Detecção diferencial de vazamento | RT | Juiz | instituição |
+| 51 | 2024 | Vazamento por logits | Vazamento pela saída do modelo | RT | Juiz | 2024_xiao_logits-leakage.pdf |
+| 52 | 2024 | Owl | Detecção diferencial de vazamento | RT | Juiz | 2024_zhao_owl.pdf |
 | 53 | 2023 | YODA | Exfiltração por DNS | RT (PER) | Juiz, base | instituição |
 | 54 | 2022 | DisTA | Rastreamento de taint distribuído | RT | Juiz | instituição |
 
@@ -668,7 +669,7 @@ ferramenta **(a verificar)**.
 - **Avaliação:** **a verificar**.
 - **Para nós (base, Juiz):** canal lateral é limitação declarada do DNAT (D3). Citar como a defesa
   que existe para CVMs.
-- **PDF:** instituição.
+- **PDF:** `2024_lou_cvm-hpc-side-channels.pdf` (anais oficiais do DSN 2024, dsn2024uq.github.io/Proceedings).
 
 **[33] ConfBench** (2025)
 - **Ref.** De Murtas, A.; D'Elia, D. C.; Di Luna, G. A.; Felber, P.; Querzoni, L.; Schiavoni, V.
@@ -762,7 +763,7 @@ ferramenta **(a verificar)**.
 - **Avaliação:** micro e macrobenchmarks.
 - **Para nós (base, Juiz):** a camada L2 do Juiz observa syscalls (seccomp em modo log). Citar
   como alternativa de monitoração barata e completa.
-- **PDF:** instituição (link aberto inacessível na coleta).
+- **PDF:** `2024_jacobs_lazypoline.pdf` (anais oficiais do DSN 2024, dsn2024uq.github.io/Proceedings).
 
 **[40] Mutiny: como o Kubernetes falha** (2024)
 - **Ref.** Barletta, M.; Cinque, M.; Di Martino, C.; Kalbarczyk, Z.; Iyer, R. K. "Mutiny! How Does
@@ -925,7 +926,7 @@ ferramenta **(a verificar)**.
 - **Para nós (Juiz, central):** é vazamento pela **saída legítima** de um programa de ML. Reduzir
   a granularidade da saída (rótulo em vez de logit) é uma defesa possível. Citar no Juiz, caso ML
   do benchmark.
-- **PDF:** instituição.
+- **PDF:** `2024_xiao_logits-leakage.pdf` (anais oficiais do DSN 2024, dsn2024uq.github.io/Proceedings).
 
 **[52] Owl: detecção diferencial de vazamento em CUDA** (2024)
 - **Ref.** Zhao, Y.; Xue, W.; Chen, W.; Qiang, W.; Zou, D.; Jin, H. "Owl: Differential-Based
@@ -937,7 +938,7 @@ ferramenta **(a verificar)**.
 - **Avaliação:** Libgpucrypto, PyTorch e nvJPEG.
 - **Para nós (Juiz, central):** é o mesmo princípio da camada L2 com **variação do segredo** e
   teste estatístico. Citar como precedente metodológico da detecção diferencial.
-- **PDF:** instituição.
+- **PDF:** `2024_zhao_owl.pdf` (anais oficiais do DSN 2024, dsn2024uq.github.io/Proceedings).
 
 **[53] YODA: canal encoberto via DNS público** (2023)
 - **Ref.** Saha, S.; Karapoola, S.; Rebeiro, C.; Kamakoti, V. "YODA: Covert Communication Channel over
@@ -999,18 +1000,18 @@ adaptativo contra detectores).
 
 ## Pendências e observações
 
-- **Pedir via instituição** os 25 marcados "instituição". Prioridade: LUMEN, Owl, vazamento por
-  logits, ConfBench, PDGraph e VCAligner.
+- **Pedir via instituição** os 21 marcados "instituição" (Steylor vai baixar). Prioridade: LUMEN,
+  ConfBench, PDGraph e VCAligner.
 - **Links abertos que falharam na coleta:**
   - ConfBench: diag.uniroma1.it, conexão falhou; IRIS, 403;
-  - lazypoline: repository.tudelft.nl, sem resposta.
+  - lazypoline: repository.tudelft.nl, sem resposta (resolvido pelos anais de 2024).
   Vale tentar de novo no navegador.
 - **Torpedo:** o PDF é a tese de mestrado, não o artigo.
 - **Prefill e MCP:** os PDFs são preprints arXiv com título anterior ou versão pré-revisão.
   Conferir números contra a versão final antes de citar.
 - **DOIs a confirmar:** VulStyle [18], LymphNode [50] e o pôster [20].
-- **Anais de 2024:** o site oficial do DSN 2024 (dsn2024uq.github.io/Proceedings) publica o
-  sumário com caminhos de PDF de todos os artigos. Não baixamos de lá porque não é claramente
-  uma versão de acesso aberto autorizada. Fica para o grupo decidir.
+- **Anais de 2024:** o site oficial do DSN 2024 (dsn2024uq.github.io/Proceedings) publica os
+  PDFs de todos os artigos. O grupo decidiu usá-lo (2026-10-26): Owl, lazypoline, vazamento por
+  logits e CVM × contadores vieram de lá.
 - **Cobertura:** a busca foi por título e resumo, a partir das listas oficiais e da OpenAlex.
   Artigos de 2021–2022 do Industry Track e do DSN-S não foram varridos sistematicamente.
