@@ -22,9 +22,10 @@ marcados como tal. Não entrou nenhum workshop (DSN-W).
    Nada foi baixado do IEEE Xplore nem de sites de pirataria.
 5. **PDFs:** cada um foi conferido com `pdfinfo` e pela primeira página.
 
-**Contagem.** 54 artigos listados. 33 PDFs baixados: 32 do próprio artigo (4 deles de 2024
-vieram dos anais oficiais do DSN 2024, por decisão do grupo em 2026-10-26) e 1 tese de mestrado
-que é a versão estendida (Torpedo). 21 estão pendentes, com o status "instituição". Um desses
+**Contagem.** 58 artigos listados. 36 PDFs baixados: 35 do próprio artigo (4 deles de 2024
+vieram dos anais oficiais do DSN 2024, por decisão do grupo em 2026-10-26; 3 de §4.9 vieram das
+páginas dos autores) e 1 tese de mestrado que é a versão estendida (Torpedo). 22 estão
+pendentes, com o status "instituição". Um desses
 tem link aberto conhecido, mas o servidor não respondeu na coleta (ConfBench).
 
 Contribuições e números vêm dos resumos e das primeiras páginas. Só seis artigos foram lidos
@@ -229,6 +230,10 @@ Pôst = pôster (DSN-S).
 | 52 | 2024 | Owl | Detecção diferencial de vazamento | RT | Juiz | 2024_zhao_owl.pdf |
 | 53 | 2023 | YODA | Exfiltração por DNS | RT (PER) | Juiz, base | instituição |
 | 54 | 2022 | DisTA | Rastreamento de taint distribuído | RT | Juiz | instituição |
+| 55 | 2025 | Multi-version ML e rejuvenescimento | Confiabilidade de ML (N-versões) | RT | B (molde) | 2025_wen_multiversion-ml.pdf |
+| 56 | 2025 | ReMlX | Resiliência a falhas nos dados de treino | RT | B (molde) | 2025_chan_remlx.pdf |
+| 57 | 2026 | Radiação em aceleradores de ML (TPU-FI) | Injeção de falhas realista em ML | RT | B (molde) | 2026_coelho_radiation-tpu.pdf |
+| 58 | 2026 | LLMGuard | Diagnóstico de falhas em LLM como serviço | RT | B (molde) | instituição |
 
 ---
 
@@ -970,6 +975,76 @@ ferramenta **(a verificar)**.
 - **Para nós (Juiz):** o taint dinâmico é a alternativa clássica ao Juiz para seguir o dado até a
   saída. Citar como linha de base que não pega canais implícitos e transformações (canário
   codificado).
+- **PDF:** instituição.
+
+### 4.9 Confiabilidade de sistemas de ML ("mesmo norte" de B)
+
+Acrescentados em 2026-10-26 para refinar o enquadramento de B ([E8](../etapas/E8_alinhamento_dsn.md)
+§9). Não são vizinhos de tema: são **moldes de forma** de como o DSN escreve sobre ML.
+
+**[55] Multi-version ML e rejuvenescimento** (2025)
+- **Ref.** Wen, Q.; Mendonça, J.; Machida, F.; Völp, M. "Multi-version Machine Learning and
+  Rejuvenation for Resilient Perception in Safety-critical Systems". DSN 2025.
+  DOI 10.1109/DSN64029.2025.00071. Preprint aberto (Tsukuba; também no ORBilu).
+- **Trilha:** RT.
+- **Contribuição:** arquitetura de ML replicado (2 ou 3 versões) com votador e rejuvenescimento
+  proativo, que tolera falhas **acidentais e maliciosas** nos módulos de ML. Cada módulo passa por
+  três estados: saudável (H), **comprometido mas funcional (C)** e não funcional (N). O votador e o
+  rejuvenescimento são declarados **confiáveis**.
+- **Avaliação:** modelos DSPN (redes de Petri) e funções de confiabilidade; injeção de falhas com
+  PyTorchFI; estudo de parâmetros; caso no simulador CARLA: taxa de colisão de 0% com
+  rejuvenescimento contra 33,54% sem (40 corridas). Tem seção de ameaças à validade. ✔ PDF lido.
+- **Para nós (B, molde):** o estado C é exatamente o objetivo do atacante em B (derivado útil e
+  sem recusa). Copiar: estados H/C/N do derivado, componentes confiáveis explícitos, uma classe de
+  falha acidental e uma maliciosa no mesmo modelo, e recuperação (reverter ao base custodiado).
+- **PDF:** `2025_wen_multiversion-ml.pdf`.
+
+**[56] ReMlX** (2025)
+- **Ref.** Chan, A.; Gujarati, A.; Pattabiraman, K.; Gopalakrishnan, S. "ReMlX: Resilience for ML
+  Ensembles using XAI at Inference against Faulty Training Data". DSN 2025.
+  DOI 10.1109/DSN64029.2025.00069. PDF da página do laboratório (UBC); artefatos reprodutíveis.
+- **Trilha:** RT.
+- **Contribuição:** pesos de votação de um *ensemble* calculados pela diversidade no espaço de
+  features (via XAI), para tolerar **falhas nos dados de treino** (rótulo trocado, remoção,
+  repetição). Define resiliência como manter a capacidade preditiva apesar de treino com dados
+  defeituosos.
+- **Avaliação:** RQ1–RQn; ferramenta de injeção de falhas nos dados (TF-DM); curvas de acurácia
+  balanceada em função da **quantidade de falha (0–50%)**; 12% mais resiliente que a melhor linha
+  de base e 15% mais lento; distribuições de falha **realistas (assimétricas)** em vez de
+  uniformes; ameaças à validade. ✔ PDF lido.
+- **Para nós (B, molde):** o fine-tuning de B é "treino com dados possivelmente defeituosos".
+  Copiar: tabela do modelo de falhas por classe, varredura da quantidade de falha, e o custo
+  (overhead) reportado ao lado do ganho.
+- **PDF:** `2025_chan_remlx.pdf`.
+
+**[57] Radiação em aceleradores de ML / TPU-FI** (2026)
+- **Ref.** Coelho, B. L.; Sadati, S.; Chan, A.; Hands, A.; Pattabiraman, K.; Rech, P. "Thinking
+  Inside the Box: Injecting Realistic Radiation Faults in ML Accelerators". DSN 2026.
+  DOI 10.1109/DSN69566.2026.00017. Versão final na página do laboratório (UBC); código e dados
+  abertos (TPU-FI no GitHub, Zenodo).
+- **Trilha:** RT. Premiado em 2026 (a página do laboratório diverge entre "Best Paper" e
+  "Distinguished"; **a verificar**).
+- **Contribuição:** experimentos com feixes (nêutrons, prótons, íons pesados) em TPUs mostram que
+  as falhas reais atingem **regiões retangulares** dos tensores, não bits isolados. Daí um modelo
+  de falhas derivado de dados reais e um injetor (TPU-FI) que prevê a taxa de falhas (FIT) a 1,7×
+  do feixe. O modelo uniforme de um bit **subestima em até ~4×** as classificações erradas.
+- **Avaliação:** RQ1 (injetor × feixe), RQ2–RQ4 (tipo de falha, arquitetura, entrada); 6 milhões
+  de injeções. ✔ PDF lido.
+- **Para nós (B, molde):** **validar a população sintética contra dados de campo.** Em B, os
+  obliterados públicos do HF são o "feixe" e as nossas abliterações são o "injetor": medir se os
+  sinais do portão têm a mesma distribuição nos dois.
+- **PDF:** `2026_coelho_radiation-tpu.pdf`.
+
+**[58] LLMGuard** (2026)
+- **Ref.** Zhong, Y.; Yu, G.; Huang, Y.; Fu, Q.; Ren, R.; Feng, C.; Yang, Y.; Lyu, M. R.
+  "LLMGuard: Multi-Agent Fault Diagnosis for Reliable Language-Model-as-a-Service". DSN 2026.
+  DOI 10.1109/DSN69566.2026.00018 (OpenAlex ✔). Sem versão aberta; não confundir com o
+  "LLMGuard" de arXiv 2403.00826, que é outro trabalho.
+- **Trilha:** RT.
+- **Contribuição:** diagnóstico de falhas para LLM oferecido como serviço (**a verificar**; só o
+  título foi conferido).
+- **Para nós (B, molde):** mostra que o DSN aceita "LLM como serviço que precisa ser confiável".
+  Citar só depois de ler.
 - **PDF:** instituição.
 
 ---

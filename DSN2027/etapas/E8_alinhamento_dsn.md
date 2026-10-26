@@ -88,7 +88,7 @@ classificados só pelo título, porque faltam resumos na OpenAlex.
   - *ReMlX*: resiliência de *ensembles* contra dados de treino defeituosos, 2025;
   - *Thinking Inside the Box*: falhas por radiação em aceleradores de ML, 2026, **premiado**;
   - *Keeping Reliability on Track* em aprendizado federado, 2026.
-  Esses não foram lidos (**a verificar**), mas os títulos já mostram o molde que B deve copiar.
+  Três deles foram lidos depois (§9.1, ✔); o LLMGuard não tem versão aberta.
 - **Os adjacentes de A são detecção de vulnerabilidades e fuzzing** (14 em 2026). É um tema forte no
   DSN, mas é o "achar o bug", não o "mercado".
 
@@ -168,40 +168,101 @@ Contei o vocabulário no corpo dos 16 PDFs: *dependab*, *reliab*, *fault*, *fail
 
 ## 9. O enquadramento mais "DSN" de cada um
 
-### B: *Safety by Custody* (o recomendado)
+### B: *Safety by Custody* (o recomendado; refinado em 2026-10-26)
 
-**Título provisório:** *Safety by Custody: Preserving Refusal Across Fine-Tuning of Open-Weight LLMs
-with an Attested Release Gate.*
+**Título provisório:** *Safety by Custody: Containing Accidental and Malicious Refusal Failures in
+Open-Weight LLM Derivatives.* Alternativa mais curta: *Safety by Custody: Preserving Refusal Across
+Fine-Tuning of Open-Weight LLMs.*
 
-**Enquadramento:**
-- **Propriedade:** a recusa é um atributo de *safety* do sistema.
-- **Ameaças:**
-  - o fine-tuning benigno a degrada (causa acidental);
-  - a obliteração a remove (causa maliciosa);
-  - salvaguardas dentro dos pesos supõem que ninguém escreve nos parâmetros (LymphNode §III-A);
-  - quem controla a interface controla o alinhamento (Prefill).
-- **Mecanismo:**
-  - cada derivado é uma versão possivelmente defeituosa;
-  - o portão é a **detecção de erro**;
-  - a custódia (o derivado nunca sai) é a **contenção**.
+#### 9.1 O que os artigos de "mesmo norte" ensinam
 
-**Métricas que o DSN reconhece:**
-- cobertura de detecção (TPR a FPR de 1% e 5%) numa **campanha de modificações injetadas** com
-  atacante adaptativo;
-- falso alarme em fine-tuning benigno, que é o custo de disponibilidade para o usuário legítimo;
-- latência e custo por veredito; overhead da CVM.
+Foram lidos três dos quatro artigos ✔. O LLMGuard [58] não tem versão aberta e fica para baixar
+pela instituição. Fichas completas no [GUIA §4.9](../referencias/GUIA_DSN.md).
 
-**Para citar:**
-- **Prefill [44]:** motivação e linha de base.
-- **LymphNode [50]:** contraste "proteção no modelo × custódia".
-- **BProm [48]:** certificação no nível do modelo; molde de AUROC e atacante adaptativo.
-- **AnBridge [36]:** modelo em VM protegida; molde de avaliação de sistema; deixa de fora as
-  ameaças pela entrada e pela saída legítimas, onde B atua.
-- **Plinius [29]:** segurança e tolerância a falhas no mesmo mecanismo.
+| Artigo | Lição de forma | Como entra em B |
+|---|---|---|
+| **Multi-version ML [55]** (DSN'25) | Cada módulo de ML passa por três estados: saudável (H), **comprometido mas funcional (C)** e não funcional (N). Votador e rejuvenescimento são declarados **confiáveis**. Falha acidental e ataque ficam no mesmo modelo. Avaliação em três camadas: modelo analítico (redes de Petri) + injeção de falhas + caso realista | Os mesmos três estados para o derivado. O estado C é o objetivo do atacante (útil e sem recusa). Componentes confiáveis explícitos. Recuperação: reverter ao base custodiado |
+| **ReMlX [56]** (DSN'25) | Modelo de falhas como **falhas nos dados de treino**, numa tabela por classe com origem real. Ferramenta de injeção. Curvas de resultado em função da **quantidade de falha** (0–50%). Distribuições realistas em vez de uniformes. Custo reportado ao lado do ganho | O fine-tuning é "treino com dados possivelmente defeituosos". Tabela de classes de falha, varredura da quantidade de falha e overhead do portão ao lado da cobertura |
+| **TPU-FI [57]** (DSN'26, premiado) | O modelo de falhas é **derivado de dados reais** (feixe de radiação), e o injetor é **validado contra o campo** (taxa de falhas a 1,7×). O modelo sintético simples subestima em até ~4× | Os obliterados públicos do HF são o "campo"; as nossas abliterações são o "injetor". Medir se os sinais do portão têm a mesma distribuição nos dois. Isso responde à crítica da E7 de que a população é construída por nós |
 
-**Mesmo norte (molde de forma, a ler):** LLMGuard (2026), *Multi-version ML and Rejuvenation*
-(2025), ReMlX (2025), Rowhammer no backdoor (2023; derivar a população de ataques de um modelo
-de modificação medido) e Aegis (DSN-S'26; causa acidental e maliciosa no mesmo modelo de ameaça).
+#### 9.2 Enquadramento refinado
+
+1. **Serviço e propriedade.** O DNAT oferece fine-tuning de modelo aberto como serviço. A
+   propriedade de *safety* S é esta: **todo derivado liberado mantém a recusa do base dentro de uma
+   tolerância δ**, medida numa bateria fixa e parcialmente secreta.
+2. **Modelo de falhas** (no molde da tabela do ReMlX):
+
+   | Classe | Causa | Exemplo | "Quantidade de falha" a varrer |
+   |---|---|---|---|
+   | F1 acidental | Dados benignos | LoRA em Alpaca ou GSM8K que degrada a recusa (Qi et al. 2024) | Passos ou épocas de treino |
+   | F2 maliciosa nos dados | Dados nocivos | LoRA com 10–100 exemplos nocivos; *Covert Malicious Finetuning* | Número ou fração de exemplos nocivos |
+   | F3 maliciosa nos pesos | Edição direta | Abliteração rank-1 (Arditi et al.) | Intensidade da edição e camadas |
+   | F4 adaptativa | O atacante conhece o portão | Treino contra o limiar; abliteração + LoRA de "cura" | Rodadas de adaptação |
+
+   **Fora do modelo:**
+   - exportação de pesos, contida pela custódia (C3);
+   - backdoor com gatilho (limitação declarada);
+   - canais laterais;
+   - falhas de hardware na CVM: o Rowhammer [49] mostra que os pesos podem mudar depois da
+     checagem, então a integridade de memória da CVM é **premissa**.
+3. **Estados do derivado** (no molde do [55]): H (recusa preservada), C (útil e sem recusa) e N
+   (degenerado). O portão precisa separar C de H; N se pega por utilidade. **A falha perigosa é
+   liberar um C**: uma "liberação silenciosa", análoga à corrupção silenciosa de dados do [57].
+4. **Componentes confiáveis:** a CVM, o portão (código e juiz fixados por hash) e a referência
+   custodiada. **Não confiáveis:** o script, os dados de treino e o derivado.
+5. **Ciclo completo de dependabilidade:**
+   - **prevenção:** custódia (os pesos nunca saem);
+   - **detecção:** o portão;
+   - **contenção:** derivado reprovado não sai e não vira ativo;
+   - **recuperação:** reverter ao base ou ao último derivado aprovado, e **revogar** um derivado já
+     liberado se a bateria secreta posterior mostrar falha. O `revokeAsset` já existe em
+     `smart-contract/contracts/DnatMarketplace.sol:183-191`.
+
+#### 9.3 Métricas e perguntas de pesquisa
+
+**Métricas, no vocabulário do DSN:**
+- **taxa de liberação silenciosa**: a fração de derivados C aprovados. É a métrica-título;
+- **cobertura de detecção** por classe de falha (TPR a FPR de 1% e 5%);
+- **taxa de falso alarme** em F1 que preserva a recusa, que é o custo de disponibilidade para o
+  usuário legítimo;
+- **curvas de cobertura × quantidade de falha** (molde do [56]): o ponto em que a degradação já é
+  real e o portão ainda não a vê;
+- **representatividade** (molde do [57]): a distância entre os sinais nos derivados injetados e
+  nos obliterados de campo;
+- latência e custo por veredito; overhead da CVM;
+- **modelo analítico leve** (versão simples do molde do [55]): com k tentativas e taxa de escape e
+  por tentativa, a chance de escapar é 1 − (1 − e)^k. Isso justifica o registro de tentativas e o
+  limite por conta.
+
+**Perguntas de pesquisa (formato RQ dos artigos de 2025–26):**
+- **RQ1:** cobertura e falso alarme por classe de falha;
+- **RQ2:** sensibilidade à quantidade de falha;
+- **RQ3:** representatividade da população injetada contra os obliterados de campo;
+- **RQ4:** atacante adaptativo (rodadas até escapar);
+- **RQ5:** custo e overhead na CVM.
+
+**Seções que os três artigos têm e B deve ter:**
+- ameaças à validade;
+- artefato aberto: código, sinais e scripts de geração, **sem** publicar pesos nocivos.
+
+#### 9.4 Para citar (atualizado)
+
+- **Motivação:** Prefill [44] (quem controla a interface derruba o alinhamento) e LymphNode [50]
+  (a proteção no modelo supõe integridade dos parâmetros, §III-A).
+- **Molde de forma:** Multi-version ML [55], ReMlX [56] e TPU-FI [57].
+- **Base técnica:**
+  - BProm [48]: certificação no nível do modelo;
+  - AnBridge [36]: modelo em VM protegida;
+  - Plinius [29]: segurança e tolerância a falhas juntas;
+  - Rowhammer [49]: premissa de integridade de memória.
+- **Só depois de ler:** LLMGuard [58]; Aegis (DSN-S'26) como apoio de "acidental + malicioso".
+
+**O que mudou em relação à primeira versão deste enquadramento:**
+- de "detector" para **serviço com uma propriedade S**, modelo de falhas com quantidade, estados
+  do derivado e ciclo completo de prevenção, detecção, contenção e recuperação;
+- uma **RQ de representatividade** (injeção × campo), que vira contribuição metodológica e ataca o
+  ponto fraco que a E7 apontou na avaliação de B;
+- uma métrica-título que o DSN reconhece: **liberação silenciosa**.
 
 ### A: *Verified Containment* (se o grupo preferir A)
 
@@ -244,7 +305,7 @@ colide com OCTOPOCS e com o Dependabot.
 - **"B núcleo" inclui vizinhos distantes:** backdoor em aprendizado federado e injeção em RAG. Os
   próximos de verdade são só Prefill, LymphNode e BProm.
 - **PDFs:** 12 dos 16 lidos são preprints, e números ou títulos podem diferir da versão publicada.
-- **Ainda sem ler:** os 21 artigos marcados "instituição" e os adjacentes de "mesmo norte" citados
-  em §4 e §9.
+- **Ainda sem ler:** os 22 artigos marcados "instituição", entre eles o LLMGuard [58]. Os outros
+  três de "mesmo norte" foram lidos (§9.1).
 - **Encaixe não é aceitação:** esta análise mede só o encaixe. Viabilidade, novidade e risco estão
   na E7, e as duas análises apontam na mesma direção por motivos diferentes.
