@@ -89,13 +89,13 @@ o exploit — ver §8 e §9).
 | Peça existente | Reuso na alternativa | Fonte |
 |---|---|---|
 | **Marketplace em contrato** (`registerAsset`, `purchaseAccess`, eventos, guarda de reentrância) | Base do *vault* de recompensa: `registerAsset` já modela Dataset/Application; falta um tipo de recompensa e depósito cumulativo | `smart-contract/contracts/DnatMarketplace.sol:33-64,126-159,214-265` |
-| **`contentHash` no ativo e na compra** | Vincula a prova ao digest exato julgado (como o veredito do Juiz é vinculado ao digest, JUIZ_IA §1) | `DnatMarketplace.sol:47,147`; E2b.4 passo 5 |
+| **`contentHash` no ativo e na compra** | Vincula a prova ao digest exato julgado (como o veredito do Juiz é vinculado ao digest, JUIZ_IA §1) | `DnatMarketplace.sol:47,153`; E2b.4 passo 5 |
 | **CVM de uso único, container sem rede** (D4) | Sandbox onde a prova roda; "a app roda sem rede, a CVM só fala com o DNAT" é exatamente o ambiente para medir um exploit sem vazá-lo para fora | `DECISOES.md:37-59`; [E2c](E2c_ameacas_oci.md) §2 (R1–R9) |
 | **Verdade de referência estilo CTF com canário** (D2) | É o coração da prova mecânica: já decidido que "vale se a tarefa é cumprida e o canário sai da saída" — aqui vira "vale se o exploit dispara a condição e a flag sai" | `DECISOES.md:18-20`; [JUIZ_IA.md](../JUIZ_IA.md) §9.2, §9.4 |
-| **Build atestado em duas CVMs + proxy de registro que anota cada download** (D4) | Fonte natural do **SBOM**: o proxy já registra cada dependência baixada como `materials` da proveniência; é o grafo componente→app que a propagação precisa | `DECISOES.md:43-51`; [E2b](E2b_build_oci.md) §3, §4.1; [E2c](E2c_ameacas_oci.md) §7 B4 (`syft`/`osv-scanner`) |
-| **Executor mínimo** (seccomp, gVisor, rootfs RO, saída como dado) | Roda o exploit não confiável com as mesmas defesas X1–X6 | `vm_runtime/executor.py:11-16,52-57`; [E2c](E2c_ameacas_oci.md) §3 |
+| **Build atestado em duas CVMs + proxy de registro que anota cada download** (D4) | Fonte natural do **SBOM**: o proxy já registra cada dependência baixada como `materials` da proveniência; é o grafo componente→app que a propagação precisa. **Só desenho:** a E2b está em rascunho e não há proxy nem `syft` no código | `DECISOES.md:43-51`; [E2b](E2b_build_oci.md) §3, §4.1; [E2c](E2c_ameacas_oci.md) §7 B4 (`syft`/`osv-scanner`) |
+| **Executor mínimo** (seccomp, gVisor, rootfs RO, saída como dado) | Roda o exploit não confiável com as mesmas defesas X1–X6 | **Só desenho** ([E2c](E2c_ameacas_oci.md) §3). Conferido em 2026-10-26: o código tem Firecracker (`vm_runtime/vm/run-vm.sh`) e o modo sem isolamento (`vm_runtime/executor.py:11-16`); seccomp e gVisor não existem |
 | **Apps de ataque semente** (`t1_network_exfil`, `t1b_fs_escape`, `t2_malicious_dep`) | Casos-teste prontos de exploit reproduzível na CVM | `assets/apps/`; [E2c](E2c_ameacas_oci.md) §8 |
-| **`manifestUri` / proveniência** | Onde o SBOM por ativo é ancorado | `DnatMarketplace.sol:44,151` |
+| **`manifestUri` / proveniência** | Onde o SBOM por ativo é ancorado | `DnatMarketplace.sol:44,152` |
 
 **Observação de encaixe (D3):** a alternativa **mantém** "sem distribuição" e "atestação implícita"
 e **não precisa** da parte mais cara do Juiz (o LLM generalista). Em troca, pede um subsistema novo
@@ -166,7 +166,7 @@ exploit reproduzível já empacotadas em container:
 
 | Dataset | O que traz | Uso |
 |---|---|---|
-| [ARVO ✔](http://arxiv.org/abs/2408.02153) | >5.000 (depois >6.000) vulns de memória OSS-Fuzz, cada uma com *input* gatilho e patch, em imagens Docker | Alvo pré/pós-patch; predicado = crash de sanitizador |
+| [ARVO ✔](http://arxiv.org/abs/2408.02153) | >6.100 vulns de memória OSS-Fuzz em 311 projetos, **só ~81% reproduzem**, cada uma com *input* gatilho e patch, em imagens Docker | Alvo pré/pós-patch; predicado = crash de sanitizador |
 | [CyberGym ✔](http://arxiv.org/abs/2506.02548) | 1.507 instâncias, 188 projetos; tarefa = PoC que quebra pré-patch e não pós-patch | Mesmo predicado diferencial que a verdade CTF do DNAT |
 | [CVE-Bench ✔](https://arxiv.org/abs/2503.17332) | 40 CVEs web críticos; **8 metas de ataque** com *grader* por meta | Mapa direto de "classe → como a flag é conferida" |
 | [Vulhub](https://github.com/vulhub/vulhub) | Ambientes vulneráveis por CVE em docker-compose | Casos extra de RCE/leitura |
@@ -312,6 +312,22 @@ consolidação de 2026-10-26):
 - **[21] Reentrancy Redux, DSN'25** e **[26] Iniva, DSN'24**: exploits reais em contratos e
   compatibilidade de incentivos aceitos no DSN (apoio a C2/C3).
 
+**Vizinhos não citados acima, achados na segunda opinião** ([E7](E7_decisao_rumo.md) §8;
+nenhum lido por inteiro):
+- [Agora, OOPSLA'25](https://arxiv.org/abs/2407.15062) (DOI 10.1145/3763099 ✔ no OpenAlex): bounty em
+  blockchain + verificação para computação confidencial; vizinho, não núcleo.
+- [Ayala, Tung e Garcia 2025](https://arxiv.org/abs/2501.17748) ✔: como bounties e advisories chegam
+  aos dependentes em OSS.
+- [VeriOSS, Tokenomics 2020](https://doi.org/10.4230/oasics.tokenomics.2020.6) (registro ✔; conteúdo
+  não lido); [Bug Buster](https://github.com/crypto-bug-hunters/bug-buster) (ETHOnline 2023: exploit
+  numa VM determinística, pagamento por contrato); DecentralCVE (Georgia Tech, prova de exploit em
+  SGX, **a verificar**); ExploitArena (hackathon 2026, **a verificar**).
+- [Dependabot alerts](https://docs.github.com/en/code-security/dependabot/dependabot-alerts/about-dependabot-alerts):
+  alerta automático pelo grafo de dependências, já em produção.
+- **Consequência:** sem a ocultação medida, um revisor lê A como "Sealed-Glass Proofs + Dependabot".
+  E o OCTOPOCS mostra que a PoC original muitas vezes não dispara no dependente: presença no SBOM
+  não é verdade de referência para a propagação.
+
 ---
 
 ## 9. Riscos
@@ -332,8 +348,9 @@ consolidação de 2026-10-26):
   adivinhar quem depende dele (recompensa alta ⇒ muitos/valiosos dependentes). A ocultação (§5.5) é
   frágil; mitigação parcial com SBOM cego em ZK ([zkSBOM ✔](http://arxiv.org/abs/2605.00076)) tem custo
   e vazamento residual medido pelos próprios autores.
-- CFP do DSN exige tratar vulns de alto impacto (contato com fabricantes) e passar por comitê de
-  ética (§10). Publicar o desenho de um "mercado de alvos" precisa de justificativa forte.
+- O CFP do DSN pede discutir questões éticas, declarar revisão ética institucional quando aplicável
+  e, para vulns de alto impacto, os passos tomados (contato com fabricantes); o PC pode rejeitar
+  por ética insuficiente (§10). Não exige passar por comitê (correção do conselho, 2026-10-26). Publicar o desenho de um "mercado de alvos" precisa de justificativa forte.
 
 **Econômicos.**
 - **Dono pagando a si mesmo / conluio:** dono do componente patrocina, um caçador cúmplice reivindica,

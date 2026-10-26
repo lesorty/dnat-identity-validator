@@ -103,7 +103,7 @@ No DNAT a referência é o base que o próprio DNAT custodia: esse ataque some p
 | Fato | Fonte |
 |---|---|
 | Abliteration não treina: direção = diferença de médias de ativações em ≤ 256 + 256 prompts, depois edição rank-1 | Arditi et al., NeurIPS 2024 ✔ (pesquisa/03); receita de [Labonne, HF blog](https://huggingface.co/blog/mlabonne/abliteration) ✔ |
-| O detector de Hurtado roda num laptop (Apple M4 Max, MPS); 500 pares de prompts; modelos de 1,5B a 8B; AUROC 0,95 em 273 checkpoints; acurácia balanceada 0,89 com FPR 0,11 em famílias novas; **código "sob pedido"** | [arXiv 2607.01854](https://arxiv.org/html/2607.01854) ✔ |
+| O detector de Hurtado roda num laptop (Apple M4 Max, MPS); 500 pares de prompts; AUROC 0,95 em 273 checkpoints; acurácia balanceada 0,89 com FPR 0,11 em famílias novas. Correções do conselho (E7 §8): o artigo não dá a faixa "1,5B a 8B" (o 8B é o guard usado como oráculo), e o "código sob pedido" não aparece na página do arXiv (**a verificar**) | [arXiv 2607.01854](https://arxiv.org/html/2607.01854) ✔ |
 | CVM SEV-SNP sem GPU (DC4as_v5): US$ 0,172/h sob demanda, US$ 0,036/h spot | pesquisa/03 §8 ✔ (Retail Prices API) |
 | CPU TEE custa < 10% de vazão no Llama2-7B; em lote pequeno a GPU CC sai até 100% mais cara | Chrapek et al. 2025, pesquisa/03 ✔ |
 | GPU CC na Azure: só `NCC40ads_H100_v5`, 1× H100, US$ 6,98/h (eastus2), spot US$ 1,29/h; sem multi-GPU; conta de estudante não serve | pesquisa/02 §4.1, §4.4.2 (SKU ✔; preços da API em 2026-10-20) |
@@ -190,8 +190,8 @@ conhecidos; a contribuição é a integração e a avaliação, e um revisor pod
 
 **Âncoras no próprio DSN** (detalhes em [GUIA_DSN.md](../referencias/GUIA_DSN.md); acrescentadas na
 consolidação de 2026-10-26):
-- **[44] Prefill, DSN'26** (DOI 10.1109/DSN69566.2026.00054): *response prefill* passa de 99% de
-  sucesso em 14 modelos; o controle precisa estar na **interface de inferência**, não só nos pesos.
+- **[44] Prefill, DSN'26** (DOI 10.1109/DSN69566.2026.00054): com estratégia adaptativa, o
+  *response prefill* passa de 99% de sucesso em vários dos 14 modelos testados (PDF conferido); o controle precisa estar na **interface de inferência**, não só nos pesos.
   Apoia a custódia (o DNAT controla a interface). O PDF é o preprint com título anterior.
 - **[50] LymphNode, DSN'26**: controle de acesso embutido no modelo; contraste direto "proteção no
   modelo × proteção na infraestrutura". DOI a verificar.
@@ -200,6 +200,10 @@ consolidação de 2026-10-26):
   parecido com o portão de liberação.
 - **[36] AnBridge, DSN'26**: IA em VM protegida; **[45] prompt polimórfico, DSN-S'25** e
   **[47] Aegis, DSN-S'26**: o DSN aceita guardrails de LLM como tema de sistema.
+- **Faltam no modelo de ameaça e na população P6** (achados na segunda opinião, E7 §8):
+  [Covert Malicious Finetuning, Halawi et al. 2024](https://arxiv.org/abs/2406.20053) ✔ (a saída
+  codificada passa por uma bateria em texto plano) e [Sophon, S&P'24](https://doi.org/10.1109/sp54263.2024.00234)
+  ✔ (modelo não ajustável, outra defesa embutida nos pesos).
 - Não há, na amostra, artigo do DSN sobre obliteração ou fine-tuning nocivo: o núcleo de C2 vem de
   ML (NeurIPS/ICLR), o que confirma a leitura franca do §10.
 

@@ -35,7 +35,7 @@ decisões vigentes, etapas e o LaTeX.
 | E4 | **Juiz de IA** (contribuição principal) | 🔄 em desenho; rumo em reavaliação | [JUIZ_IA.md](JUIZ_IA.md) |
 | E5 | Alternativa A: mercado anônimo de bug bounty sobre a cadeia de suprimentos | 🔄 coleta concluída | [E5](etapas/E5_alt_bug_bounty.md) |
 | E6 | Alternativa B: modelos abertos com guardrails por custódia | 🔄 coleta concluída | [E6](etapas/E6_alt_modelos_abertos.md) |
-| E7 | Decisão de rumo (matriz A × B) | ⏳ pendente | — |
+| E7 | Decisão de rumo (matriz A × B + segunda opinião) | 🔄 proposta: B com condições, depende do piloto de 27–29/out | [E7](etapas/E7_decisao_rumo.md) |
 
 A E3 (descentralização) foi concluída e **descartada** com o orientador (D3). O histórico
 completo, com o material do LADC 2026, está na tag git `ladc-2026`.

@@ -831,7 +831,8 @@ ferramenta **(a verificar)**.
 - **Trilha:** RT.
 - **Contribuição:**
   - sete categorias de ataque por *response prefill*;
-  - o sucesso passa de 99% com estratégia adaptativa, em 14 modelos de 8 provedores;
+  - com estratégia adaptativa, o sucesso passa de 99% em vários modelos (14 modelos de 8
+    provedores testados; PDF conferido);
   - o prefill desloca a distribuição do primeiro token de recusa para obediência;
   - filtros de entrada falham.
 - **Avaliação:** benchmark multi-provedor com análise de probabilidade por token e RQs.
