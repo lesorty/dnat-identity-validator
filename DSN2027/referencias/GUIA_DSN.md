@@ -363,7 +363,8 @@ ferramenta **(a verificar)**.
   - extrai, por taint, as primitivas de crash do código compartilhado;
   - gera com execução simbólica dirigida as entradas que levam o software derivado até ele;
   - remonta uma **nova PoC que verifica a vulnerabilidade no dependente**.
-- **Avaliação:** 15 pares reais em C/C++, com 14 vulnerabilidades propagadas verificadas.
+- **Avaliação:** o resumo diz 15 pares reais em C/C++, mas o §V-A diz 14 pares reais + 1 caso
+  artificial; 14 vulnerabilidades propagadas verificadas (PDF conferido em 2026-10-26).
 - **Para nós (A, central):** é o mais próximo de "verificar mecanicamente o exploit e propagá-lo
   aos dependentes". Citar como trabalho relacionado direto. O nosso difere em marcar pela
   presença no SBOM e em verificar dentro da CVM, sem expor os dependentes ao atacante.
@@ -880,11 +881,14 @@ ferramenta **(a verificar)**.
   Backdoors in Black-Box Models". DSN 2025, pp. 547–561. DOI 10.1109/DSN64029.2025.00058.
   arXiv 2411.09540.
 - **Trilha:** RT.
-- **Contribuição:** detectar backdoor só com acesso caixa-preta, via *visual prompting*. O
-  cenário motivador é a certificação de modelos em "centros de teste".
-- **Avaliação:** experimentos extensos em visão.
-- **Para nós (B):** o cenário "centro de teste certifica modelo sem ver o interior" é o papel que
-  o DNAT faria no rumo B. Citar na motivação.
+- **Contribuição:** detectar backdoor só com acesso caixa-preta, via *visual prompting*. A
+  motivação são modelos vindos de mercados (BigML, ONNX zoo) e de MLaaS. O PDF não fala em
+  "centros de teste" (correção de 2026-10-26).
+- **Avaliação:** 5 datasets de imagem, 2 arquiteturas, 9 ataques (inclusive adaptativos), 10
+  defesas como linha de base; AUROC e F1; falha declarada contra backdoor all-to-all.
+- **Para nós (B):** precedente de certificar, no nível do modelo, um comportamento oculto sem ver
+  o interior, que é o papel do portão no rumo B. Molde: AUROC + atacante adaptativo + muitas
+  linhas de base.
 - **PDF:** `2025_huang_backdoor-prompting.pdf`.
 
 **[49] Rowhammer no backdoor de DNN** (2023)
@@ -908,7 +912,10 @@ ferramenta **(a verificar)**.
   - perturbações universais esparsas anulam a utilidade para consultas não autorizadas;
   - uma credencial no espaço de features restaura a utilidade;
   - bastam menos de 100 amostras.
-- **Avaliação:** **a verificar** (extração e inversão de modelo).
+- **Avaliação:** CIFAR-10, MNIST e SVHN em 6 arquiteturas; robustez a falsificação de
+  credencial, fine-tuning (com os pesos e 10% dos dados, a acurácia volta a ~52% contra ~95% do
+  original), compressão e poda; latência e memória. O modelo de ameaça (§III-A) supõe um runtime
+  que preserva a integridade dos parâmetros (PDF conferido em 2026-10-26).
 - **Para nós (B):** controle de uso embutido no modelo é uma alternativa ao controle pelo DNAT.
   Citar como trabalho relacionado e como contraste: proteção no modelo × proteção na
   infraestrutura.

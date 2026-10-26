@@ -1,0 +1,394 @@
+ano,trilha,titulo,doi,codigo,duvida
+2021,Research,A Comprehensive Study of Bugs in Software Defined Networks,10.1109/dsn48987.2021.00026,outro,
+2021,Research,A Low-cost Fault Corrector for Deep Neural Networks through Range Restriction,10.1109/dsn48987.2021.00018,B-adjacente,
+2021,Research,ADAM-CS: Advanced Asynchronous Monotonic Counter Service,10.1109/dsn48987.2021.00053,outro,
+2021,Research,An Application Agnostic Defense Against the Dark Arts of Cryptojacking,10.1109/dsn48987.2021.00044,outro,
+2021,Research,Asteria: Deep Learning-based AST-Encoding for Cross-platform Binary Code Similarity Detection,10.1109/dsn48987.2021.00036,A-adjacente,similaridade de binários; o resumo cita busca de vulnerabilidade como aplicação
+2021,Research,Avis: In-Situ Model Checking for Unmanned Aerial Vehicles,10.1109/dsn48987.2021.00057,outro,
+2021,Research,BigMap: Future-proofing Fuzzers with Efficient Large Maps,10.1109/dsn48987.2021.00062,A-adjacente,
+2021,Research,Catch You With Cache: Out-of-VM Introspection to Trace Malicious Executions,10.1109/dsn48987.2021.00045,outro,
+2021,Research,CloudSkulk: A Nested Virtual Machine Based Rootkit and Its Detection,10.1109/dsn48987.2021.00047,outro,
+2021,Research,Compromised Computers Meet Voice Assistants: Stealthily Exfiltrating Data as Voice over Telephony,10.1109/dsn48987.2021.00061,outro,
+2021,Research,"Conservative Confidence Bounds in Safety, from Generalised Claims of Improvement & Statistical Evidence",10.1109/dsn48987.2021.00055,outro,
+2021,Research,Data-centric Reliability Management in GPUs,10.1109/dsn48987.2021.00040,outro,
+2021,Research,Data-driven Design of Context-aware Monitors for Hazard Prediction in Artificial Pancreas Systems,10.1109/dsn48987.2021.00058,outro,
+2021,Research,Decamouflage: A Framework to Detect Image-Scaling Attacks on CNN,10.1109/dsn48987.2021.00023,B-adjacente,
+2021,Research,Enabling Novel Interconnection Agreements with Path-Aware Networking Architectures,10.1109/dsn48987.2021.00027,outro,
+2021,Research,"EncDBDB: Searchable Encrypted, Fast, Compressed, In-Memory Database Using Enclaves",10.1109/dsn48987.2021.00054,outro,
+2021,Research,Examining Failures and Repairs on Supercomputers with Multi-GPU Compute Nodes,10.1109/dsn48987.2021.00043,outro,
+2021,Research,Fast IPv6 Network Periphery Discovery and Security Implications,10.1109/dsn48987.2021.00025,outro,
+2021,Research,FIRestarter: Practical Software Crash Recovery with Targeted Library-level Fault Injection,10.1109/dsn48987.2021.00048,outro,
+2021,Research,GARFIELD: System Support for Byzantine Machine Learning,10.1109/dsn48987.2021.00021,B-adjacente,ML tolerante a falhas bizantinas; não é robustez adversarial clássica
+2021,Research,General Feature Selection for Failure Prediction in Large-scale SSD Deployment,10.1109/dsn48987.2021.00039,outro,
+2021,Research,Glitching Demystified: Analyzing Control-flow-based Glitching Attacks and Defenses,10.1109/dsn48987.2021.00051,outro,
+2021,Research,Hiding in the Particles: When Return-Oriented Programming Meets Program Obfuscation,10.1109/dsn48987.2021.00064,outro,
+2021,Research,Horus: Non-Intrusive Causal Analysis of Distributed Systems Logs,10.1109/dsn48987.2021.00035,outro,
+2021,Research,InjectaBLE: Injecting malicious traffic into established Bluetooth Low Energy connections,10.1109/dsn48987.2021.00050,outro,
+2021,Research,K2: Reading Quickly from Storage Across Many Datacenters,10.1109/dsn48987.2021.00034,outro,
+2021,Research,MILR: Mathematically Induced Layer Recovery for Plaintext Space Error Correction of CNNs,10.1109/dsn48987.2021.00024,B-adjacente,
+2021,Research,Model Checking the Multi-Formalism Language FIGARO,10.1109/dsn48987.2021.00056,outro,
+2021,Research,NVBitFI: Dynamic Fault Injection for GPUs,10.1109/dsn48987.2021.00041,outro,
+2021,Research,NVCache: A Plug-and-Play NVMM-based I/O Booster for Legacy Systems,10.1109/dsn48987.2021.00033,outro,
+2021,Research,OCTOPOCS: Automatic Verification of Propagated Vulnerable Code Using Reformed Proofs of Concept,10.1109/dsn48987.2021.00032,A-nucleo,
+2021,Research,PatchDB: A Large-Scale Security Patch Dataset,10.1109/dsn48987.2021.00030,A-nucleo,
+2021,Research,PDGraph: A Large-Scale Empirical Study on Project Dependency of Security Vulnerabilities,10.1109/dsn48987.2021.00031,A-nucleo,
+2021,Research,Physics-Aware Security Monitoring against Structural Integrity Attacks in 3D Printers,10.1109/dsn48987.2021.00060,outro,
+2021,Research,PID-Piper: Recovering Robotic Vehicles from Physical Attacks,10.1109/dsn48987.2021.00020,outro,
+2021,Research,Plinius: Secure and Persistent Machine Learning Model Training,10.1109/dsn48987.2021.00022,B-adjacente,
+2021,Research,Practical and Efficient in-Enclave Verification of Privacy Compliance,10.1109/dsn48987.2021.00052,outro,
+2021,Research,Revealing GPUs Vulnerabilities by Combining Register-Transfer and Software-Level Fault Injection,10.1109/dsn48987.2021.00042,outro,
+2021,Research,Sanitizing the IoT Cyber Security Posture: An Operational CTI Feed Backed up by Internet Measurements,10.1109/dsn48987.2021.00059,outro,
+2021,Research,Self-Healing Protocol: Repairing Schedules Online after Link Failures in Time-Triggered Networks,10.1109/dsn48987.2021.00028,outro,
+2021,Research,Sentiment Analysis based Error Detection for Large-Scale Systems,10.1109/dsn48987.2021.00037,outro,NLP aplicado a detecção de erros (não é segurança)
+2021,Research,Statically Detecting JavaScript Obfuscation and Minification Techniques in the Wild,10.1109/dsn48987.2021.00065,outro,
+2021,Research,The Master and Parasite Attack,10.1109/dsn48987.2021.00029,outro,
+2021,Research,Time-Window Based Group-Behavior Supported Method for Accurate Detection of Anomalous Users,10.1109/dsn48987.2021.00038,outro,
+2021,Research,Toward Intrusion Tolerance as a Service: Confidentiality in Partially Cloud-Based BFT Systems,10.1109/dsn48987.2021.00019,outro,
+2021,Research,Towards Optimal Use of Exception Handling Information for Function Detection,10.1109/dsn48987.2021.00046,outro,
+2021,Research,WazaBee: attacking Zigbee networks by diverting Bluetooth Low Energy chips,10.1109/dsn48987.2021.00049,outro,
+2021,Research,When Program Analysis Meets Bytecode Search: Targeted and Efficient Inter-procedural Analysis of Modern Android Apps in BackDroid,10.1109/dsn48987.2021.00063,A-adjacente,análise estática de apps Android para vetting de segurança; pode ser outro
+2021,Industry,A Matter of Trust: Verification of Security and Performance for Network Platform as a Service,10.1109/dsn-s52858.2021.00030,outro,
+2021,Industry,AMD EPYC™ 7002 Series – A Processor with Improved Soft Error Resilience,10.1109/dsn-s52858.2021.00026,outro,
+2021,Industry,BACgraph: Automatic Extraction of Object Relationships in the BACnet Protocol,10.1109/dsn-s52858.2021.00029,outro,
+2021,Industry,Designing Adversarial Attack and Defence for Robust Android Malware Detection Models,10.1109/dsn-s52858.2021.00025,B-adjacente,
+2021,Industry,Hardware Support for Low-Cost Memory Safety,10.1109/dsn-s52858.2021.00032,outro,
+2021,Industry,Near-Realtime Server Reboot Monitoring and Root Cause Analysis in a Large-Scale System,10.1109/dsn-s52858.2021.00027,outro,
+2021,Industry,SERMiner : A Framework for Early-stage Reliability Estimation for IBM Processors,10.1109/dsn-s52858.2021.00033,outro,
+2021,Industry,SymPLe: Complexity-Aware Design for Safety Critical I&C Systems,10.1109/dsn-s52858.2021.00031,outro,
+2021,Industry,The Importance of Safety Invariants in Robustness Testing Autonomy Systems,10.1109/dsn-s52858.2021.00028,outro,
+2022,Research,"A Comprehensive, Longitudinal Study of Government DNS Deployment at Global Scale",10.1109/dsn53405.2022.00030,outro,
+2022,Research,Active-MTSAD: Multivariate Time Series Anomaly Detection With Active Learning,10.1109/dsn53405.2022.00036,outro,
+2022,Research,Arming IDS Researchers with a Robotic Arm Dataset,10.1109/dsn53405.2022.00022,outro,
+2022,Research,Back to the future: N-Versioning of Microservices,10.1109/dsn53405.2022.00049,outro,
+2022,Research,Background Buster: Peeking through Virtual Backgrounds in Online Video Calls,10.1109/dsn53405.2022.00058,outro,
+2022,Research,BFL: a Logic to Reason about Fault Trees,10.1109/dsn53405.2022.00051,outro,
+2022,Research,BLAP: Bluetooth Link key extraction And Page blocking attacks,10.1109/dsn53405.2022.00033,outro,
+2022,Research,CAROL: Confidence-Aware Resilience Model for Edge Federations,10.1109/dsn53405.2022.00016,outro,
+2022,Research,CFGExplainer: Explaining Graph Neural Network-Based Malware Classification from Control Flow Graphs,10.1109/dsn53405.2022.00028,outro,"explicabilidade de GNN para malware; ML aplicado, sem ataque ao modelo"
+2022,Research,Characterizing and Mitigating Anti-patterns of Alerts in Industrial Cloud Systems,10.1109/dsn53405.2022.00047,outro,
+2022,Research,COMET: On-die and In-controller Collaborative Memory ECC Technique for Safer and Stronger Correction of DRAM Errors,10.1109/dsn53405.2022.00024,outro,
+2022,Research,ComFASE: A Tool for Evaluating the Effects of V2V Communication Faults and Attacks on Automated Vehicles,10.1109/dsn53405.2022.00029,outro,
+2022,Research,CYCLE: Sustainable Off-Chain Payment Channel Network with Asynchronous Rebalancing,10.1109/dsn53405.2022.00017,outro,
+2022,Research,DisTA: System-Agnostic Dynamic Taint Tracking for Distributed Systems,10.1109/dsn53405.2022.00060,outro,
+2022,Research,ERIC: An Efficient and Practical Software Obfuscation Framework,10.1109/dsn53405.2022.00053,outro,
+2022,Research,Exploiting monotonicity and symmetry for evaluation of highly dependable systems,10.1109/dsn53405.2022.00040,outro,
+2022,Research,Exploiting Temporal Data Diversity for Detecting Safety-critical Faults in AV Compute Systems,10.1109/dsn53405.2022.00021,outro,falhas de hardware em computação de veículo autônomo; não é específico de DNN
+2022,Research,False Data Injection Attack Detection for Secure Distributed Demand Response in Smart Grids,10.1109/dsn53405.2022.00045,outro,
+2022,Research,GoldenEye: A Platform for Evaluating Emerging Data Formats in DNN Accelerators,10.1109/dsn53405.2022.00031,B-adjacente,
+2022,Research,Hardening In-memory Key-value Stores against ECC-uncorrectable Memory Errors,10.1109/dsn53405.2022.00057,outro,
+2022,Research,HDiff: A Semi-automatic Framework for Discovering Semantic Gap Attack in HTTP Implementations,10.1109/dsn53405.2022.00014,A-adjacente,teste diferencial (não fuzzing) para achar ataques de semantic gap em HTTP
+2022,Research,How'd Security Benefit Reverse Engineers? The Implication of Intel CET on Function Identification,10.1109/dsn53405.2022.00061,outro,
+2022,Research,Invoke-Deobfuscation: AST-Based and Semantics-Preserving Deobfuscation for PowerShell Scripts,10.1109/dsn53405.2022.00039,outro,
+2022,Research,IoT Phantom-Delay Attacks: Demystifying and Exploiting IoT Timeout Behaviors,10.1109/dsn53405.2022.00050,outro,
+2022,Research,KINGFISHER: Unveiling Insecurely Used Credentials in IoT-to-Mobile Communications,10.1109/dsn53405.2022.00055,A-adjacente,framework de análise que revela credenciais mal usadas; pode ser outro
+2022,Research,L2Fuzz: Discovering Bluetooth L2CAP Vulnerabilities Using Stateful Fuzz Testing,10.1109/dsn53405.2022.00043,A-adjacente,
+2022,Research,Marlin: Two-Phase BFT with Linearity,10.1109/dsn53405.2022.00018,outro,
+2022,Research,Minimizing Noise in HyperLogLog-Based Spread Estimation of Multiple Flows,10.1109/dsn53405.2022.00042,outro,
+2022,Research,NEC: Speaker Selective Cancellation via Neural Enhanced Ultrasound Shadowing,10.1109/dsn53405.2022.00044,outro,
+2022,Research,On the Price of Locality in Static Fast Rerouting,10.1109/dsn53405.2022.00032,outro,
+2022,Research,PassFlow: Guessing Passwords with Generative Flows,10.1109/dsn53405.2022.00035,outro,modelo generativo (não LLM) para adivinhar senhas
+2022,Research,Predicting DRAM-Caused Node Unavailability in Hyper-Scale Clouds,10.1109/dsn53405.2022.00037,outro,
+2022,Research,QuFI: a Quantum Fault Injector to Measure the Reliability of Qubits and Quantum Circuits,10.1109/dsn53405.2022.00025,outro,
+2022,Research,RAPMiner: A Generic Anomaly Localization Mechanism for CDN System with Multi-dimensional KPIs,10.1109/dsn53405.2022.00041,outro,
+2022,Research,"SAINTDroid: Scalable, Automated Incompatibility Detection for Android",10.1109/dsn53405.2022.00062,outro,
+2022,Research,SEVulDet: A Semantics-Enhanced Learnable Vulnerability Detector,10.1109/dsn53405.2022.00026,A-adjacente,
+2022,Research,SIMulation: Demystifying (Insecure) Cellular Network based One-Tap Authentication Services,10.1109/dsn53405.2022.00059,outro,
+2022,Research,Solution Bundles of Markov Performability Models through Adaptive Cross Approximation,10.1109/dsn53405.2022.00046,outro,
+2022,Research,STBPU: A Reasonably Secure Branch Prediction Unit,10.1109/dsn53405.2022.00023,outro,
+2022,Research,Strategic Safety-Critical Attacks against an Advanced Driver Assistance System,10.1109/dsn53405.2022.00020,outro,
+2022,Research,The Fault in Our Data Stars: Studying Mitigation Techniques against Faulty Training Data in Machine Learning Applications,10.1109/dsn53405.2022.00027,B-adjacente,
+2022,Research,The Hazard Value: A Quantitative Network Connectivity Measure Accounting for Failures,10.1109/dsn53405.2022.00034,outro,
+2022,Research,TimeDice: Schedulability-Preserving Priority Inversion for Mitigating Covert Timing Channels Between Real-time Partitions,10.1109/dsn53405.2022.00052,outro,
+2022,Research,Tool: An Efficient and Flexible Simulator for Byzantine Fault-Tolerant Protocols,10.1109/dsn53405.2022.00038,outro,
+2022,Research,TORPEDO: A Fuzzing Framework for Discovering Adversarial Container Workloads,10.1109/dsn53405.2022.00048,A-adjacente,
+2022,Research,Treaty: Secure Distributed Transactions,10.1109/dsn53405.2022.00015,outro,
+2022,Research,Understanding the RowHammer Vulnerability Under Reduced Wordline Voltage: An Experimental Study Using Real Devices,10.1109/dsn53405.2022.00054,outro,
+2022,Research,WideLeak: How Over-the-Top Platforms Fail in Android,10.1109/dsn53405.2022.00056,outro,
+2022,Research,ZugChain: Blockchain-Based Juridical Data Recording in Railway Systems,10.1109/dsn53405.2022.00019,outro,
+2022,Industry,An industrial perspective on web scrapers' characteristics and open issues,10.1109/dsn-s54099.2022.00012,outro,
+2022,Industry,Challenges/Opportunities to Enable Dependable Scale-out System with Groq Deterministic Tensor-Streaming Processors,10.1109/dsn-s54099.2022.00016,outro,
+2022,Industry,Long-Term Study of Honeypots in a Public Cloud,10.1109/dsn-s54099.2022.00011,outro,
+2022,Industry,On the Scalability of HeapCheck,10.1109/dsn-s54099.2022.00015,outro,
+2022,Industry,"Revisiting Tendermint: Design Tradeoffs, Accountability, and Practical Use",10.1109/dsn-s54099.2022.00014,outro,
+2022,Industry,SimLane: A Risk-Orientated Benchmark for Lane Detection,10.1109/dsn-s54099.2022.00013,B-adjacente,
+2023,Research,Analyzing the Performance of the Inter-Blockchain Communication Protocol,10.1109/dsn58367.2023.00026,outro,
+2023,Research,Breaking Geographic Routing Among Connected Vehicles,10.1109/dsn58367.2023.00018,outro,
+2023,Research,Compiler-Implemented Differential Checksums: Effective Detection and Correction of Transient and Permanent Memory Errors,10.1109/dsn58367.2023.00021,outro,
+2023,Research,Cost-damage analysis of attack trees,10.1109/dsn58367.2023.00057,outro,
+2023,Research,DARPA: Combating Asymmetric Dark UI Patterns on Android with Run-time View Decorator,10.1109/dsn58367.2023.00052,outro,
+2023,Research,Detection of e-Mobility-based Attacks on the Power Grid,10.1109/dsn58367.2023.00042,outro,
+2023,Research,Devils in Your Apps: Vulnerabilities and User Privacy Exposure in Mobile Notification Systems,10.1109/dsn58367.2023.00017,outro,
+2023,Research,DNAttest: Digital-twin-based Non-intrusive Attestation under Transient Uncertainty,10.1109/dsn58367.2023.00044,outro,
+2023,Research,Does TLS Provide Any Privacy Anymore? Adaptive Webpage Inference from TLS traces,10.1109/dsn58367.2023.00049,outro,
+2023,Research,Don’t Knock! Rowhammer at the Backdoor of DNN Models,10.1109/dsn58367.2023.00023,B-adjacente,"backdoor em DNN (núcleo) injetado por Rowhammer (bit-flip, adjacente)"
+2023,Research,Exploiting Code Reuse Attacks from Obfuscated Programs,10.1109/dsn58367.2023.00039,outro,
+2023,Research,Fabricated Flips: Poisoning Federated Learning without Data,10.1109/dsn58367.2023.00036,B-adjacente,
+2023,Research,Faster Asynchronous Distributed Key Generation from Weaker Assumption and Standard Model,10.1109/dsn58367.2023.00059,outro,
+2023,Research,Fortifying Federated Learning against Membership Inference Attacks via Client-level Input Perturbation,10.1109/dsn58367.2023.00037,B-adjacente,privacidade de FL (membership inference); privacidade não está na lista de B
+2023,Research,Get Your Cyber-Physical Tests Done! Data-Driven Vulnerability Assessment of Robotic Vehicles,10.1109/dsn58367.2023.00020,outro,avaliação de vulnerabilidade ciberfísica de drones; pode ser A-adjacente
+2023,Research,Heron: Scalable State Machine Replication on Shared Memory,10.1109/dsn58367.2023.00025,outro,
+2023,Research,HiMFP: Hierarchical Intelligent Memory Failure Prediction for Cloud Service Reliability,10.1109/dsn58367.2023.00031,outro,
+2023,Research,How Different are the Cloud Workloads? Characterizing Large-Scale Private and Public Cloud Workloads,10.1109/dsn58367.2023.00055,outro,
+2023,Research,IDTracker:Discovering Illegal Campaigns via Third-party Service ID,10.1109/dsn58367.2023.00050,outro,
+2023,Research,Intrusion Injection for Virtualized Systems: Concepts and Approach,10.1109/dsn58367.2023.00047,outro,
+2023,Research,IoT Anomaly Detection Via Device Interaction Graph,10.1109/dsn58367.2023.00053,outro,
+2023,Research,IRIS: a Record and Replay Framework to Enable Hardware-assisted Virtualization Fuzzing,10.1109/dsn58367.2023.00045,A-adjacente,
+2023,Research,JSRevealer: A Robust Malicious JavaScript Detector against Obfuscation,10.1109/dsn58367.2023.00041,outro,
+2023,Research,MalAder: Decision-Based Black-Box Attack Against API Sequence Based Malware Detectors,10.1109/dsn58367.2023.00027,B-adjacente,
+2023,Research,Micro Replication – Improving the Debuggability of State-Machine Replication Protocols,10.1109/dsn58367.2023.00024,outro,
+2023,Research,NPTSN: RL-Based Network Planning with Guaranteed Reliability for In-Vehicle TSSDN,10.1109/dsn58367.2023.00019,outro,
+2023,Research,On Adversarial Robustness of Point Cloud Semantic Segmentation,10.1109/dsn58367.2023.00056,B-adjacente,
+2023,Research,PASTA: Pragmatic Automated System-Theoretic Process Analysis,10.1109/dsn58367.2023.00058,outro,
+2023,Research,Poisoning Online Learning Filters by Shifting on the Move,10.1109/dsn58367.2023.00033,B-adjacente,
+2023,Research,Practical Experience: Creating a Large-scale Memory Error IoT Botnet Using NS3DockerEmulator,10.1109/dsn58367.2023.00051,outro,
+2023,Research,PT-Guard: Integrity-Protected Page Tables to Defend Against Breakthrough Rowhammer Attacks,10.1109/dsn58367.2023.00022,outro,
+2023,Research,ReFace: Adversarial Transformation Networks for Real-time Attacks on Face Recognition Systems,10.1109/dsn58367.2023.00038,B-adjacente,
+2023,Research,Rewind & Discard: Improving Software Resilience using Isolated Domains,10.1109/dsn58367.2023.00046,outro,
+2023,Research,SecDDR: Enabling Low-Cost Secure Memories by Protecting the DDR Interface,10.1109/dsn58367.2023.00016,outro,
+2023,Research,SGX Switchless Calls Made Configless,10.1109/dsn58367.2023.00032,outro,
+2023,Research,SHATTER: Control and Defense-Aware Attack Analytics for Activity-Driven Smart Home Systems,10.1109/dsn58367.2023.00015,outro,
+2023,Research,Speaker Orientation-Aware Privacy Control to Thwart Misactivation of Voice Assistants,10.1109/dsn58367.2023.00061,outro,
+2023,Research,SwarmFuzz: Discovering GPS Spoofing Attacks in Drone Swarms,10.1109/dsn58367.2023.00043,A-adjacente,fuzzing para descobrir ataques de spoofing de GPS em enxames
+2023,Research,Tabby: Automated Gadget Chain Detection for Java Deserialization Vulnerabilities,10.1109/dsn58367.2023.00028,A-adjacente,
+2023,Research,TagClass: A Tool for Extracting Class-determined Tags from Massive Malware Labels via Incremental Parsing,10.1109/dsn58367.2023.00029,outro,
+2023,Research,Targeted Privacy Attacks by Fingerprinting Mobile Apps in LTE Radio Layer,10.1109/dsn58367.2023.00035,outro,
+2023,Research,Time Machine: Generative Real-Time Model For Failure (and Lead Time) Prediction in HPC Systems,10.1109/dsn58367.2023.00054,outro,
+2023,Research,TransAST: A Machine Translation-Based Approach for Obfuscated Malicious JavaScript Detection,10.1109/dsn58367.2023.00040,outro,modelo de tradução automática aplicado a detecção de JS malicioso
+2023,Research,VoiceGuard: An Effective and Practical Approach for Detecting and Blocking Unauthorized Voice Commands to Smart Speakers,10.1109/dsn58367.2023.00060,outro,
+2023,Research,vWitness: Certifying Web Page Interactions with Computer Vision,10.1109/dsn58367.2023.00048,outro,
+2023,Research,YODA: Covert Communication Channel over Public DNS Resolvers,10.1109/dsn58367.2023.00034,outro,
+2023,Research,Āpta: Fault-tolerant object-granular CXL disaggregated memory for accelerating FaaS,10.1109/dsn58367.2023.00030,outro,
+2023,Industry,ACE: Analog Cell Emulator for Dependability Study of NAND Flash Memory,10.1109/dsn-s58398.2023.00021,outro,
+2023,Industry,An Integrated Runtime Verification and Simulation Testbed for UAM Hazard Assessment,10.1109/dsn-s58398.2023.00023,outro,
+2023,Industry,Characterization and exploration of latch checkers for efficient RAS protection,10.1109/dsn-s58398.2023.00026,outro,
+2023,Industry,"Data Shower in Electronics Manufacturing: Measuring Wi-Fi 4, Wi-Fi 6, and 5G SA behavior in production assembly lines",10.1109/dsn-s58398.2023.00019,outro,
+2023,Industry,ECHAIN: Securing Electronic Device Provenance through Privacy-Preserving Consortium Blockchains,10.1109/dsn-s58398.2023.00028,outro,"proveniência de dispositivos eletrônicos (cadeia de suprimentos de hardware, não de software)"
+2023,Industry,EXPERT: Exploiting DRAM Failure Types to Improve the Effective Forecasting Coverage in the Field,10.1109/dsn-s58398.2023.00022,outro,
+2023,Industry,Hard Disk Drive Failure Analysis and Prediction: An Industry View,10.1109/dsn-s58398.2023.00020,outro,
+2023,Industry,HIRN: A Hierarchical Intent Refinement Approach for Dependable Network Slicing with Multi-path Resource Allocation,10.1109/dsn-s58398.2023.00018,outro,
+2023,Industry,IEEE 802.1AS Multi-Domain Aggregation for Virtualized Distributed Real-Time Systems,10.1109/dsn-s58398.2023.00027,outro,
+2023,Industry,Large-Scale Application of Fault Injection into PyTorch Models - an Extension to PyTorchFI for Validation Efficiency,10.1109/dsn-s58398.2023.00025,B-adjacente,
+2023,Industry,Towards Automated Generation of Smart Grid Cyber Range for Cybersecurity Experiments and Training,10.1109/dsn-s58398.2023.00024,outro,
+2024,Research,A Comprehensive Study on Drones Resilience in the Presence of Inertial Measurement Unit Faults,10.1109/dsn58291.2024.00040,outro,
+2024,Research,A Fast Low-Level Error Detection Technique,10.1109/dsn58291.2024.00023,outro,
+2024,Research,ADSynth: Synthesizing Realistic Active Directory Attack Graphs,10.1109/dsn58291.2024.00021,outro,
+2024,Research,AOAB: Optimal and Fair Ordering of Financial Transactions,10.1109/dsn58291.2024.00045,outro,ordenação justa contra front-running (consenso)
+2024,Research,BFTRAND: Low-Latency Random Number Provider for BFT Smart Contracts,10.1109/dsn58291.2024.00046,outro,
+2024,Research,Byzantine Attacks Exploiting Penalties in Ethereum PoS,10.1109/dsn58291.2024.00020,outro,ataque a penalidades do PoS do Ethereum (incentivos de consenso)
+2024,Research,ChainNet: A Customized Graph Neural Network Model for Loss-Aware Edge AI Service Deployment,10.1109/dsn58291.2024.00034,outro,
+2024,Research,ChatScam: Unveiling the Rising Impact of ChatGPT on Domain Name Abuse,10.1109/dsn58291.2024.00055,outro,abuso de domínios com a marca ChatGPT; não é segurança do modelo
+2024,Research,Decentagram: Highly-Available Decentralized Publish/Subscribe Systems,10.1109/dsn58291.2024.00037,outro,
+2024,Research,Delphi: Efficient Asynchronous Approximate Agreement for Distributed Oracles,10.1109/dsn58291.2024.00051,outro,
+2024,Research,FIRMRES: Exposing Broken Device-Cloud Access Control in IoT Through Static Firmware Analysis,10.1109/dsn58291.2024.00054,A-adjacente,
+2024,Research,Goldfish: An Efficient Federated Unlearning Framework,10.1109/dsn58291.2024.00035,outro,federated unlearning (privacidade/direito ao esquecimento)
+2024,Research,Grunt Attack: Exploiting Execution Dependencies in Microservices,10.1109/dsn58291.2024.00025,outro,
+2024,Research,Iniva: Inclusive and Incentive-Compatible Vote Aggregation,10.1109/dsn58291.2024.00050,outro,agregação de votos compatível com incentivos (consenso)
+2024,Research,Intrusion Tolerance for Networked Systems through Two-Level Feedback Control,10.1109/dsn58291.2024.00042,outro,
+2024,Research,IPMES: A Tool for Incremental TTP Detection over the System Audit Event Stream,10.1109/dsn58291.2024.00036,outro,
+2024,Research,iPrism: Characterize and Mitigate Risk by Quantifying Change in Escape Routes,10.1109/dsn58291.2024.00027,outro,
+2024,Research,JITBULL: Securing JavaScript Runtime with a Go/No-Go Policy for JIT Engine,10.1109/dsn58291.2024.00028,outro,
+2024,Research,Moonshot: Optimizing Block Period and Commit Latency in Chain-Based Rotating Leader BFT,10.1109/dsn58291.2024.00052,outro,
+2024,Research,"Mutiny! How does Kubernetes fail, and what can we do about it?",10.1109/dsn58291.2024.00016,outro,
+2024,Research,OffRAMPS: An FPGA-Based Intermediary for Analysis and Modification of Additive Manufacturing Control Systems,10.1109/dsn58291.2024.00057,outro,
+2024,Research,On the Correctness of Metadata-Based SBOM Generation: A Differential Analysis Approach,10.1109/dsn58291.2024.00018,A-nucleo,
+2024,Research,Owl: Differential-Based Side-Channel Leakage Detection for CUDA Applications,10.1109/dsn58291.2024.00044,A-adjacente,detecção de vazamento por canal lateral em código CUDA
+2024,Research,PagPassGPT: Pattern Guided Password Guessing via Generative Pretrained Transformer,10.1109/dsn58291.2024.00049,B-adjacente,modelo tipo GPT treinado para adivinhar senhas
+2024,Research,PAROLE: Profitable Arbitrage in Optimistic Rollup with ERC-721 Token Transactions,10.1109/dsn58291.2024.00026,A-adjacente,"arbitragem em rollup com tokens ERC-721 (incentivos), não vulnerabilidade de código"
+2024,Research,Privacy Leakage from Logits Attack and Its Defense in Federated Distillation,10.1109/dsn58291.2024.00029,B-adjacente,ataque de privacidade a FL (logits); privacidade não está na lista de B
+2024,Research,Protecting Confidential Virtual Machines from Hardware Performance Counter Side Channels,10.1109/dsn58291.2024.00031,outro,
+2024,Research,"RABIT, a Robot Arm Bug Intervention Tool for Self-Driving Labs",10.1109/dsn58291.2024.00043,outro,
+2024,Research,Read Disturbance in High Bandwidth Memory: A Detailed Experimental Study on HBM2 DRAM Chips,10.1109/dsn58291.2024.00022,outro,
+2024,Research,Real-Time Intrusion Detection and Prevention with Neural Network in Kernel using eBPF,10.1109/dsn58291.2024.00048,outro,
+2024,Research,Reboot-Based Recovery of Unikernels at the Component Level,10.1109/dsn58291.2024.00017,outro,
+2024,Research,SEDSpec: Securing Emulated Devices by Enforcing Execution Specification,10.1109/dsn58291.2024.00056,outro,
+2024,Research,Simultaneous Many-Row Activation in Off-the-Shelf DRAM Chips: Experimental Characterization and Analysis,10.1109/dsn58291.2024.00024,outro,
+2024,Research,SPP: Safe Persistent Pointers for Memory Safety,10.1109/dsn58291.2024.00019,outro,
+2024,Research,Stealthy Peers: Understanding Security and Privacy Risks of Peer-Assisted Video Streaming,10.1109/dsn58291.2024.00041,outro,
+2024,Research,SyRep: Efficient Synthesis and Repair of Fast Re-Route Forwarding Tables for Resilient Networks,10.1109/dsn58291.2024.00053,outro,
+2024,Research,System Call Interposition Without Compromise,10.1109/dsn58291.2024.00030,outro,
+2024,Research,Toward Evaluating Robustness of Reinforcement Learning with Adversarial Policy,10.1109/dsn58291.2024.00038,B-adjacente,
+2024,Research,Towards Shielding 5G Control Plane Functions,10.1109/dsn58291.2024.00039,outro,
+2024,Research,Verifying Randomized Consensus Protocols with Common Coins,10.1109/dsn58291.2024.00047,outro,
+2024,Research,ZipChannel: Cache Side-Channel Vulnerabilities in Compression Algorithms,10.1109/dsn58291.2024.00033,A-adjacente,ferramenta que detecta canais laterais de cache em código
+2024,Research,ZLB: A Blockchain to Tolerate Colluding Majorities,10.1109/dsn58291.2024.00032,outro,
+2024,Industry,Active Learning Omnivariate Decision Trees for Fault Diagnosis in Robotic Systems,10.1109/dsn-s60304.2024.00037,outro,
+2024,Industry,Bridging the Gap: A Study of AI-Based Vulnerability Management between Industry and Academia,10.1109/dsn-s60304.2024.00032,A-adjacente,"estudo sobre gestão de vulnerabilidades com IA; foco em detecção por IA, não no ciclo de gestão"
+2024,Industry,Empowering Data Centers with Computational Storage Drive-Based Deep Learning Inference Functionality to Combat Ransomware,10.1109/dsn-s60304.2024.00038,outro,
+2024,Industry,Fault Localization Using Interventional Causal Learning for Cloud-Native Applications,10.1109/dsn-s60304.2024.00040,outro,
+2024,Industry,Federated Unlearning in the Internet of Vehicles,10.1109/dsn-s60304.2024.00034,outro,federated unlearning; cita recuperação de envenenamento
+2024,Industry,Intrusion Detection at Scale with the Assistance of a Command-line Language Model,10.1109/dsn-s60304.2024.00031,B-adjacente,
+2024,Industry,Investigating Memory Failure Prediction Across CPU Architectures,10.1109/dsn-s60304.2024.00033,outro,
+2024,Industry,Optimizing Large-Scale Fault Injection Experiments through Martingale Hypothesis: A Systematic Approach for Reliability Assessment of Safety-Critical Systems,10.1109/dsn-s60304.2024.00036,outro,
+2024,Industry,Road Decals as Trojans: Disrupting Autonomous Vehicle Navigation with Adversarial Patterns,10.1109/dsn-s60304.2024.00039,B-adjacente,
+2024,Industry,Zone-Hopping: Sensitive Information Leakage Prevention for DNSSEC-NSEC,10.1109/dsn-s60304.2024.00035,outro,
+2025,Research,"""I will always be by your side"": A Side-channel Aided PWM-based Holistic Attack Recovery for Unmanned Aerial Vehicles",10.1109/dsn64029.2025.00070,outro,
+2025,Research,"5G-STREAM: 5G Service Mesh Tailored for Reliable, Efficient and Authorized Microservices in the Cloud",10.1109/dsn64029.2025.00025,outro,
+2025,Research,A Closer Look At Modern Evasive Phishing Emails,10.1109/dsn64029.2025.00066,outro,
+2025,Research,A Human Study of Automatically Generated Decompiler Annotations,10.1109/dsn64029.2025.00026,outro,anotações de descompilador geradas automaticamente; estudo com humanos
+2025,Research,ammBoost: State Growth Control for AMMs,10.1109/dsn64029.2025.00027,outro,
+2025,Research,An Analysis of Malicious Packages in Open-Source Software in the Wild,10.1109/dsn64029.2025.00045,A-nucleo,
+2025,Research,Attack-Defense Trees with Offensive and Defensive Attributes,10.1109/dsn64029.2025.00044,outro,
+2025,Research,Automatically Generating Rules of Malicious Software Packages via Large Language Model,10.1109/dsn64029.2025.00072,A-nucleo,usa LLM (seria B-adjacente); tema é pacote malicioso
+2025,Research,BASSET: Enhancing Binary Code Clone Searching through Multi-Level Hybrid Semantic Indexing,10.1109/dsn64029.2025.00020,outro,busca de clones binários; resumo não foca vulnerabilidade
+2025,Research,ConfBench: A Tool for Easy Evaluation of Confidential Virtual Machines,10.1109/dsn64029.2025.00038,outro,
+2025,Research,Decoding DNS Centralization: Measuring and Identifying NS Domains Across Hosting Providers,10.1109/dsn64029.2025.00037,outro,
+2025,Research,Detecting Code Vulnerabilities using LLMs,10.1109/dsn64029.2025.00047,B-adjacente,LLM para detectar vulnerabilidade; também seria A-adjacente
+2025,Research,EasyDRAM: An FPGA-based Infrastructure for Fast and Accurate End-to-End Evaluation of Emerging DRAM Techniques,10.1109/dsn64029.2025.00042,outro,
+2025,Research,Faster Hash-based Multi-valued Validated Asynchronous Byzantine Agreement,10.1109/dsn64029.2025.00040,outro,
+2025,Research,GnuZero: A Compiler-Based Zeroization Static Detection Tool for the Masses,10.1109/dsn64029.2025.00032,A-adjacente,
+2025,Research,GREAT: Global Representation and Edge-Attention for Hardware Trojan Detection,10.1109/dsn64029.2025.00034,outro,detecção de trojan de hardware; resumo cita cadeia de suprimentos de hardware
+2025,Research,GTV: Generating Tabular Data via Vertical Federated Learning,10.1109/dsn64029.2025.00019,outro,
+2025,Research,Hierarchical Model-Based Approach for Concurrent Testing of Neuromorphic Architecture,10.1109/dsn64029.2025.00055,outro,teste de hardware neuromórfico
+2025,Research,ICSTRACKER: Backtracking Intrusions in Modern Industrial Control Systems,10.1109/dsn64029.2025.00031,outro,
+2025,Research,IPMES+: Enhancing Incremental TTP Detection with Frequency and Flow Semantics,10.1109/dsn64029.2025.00035,outro,
+2025,Research,KubeFence: Security Hardening of the Kubernetes Attack Surface,10.1109/dsn64029.2025.00054,outro,
+2025,Research,LAGER: Layer-wise Graph Feature Extractor for Network Intrusion Detection,10.1109/dsn64029.2025.00021,outro,
+2025,Research,Less is More: Boosting Coverage of Web Crawling through Adversarial Multi-Armed Bandit,10.1109/dsn64029.2025.00030,outro,
+2025,Research,LiveGuard: Voice Liveness Detection via Wavelet Scattering Transform and Mel Spectrogram Scaling,10.1109/dsn64029.2025.00041,outro,
+2025,Research,MalTAG: Encrypted Malware Traffic Detection Framework via Graph Based Flow Interaction Mining,10.1109/dsn64029.2025.00052,outro,
+2025,Research,MichiCAN: Spoofing and Denial-of-Service Protection using Integrated CAN Controllers,10.1109/dsn64029.2025.00050,outro,
+2025,Research,MicroSampler: A Framework for Microarchitecture-Level Leakage Detection in Constant Time Execution,10.1109/dsn64029.2025.00059,A-adjacente,detecção de vazamento microarquitetural em código constant-time
+2025,Research,Mitigating Front-Running Attacks through Fair and Resilient Transaction Dissemination,10.1109/dsn64029.2025.00065,outro,disseminação justa contra front-running (consenso)
+2025,Research,Multi-version Machine Learning and Rejuvenation for Resilient Perception in Safety-critical Systems,10.1109/dsn64029.2025.00071,B-adjacente,
+2025,Research,On Security Vulnerabilities in Transportation IoT Devices,10.1109/dsn64029.2025.00061,A-adjacente,estudo empírico de CVEs de dispositivos IoT de transporte
+2025,Research,ParaVerser: Harnessing Heterogeneous Parallelism for Affordable Fault Detection in Data Centers,10.1109/dsn64029.2025.00046,outro,
+2025,Research,PhishingHook: Catching Phishing Ethereum Smart Contracts leveraging EVM Opcodes,10.1109/dsn64029.2025.00033,A-adjacente,
+2025,Research,Privacy Analysis of Oblivious DNS over HTTPS: a Website Fingerprinting Study,10.1109/dsn64029.2025.00048,outro,
+2025,Research,Privacy from 5 PM to 6 AM: Tracking and Transparency Mechanisms in the HbbTV Ecosystem,10.1109/dsn64029.2025.00017,outro,
+2025,Research,Prompting the Unseen: Detecting Hidden Backdoors in Black-Box Models,10.1109/dsn64029.2025.00058,B-nucleo,
+2025,Research,PTC: Prefix Tuning CodeT5 for High-Quality Secure Network Measurement Script Generation,10.1109/dsn64029.2025.00024,B-adjacente,modelo de código (CodeT5) para gerar scripts seguros
+2025,Research,QUIC-Aware Load Balancing: Attacks and Mitigations,10.1109/dsn64029.2025.00056,outro,
+2025,Research,RAVAGE: Robotic Autonomous Vehicles’ Attack Generation Engine,10.1109/dsn64029.2025.00057,outro,
+2025,Research,"ReCraft: Self-Contained Split, Merge, and Membership Change of Raft Protocol",10.1109/dsn64029.2025.00028,outro,
+2025,Research,Reentrancy Redux: The Evolution of Real-World Reentrancy Attacks on Blockchains,10.1109/dsn64029.2025.00060,A-adjacente,
+2025,Research,ReMlX: Resilience for ML Ensembles using XAI at Inference against Faulty Training Data,10.1109/dsn64029.2025.00069,B-adjacente,
+2025,Research,Revisiting Main Memory-Based Covert and Side Channel Attacks in the Context of Processing-in-Memory,10.1109/dsn64029.2025.00018,outro,
+2025,Research,Safety Interventions against Adversarial Patches in an Open-Source Driver Assistance System,10.1109/dsn64029.2025.00062,B-adjacente,
+2025,Research,Secure access to network data for mobile network traffic analysis applications,10.1109/dsn64029.2025.00063,outro,
+2025,Research,Securing In-Network Traffic Control Systems with P4Auth,10.1109/dsn64029.2025.00049,outro,
+2025,Research,Semantically Improved Adversarial Attack Based on Masked Language Model via Context Preservation,10.1109/dsn64029.2025.00029,B-adjacente,ataque adversarial textual com masked LM; vítima não é LLM gerativo
+2025,Research,SemiAF: Semi-Supervised App Fingerprinting on Unknown Traffic via Graph Neural Network,10.1109/dsn64029.2025.00051,outro,
+2025,Research,SOUNDBOOST: Effective RCA and Attack Detection for UAV via Acoustic Side-Channel,10.1109/dsn64029.2025.00039,outro,
+2025,Research,Towards Automated and Explainable Threat Hunting with Generative AI,10.1109/dsn64029.2025.00067,B-adjacente,
+2025,Research,Towards Continuous Integrity Attestation and Its Challenges in Practice: A Case Study of Keylime,10.1109/dsn64029.2025.00036,outro,
+2025,Research,Towards More Dependable Specifications: An Empirical Study Exploring the Synergy of Traditional and LLM-Based Repair Approaches,10.1109/dsn64029.2025.00023,outro,"LLM aplicado a reparo de especificações (confiabilidade, não segurança)"
+2025,Research,Valkyrie: A Response Framework to Augment Runtime Detection of Time-Progressive Attacks,10.1109/dsn64029.2025.00053,outro,
+2025,Research,VerifyVFL: Practical Verifiable Vertical Federated Learning,10.1109/dsn64029.2025.00022,B-adjacente,verificabilidade do treino em VFL (integridade de modelo seria núcleo)
+2025,Research,What Lies Beneath: An Empirical Study of Silent Vulnerability Fixes in Open-Source Software,10.1109/dsn64029.2025.00043,A-nucleo,
+2025,Research,ZCOVER: Uncovering Z-Wave Controller Vulnerabilities Through Systematic Security Analysis of Application Layer Implementation,10.1109/dsn64029.2025.00068,A-adjacente,
+2025,Research,Zero-Interference Containers: A Framework to Orchestrate Mixed-Criticality Applications,10.1109/dsn64029.2025.00064,outro,
+2025,Industry,An Open-source Implementation and Security Analysis of Triad's TEE Trusted Time Protocol,10.1109/dsn-s65789.2025.00053,outro,
+2025,Industry,Anomaly Detection in Energy Performance Certificates: From Oblivious to Enlightened,10.1109/dsn-s65789.2025.00035,outro,
+2025,Industry,Assessing the Transferability of Adversarial Patches in Real-World Systems: Implications for Adversarial Testing of Image Recognition Security,10.1109/dsn-s65789.2025.00040,B-adjacente,
+2025,Industry,Be My Guest: Welcoming Interoperability into IBC-Incompatible Blockchains,10.1109/dsn-s65789.2025.00057,outro,
+2025,Industry,Beyond Component Failures: Safety Challenges in Complex Maritime Control Systems,10.1109/dsn-s65789.2025.00036,outro,
+2025,Industry,Bridging the Safety Gap: A C-ITS Solution for Protecting Vulnerable Road Users with DSRC/C-V2X,10.1109/dsn-s65789.2025.00043,outro,
+2025,Industry,Cordial: Cross-row Failure Prediction Method Based on Bank-level Error Locality for HBMs,10.1109/dsn-s65789.2025.00045,outro,
+2025,Industry,DDR5 DRAM Faults in the Field,10.1109/dsn-s65789.2025.00039,outro,
+2025,Industry,Energy-Efficient Anomaly Detection in Autonomous Vehicles Using RSNNs,10.1109/dsn-s65789.2025.00046,outro,
+2025,Industry,Expectations Versus Reality: Evaluating Intrusion Detection Systems in Practice,10.1109/dsn-s65789.2025.00042,outro,
+2025,Industry,Hardware Telemetry at Scale: A Case Study on SSDs Endurance Monitoring in Datacenters,10.1109/dsn-s65789.2025.00055,outro,
+2025,Industry,IAM Role Diet: A Scalable Approach to Detecting RBAC Data Inefficiencies,10.1109/dsn-s65789.2025.00052,outro,
+2025,Industry,Integrating Testing with Runtime Verification for Mission-Critical Distributed Control Systems,10.1109/dsn-s65789.2025.00056,outro,
+2025,Industry,KubeChecker: Detecting Configuration Bugs in Container Orchestration,10.1109/dsn-s65789.2025.00047,outro,
+2025,Industry,"Large-Scale AI Infra Reliability: Challenges, Strategies, and Llama 3 Training Experience",10.1109/dsn-s65789.2025.00054,outro,confiabilidade de infraestrutura de treino do Llama 3
+2025,Industry,LLMPrism: Black-box Performance Diagnosis for Production LLM Training Platforms,10.1109/dsn-s65789.2025.00034,outro,diagnóstico de desempenho de plataforma de treino de LLM
+2025,Industry,Observe and Regulate Memory Interference on MPSoC: a Practical Approach,10.1109/dsn-s65789.2025.00044,outro,
+2025,Industry,On the Feasibility of Exploiting the USB Power Line for Side-Channel Attacks against Samsung Smartphone Models,10.1109/dsn-s65789.2025.00051,outro,
+2025,Industry,Quantitative Security Metrics: Assessment of Cyberattack Scenarios for Cyber-Physical Systems,10.1109/dsn-s65789.2025.00048,outro,
+2025,Industry,Regulating Prosumer Device Security: a Key Priority in Power Grid Protection,10.1109/dsn-s65789.2025.00049,outro,
+2025,Industry,Runtime Verification of Program Organization Units in Safe Programmable Logic Controller Systems,10.1109/dsn-s65789.2025.00050,outro,
+2025,Industry,Security-by-Design at the Telco Edge with OSS: Challenges and Lessons Learned,10.1109/dsn-s65789.2025.00041,A-adjacente,experiência industrial que inclui gestão de vulnerabilidades em OSS; escopo amplo
+2025,Industry,To Protect the LLM Agent Against the Prompt Injection Attack with Polymorphic Prompt,10.1109/dsn-s65789.2025.00037,B-nucleo,
+2025,Industry,Towards Robust Autonomous Landing Systems: Iterative Solutions and Key Lessons Learned,10.1109/dsn-s65789.2025.00058,outro,
+2025,Industry,When Features Gets Exploited: Functional Abuse and the Future of Industrial Fraud Prevention,10.1109/dsn-s65789.2025.00038,outro,
+2026,Research,A First Look at the Security Issues in the Model Context Protocol Ecosystem,10.1109/dsn69566.2026.00046,ponte,
+2026,Research,"Accurate, Secure, and Efficient Semi-Constrained Navigation with Multiple Spatial Restrictions",10.1109/dsn69566.2026.00049,outro,
+2026,Research,"An (m,k)-firm Elevation Policy for Weakly Hard Real-Time in Converged 5G-TSN Networks",10.1109/dsn69566.2026.00060,outro,
+2026,Research,AnBridge: Protecting On-Device AI with Android Virtualization Framework,10.1109/dsn69566.2026.00081,B-adjacente,protege IA no dispositivo em VM protegida (ML em ambiente isolado); proteção contra roubo seria núcleo
+2026,Research,Automated Data Error Cleaning Impact on Federated Learning Utility and Fairness,10.1109/dsn69566.2026.00080,outro,qualidade de dados em FL
+2026,Research,Behavior-Guided Decompilation of AVR Firmware with Autonomous LLM Agents,10.1109/dsn69566.2026.00070,B-adjacente,agentes LLM para descompilação (engenharia reversa); classificado só pelo título
+2026,Research,Beyond Corner Patches: Semantics-Aware Backdoor Attack in Federated Learning,10.1109/dsn69566.2026.00032,B-nucleo,
+2026,Research,Beyond Token Attention: Contiguous and Interpretable Payload Identification for Web Attacks,10.1109/dsn69566.2026.00044,outro,identificação de payload em ataques web; pode usar transformer
+2026,Research,Bringing Your Own Privacy: Towards Measurable Privacy in Mobile Device Management and Security,10.1109/dsn69566.2026.00040,outro,
+2026,Research,Bypassing Safety Alignment via API Design: A Systematic Risk Analysis of Response Prefill in LLM systems,10.1109/dsn69566.2026.00054,B-nucleo,
+2026,Research,Computationally Efficient Anomaly Detection and Exclusion for Practical and Robust Federated Learning,10.1109/dsn69566.2026.00055,B-adjacente,robustez bizantina em FL; classificado só pelo título
+2026,Research,Demystifying Progressive Web Application Permission Systems,10.1109/dsn69566.2026.00030,outro,
+2026,Research,DRIFT: Drift-Resilient Invariant-Feature Transformer for DGA Detection,10.1109/dsn69566.2026.00077,outro,
+2026,Research,Efficient Bug Detection by Inferring Implicit API Contract of Pointer State Transition,10.1109/dsn69566.2026.00035,A-adjacente,detecção de bugs de ponteiro; classificado só pelo título
+2026,Research,Efficient Merkle-Tree Consistent Accumulator,10.1109/dsn69566.2026.00045,outro,
+2026,Research,Exploring the Limits of Side-Channel Protections in ML-KEM Hardware Implementations,10.1109/dsn69566.2026.00033,outro,
+2026,Research,Fault-tolerant and Self-recovering Sharing of Multicast Transmission,10.1109/dsn69566.2026.00073,outro,
+2026,Research,FORTIHTLC: Because a Atomic Swap Must Resist Bribery Attacks,10.1109/dsn69566.2026.00059,A-adjacente,suborno contra atomic swap (incentivos); classificado só pelo título
+2026,Research,From Centralized Learning to Federated Setting: Keeping Reliability on Track,10.1109/dsn69566.2026.00057,B-adjacente,confiabilidade de FL; classificado só pelo título
+2026,Research,From MIRAGE to CLEAR: Component-Level Explainable Anomaly Reasoning for Autonomous Vehicle Perception Systems,10.1109/dsn69566.2026.00072,B-adjacente,raciocínio explicável de anomalias em percepção de VA; classificado só pelo título
+2026,Research,Generalizable Graph-based Reinforcement Learning Agents for Automated Cyber Defense,10.1109/dsn69566.2026.00079,outro,"agentes de RL para ciberdefesa (ML aplicado, sem LLM)"
+2026,Research,Hi-Fi Flow: Real-Time High-Granularity Flow Feature Extraction for Robust Network Monitoring,10.1109/dsn69566.2026.00052,outro,
+2026,Research,I-DETECT: In-network Deep Packet Inspection for Timed Event Correlation in Industrial Control Systems,10.1109/dsn69566.2026.00065,outro,
+2026,Research,In-Depth Exploration of Differentially Private Quantization for Privacy-Preserving and Communication-Efficient Federated Learning,10.1109/dsn69566.2026.00051,outro,DP em FL (privacidade/comunicação)
+2026,Research,Large-Scale Security Analysis of Multi-Token Smart Contracts: Uncovering Hidden Flaws in Batch Transfers,10.1109/dsn69566.2026.00034,A-adjacente,classificado só pelo título
+2026,Research,LaserTag: A Tool for Autonomous XAI-Guided Physical Adversarial Perturbations in Industrial Vision Pipelines,10.1109/dsn69566.2026.00063,B-adjacente,classificado só pelo título
+2026,Research,LLM-Empowered Discovery of Windows APIs Exploitable for Persistent Storage in Fileless Attacks,10.1109/dsn69566.2026.00042,B-adjacente,classificado só pelo título
+2026,Research,LLMGuard: Multi-Agent Fault Diagnosis for Reliable Language-Model-as-a-Service,10.1109/dsn69566.2026.00018,B-adjacente,confiabilidade de serviço de LLM (LMaaS) por diagnóstico de falhas; classificado só pelo título
+2026,Research,LUMEN: A Systems Approach to LLM-Guided Activation of Hidden Behaviors in Malware,10.1109/dsn69566.2026.00026,B-adjacente,"classificado pelo título; a nota em GUIA_DSN.md (coleta anterior, com resumo) confirma o tema"
+2026,Research,LymphNode: A Plug-and-Play Access Control Method for Deep Neural Networks,10.1109/dsn69566.2026.00062,B-nucleo,
+2026,Research,MBA-Sniffer: Rapidly Locating Mixed Boolean-Arithmetic Obfuscation in Binary Code,10.1109/dsn69566.2026.00022,outro,
+2026,Research,Measuring Attack Observability in Cloud Telemetry Logs: A Cross-Platform Analysis,10.1109/dsn69566.2026.00036,outro,
+2026,Research,MeshGuard: MUD-Based Network Access Control for Large-Scale Thread-Powered IoT Networks,10.1109/dsn69566.2026.00031,outro,
+2026,Research,Meta-Architecture Binary Code Analysis,10.1109/dsn69566.2026.00047,outro,
+2026,Research,MTFuzz: A Novel Efficacy Fuzzing Framework for Aerospace Monolithic Firmware,10.1109/dsn69566.2026.00074,A-adjacente,fuzzing de firmware aeroespacial; classificado só pelo título
+2026,Research,NS-FirmID: A Neuro-Symbolic Multi-Agent Framework for Reliable Firmware Version Identification at Internet Scale,10.1109/dsn69566.2026.00053,B-adjacente,agentes LLM para identificar versão de firmware; ligação com gestão de vulnerabilidade incerta; classificado só pelo título
+2026,Research,One Error to Rule Them All: Can a Single Bit-Flip Disrupt Fully Homomorphic Encryption?,10.1109/dsn69566.2026.00029,outro,
+2026,Research,OptiMAC: Adaptive Security Optimization for Message Authentication Code in Adversarial Environment,10.1109/dsn69566.2026.00067,outro,
+2026,Research,PDLogger: Automated Logging Framework for Practical Software Development,10.1109/dsn69566.2026.00075,outro,
+2026,Research,PRAXIS: Integrating Program Analysis with Observability for Root-Cause Analysis,10.1109/dsn69566.2026.00021,outro,"LLM aplicado a diagnóstico de incidentes (confiabilidade, não segurança)"
+2026,Research,Psyzkaller: Learning from Historical and On-the-Fly Execution Data for Smarter OS Kernel Fuzzing,10.1109/dsn69566.2026.00024,A-adjacente,
+2026,Research,Q3Fuzz: Multi-Layered Stateful Fuzzing for the QUIC-HTTP/3 Protocol Stack,10.1109/dsn69566.2026.00019,A-adjacente,classificado só pelo título
+2026,Research,Reentrancy Detection in the Age of LLMs,10.1109/dsn69566.2026.00050,B-adjacente,LLM para detectar reentrância; também seria A-adjacente (smart contracts)
+2026,Research,ReSect: A Tool for Automated Analysis of Reentrancy Transactions on Blockchains,10.1109/dsn69566.2026.00038,A-adjacente,classificado só pelo título
+2026,Research,RIPE-II: Retrieval In-Place Poisoning Evaluation with Indirect Injections,10.1109/dsn69566.2026.00078,B-nucleo,"injeção indireta / envenenamento em RAG; classificado pelo título; a nota em GUIA_DSN.md (coleta anterior, com resumo) confirma o tema"
+2026,Research,Robust and Automated Reconfiguration of Byzantine Wide-Area Replication,10.1109/dsn69566.2026.00061,outro,
+2026,Research,RomeFuzz: Path-aware Directed Greybox Fuzzing via Dyna-Static Indirect Call analysis,10.1109/dsn69566.2026.00056,A-adjacente,classificado só pelo título
+2026,Research,Ruby: Unmasking Unsafe Rust in Stripped Binaries via Machine Learning,10.1109/dsn69566.2026.00068,A-adjacente,localiza código unsafe em binários Rust para caça a bugs
+2026,Research,ScaleDisturb: Exploiting Temporal Asymmetry to Amplify Read Disturbance in Modern DRAM Chips,10.1109/dsn69566.2026.00023,outro,
+2026,Research,ShuttleCross: An Efficient Cross-Chain Smart Contract Invocation Framework,10.1109/dsn69566.2026.00041,outro,"invocação cross-chain de smart contracts, sem foco em segurança"
+2026,Research,SnipleyFuzz: Enhancing Black-Box Fuzzing of IoT Devices with Shapley-Based Priority Selection,10.1109/dsn69566.2026.00069,A-adjacente,classificado só pelo título
+2026,Research,SPDAgent: Leveraging LLM Agents for Context-Aware Binary Security Patch Detection via Pseudocode Diff Analysis,10.1109/dsn69566.2026.00058,A-nucleo,"usa agentes LLM (seria B-adjacente); tema é detecção de patch de segurança; classificado pelo título; a nota em GUIA_DSN.md (coleta anterior, com resumo) confirma o tema"
+2026,Research,SpeechShield: Latency-Efficient and Robust Timbre-Aware Voice Protection Against Speech Synthesis Deepfake Attacks,10.1109/dsn69566.2026.00037,B-adjacente,perturbação para proteger voz contra síntese por deepfake; classificado só pelo título
+2026,Research,Thinking Inside the Box: Injecting Realistic Radiation Faults in ML Accelerators,10.1109/dsn69566.2026.00017,B-adjacente,classificado só pelo título
+2026,Research,TLG: Two-stage Layer-wise Gradient Inversion Attack in Federated Learning,10.1109/dsn69566.2026.00066,B-adjacente,ataque de inversão de gradiente (privacidade); classificado só pelo título
+2026,Research,Too Open to be Secure: An Evaluation of OpenNIC DNS Services and Domains,10.1109/dsn69566.2026.00039,outro,
+2026,Research,Understanding and Exploiting DNS Relaying: Harnessing Legitimate Services for DNS Attacks,10.1109/dsn69566.2026.00020,outro,
+2026,Research,VCAligner: Aligning Source Distribution Versions with Upstream Git Commits to Secure Supply Chain,10.1109/dsn69566.2026.00048,A-nucleo,"classificado pelo título; a nota em GUIA_DSN.md (coleta anterior, com resumo) confirma o tema"
+2026,Research,VulJSFormer: Learning to Detect JavaScript Vulnerabilities with Vulnerability-Relevant Graphs,10.1109/dsn69566.2026.00064,A-adjacente,classificado só pelo título
+2026,Research,VulLens: Enhancing Software Vulnerability Detection against Evasion Attacks,10.1109/dsn69566.2026.00025,A-adjacente,robustez de detector ML a evasão (também B-adjacente); classificado só pelo título
+2026,Research,VulStyle: A Multi-Modal Pre-Training for Code Stylometry-Augmented Vulnerability Detection,10.1109/dsn69566.2026.00043,A-adjacente,
+2026,Research,What Makes Software Bugs Escape Testing? Evidence from a Large-Scale Empirical Study,10.1109/dsn69566.2026.00027,outro,
+2026,Research,Whiplash on the Grid: Emulation of a Cyber-Physical Attack Misusing Inverter-Based Resources in a Distribution Grid,10.1109/dsn69566.2026.00028,outro,
+2026,Research,Will It Break in Production? Metric-Driven Prediction of Residual Defects in Python Systems,10.1109/dsn69566.2026.00076,outro,
+2026,Research,Zero-Shot Vulnerability Detection in Low-Resource Smart Contracts Through Solidity-Only Training,10.1109/dsn69566.2026.00071,A-adjacente,
+2026,Industry,A Configurable Logic Architecture Based on Micro-Electromechanical Relays for Nuclear Power Safety Systems,(a verificar),outro,
+2026,Industry,A Polyglot OpenTelemetry Framework for Cloud-Native Reliability and Performance Engineering in Connected-Vehicle Platforms,(a verificar),outro,
+2026,Industry,A Robustness Metric and Evaluation Approach for Machine Learning Components in Aviation,(a verificar),B-adjacente,classificado só pelo título
+2026,Industry,"A Secure, Manifest-Based Framework for Delegated Privilege Promotion",(a verificar),outro,privilégio delegado para ferramentas de patch automatizado
+2026,Industry,Aegis: Preventing Cross-Domain Resource Abuse in MCP,(a verificar),ponte,
+2026,Industry,AIReSim: A Discrete Event Simulator for Large-scale AI Cluster Reliability Modeling,(a verificar),outro,
+2026,Industry,An IPsec Tunnel Recovery Protocol to Overcome QKD Key desynchronization,(a verificar),outro,
+2026,Industry,CRISP: End-to-End Fingerprint Recognition Leveraging Hardware-Anchored Liveness Detection,(a verificar),outro,
+2026,Industry,Cross-referencing Whitepaper Claims and Smart Contract Code for Automated ICO Auditing,(a verificar),A-adjacente,auditoria de ICO cruzando whitepaper e smart contract; classificado só pelo título
+2026,Industry,Decentralized Root Cause Analysis for Cloud-Native Microservices: Experience with Distributed PageRank in Production,(a verificar),outro,
+2026,Industry,EgoLoc: Secure Ego-Agent Selection for Robust Collaborative Perception Against Privilege Hijacking,(a verificar),outro,
+2026,Industry,Enterprise-Scale RAS in IBM Z Memory Subsystem,(a verificar),outro,
+2026,Industry,Event Burst Trigger: An Availability Backdoor Attack on Event-Based SNN Object Detection,(a verificar),B-nucleo,
+2026,Industry,From Security Standards to Adversary Emulation: An AI-Assisted Framework for ICS Security Assessment,(a verificar),B-adjacente,framework assistido por IA para emulação de adversário; classificado só pelo título
+2026,Industry,Harnessing Large Language Models for Seed Generation in Greybox Fuzzing,(a verificar),B-adjacente,LLM para gerar sementes de fuzzing (também A-adjacente)
+2026,Industry,Harpocrates-in-action: Using Simulation-based Functional Test Programs to Catch Marginal Defects in CPUs,(a verificar),outro,
+2026,Industry,HBM Errors at Scale: An Industrial Study,(a verificar),outro,
+2026,Industry,Knowledge Transfer from LLMs to Provenance Analysis: Semantic-Augmented APT Detection,(a verificar),B-adjacente,
+2026,Industry,LLM4BP: A Collaborative LLM Framework for Insider-Resilient BPMN Workflows in Industrial Control Systems,(a verificar),B-adjacente,classificado só pelo título
+2026,Industry,PeerLumen: A Bitcoin P2P Honeypot Telescope,(a verificar),outro,
+2026,Industry,Redefining Page Offlining: Real-World Memory Failure Modes with Preemptive Strategies,(a verificar),outro,
+2026,Industry,SNAS: A Multi-Layer Defense-in-Depth Architecture for Secure Egress in Sandboxed Workloads,(a verificar),outro,
+2026,Industry,"Structural Compliance, Governed Adaptation: Dependable Evolution in the ePayroll Governmental Blockchain Platform",(a verificar),outro,
+2026,Industry,The Anatomy of Silent Data Corruption: GPU Error Pattern Study and Modeling Guidance,(a verificar),outro,
+2026,Industry,VeriExist: Blockchain-Assisted Existence-Verifiable Protocol in User-Centric Data Sharing,(a verificar),outro,
