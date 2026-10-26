@@ -37,6 +37,7 @@ decisões vigentes, etapas e o LaTeX.
 | E6 | Alternativa B: modelos abertos com guardrails por custódia | 🔄 coleta concluída | [E6](etapas/E6_alt_modelos_abertos.md) |
 | E7 | Decisão de rumo (matriz A × B + segunda opinião) | 🔄 proposta: B com condições, depende do piloto de 27–29/out | [E7](etapas/E7_decisao_rumo.md) |
 | E8 | Alinhamento com o DSN (só teor da conferência; 307 artigos de 2021–2026 + 16 âncoras lidas) | ✅ B se alinha melhor, se vendido como dependabilidade | [E8](etapas/E8_alinhamento_dsn.md) |
+| E9 | Desenho de testes válidos para A e B | 🔄 proposta | [E9](etapas/E9_testes_validos.md) |
 
 A E3 (descentralização) foi concluída e **descartada** com o orientador (D3). O histórico
 completo, com o material do LADC 2026, está na tag git `ladc-2026`.
