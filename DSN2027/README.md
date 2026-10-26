@@ -17,7 +17,12 @@ decisões vigentes, etapas e o LaTeX.
 | [JUIZ_IA.md](JUIZ_IA.md) | **Documento central do Juiz**: casos de uso, tags, problemas, abordagens, pesquisa, testes |
 | [DECISOES.md](DECISOES.md) | Só as decisões vigentes, por tema |
 | [etapas/](etapas/) | Análises que embasam as decisões (tabela abaixo) |
+| [referencias/](referencias/) | Artigos do DSN 2021–2026 (PDFs abertos) e o [guia/glossário](referencias/GUIA_DSN.md) |
 | [artigo/](artigo/) | LaTeX do artigo (template IEEE, uma seção por arquivo) |
+
+> **Rumo em reavaliação (2026-10-26).** O Juiz como avaliador geral de vazamento foi julgado amplo
+> demais. Estão em comparação a alternativa A (bug bounty sobre a cadeia de suprimentos, E5) e a B
+> (modelos abertos com guardrails, E6). A decisão sai na E7; até lá D1–D4 seguem valendo.
 
 ## Etapas
 
@@ -27,7 +32,10 @@ decisões vigentes, etapas e o LaTeX.
 | E2 | Isolamento confidencial por job | ✅ decidida; falta medir | [E2](etapas/E2_isolamento_confidencial.md) |
 | E2b | Build seguro de imagens OCI | 🔄 rascunho; duas fases em duas CVMs; todo build atestado, sem imagem pronta | [E2b](etapas/E2b_build_oci.md) |
 | E2c | Ameaças do build e da execução OCI (problemas → soluções; rede zero; Juiz e rede) | ✅ decidida; falta verificar no Azure | [E2c](etapas/E2c_ameacas_oci.md) |
-| E4 | **Juiz de IA** (contribuição principal) | 🔄 em desenho | [JUIZ_IA.md](JUIZ_IA.md) |
+| E4 | **Juiz de IA** (contribuição principal) | 🔄 em desenho; rumo em reavaliação | [JUIZ_IA.md](JUIZ_IA.md) |
+| E5 | Alternativa A: mercado anônimo de bug bounty sobre a cadeia de suprimentos | 🔄 coleta concluída | [E5](etapas/E5_alt_bug_bounty.md) |
+| E6 | Alternativa B: modelos abertos com guardrails por custódia | 🔄 coleta concluída | [E6](etapas/E6_alt_modelos_abertos.md) |
+| E7 | Decisão de rumo (matriz A × B) | ⏳ pendente | — |
 
 A E3 (descentralização) foi concluída e **descartada** com o orientador (D3). O histórico
 completo, com o material do LADC 2026, está na tag git `ladc-2026`.
