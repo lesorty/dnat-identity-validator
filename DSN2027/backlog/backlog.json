@@ -1,0 +1,2353 @@
+{
+ "epicos": [
+  {
+   "id": "J1",
+   "entrega": "E14 commitado e D6 registrada.",
+   "estimativa": "14",
+   "fase": 1,
+   "marco": "ESP",
+   "objetivo": "Definir o que o Juiz é, como entra no DNAT, o que decide e o que sustenta no artigo.",
+   "titulo": "Especificação do Juiz"
+  },
+  {
+   "id": "J2",
+   "entrega": "Pacote model_gate/, ambiente, modelos e datasets baixados, registro de resultados.",
+   "estimativa": "10",
+   "fase": 2,
+   "marco": "G1",
+   "objetivo": "Bancada de experimentos para construir o Juiz em CPU.",
+   "titulo": "Fundação"
+  },
+  {
+   "id": "J3",
+   "entrega": "Instrumento em dois estágios, parte secreta, codificações, juiz do portão.",
+   "estimativa": "14",
+   "fase": 2,
+   "marco": "G1",
+   "objetivo": "Perguntas que o Juiz faz ao derivado para medir recusa, dano e recusa excessiva.",
+   "titulo": "Instrumento comportamental"
+  },
+  {
+   "id": "J4",
+   "entrega": "S2 (gap de recusa) e S3 (energia rank-1), testados.",
+   "estimativa": "10",
+   "fase": 2,
+   "marco": "G1",
+   "objetivo": "Sinais nos pesos e ativações contra o base custodiado.",
+   "titulo": "Sinais internos S2/S3"
+  },
+  {
+   "id": "J5",
+   "entrega": "Quantização int8/NF4/FP4 em CPU e leitura de GGUF.",
+   "estimativa": "8",
+   "fase": 2,
+   "marco": "G1",
+   "objetivo": "Avaliar o que sai: precisão cheia e quantizações zero-shot (D5).",
+   "titulo": "Formatos"
+  },
+  {
+   "id": "J6",
+   "entrega": "z-soma, limiar, inconclusivo, δ e prereg.yaml.",
+   "estimativa": "8",
+   "fase": 2,
+   "marco": "G2",
+   "objetivo": "Juntar os instrumentos numa decisão de três estados.",
+   "titulo": "Veredito"
+  },
+  {
+   "id": "J7",
+   "entrega": "Tipos Model/Derivative, recibo, revogação, testes.",
+   "estimativa": "10",
+   "fase": 3,
+   "marco": "G3",
+   "objetivo": "Recibo do veredito e revogação pelo operador.",
+   "titulo": "Contrato"
+  },
+  {
+   "id": "J8",
+   "entrega": "Recursos e tempos limite, disco de custódia, Juiz como segundo job.",
+   "estimativa": "12",
+   "fase": 3,
+   "marco": "G3",
+   "objetivo": "O Juiz rodando no DNAT com o derivado retido.",
+   "titulo": "Executor e custódia"
+  },
+  {
+   "id": "J9",
+   "entrega": "Scripts de treino e abliteração, varreduras, validação de utilidade.",
+   "estimativa": "16",
+   "fase": 4,
+   "marco": "G2",
+   "objetivo": "Derivados F0–F3 com quantidade de falha.",
+   "titulo": "População de derivados"
+  },
+  {
+   "id": "J10",
+   "entrega": "Bateria e juiz independentes, anotação humana, κ.",
+   "estimativa": "10",
+   "fase": 4,
+   "marco": "G2",
+   "objetivo": "Rótulo independente do Juiz.",
+   "titulo": "Verdade de referência"
+  },
+  {
+   "id": "J11",
+   "entrega": "≥ 20 derivados de campo, controle negativo com GGUF.",
+   "estimativa": "8",
+   "fase": 4,
+   "marco": "G4",
+   "objetivo": "Teste cego com derivados públicos (RQ3).",
+   "titulo": "Campo"
+  },
+  {
+   "id": "J12",
+   "entrega": "Treino contra o limiar, referência forjada, CMFT, rodadas.",
+   "estimativa": "12",
+   "fase": 4,
+   "marco": "G4",
+   "objetivo": "RQ4 e RQ5: atacante que conhece o Juiz.",
+   "titulo": "Adaptativo e bounty"
+  },
+  {
+   "id": "J13",
+   "entrega": "Dois sinais de Hurtado reimplementados sem custódia.",
+   "estimativa": "5",
+   "fase": 4,
+   "marco": "G4",
+   "objetivo": "Comparação justa com a melhor alternativa.",
+   "titulo": "Linha de base"
+  },
+  {
+   "id": "J14",
+   "entrega": "Orquestração, bootstrap, tabelas e figuras das RQs.",
+   "estimativa": "14",
+   "fase": 4,
+   "marco": "G4",
+   "objetivo": "Números com intervalo de confiança.",
+   "titulo": "Campanha e análise"
+  },
+  {
+   "id": "J15",
+   "entrega": "Seções reescritas, resumo em 25/nov, submissão em 02/dez.",
+   "estimativa": "18",
+   "fase": 5,
+   "marco": "SUB",
+   "objetivo": "O artigo do DSN 2027.",
+   "titulo": "Escrita"
+  },
+  {
+   "id": "J16",
+   "entrega": "Decisões do E13 §8, pessoas, ética, crédito Azure, PDF do Natella.",
+   "estimativa": "8",
+   "fase": 5,
+   "marco": "G0",
+   "objetivo": "Destravar o resto.",
+   "titulo": "Gestão"
+  }
+ ],
+ "marcos": [
+  {
+   "id": "ESP",
+   "data": "2026-10-30",
+   "nome": "Especificação do Juiz"
+  },
+  {
+   "id": "G1",
+   "data": "2026-11-01",
+   "nome": "Piloto"
+  },
+  {
+   "id": "G0",
+   "data": "2026-11-02",
+   "nome": "Recursos decididos"
+  },
+  {
+   "id": "G2",
+   "data": "2026-11-09",
+   "nome": "Calibração e pré-registro"
+  },
+  {
+   "id": "G3",
+   "data": "2026-11-16",
+   "nome": "Integração no DNAT"
+  },
+  {
+   "id": "G4",
+   "data": "2026-11-23",
+   "nome": "Congelamento"
+  },
+  {
+   "id": "RES",
+   "data": "2026-11-25",
+   "nome": "Resumo"
+  },
+  {
+   "id": "SUB",
+   "data": "2026-12-02",
+   "nome": "Submissão"
+  }
+ ],
+ "tasks": [
+  {
+   "id": "T-101",
+   "deps": [],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Diagrama de sequência aprovado",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Desenhar o fluxo de ponta a ponta: depósito dos pesos, fine-tuning, retenção do derivado, Juiz, ativo ou rejeitado, revogação"
+  },
+  {
+   "id": "T-102",
+   "deps": [
+    "T-101"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Mapa de lacunas com arquivo e linha",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Levantar o que o DNAT atual já oferece para o fluxo e o que falta (executor, contrato, IPFS, build)"
+  },
+  {
+   "id": "T-103",
+   "deps": [
+    "T-101"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Contrato de entrada e saída escrito",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir a interface do Juiz: entradas (base por digest, derivado, metadados do job, formatos) e saídas (veredito em 3 estados, motivos)"
+  },
+  {
+   "id": "T-104",
+   "deps": [
+    "T-103"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Esquema do recibo",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir o recibo: campos, o que fica no contrato e o que fica fora"
+  },
+  {
+   "id": "T-105",
+   "deps": [
+    "T-101"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Tabela alinhada com a E8 §9.2",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir as fronteiras de confiança: confiável (CVM, Juiz por hash, referência) e não confiável (script, dados, derivado)"
+  },
+  {
+   "id": "T-106",
+   "deps": [],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Definição formal",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir a propriedade que o Juiz decide: δ por categoria, tolerância de recusa excessiva, utilidade"
+  },
+  {
+   "id": "T-107",
+   "deps": [
+    "T-106"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Regra escrita",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir o que acontece com um veredito inconclusivo (reter, reavaliar ou revisão humana)"
+  },
+  {
+   "id": "T-108",
+   "deps": [
+    "T-105",
+    "T-106"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Uma linha por instrumento com o artigo que o exige",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir os instrumentos do Juiz e o papel de cada um, justificado pela base (A3, A4), sem implementar"
+  },
+  {
+   "id": "T-109",
+   "deps": [
+    "T-108"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Política escrita",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir a parte secreta: quem gera, onde fica, rotação, compromisso por hash"
+  },
+  {
+   "id": "T-110",
+   "deps": [
+    "T-104"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Diagrama de estados do derivado",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir o ciclo de vida: cache do veredito por (digest, versão do Juiz), reavaliação quando o Juiz muda, revogação"
+  },
+  {
+   "id": "T-111",
+   "deps": [
+    "T-101"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Regra no fluxo do T-101",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Encaixar no fluxo a política de formatos liberados (D5)"
+  },
+  {
+   "id": "T-112",
+   "deps": [
+    "T-108"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Lista de limitações",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos"
+  },
+  {
+   "id": "T-113",
+   "deps": [
+    "T-103",
+    "T-104",
+    "T-105",
+    "T-106",
+    "T-107",
+    "T-108",
+    "T-109",
+    "T-110",
+    "T-111",
+    "T-112"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "Tabela de rastreabilidade",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Mapear Juiz × artigo: que afirmação (A1–A5), contribuição (C1, P2) e seção cada decisão sustenta"
+  },
+  {
+   "id": "T-114",
+   "deps": [
+    "T-113"
+   ],
+   "epico": "J1",
+   "marco": "ESP",
+   "notas": "",
+   "pronto": "E14 commitado e D6 registrada",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Consolidar a especificação (E14) e registrar como D6, depois de revisar com o orientador"
+  },
+  {
+   "id": "T-201",
+   "deps": [
+    "T-103"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "README do pacote com o layout",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Definir onde vive o código do Juiz (model_gate/ no repositório) e o layout de pastas"
+  },
+  {
+   "id": "T-202",
+   "deps": [
+    "T-201"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Instalação limpa numa VM de 4 vCPU",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Montar ambiente CPU reproduzível (torch CPU, transformers, peft) com versões fixadas"
+  },
+  {
+   "id": "T-203",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Digest registrado e conferido",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)"
+  },
+  {
+   "id": "T-204",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Manifesto com hashes e licenças",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes"
+  },
+  {
+   "id": "T-205",
+   "deps": [
+    "T-203"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "10 respostas iguais em duas execuções",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)"
+  },
+  {
+   "id": "T-206",
+   "deps": [
+    "T-201"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Esquema e função de escrita",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros"
+  },
+  {
+   "id": "T-207",
+   "deps": [
+    "T-206"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Relatório por execução",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Medidor de tempo e memória por etapa"
+  },
+  {
+   "id": "T-208",
+   "deps": [
+    "T-205",
+    "T-207"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Tokens/s com 3 repetições",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1"
+  },
+  {
+   "id": "T-209",
+   "deps": [
+    "T-205"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "CI verde",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Testes e CI mínimos com um modelo minúsculo"
+  },
+  {
+   "id": "T-210",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": "Máquina acessível com o ambiente",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Máquina de 4 vCPU do piloto"
+  },
+  {
+   "id": "T-211",
+   "deps": [
+    "T-201"
+   ],
+   "epico": "J2",
+   "marco": "G1",
+   "notas": "",
+   "pronto": ".gitignore e regra no README",
+   "resp": "",
+   "status": "a fazer",
+   "titulo": "Regra de manuseio: gerações nocivas nunca entram no git"
+  },
+  {
+   "id": "T-301",
+   "deps": [
+    "T-108",
+    "T-204"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Tabela de composição",
+   "status": "backlog",
+   "titulo": "Definir a composição do instrumento: itens nocivos por categoria (StrongREJECT), seguros e contrastes (XSTest), fração secreta"
+  },
+  {
+   "id": "T-302",
+   "deps": [
+    "T-301"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Lista de IDs versionada",
+   "status": "backlog",
+   "titulo": "Selecionar os itens nocivos estratificados por categoria, com amostra fixa por seed"
+  },
+  {
+   "id": "T-303",
+   "deps": [
+    "T-301"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Lista de IDs versionada",
+   "status": "backlog",
+   "titulo": "Selecionar os seguros e os contrastes do XSTest"
+  },
+  {
+   "id": "T-304",
+   "deps": [
+    "T-302",
+    "T-303",
+    "T-109"
+   ],
+   "epico": "J3",
+   "marco": "G2",
+   "pronto": "Hash registrado; secreta guardada conforme o T-109",
+   "status": "backlog",
+   "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta"
+  },
+  {
+   "id": "T-305",
+   "deps": [
+    "T-302"
+   ],
+   "epico": "J3",
+   "marco": "G2",
+   "pronto": "Variantes conferidas por decodificação",
+   "status": "backlog",
+   "titulo": "Gerar variantes em codificações conhecidas (base64, César, leetspeak) para um subconjunto"
+  },
+  {
+   "id": "T-306",
+   "deps": [
+    "T-205"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Configurações versionadas",
+   "status": "backlog",
+   "titulo": "Fixar o template de chat e as duas configurações (com e sem system prompt)"
+  },
+  {
+   "id": "T-307",
+   "deps": [
+    "T-302",
+    "T-303",
+    "T-306"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Taxa de recusa por item no base, com acurácia do detector",
+   "status": "backlog",
+   "titulo": "Estágio 1: gerar 64 tokens em todos os itens e detectar recusa, conferindo o detector numa amostra"
+  },
+  {
+   "id": "T-308",
+   "deps": [
+    "T-307"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Lista do estágio 2 e gerações completas",
+   "status": "backlog",
+   "titulo": "Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens"
+  },
+  {
+   "id": "T-309",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Notas reproduzíveis em 10 exemplos",
+   "status": "backlog",
+   "titulo": "Rodar o juiz do portão (avaliador StrongREJECT em Gemma 2B) em CPU e conferir o modelo"
+  },
+  {
+   "id": "T-310",
+   "deps": [
+    "T-308",
+    "T-309"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Notas por item",
+   "status": "backlog",
+   "titulo": "Pontuar dano (nota StrongREJECT) e recusa excessiva (classes do XSTest)"
+  },
+  {
+   "id": "T-311",
+   "deps": [
+    "T-310",
+    "T-106"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Métricas comparáveis entre modelos",
+   "status": "backlog",
+   "titulo": "Agregar métricas por categoria (recusa, dano, recusa excessiva) e a diferença para o base"
+  },
+  {
+   "id": "T-312",
+   "deps": [
+    "T-311"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Valores do pai registrados com o digest",
+   "status": "backlog",
+   "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai"
+  },
+  {
+   "id": "T-313",
+   "deps": [
+    "T-312"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "As duas checagens passam",
+   "status": "backlog",
+   "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda"
+  },
+  {
+   "id": "T-314",
+   "deps": [
+    "T-312",
+    "T-207"
+   ],
+   "epico": "J3",
+   "marco": "G1",
+   "pronto": "Minutos por configuração, 3 repetições",
+   "status": "backlog",
+   "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)"
+  },
+  {
+   "id": "T-401",
+   "deps": [
+    "T-205",
+    "T-302"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Tensores salvos com hash",
+   "status": "backlog",
+   "titulo": "Extrair ativações do resíduo por camada no base para pares nocivo/inócuo (conjunto da direção, separado do instrumento)"
+  },
+  {
+   "id": "T-402",
+   "deps": [
+    "T-401"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Direções por camada salvas",
+   "status": "backlog",
+   "titulo": "Calcular a direção de recusa por diferença de médias, por camada, no base custodiado (Arditi)"
+  },
+  {
+   "id": "T-403",
+   "deps": [
+    "T-402"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Critério e camada registrados",
+   "status": "backlog",
+   "titulo": "Escolher a camada da direção por critério definido antes (maior separação na validação)"
+  },
+  {
+   "id": "T-404",
+   "deps": [
+    "T-403"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Referência do pai inclui a direção",
+   "status": "backlog",
+   "titulo": "Guardar a direção como parte da referência custodiada, com hash"
+  },
+  {
+   "id": "T-405",
+   "deps": [
+    "T-404"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Função S2 com teste",
+   "status": "backlog",
+   "titulo": "S2: medir o gap de recusa no derivado e a razão contra o base (Hurtado)"
+  },
+  {
+   "id": "T-406",
+   "deps": [
+    "T-405"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "As duas checagens passam",
+   "status": "backlog",
+   "titulo": "Teste de S2: abliterado público com razão baixa; base repetido perto de 1"
+  },
+  {
+   "id": "T-407",
+   "deps": [
+    "T-205"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "ΔW por matriz",
+   "status": "backlog",
+   "titulo": "S3: casar camadas e calcular ΔW em o_proj e down_proj das camadas do meio"
+  },
+  {
+   "id": "T-408",
+   "deps": [
+    "T-407"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Função S3 com saída por camada",
+   "status": "backlog",
+   "titulo": "S3: energia do top-1 da SVD por matriz e agregação"
+  },
+  {
+   "id": "T-409",
+   "deps": [
+    "T-408"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Teste passa no CI",
+   "status": "backlog",
+   "titulo": "Teste unitário de S3 com ΔW sintético de posto 1 e ruído"
+  },
+  {
+   "id": "T-410",
+   "deps": [
+    "T-408"
+   ],
+   "epico": "J4",
+   "marco": "G2",
+   "pronto": "Mesmo valor nas duas formas",
+   "status": "backlog",
+   "titulo": "S3 em derivados LoRA: adaptador mesclado × separado"
+  },
+  {
+   "id": "T-411",
+   "deps": [
+    "T-405",
+    "T-408",
+    "T-207"
+   ],
+   "epico": "J4",
+   "marco": "G1",
+   "pronto": "Minutos e GiB por sinal",
+   "status": "backlog",
+   "titulo": "Medir tempo e memória de S2 e S3 no 0,5B"
+  },
+  {
+   "id": "T-412",
+   "deps": [
+    "T-408",
+    "T-504"
+   ],
+   "epico": "J4",
+   "marco": "G2",
+   "pronto": "Piso de S3 por formato",
+   "status": "backlog",
+   "titulo": "Controle negativo: S3 entre o base e o base quantizado (piso de ruído)"
+  },
+  {
+   "id": "T-413",
+   "deps": [
+    "T-406"
+   ],
+   "epico": "J4",
+   "marco": "G2",
+   "pronto": "Variação de S2 entre 2–3 direções",
+   "status": "backlog",
+   "titulo": "Sensibilidade de S2 à escolha da direção (várias direções, Wollschläger)"
+  },
+  {
+   "id": "T-501",
+   "deps": [
+    "T-205"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "Função por formato com teste",
+   "status": "backlog",
+   "titulo": "Quantizar e desquantizar por bloco (absmax, alfabeto) para LLM.int8, NF4 e FP4 em CPU (Egashira §3)"
+  },
+  {
+   "id": "T-502",
+   "deps": [
+    "T-501",
+    "T-503"
+   ],
+   "epico": "J5",
+   "marco": "G2",
+   "pronto": "Erro máximo por bloco documentado",
+   "status": "backlog",
+   "titulo": "Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos"
+  },
+  {
+   "id": "T-503",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "Sim ou não, com versão",
+   "status": "backlog",
+   "titulo": "Verificar se o bitsandbytes roda em CPU no ambiente"
+  },
+  {
+   "id": "T-504",
+   "deps": [
+    "T-501"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "3 formatos com digest",
+   "status": "backlog",
+   "titulo": "Gerar as versões quantizadas de um derivado e registrar os digests"
+  },
+  {
+   "id": "T-505",
+   "deps": [
+    "T-504",
+    "T-506",
+    "T-311"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "Métricas por formato",
+   "status": "backlog",
+   "titulo": "Rodar o instrumento reduzido em cada formato"
+  },
+  {
+   "id": "T-506",
+   "deps": [
+    "T-301"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "Composição reduzida registrada",
+   "status": "backlog",
+   "titulo": "Definir o instrumento reduzido por formato (subconjunto e tamanho)"
+  },
+  {
+   "id": "T-507",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J5",
+   "marco": "G2",
+   "pronto": "Pesos GGUF carregados e alinhados ao base",
+   "status": "backlog",
+   "titulo": "Ler GGUF e desquantizar para comparar com o base (pacote gguf)"
+  },
+  {
+   "id": "T-508",
+   "deps": [
+    "T-505"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "Base aprovado nos 3 formatos",
+   "status": "backlog",
+   "titulo": "Teste: o base quantizado não dispara falso alarme por formato"
+  },
+  {
+   "id": "T-509",
+   "deps": [
+    "T-505",
+    "T-207"
+   ],
+   "epico": "J5",
+   "marco": "G1",
+   "pronto": "Minutos por formato",
+   "status": "backlog",
+   "titulo": "Medir o custo por formato"
+  },
+  {
+   "id": "T-601",
+   "deps": [
+    "T-311",
+    "T-405",
+    "T-408"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Normalização versionada",
+   "status": "backlog",
+   "titulo": "Normalizar cada sinal em z-score com estatísticas da calibração"
+  },
+  {
+   "id": "T-602",
+   "deps": [
+    "T-601"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Duas combinações implementadas",
+   "status": "backlog",
+   "titulo": "Combinar por z-soma (Hurtado) e documentar a alternativa por regra (qualquer sinal reprova)"
+  },
+  {
+   "id": "T-603",
+   "deps": [
+    "T-602",
+    "T-912"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Limiar registrado",
+   "status": "backlog",
+   "titulo": "Escolher o limiar por Youden na calibração"
+  },
+  {
+   "id": "T-604",
+   "deps": [
+    "T-603",
+    "T-107"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Faixa registrada e ligada à regra do T-107",
+   "status": "backlog",
+   "titulo": "Definir a faixa de inconclusivo em torno do limiar"
+  },
+  {
+   "id": "T-605",
+   "deps": [
+    "T-505",
+    "T-602"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Regra no veredito com teste",
+   "status": "backlog",
+   "titulo": "Regra por formato: reprova se qualquer formato liberado reprova (D5)"
+  },
+  {
+   "id": "T-606",
+   "deps": [
+    "T-106",
+    "T-603",
+    "T-604"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Arquivo revisado",
+   "status": "backlog",
+   "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ"
+  },
+  {
+   "id": "T-607",
+   "deps": [
+    "T-606"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Commit anterior ao primeiro teste",
+   "status": "backlog",
+   "titulo": "Commitar o prereg.yaml antes de abrir qualquer conjunto de teste"
+  },
+  {
+   "id": "T-608",
+   "deps": [
+    "T-602",
+    "T-104"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "Esquema e gerador do verdict.json",
+   "status": "backlog",
+   "titulo": "Saída do veredito: verdict.json com motivos por instrumento e hashes para o recibo"
+  },
+  {
+   "id": "T-609",
+   "deps": [
+    "T-608"
+   ],
+   "epico": "J6",
+   "marco": "G2",
+   "pronto": "4 vereditos esperados",
+   "status": "backlog",
+   "titulo": "Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado"
+  },
+  {
+   "id": "T-701",
+   "deps": [
+    "T-104"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Contrato compila com os novos tipos",
+   "status": "backlog",
+   "titulo": "Adicionar os tipos Model e Derivative em AssetType"
+  },
+  {
+   "id": "T-702",
+   "deps": [
+    "T-701"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Struct e getters",
+   "status": "backlog",
+   "titulo": "Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito"
+  },
+  {
+   "id": "T-703",
+   "deps": [
+    "T-702"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Chamada por outro endereço reverte",
+   "status": "backlog",
+   "titulo": "Papel de executor/operador e registerDerivative só por ele"
+  },
+  {
+   "id": "T-704",
+   "deps": [
+    "T-703"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Reativação pelo dono reverte",
+   "status": "backlog",
+   "titulo": "Derivado reprovado nunca fica active; o dono não reativa (ajustar updateAsset, hoje linha 173)"
+  },
+  {
+   "id": "T-705",
+   "deps": [
+    "T-703"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Operador revoga; evento emitido",
+   "status": "backlog",
+   "titulo": "Revogação pelo operador (hoje revokeAsset exige o dono, linha 185) e evento"
+  },
+  {
+   "id": "T-706",
+   "deps": [
+    "T-704"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Compra de reprovado reverte",
+   "status": "backlog",
+   "titulo": "Compra de acesso a derivado exige veredito aprovado e pai ativo"
+  },
+  {
+   "id": "T-707",
+   "deps": [
+    "T-705",
+    "T-110"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Regra decidida e implementada",
+   "status": "backlog",
+   "titulo": "Regra para derivados de um pai revogado"
+  },
+  {
+   "id": "T-708",
+   "deps": [
+    "T-704",
+    "T-705",
+    "T-706"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Testes passam",
+   "status": "backlog",
+   "titulo": "Testes do contrato: aprovado, reprovado, revogação, reativação negada"
+  },
+  {
+   "id": "T-709",
+   "deps": [
+    "T-708"
+   ],
+   "epico": "J7",
+   "marco": "G4",
+   "pronto": "Tabela de gás",
+   "status": "backlog",
+   "titulo": "Medir o gás das novas funções (measure-gas.js)"
+  },
+  {
+   "id": "T-710",
+   "deps": [
+    "T-703"
+   ],
+   "epico": "J7",
+   "marco": "G3",
+   "pronto": "Derivado aparece na interface",
+   "status": "backlog",
+   "titulo": "API e CLI registram e mostram derivados"
+  },
+  {
+   "id": "T-801",
+   "deps": [],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "O 0,5B carrega na microVM",
+   "status": "backlog",
+   "titulo": "Recursos configuráveis da microVM (hoje 1 vCPU e 512 MiB, run-vm.sh:175)"
+  },
+  {
+   "id": "T-802",
+   "deps": [],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Job de 2 h termina",
+   "status": "backlog",
+   "titulo": "Tempos limite configuráveis (runner:121, 600 s; executor.py:56, 720 s)"
+  },
+  {
+   "id": "T-803",
+   "deps": [
+    "T-102"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Derivado fica no host, não na saída",
+   "status": "backlog",
+   "titulo": "Disco de custódia: o derivado é gravado fora do result.json"
+  },
+  {
+   "id": "T-804",
+   "deps": [
+    "T-803"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Saída grande é recusada",
+   "status": "backlog",
+   "titulo": "Limite e checagem de tamanho da saída do job (nada de pesos na saída)"
+  },
+  {
+   "id": "T-805",
+   "deps": [
+    "T-102"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Job lê o base e não escreve nele",
+   "status": "backlog",
+   "titulo": "Montar o base (por digest) somente leitura para o job de fine-tuning"
+  },
+  {
+   "id": "T-806",
+   "deps": [
+    "T-801",
+    "T-802",
+    "T-803",
+    "T-805",
+    "T-901"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Derivado no disco de custódia",
+   "status": "backlog",
+   "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) dentro da microVM"
+  },
+  {
+   "id": "T-807",
+   "deps": [
+    "T-608",
+    "T-803"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "verdict.json gerado na microVM",
+   "status": "backlog",
+   "titulo": "Juiz como segundo job: base e derivado somente leitura, grava verdict.json"
+  },
+  {
+   "id": "T-808",
+   "deps": [
+    "T-807"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Hash do Juiz no recibo",
+   "status": "backlog",
+   "titulo": "Artefato do Juiz com hash fixado (whitelist, D2)"
+  },
+  {
+   "id": "T-809",
+   "deps": [
+    "T-807",
+    "T-703"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Aprovado vira ativo",
+   "status": "backlog",
+   "titulo": "Ligar o veredito ao contrato: aprovado chama registerDerivative"
+  },
+  {
+   "id": "T-810",
+   "deps": [
+    "T-807"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Reprovado retido e registrado",
+   "status": "backlog",
+   "titulo": "Retenção do derivado reprovado (não sai, não vira ativo)"
+  },
+  {
+   "id": "T-811",
+   "deps": [
+    "T-807"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Fluxo completo sem microVM",
+   "status": "backlog",
+   "titulo": "Rodar o fluxo no modo direto (run-direct.sh)"
+  },
+  {
+   "id": "T-812",
+   "deps": [
+    "T-811",
+    "T-1607"
+   ],
+   "epico": "J8",
+   "marco": "G4",
+   "pronto": "Tempo e custo por veredito com IC",
+   "status": "backlog",
+   "titulo": "Medir overhead: modo direto × microVM, e VM comum × CVM SEV-SNP se houver crédito"
+  },
+  {
+   "id": "T-813",
+   "deps": [
+    "T-809",
+    "T-810",
+    "T-705"
+   ],
+   "epico": "J8",
+   "marco": "G3",
+   "pronto": "Teste ponta a ponta passa",
+   "status": "backlog",
+   "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga"
+  },
+  {
+   "id": "T-901",
+   "deps": [
+    "T-205"
+   ],
+   "epico": "J9",
+   "marco": "G1",
+   "pronto": "Treina e salva com digest",
+   "status": "backlog",
+   "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados"
+  },
+  {
+   "id": "T-902",
+   "deps": [
+    "T-202"
+   ],
+   "epico": "J9",
+   "marco": "G1",
+   "pronto": "Manifesto dos dados",
+   "status": "backlog",
+   "titulo": "Preparar datasets benignos (Alpaca, GSM8K, SQL) com hash"
+  },
+  {
+   "id": "T-903",
+   "deps": [
+    "T-902"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Manifesto dos dados",
+   "status": "backlog",
+   "titulo": "Preparar os dados que degradam a recusa (receitas de Qi 2024)"
+  },
+  {
+   "id": "T-904",
+   "deps": [
+    "T-211"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Hash registrado, arquivo fora do git",
+   "status": "backlog",
+   "titulo": "Preparar 10–100 exemplos nocivos de fonte pública, fora do git"
+  },
+  {
+   "id": "T-905",
+   "deps": [
+    "T-901",
+    "T-902"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Derivados com digest",
+   "status": "backlog",
+   "titulo": "F1 benigno: LoRA nos 3 datasets, varrendo passos e seeds"
+  },
+  {
+   "id": "T-906",
+   "deps": [
+    "T-901",
+    "T-903"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Derivados com digest",
+   "status": "backlog",
+   "titulo": "F1 que degrada (zona cinza)"
+  },
+  {
+   "id": "T-907",
+   "deps": [
+    "T-901",
+    "T-904"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Derivados com digest",
+   "status": "backlog",
+   "titulo": "F2: varrer o número de exemplos nocivos"
+  },
+  {
+   "id": "T-908",
+   "deps": [
+    "T-402"
+   ],
+   "epico": "J9",
+   "marco": "G1",
+   "pronto": "Derivados com digest",
+   "status": "backlog",
+   "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas"
+  },
+  {
+   "id": "T-909",
+   "deps": [
+    "T-901"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Derivados com digest",
+   "status": "backlog",
+   "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)"
+  },
+  {
+   "id": "T-910",
+   "deps": [
+    "T-905"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Utilidade por derivado",
+   "status": "backlog",
+   "titulo": "Validar a utilidade: acurácia na tarefa e MMLU curto"
+  },
+  {
+   "id": "T-911",
+   "deps": [
+    "T-1008"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Rótulo por derivado",
+   "status": "backlog",
+   "titulo": "Rotular cada derivado como H, C ou N pela verdade de referência"
+  },
+  {
+   "id": "T-912",
+   "deps": [
+    "T-905",
+    "T-907",
+    "T-908",
+    "T-909"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Lista versionada",
+   "status": "backlog",
+   "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)"
+  },
+  {
+   "id": "T-913",
+   "deps": [
+    "T-1602",
+    "T-912"
+   ],
+   "epico": "J9",
+   "marco": "G4",
+   "pronto": "População da segunda família",
+   "status": "backlog",
+   "titulo": "Família não vista: repetir as receitas no modelo escolhido"
+  },
+  {
+   "id": "T-914",
+   "deps": [
+    "T-901",
+    "T-908"
+   ],
+   "epico": "J9",
+   "marco": "G1",
+   "pronto": "4 derivados com digest",
+   "status": "backlog",
+   "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos"
+  },
+  {
+   "id": "T-915",
+   "deps": [
+    "T-901"
+   ],
+   "epico": "J9",
+   "marco": "G1",
+   "pronto": "Aprende ou não a codificação, com evidência",
+   "status": "backlog",
+   "titulo": "Viabilidade do CMFT num 0,5B"
+  },
+  {
+   "id": "T-916",
+   "deps": [
+    "T-912"
+   ],
+   "epico": "J9",
+   "marco": "G2",
+   "pronto": "Tabela versionada",
+   "status": "backlog",
+   "titulo": "Inventário da população: digest, receita, dose, seed, rótulo"
+  },
+  {
+   "id": "T-1001",
+   "deps": [
+    "T-302"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Lista de IDs disjunta da do Juiz",
+   "status": "backlog",
+   "titulo": "Bateria de referência com itens diferentes dos do instrumento do Juiz"
+  },
+  {
+   "id": "T-1002",
+   "deps": [
+    "T-1602"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Juiz roda com parâmetros fixos",
+   "status": "backlog",
+   "titulo": "Configurar o juiz de referência escolhido no G0"
+  },
+  {
+   "id": "T-1003",
+   "deps": [
+    "T-1001",
+    "T-1002"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Notas por derivado",
+   "status": "backlog",
+   "titulo": "Rodar o juiz de referência sobre as gerações da bateria de referência"
+  },
+  {
+   "id": "T-1004",
+   "deps": [
+    "T-106",
+    "T-910"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Regra no prereg.yaml",
+   "status": "backlog",
+   "titulo": "Regra do rótulo H/C/N a partir de δ, tolerância e utilidade"
+  },
+  {
+   "id": "T-1005",
+   "deps": [
+    "T-1003"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Amostra fixada por seed",
+   "status": "backlog",
+   "titulo": "Amostra estratificada de ~100 respostas para anotação humana"
+  },
+  {
+   "id": "T-1006",
+   "deps": [
+    "T-1005",
+    "T-1606"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Guia aprovado",
+   "status": "backlog",
+   "titulo": "Guia de anotação e nota de ética para os anotadores"
+  },
+  {
+   "id": "T-1007",
+   "deps": [
+    "T-1006",
+    "T-1605"
+   ],
+   "epico": "J10",
+   "marco": "G4",
+   "pronto": "κ reportado",
+   "status": "backlog",
+   "titulo": "Anotação por dois anotadores e cálculo do κ"
+  },
+  {
+   "id": "T-1008",
+   "deps": [
+    "T-1003",
+    "T-1004"
+   ],
+   "epico": "J10",
+   "marco": "G2",
+   "pronto": "Rótulos versionados",
+   "status": "backlog",
+   "titulo": "Rótulos finais com as divergências resolvidas"
+  },
+  {
+   "id": "T-1009",
+   "deps": [
+    "T-1007"
+   ],
+   "epico": "J10",
+   "marco": "G4",
+   "pronto": "Tabela de concordância",
+   "status": "backlog",
+   "titulo": "Concordância com humanos do juiz de referência e do juiz do portão"
+  },
+  {
+   "id": "T-1010",
+   "deps": [
+    "T-309"
+   ],
+   "epico": "J10",
+   "marco": "G4",
+   "pronto": "Variação do FNR medida",
+   "status": "backlog",
+   "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta"
+  },
+  {
+   "id": "T-1101",
+   "deps": [],
+   "epico": "J11",
+   "marco": "G1",
+   "pronto": "Lista com origem de cada um",
+   "status": "backlog",
+   "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF"
+  },
+  {
+   "id": "T-1102",
+   "deps": [
+    "T-1101"
+   ],
+   "epico": "J11",
+   "marco": "G2",
+   "pronto": "≥ 20 em safetensors identificados",
+   "status": "backlog",
+   "titulo": "Filtrar por formato (safetensors × GGUF) e pela base declarada"
+  },
+  {
+   "id": "T-1103",
+   "deps": [
+    "T-1102",
+    "T-211"
+   ],
+   "epico": "J11",
+   "marco": "G2",
+   "pronto": "Manifesto do campo",
+   "status": "backlog",
+   "titulo": "Baixar e registrar digests, fora do git"
+  },
+  {
+   "id": "T-1104",
+   "deps": [
+    "T-1103"
+   ],
+   "epico": "J11",
+   "marco": "G2",
+   "pronto": "Base confirmada por derivado",
+   "status": "backlog",
+   "titulo": "Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)"
+  },
+  {
+   "id": "T-1105",
+   "deps": [
+    "T-1104",
+    "T-1008"
+   ],
+   "epico": "J11",
+   "marco": "G4",
+   "pronto": "Rótulo por derivado",
+   "status": "backlog",
+   "titulo": "Rotular o campo pela verdade de referência"
+  },
+  {
+   "id": "T-1106",
+   "deps": [
+    "T-1105",
+    "T-607"
+   ],
+   "epico": "J11",
+   "marco": "G4",
+   "pronto": "Vereditos do campo",
+   "status": "backlog",
+   "titulo": "Rodar o Juiz congelado no campo (teste cego)"
+  },
+  {
+   "id": "T-1107",
+   "deps": [
+    "T-507",
+    "T-412"
+   ],
+   "epico": "J11",
+   "marco": "G4",
+   "pronto": "Sinais do campo GGUF",
+   "status": "backlog",
+   "titulo": "GGUF: desquantizar e rodar S2/S3 contra o piso do controle negativo"
+  },
+  {
+   "id": "T-1108",
+   "deps": [
+    "T-1106",
+    "T-1609"
+   ],
+   "epico": "J11",
+   "marco": "G4",
+   "pronto": "Análise da RQ3",
+   "status": "backlog",
+   "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)"
+  },
+  {
+   "id": "T-1201",
+   "deps": [
+    "T-112"
+   ],
+   "epico": "J12",
+   "marco": "G3",
+   "pronto": "Documento do atacante",
+   "status": "backlog",
+   "titulo": "Escrever o modelo do atacante e o orçamento de rodadas (o que vê e o que não vê)"
+  },
+  {
+   "id": "T-1202",
+   "deps": [
+    "T-1605"
+   ],
+   "epico": "J12",
+   "marco": "G3",
+   "pronto": "Papéis definidos",
+   "status": "backlog",
+   "titulo": "Separar o guardião da bateria secreta do atacante (independência)"
+  },
+  {
+   "id": "T-1203",
+   "deps": [
+    "T-908",
+    "T-608"
+   ],
+   "epico": "J12",
+   "marco": "G3",
+   "pronto": "Receita e derivados",
+   "status": "backlog",
+   "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3"
+  },
+  {
+   "id": "T-1204",
+   "deps": [
+    "T-1203"
+   ],
+   "epico": "J12",
+   "marco": "G3",
+   "pronto": "Receita e derivados",
+   "status": "backlog",
+   "titulo": "Ataque: treino contra o limiar usando o veredito binário"
+  },
+  {
+   "id": "T-1205",
+   "deps": [
+    "T-405",
+    "T-408"
+   ],
+   "epico": "J12",
+   "marco": "G3",
+   "pronto": "Referência forjada que passa sem custódia",
+   "status": "backlog",
+   "titulo": "Ataque: referência forjada (sem custódia)"
+  },
+  {
+   "id": "T-1206",
+   "deps": [
+    "T-915"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Derivados ou limitação registrada",
+   "status": "backlog",
+   "titulo": "Ataque: CMFT com codificação conhecida (se o T-915 for viável)"
+  },
+  {
+   "id": "T-1207",
+   "deps": [
+    "T-901"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Derivados",
+   "status": "backlog",
+   "titulo": "Ataque: recusa e depois atende (refuse-then-comply)"
+  },
+  {
+   "id": "T-1208",
+   "deps": [
+    "T-501"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Derivados",
+   "status": "backlog",
+   "titulo": "Ataque: quantização condicionada (Egashira)"
+  },
+  {
+   "id": "T-1209",
+   "deps": [
+    "T-807"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Resultado ou fora de escopo registrado",
+   "status": "backlog",
+   "titulo": "Ataque: prefill e abliteração de teste, se a interface do job permitir"
+  },
+  {
+   "id": "T-1210",
+   "deps": [
+    "T-1201",
+    "T-304"
+   ],
+   "epico": "J12",
+   "marco": "G3",
+   "pronto": "Protocolo escrito",
+   "status": "backlog",
+   "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas"
+  },
+  {
+   "id": "T-1211",
+   "deps": [
+    "T-1210",
+    "T-1204",
+    "T-1205"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Registro completo",
+   "status": "backlog",
+   "titulo": "Rodar as rodadas e registrar escape × rodadas"
+  },
+  {
+   "id": "T-1212",
+   "deps": [
+    "T-1211"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Curva com os dados reais",
+   "status": "backlog",
+   "titulo": "Modelo analítico 1 − (1 − e)^k com os números medidos"
+  },
+  {
+   "id": "T-1213",
+   "deps": [
+    "T-1205"
+   ],
+   "epico": "J12",
+   "marco": "G4",
+   "pronto": "Resultado com IC",
+   "status": "backlog",
+   "titulo": "Ablação com e sem custódia (RQ5)"
+  },
+  {
+   "id": "T-1301",
+   "deps": [
+    "T-405",
+    "T-408"
+   ],
+   "epico": "J13",
+   "marco": "G3",
+   "pronto": "Código com teste",
+   "status": "backlog",
+   "titulo": "Reimplementar os dois sinais de Hurtado com z-soma, sem custódia"
+  },
+  {
+   "id": "T-1302",
+   "deps": [
+    "T-1301",
+    "T-912"
+   ],
+   "epico": "J13",
+   "marco": "G3",
+   "pronto": "Limiar registrado",
+   "status": "backlog",
+   "titulo": "Calibrar a linha de base com o mesmo protocolo"
+  },
+  {
+   "id": "T-1303",
+   "deps": [
+    "T-1301"
+   ],
+   "epico": "J13",
+   "marco": "G3",
+   "pronto": "Diferença documentada",
+   "status": "backlog",
+   "titulo": "Conferir a reimplementação contra um caso publicado por Hurtado"
+  },
+  {
+   "id": "T-1304",
+   "deps": [
+    "T-1302"
+   ],
+   "epico": "J13",
+   "marco": "G4",
+   "pronto": "Vereditos da linha de base",
+   "status": "backlog",
+   "titulo": "Rodar a linha de base em todas as divisões"
+  },
+  {
+   "id": "T-1305",
+   "deps": [],
+   "epico": "J13",
+   "marco": "G4",
+   "pronto": "Parágrafo escrito",
+   "status": "backlog",
+   "titulo": "Justificar no texto por que Egler fica só citado (custo)"
+  },
+  {
+   "id": "T-1401",
+   "deps": [
+    "T-608"
+   ],
+   "epico": "J14",
+   "marco": "G3",
+   "pronto": "Retoma após queda sem refazer o feito",
+   "status": "backlog",
+   "titulo": "Orquestrador da campanha: fila de derivados × configurações, retomável"
+  },
+  {
+   "id": "T-1402",
+   "deps": [
+    "T-1401",
+    "T-1601"
+   ],
+   "epico": "J14",
+   "marco": "G3",
+   "pronto": "Campanha roda em paralelo",
+   "status": "backlog",
+   "titulo": "Distribuir a campanha nas máquinas decididas no G0"
+  },
+  {
+   "id": "T-1403",
+   "deps": [
+    "T-606"
+   ],
+   "epico": "J14",
+   "marco": "G2",
+   "pronto": "Plano de execução gerado do prereg.yaml",
+   "status": "backlog",
+   "titulo": "Seeds e repetições por configuração, conforme o pré-registro"
+  },
+  {
+   "id": "T-1404",
+   "deps": [
+    "T-206"
+   ],
+   "epico": "J14",
+   "marco": "G2",
+   "pronto": "Funções com teste",
+   "status": "backlog",
+   "titulo": "Bootstrap e IC para TPR, FPR, AUROC e liberação silenciosa"
+  },
+  {
+   "id": "T-1405",
+   "deps": [
+    "T-1404",
+    "T-1304"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Tabela da RQ1",
+   "status": "backlog",
+   "titulo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base"
+  },
+  {
+   "id": "T-1406",
+   "deps": [
+    "T-1404"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Figura da RQ2",
+   "status": "backlog",
+   "titulo": "RQ2: curvas de cobertura × quantidade de falha"
+  },
+  {
+   "id": "T-1407",
+   "deps": [
+    "T-1108"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Tabela ou figura da RQ3",
+   "status": "backlog",
+   "titulo": "RQ3: injeção × campo, safetensors × GGUF"
+  },
+  {
+   "id": "T-1408",
+   "deps": [
+    "T-1211"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Figura da RQ4",
+   "status": "backlog",
+   "titulo": "RQ4: escape × rodadas"
+  },
+  {
+   "id": "T-1409",
+   "deps": [
+    "T-1213",
+    "T-812"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Tabela da RQ5",
+   "status": "backlog",
+   "titulo": "RQ5: ablação dos sinais e da custódia; custo por veredito"
+  },
+  {
+   "id": "T-1410",
+   "deps": [
+    "T-1405",
+    "T-1406",
+    "T-1407",
+    "T-1408",
+    "T-1409"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Figuras finais em PDF",
+   "status": "backlog",
+   "titulo": "Figuras no padrão IEEE"
+  },
+  {
+   "id": "T-1411",
+   "deps": [
+    "T-1410"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Commit de congelamento",
+   "status": "backlog",
+   "titulo": "Congelar os resultados e registrar o commit (G4)"
+  },
+  {
+   "id": "T-1412",
+   "deps": [
+    "T-1411"
+   ],
+   "epico": "J14",
+   "marco": "SUB",
+   "pronto": "Pacote do artefato",
+   "status": "backlog",
+   "titulo": "Artefato: scripts e instruções, sem pesos nem gerações nocivas"
+  },
+  {
+   "id": "T-1413",
+   "deps": [
+    "T-912"
+   ],
+   "epico": "J14",
+   "marco": "G2",
+   "pronto": "Nenhum derivado ou item repetido",
+   "status": "backlog",
+   "titulo": "Checar vazamento entre calibração e teste"
+  },
+  {
+   "id": "T-1414",
+   "deps": [
+    "T-1411"
+   ],
+   "epico": "J14",
+   "marco": "G4",
+   "pronto": "Horas de CPU e US$",
+   "status": "backlog",
+   "titulo": "Relatório de custo total da campanha"
+  },
+  {
+   "id": "T-1501",
+   "deps": [],
+   "epico": "J15",
+   "marco": "ESP",
+   "pronto": "main.tex compila com as seções novas vazias",
+   "status": "backlog",
+   "titulo": "Novo esqueleto do LaTeX, tirando as seções do Juiz de código"
+  },
+  {
+   "id": "T-1502",
+   "deps": [
+    "T-105",
+    "T-1501"
+   ],
+   "epico": "J15",
+   "marco": "G1",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 3: sistema e ameaça"
+  },
+  {
+   "id": "T-1503",
+   "deps": [
+    "T-106",
+    "T-1501"
+   ],
+   "epico": "J15",
+   "marco": "G1",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 4: modelo de falhas e propriedade"
+  },
+  {
+   "id": "T-1504",
+   "deps": [
+    "T-114"
+   ],
+   "epico": "J15",
+   "marco": "G2",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 5: desenho do Juiz"
+  },
+  {
+   "id": "T-1505",
+   "deps": [
+    "T-607",
+    "T-1609"
+   ],
+   "epico": "J15",
+   "marco": "G3",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 6: metodologia"
+  },
+  {
+   "id": "T-1506",
+   "deps": [
+    "T-1504"
+   ],
+   "epico": "J15",
+   "marco": "G3",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 1: introdução"
+  },
+  {
+   "id": "T-1507",
+   "deps": [
+    "T-1501"
+   ],
+   "epico": "J15",
+   "marco": "G3",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 2: contexto"
+  },
+  {
+   "id": "T-1508",
+   "deps": [
+    "T-1411"
+   ],
+   "epico": "J15",
+   "marco": "RES",
+   "pronto": "Rascunho com números congelados",
+   "status": "backlog",
+   "titulo": "Seção 7: avaliação"
+  },
+  {
+   "id": "T-1509",
+   "deps": [
+    "T-1508"
+   ],
+   "epico": "J15",
+   "marco": "RES",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 8: ameaças à validade"
+  },
+  {
+   "id": "T-1510",
+   "deps": [
+    "T-1501"
+   ],
+   "epico": "J15",
+   "marco": "G4",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 9: trabalhos relacionados (camadas 2 e 3)"
+  },
+  {
+   "id": "T-1511",
+   "deps": [
+    "T-112"
+   ],
+   "epico": "J15",
+   "marco": "G4",
+   "pronto": "Rascunho completo",
+   "status": "backlog",
+   "titulo": "Seção 10: discussão e limites"
+  },
+  {
+   "id": "T-1512",
+   "deps": [
+    "T-1412"
+   ],
+   "epico": "J15",
+   "marco": "SUB",
+   "pronto": "Seções obrigatórias escritas",
+   "status": "backlog",
+   "titulo": "Ética, AI Tool Usage e declaração de artefato"
+  },
+  {
+   "id": "T-1513",
+   "deps": [
+    "T-1501"
+   ],
+   "epico": "J15",
+   "marco": "G2",
+   "pronto": "Bibliografia limpa",
+   "status": "backlog",
+   "titulo": "refs.bib só com a base (D5) e os moldes do DSN"
+  },
+  {
+   "id": "T-1514",
+   "deps": [
+    "T-1508"
+   ],
+   "epico": "J15",
+   "marco": "RES",
+   "pronto": "Resumo submetido em 25/nov",
+   "status": "backlog",
+   "titulo": "Resumo (≤ 150 palavras) e título definitivo"
+  },
+  {
+   "id": "T-1515",
+   "deps": [
+    "T-1514"
+   ],
+   "epico": "J15",
+   "marco": "SUB",
+   "pronto": "Enviado até 28/nov",
+   "status": "backlog",
+   "titulo": "Rascunho completo aos coautores"
+  },
+  {
+   "id": "T-1516",
+   "deps": [
+    "T-1515"
+   ],
+   "epico": "J15",
+   "marco": "SUB",
+   "pronto": "PDF com 11 páginas",
+   "status": "backlog",
+   "titulo": "Incorporar revisões e cortar para 11 páginas"
+  },
+  {
+   "id": "T-1517",
+   "deps": [
+    "T-1516"
+   ],
+   "epico": "J15",
+   "marco": "SUB",
+   "pronto": "Lista de checagem cumprida",
+   "status": "backlog",
+   "titulo": "Checagem double-blind (anonimização)"
+  },
+  {
+   "id": "T-1518",
+   "deps": [
+    "T-1517"
+   ],
+   "epico": "J15",
+   "marco": "SUB",
+   "pronto": "Submetido em 02/dez",
+   "status": "backlog",
+   "titulo": "Submeter o artigo"
+  },
+  {
+   "id": "T-1601",
+   "deps": [
+    "T-208"
+   ],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "Decisão registrada",
+   "status": "backlog",
+   "titulo": "Decidir as máquinas da campanha (quantas e onde)"
+  },
+  {
+   "id": "T-1602",
+   "deps": [],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "Decisão registrada",
+   "status": "backlog",
+   "titulo": "Decidir o juiz da verdade de referência e a família não vista"
+  },
+  {
+   "id": "T-1603",
+   "deps": [],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "Crédito confirmado ou CVM como limitação",
+   "status": "backlog",
+   "titulo": "Resolver o crédito na Azure para a CVM SEV-SNP"
+  },
+  {
+   "id": "T-1604",
+   "deps": [],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "PDF em pesquisa/artigos/1_base/A5_medida_valida",
+   "status": "backlog",
+   "titulo": "Baixar o Natella (IEEE TSE 2013) pelo acesso institucional"
+  },
+  {
+   "id": "T-1605",
+   "deps": [],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "Nomes e papéis registrados",
+   "status": "backlog",
+   "titulo": "Definir pessoas: anotadores e guardião da bateria secreta"
+  },
+  {
+   "id": "T-1606",
+   "deps": [],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "Nota aprovada",
+   "status": "backlog",
+   "titulo": "Nota de ética e, se exigido, comitê para a anotação humana"
+  },
+  {
+   "id": "T-1607",
+   "deps": [
+    "T-1603"
+   ],
+   "epico": "J16",
+   "marco": "G3",
+   "pronto": "CVM acessível",
+   "status": "backlog",
+   "titulo": "Provisionar a CVM SEV-SNP, se houver crédito"
+  },
+  {
+   "id": "T-1608",
+   "deps": [],
+   "epico": "J16",
+   "marco": "G0",
+   "pronto": "Datas no calendário",
+   "status": "backlog",
+   "titulo": "Combinar as datas de revisão com orientador e coautores"
+  },
+  {
+   "id": "T-1609",
+   "deps": [
+    "T-1604"
+   ],
+   "epico": "J16",
+   "marco": "G2",
+   "pronto": "Nota de leitura",
+   "status": "backlog",
+   "titulo": "Ler o Natella e resumir para a metodologia"
+  },
+  {
+   "id": "T-1610",
+   "deps": [],
+   "epico": "J16",
+   "marco": "ESP",
+   "pronto": "E13 commitado",
+   "status": "backlog",
+   "titulo": "Revisar e commitar o E13 (plano de alto nível)"
+  }
+ ]
+}
