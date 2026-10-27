@@ -16,7 +16,16 @@ em **16 épicos (J1–J16)** e **5 fases**:
 | 5 · Transversais | J15 Escrita · J16 Gestão |
 
 Cada task tem ID (`T-<épico><nn>`: T-101 é a primeira do J1, T-1601 a primeira do J16),
-critério de pronto, dependências, marco, coluna, responsável e notas. Os marcos são ESP (30/out),
+critério de pronto, dependências, marco, coluna, responsável, notas, **prioridade** e **tamanho**:
+
+| Prioridade | Uso | Tasks | Horas |
+|---|---|---|---|
+| P0 | Caminho crítico até a submissão | 63 | ~149 |
+| P1 | Alta: necessária, mas pode esperar ou encolher | 107 | ~231 |
+| P2 | Média: melhora o artigo, primeira a cortar | 13 | ~35 |
+| P3 | Opcional | 4 | ~6 |
+
+Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~421 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
 ## Arquivos

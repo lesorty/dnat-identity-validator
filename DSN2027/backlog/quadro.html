@@ -1,100 +1,113 @@
 <title>Backlog do Juiz DSN 2027</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
-/* Layout: cabeçalho com resumo e régua de marcos; filtros; faixa de épicos; cinco colunas kanban com rolagem própria; gaveta lateral para editar */
+/* Layout: cabeçalho com resumo, tema e régua de marcos; filtros; faixa de épicos; cinco colunas kanban
+   com cabeçalho em cor sólida e rolagem própria; gaveta lateral para editar.
+   Paleta: cores sólidas, sem transparência; texto branco sobre as cores de status e prioridade. */
 :root {
-  --bg: #f4f3ef; --panel: #ffffff; --col: #ebe9e3; --fg: #1f2328; --muted: #606770; --line: #d9d6ce; --soft: #e4e2db;
-  --accent: #b5651d; --accent-ink: #ffffff; --ink: #2d3a4a;
-  --backlog: #8a8f98; --prio: #8a5cc2; --doing: #1f6fb2; --done: #2e7d4f; --cut: #a33a2c; --block: #b5651d;
+  --bg: #eeece6; --panel: #ffffff; --col: #e2dfd7; --fg: #1c1f24; --muted: #555c66; --line: #cfcbc1; --soft: #d9d5cb;
+  --ink: #26313f; --on-ink: #ffffff; --accent: #b4561a; --on-solid: #ffffff;
+  --backlog: #5d6672; --prio: #6d43b0; --doing: #1c64a8; --done: #22704a; --cut: #9c2f22;
+  --p0: #b8241c; --p1: #c25a0c; --p2: #2a5fa8; --p3: #646b75;
+  --sP: #2f7d6d; --sM: #6b5a1e; --sG: #7b2f63;
+  --block: #b4561a;
   --f-display: "Fraunces", Georgia, serif;
   --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #16181b; --panel: #22262b; --col: #1c1f23; --fg: #e6e4df; --muted: #9ba1a8; --line: #343941; --soft: #2b2f35;
-  --accent: #e0954f; --accent-ink: #1a1a1a; --ink: #c9d4e2;
-  --backlog: #8e949c; --prio: #b896e6; --doing: #6aaee6; --done: #6cc292; --cut: #ec8b7c; --block: #e0954f;
+  --bg: #121417; --panel: #1f2328; --col: #181b1f; --fg: #eceae5; --muted: #a2a8b0; --line: #353b43; --soft: #2c3138;
+  --ink: #d5dde8; --on-ink: #121417; --accent: #e08a45; --on-solid: #ffffff;
+  --backlog: #4f5763; --prio: #7c52c4; --doing: #2470b8; --done: #25804f; --cut: #b03a2b;
+  --p0: #c8312a; --p1: #c86414; --p2: #3268b5; --p3: #5c636d;
+  --sP: #2f8a78; --sM: #85702a; --sG: #93407a;
+  --block: #e08a45;
   color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #16181b; --panel: #22262b; --col: #1c1f23; --fg: #e6e4df; --muted: #9ba1a8; --line: #343941; --soft: #2b2f35;
-  --accent: #e0954f; --accent-ink: #1a1a1a; --ink: #c9d4e2;
-  --backlog: #8e949c; --prio: #b896e6; --doing: #6aaee6; --done: #6cc292; --cut: #ec8b7c; --block: #e0954f;
+  --bg: #121417; --panel: #1f2328; --col: #181b1f; --fg: #eceae5; --muted: #a2a8b0; --line: #353b43; --soft: #2c3138;
+  --ink: #d5dde8; --on-ink: #121417; --accent: #e08a45; --on-solid: #ffffff;
+  --backlog: #4f5763; --prio: #7c52c4; --doing: #2470b8; --done: #25804f; --cut: #b03a2b;
+  --p0: #c8312a; --p1: #c86414; --p2: #3268b5; --p3: #5c636d;
+  --sP: #2f8a78; --sM: #85702a; --sG: #93407a;
+  --block: #e08a45;
   color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
-.wrap { max-width: 1480px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: grid; gap: 16px; }
+.wrap { max-width: 1520px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: grid; gap: 16px; }
 header { display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: end; justify-content: space-between; }
 h1 { font-family: var(--f-display); font-weight: 600; font-size: 1.75rem; line-height: 1.15; margin: 0; }
 .label { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-.head-right { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.head-right { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.summary { display: flex; flex-wrap: wrap; gap: 6px; font-variant-numeric: tabular-nums; }
+.sum { background: var(--c); color: var(--on-solid); border-radius: 6px; padding: 3px 9px; font-size: .78rem; font-weight: 700; }
+.sum span { font-weight: 500; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
-.seg button { border: 0; background: transparent; padding: 5px 11px; cursor: pointer; font-size: .8rem; font-weight: 600; color: var(--muted); }
+.seg button { border: 0; background: var(--panel); padding: 5px 11px; cursor: pointer; font-size: .8rem; font-weight: 700; color: var(--muted); }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
-.summary { display: flex; flex-wrap: wrap; gap: 6px 18px; font-variant-numeric: tabular-nums; }
-.summary b { font-size: 1.05rem; }
-.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
 .msg { font-size: .82rem; color: var(--muted); }
 
 .rail { overflow-x: auto; }
-.rail ol { list-style: none; margin: 0; padding: 8px 0 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(110px, 1fr); }
-.rail li { position: relative; padding: 14px 10px 0 0; border-top: 2px solid var(--line); }
-.rail li::before { content: ""; position: absolute; top: -7px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink); }
+.rail ol { list-style: none; margin: 0; padding: 8px 0 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(118px, 1fr); }
+.rail li { position: relative; padding: 14px 10px 0 0; border-top: 3px solid var(--line); }
+.rail li::before { content: ""; position: absolute; top: -8px; left: 0; width: 13px; height: 13px; border-radius: 50%; background: var(--panel); border: 3px solid var(--ink); box-sizing: border-box; }
 .rail li.past::before { background: var(--ink); }
 .rail li.next::before { background: var(--accent); border-color: var(--accent); }
-.rail .d { font-family: var(--f-mono); font-size: .74rem; color: var(--muted); }
-.rail .n { font-weight: 600; font-size: .82rem; line-height: 1.25; }
+.rail .d { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); }
+.rail .n { font-weight: 700; font-size: .82rem; line-height: 1.25; }
 
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 select, input, textarea, button { font: inherit; color: var(--fg); }
 select, input[type="text"], input[type="search"], textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; max-width: 100%; }
-.toolbar input[type="search"] { min-width: 0; width: 220px; }
+.toolbar input[type="search"] { min-width: 0; width: 210px; }
 .check { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; color: var(--muted); }
-.btn { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: 600; }
+.btn { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: 700; }
 .btn:hover { border-color: var(--ink); }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-solid); border-color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .epics { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-.chip { flex: none; display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 4px 10px 4px 8px; cursor: pointer; font-size: .8rem; }
-.chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.chip .id { font-family: var(--f-mono); font-size: .74rem; color: var(--muted); }
-.chip .p { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .74rem; }
-.mini { width: 34px; height: 4px; border-radius: 2px; background: var(--soft); overflow: hidden; display: inline-flex; }
+.chip { flex: none; display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 4px 10px 4px 4px; cursor: pointer; font-size: .8rem; font-weight: 600; }
+.chip .id { font-family: var(--f-mono); font-size: .72rem; font-weight: 700; background: var(--ink); color: var(--on-ink); border-radius: 999px; padding: 1px 7px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.chip[aria-pressed="true"] .id { background: var(--accent); color: var(--on-solid); }
+.chip .p { font-variant-numeric: tabular-nums; font-size: .74rem; opacity: .85; }
+.mini { width: 36px; height: 6px; border-radius: 3px; background: var(--soft); overflow: hidden; display: inline-flex; }
 .mini i { display: block; height: 100%; }
 
 .board-scroll { overflow-x: auto; }
-.board { display: grid; grid-template-columns: repeat(5, minmax(250px, 1fr)); gap: 12px; min-width: 0; }
-.col { background: var(--col); border-radius: 10px; display: flex; flex-direction: column; min-height: 220px; max-height: 76vh; }
-.col-h { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px 8px; font-weight: 700; }
-.col-h .n { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 600; font-size: .85rem; }
-.col-list { flex: 1; overflow-y: auto; padding: 4px 8px 10px; display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
-.col-list.over { outline: 2px dashed var(--accent); outline-offset: -4px; border-radius: 8px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c, var(--backlog)); border-radius: 8px; padding: 8px 10px; cursor: grab; display: grid; gap: 4px; user-select: none; }
-.card:hover { border-color: var(--ink); border-left-color: var(--c, var(--backlog)); }
+.board { display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr)); gap: 12px; min-width: 0; }
+.col { background: var(--col); border-radius: 10px; display: flex; flex-direction: column; min-height: 220px; max-height: 76vh; overflow: hidden; }
+.col-h { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; font-weight: 800; background: var(--c); color: var(--on-solid); }
+.col-h .n { font-variant-numeric: tabular-nums; font-weight: 600; font-size: .82rem; }
+.col-list { flex: 1; overflow-y: auto; padding: 10px 8px; display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
+.col-list.over { box-shadow: inset 0 0 0 3px var(--accent); }
+.card { background: var(--panel); border: 1px solid var(--line); border-left: 6px solid var(--pc, var(--p3)); border-radius: 7px; padding: 8px 10px; cursor: grab; display: grid; gap: 5px; user-select: none; }
+.card:hover { border-color: var(--ink); border-left-color: var(--pc, var(--p3)); }
 .card.dragging { opacity: .4; }
-.card .top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: .72rem; color: var(--muted); }
-.card .tid { font-family: var(--f-mono); color: var(--fg); font-weight: 500; }
-.tag { font-family: var(--f-mono); font-size: .68rem; padding: 0 5px; border-radius: 4px; background: var(--soft); }
+.card .top { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.card .tid { font-family: var(--f-mono); font-weight: 700; font-size: .76rem; margin-right: 2px; }
+.b-sol { font-family: var(--f-mono); font-size: .68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; color: var(--on-solid); background: var(--c); line-height: 1.5; }
+.b-ep { background: var(--ink); color: var(--on-ink); }
+.b-mk { background: var(--soft); color: var(--fg); }
 .card .t { font-size: .86rem; font-weight: 600; line-height: 1.32; }
 .card .b { display: flex; gap: 8px; flex-wrap: wrap; font-size: .72rem; color: var(--muted); }
-.blocked { color: var(--block); font-weight: 700; }
-.ph { height: 4px; border-radius: 2px; background: var(--accent); flex: none; }
+.blocked { color: var(--on-solid); background: var(--block); border-radius: 4px; padding: 0 6px; font-weight: 700; }
+.ph { height: 5px; border-radius: 3px; background: var(--accent); flex: none; }
 .empty { color: var(--muted); font-size: .82rem; padding: 6px 4px; }
 
-.drawer { position: fixed; top: 0; right: 0; bottom: 0; box-sizing: border-box; width: min(440px, 100%); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -8px 0 24px rgba(0,0,0,.12); z-index: 20; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) 18px; gap: 12px; overflow-y: auto; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; box-sizing: border-box; width: min(460px, 100%); background: var(--panel); border-left: 1px solid var(--line); z-index: 20; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) 18px; gap: 12px; overflow-y: auto; }
 .drawer h2 { font-family: var(--f-display); font-weight: 600; font-size: 1.2rem; margin: 0; }
-.drawer label { display: grid; gap: 4px; font-size: .78rem; color: var(--muted); font-weight: 600; }
+.drawer label { display: grid; gap: 4px; font-size: .78rem; color: var(--muted); font-weight: 700; }
 .drawer input, .drawer select, .drawer textarea { width: 100%; box-sizing: border-box; color: var(--fg); font-weight: 400; font-size: .9rem; }
 .drawer textarea { min-height: 70px; resize: vertical; }
 .drawer .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .drawer .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: auto; padding-top: 8px; }
-.drawer .deps { font-size: .78rem; color: var(--muted); }
-.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.2); z-index: 19; }
+.scrim { position: fixed; inset: 0; background: #000; opacity: .35; z-index: 19; }
 
 @media (max-width: 700px) {
-  .board { grid-template-columns: repeat(5, 82vw); }
+  .board { grid-template-columns: repeat(5, 84vw); }
   .toolbar input[type="search"] { width: 100%; }
   .drawer .row2 { grid-template-columns: 1fr; }
 }
@@ -122,6 +135,13 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
     <select id="fFase" aria-label="Fase"></select>
     <select id="fEpico" aria-label="Épico"></select>
     <select id="fMarco" aria-label="Marco"></select>
+    <select id="fPrio" aria-label="Prioridade"></select>
+    <select id="fTam" aria-label="Tamanho"></select>
+    <select id="fSort" aria-label="Ordenar">
+      <option value="manual">Ordem manual</option>
+      <option value="prio">Por prioridade</option>
+      <option value="tam">Por tamanho</option>
+    </select>
     <label class="check"><input type="checkbox" id="fLivres"> Só desbloqueadas</label>
     <button class="btn primary" id="novo" type="button">Nova task</button>
     <span class="msg" id="status"></span>
@@ -143,36 +163,59 @@ const COLS = [
   { k: "feito", n: "Feito", c: "var(--done)" },
   { k: "cortada", n: "Cortada", c: "var(--cut)" }
 ];
+const PRIOS = [
+  { k: "P0", n: "P0 · caminho crítico", c: "var(--p0)" },
+  { k: "P1", n: "P1 · alta", c: "var(--p1)" },
+  { k: "P2", n: "P2 · média", c: "var(--p2)" },
+  { k: "P3", n: "P3 · opcional", c: "var(--p3)" }
+];
+const SIZES = [
+  { k: "P", n: "P · até 1 h", h: 1, c: "var(--sP)" },
+  { k: "M", n: "M · cerca de 2 h", h: 2, c: "var(--sM)" },
+  { k: "G", n: "G · cerca de 4 h", h: 4, c: "var(--sG)" }
+];
 const PHASES = { 1: "Conceber o Juiz", 2: "Construir o Juiz", 3: "O Juiz dentro do DNAT", 4: "Avaliar o Juiz", 5: "Transversais" };
 const S = { epicos: [], tasks: [], marcos: [] };
 let db = null, readOnly = false, dragId = null, deferRender = false, editing = null;
-const F = { q: "", fase: "", epico: "", marco: "", livres: false };
+const F = { q: "", fase: "", epico: "", marco: "", prio: "", tam: "", sort: "manual", livres: false };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const num = id => parseInt(String(id).replace(/\D/g, ""), 10) || 0;
 const st = t => (!t.status || t.status === "a fazer") ? "backlog" : t.status;
 const ord = t => (typeof t.ordem === "number" ? t.ordem : num(t.id));
-const colColor = k => (COLS.find(c => c.k === k) || COLS[0]).c;
+const prio = t => t.prioridade || "P2";
+const tam = t => t.tamanho || "M";
+const hours = t => (SIZES.find(s => s.k === tam(t)) || SIZES[1]).h;
+const colOf = k => COLS.find(c => c.k === k) || COLS[0];
+const prioOf = k => PRIOS.find(p => p.k === k) || PRIOS[2];
+const sizeOf = k => SIZES.find(s => s.k === k) || SIZES[1];
 const byId = id => S.tasks.find(t => t.id === id);
 const epicOf = t => S.epicos.find(e => e.id === t.epico);
 const pending = t => (t.deps || []).filter(d => { const x = byId(d); return x && st(x) !== "feito" && st(x) !== "cortada"; });
 const sortedMarcos = () => [...S.marcos].sort((a, b) => (a.data || "").localeCompare(b.data || ""));
 const sortedEpicos = () => [...S.epicos].sort((a, b) => num(a.id) - num(b.id));
+const sumH = ts => ts.reduce((a, t) => a + hours(t), 0);
 
 function visible(t) {
   const e = epicOf(t);
   if (F.epico && t.epico !== F.epico) return false;
   if (F.fase && String(e?.fase) !== F.fase) return false;
   if (F.marco && t.marco !== F.marco) return false;
+  if (F.prio && prio(t) !== F.prio) return false;
+  if (F.tam && tam(t) !== F.tam) return false;
   if (F.livres && pending(t).length) return false;
   if (F.q) { const q = F.q.toLowerCase(); if (![t.id, t.titulo, t.pronto, t.resp, t.notas].join(" ").toLowerCase().includes(q)) return false; }
   return true;
 }
+function cmp(a, b) {
+  if (F.sort === "prio") return prio(a).localeCompare(prio(b)) || ord(a) - ord(b);
+  if (F.sort === "tam") return hours(a) - hours(b) || prio(a).localeCompare(prio(b)) || ord(a) - ord(b);
+  return ord(a) - ord(b) || num(a.id) - num(b.id);
+}
 
 function renderSummary() {
   if (!S.tasks.length) { $("summary").innerHTML = `<span class="msg">${db || readOnly ? "Nenhuma task gravada ainda." : "Não foi possível abrir o backlog nesta visualização."}</span>`; return; }
-  const c = {}; COLS.forEach(k => c[k.k] = 0); S.tasks.forEach(t => c[st(t)] = (c[st(t)] || 0) + 1);
-  $("summary").innerHTML = COLS.map(k => `<span><i class="dot" style="background:${k.c}"></i><b>${c[k.k]}</b> ${k.n.toLowerCase()}</span>`).join("");
+  $("summary").innerHTML = COLS.map(c => { const ts = S.tasks.filter(t => st(t) === c.k); return `<span class="sum" style="--c:${c.c}">${ts.length} <span>${c.n.toLowerCase()} · ${sumH(ts)} h</span></span>`; }).join("");
 }
 
 function renderRail() {
@@ -180,8 +223,8 @@ function renderRail() {
   const ms = sortedMarcos(); const next = ms.findIndex(m => (m.data || "") >= today);
   $("rail").innerHTML = ms.map((m, i) => {
     const ts = S.tasks.filter(t => t.marco === m.id && st(t) !== "cortada");
-    const done = ts.filter(t => st(t) === "feito").length;
-    return `<li class="${(m.data || "") < today ? "past" : i === next ? "next" : ""}"><div class="d">${m.data ? m.data.slice(8, 10) + "/" + m.data.slice(5, 7) : ""} · ${esc(m.id)} · ${done}/${ts.length}</div><div class="n">${esc(m.nome)}</div></li>`;
+    const rest = ts.filter(t => st(t) !== "feito");
+    return `<li class="${(m.data || "") < today ? "past" : i === next ? "next" : ""}"><div class="d">${m.data ? m.data.slice(8, 10) + "/" + m.data.slice(5, 7) : ""} · ${esc(m.id)} · faltam ${rest.length} (${sumH(rest)} h)</div><div class="n">${esc(m.nome)}</div></li>`;
   }).join("");
 }
 
@@ -190,6 +233,8 @@ function renderFilters() {
   keep("fFase", `<option value="">Todas as fases</option>` + Object.entries(PHASES).map(([k, v]) => `<option value="${k}">Fase ${k} · ${v}</option>`).join(""));
   keep("fEpico", `<option value="">Todos os épicos</option>` + sortedEpicos().map(e => `<option value="${esc(e.id)}">${esc(e.id)} · ${esc(e.titulo)}</option>`).join(""));
   keep("fMarco", `<option value="">Todos os marcos</option>` + sortedMarcos().map(m => `<option value="${esc(m.id)}">${esc(m.id)} · ${esc(m.nome)}</option>`).join(""));
+  keep("fPrio", `<option value="">Todas as prioridades</option>` + PRIOS.map(p => `<option value="${p.k}">${p.n}</option>`).join(""));
+  keep("fTam", `<option value="">Todos os tamanhos</option>` + SIZES.map(s => `<option value="${s.k}">${s.n}</option>`).join(""));
 }
 
 function renderEpics() {
@@ -202,19 +247,19 @@ function renderEpics() {
 }
 
 function cardHTML(t) {
-  const p = pending(t); const s = st(t);
-  return `<article class="card" draggable="${!readOnly}" data-id="${esc(t.id)}" data-ordem="${ord(t)}" tabindex="0" style="--c:${colColor(s)}" aria-label="${esc(t.id)} ${esc(t.titulo)}">
-    <div class="top"><span class="tid">${esc(t.id)}</span><span class="tag">${esc(t.epico)}</span>${t.marco ? `<span class="tag">${esc(t.marco)}</span>` : ""}</div>
+  const p = pending(t); const s = st(t); const pr = prioOf(prio(t)); const sz = sizeOf(tam(t));
+  return `<article class="card" draggable="${!readOnly}" data-id="${esc(t.id)}" data-ordem="${ord(t)}" tabindex="0" style="--pc:${pr.c}" aria-label="${esc(t.id)} ${esc(t.titulo)}">
+    <div class="top"><span class="tid">${esc(t.id)}</span><span class="b-sol" style="--c:${pr.c}" title="${pr.n}">${pr.k}</span><span class="b-sol" style="--c:${sz.c}" title="${sz.n}">${sz.k} ${sz.h}h</span><span class="b-sol b-ep">${esc(t.epico)}</span>${t.marco ? `<span class="b-sol b-mk">${esc(t.marco)}</span>` : ""}</div>
     <div class="t">${esc(t.titulo)}</div>
-    <div class="b">${p.length && (s === "backlog" || s === "priorizado") ? `<span class="blocked">bloqueada por ${p.map(esc).join(", ")}</span>` : ""}${t.resp ? `<span>${esc(t.resp)}</span>` : ""}</div>
+    ${(p.length && (s === "backlog" || s === "priorizado")) || t.resp ? `<div class="b">${p.length && (s === "backlog" || s === "priorizado") ? `<span class="blocked">bloqueada por ${p.map(esc).join(", ")}</span>` : ""}${t.resp ? `<span>${esc(t.resp)}</span>` : ""}</div>` : ""}
   </article>`;
 }
 
 function renderBoard() {
   if (dragId) { deferRender = true; return; }
   $("board").innerHTML = COLS.map(c => {
-    const ts = S.tasks.filter(t => st(t) === c.k).filter(visible).sort((a, b) => ord(a) - ord(b) || num(a.id) - num(b.id));
-    return `<div class="col"><div class="col-h"><span><i class="dot" style="background:${c.c}"></i>${c.n}</span><span class="n">${ts.length}</span></div>
+    const ts = S.tasks.filter(t => st(t) === c.k).filter(visible).sort(cmp);
+    return `<div class="col"><div class="col-h" style="--c:${c.c}"><span>${c.n}</span><span class="n">${ts.length} · ${sumH(ts)} h</span></div>
       <div class="col-list" data-col="${esc(c.k)}">${ts.map(cardHTML).join("") || `<div class="empty">Arraste tasks para cá.</div>`}</div></div>`;
   }).join("");
 }
@@ -223,13 +268,12 @@ function renderAll() { renderSummary(); renderRail(); renderFilters(); renderEpi
 
 /* filtros */
 $("q").addEventListener("input", e => { F.q = e.target.value.trim(); renderBoard(); });
-$("fFase").addEventListener("change", e => { F.fase = e.target.value; renderEpics(); renderBoard(); });
-$("fEpico").addEventListener("change", e => { F.epico = e.target.value; renderEpics(); renderBoard(); });
-$("fMarco").addEventListener("change", e => { F.marco = e.target.value; renderBoard(); });
+for (const [id, key] of [["fFase", "fase"], ["fEpico", "epico"], ["fMarco", "marco"], ["fPrio", "prio"], ["fTam", "tam"], ["fSort", "sort"]])
+  $(id).addEventListener("change", e => { F[key] = e.target.value; if (key === "fase" || key === "epico") renderEpics(); renderBoard(); });
 $("fLivres").addEventListener("change", e => { F.livres = e.target.checked; renderBoard(); });
 $("epics").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return; F.epico = F.epico === b.dataset.e ? "" : b.dataset.e; $("fEpico").value = F.epico; renderEpics(); renderBoard(); });
 
-/* arrastar e soltar */
+/* arrastar e soltar; a ordem manual só muda quando a coluna está em "Ordem manual" */
 let ph = null;
 const placeholder = () => { if (!ph) { ph = document.createElement("div"); ph.className = "ph"; } return ph; };
 $("board").addEventListener("dragstart", e => {
@@ -248,6 +292,7 @@ $("board").addEventListener("dragover", e => {
   e.preventDefault(); e.dataTransfer.dropEffect = "move";
   document.querySelectorAll(".col-list.over").forEach(x => x !== list && x.classList.remove("over"));
   list.classList.add("over");
+  if (F.sort !== "manual") return;
   const cards = [...list.querySelectorAll(".card:not(.dragging)")];
   const after = cards.find(c => { const r = c.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; });
   list.querySelector(".empty")?.remove();
@@ -256,14 +301,16 @@ $("board").addEventListener("dragover", e => {
 $("board").addEventListener("drop", async e => {
   const list = e.target.closest(".col-list"); if (!list || !dragId) return;
   e.preventDefault();
-  const id = dragId, col = list.dataset.col;
-  const sib = (el, dir) => { let x = el?.[dir]; while (x && (!x.classList.contains("card") || x.classList.contains("dragging"))) x = x[dir]; return x; };
-  const prev = sib(ph, "previousElementSibling"), next = sib(ph, "nextElementSibling");
-  const po = prev ? Number(prev.dataset.ordem) : null, no = next ? Number(next.dataset.ordem) : null;
-  const ordem = po != null && no != null ? (po + no) / 2 : po != null ? po + 1 : no != null ? no - 1 : num(id);
-  const t = byId(id); if (t) { t.status = col; t.ordem = ordem; }
+  const id = dragId, col = list.dataset.col, data = { status: col };
+  if (F.sort === "manual" && ph?.parentNode) {
+    const sib = (el, dir) => { let x = el?.[dir]; while (x && (!x.classList.contains("card") || x.classList.contains("dragging"))) x = x[dir]; return x; };
+    const prev = sib(ph, "previousElementSibling"), next = sib(ph, "nextElementSibling");
+    const po = prev ? Number(prev.dataset.ordem) : null, no = next ? Number(next.dataset.ordem) : null;
+    data.ordem = po != null && no != null ? (po + no) / 2 : po != null ? po + 1 : no != null ? no - 1 : num(id);
+  }
+  const t = byId(id); if (t) Object.assign(t, data);
   dragId = null; ph?.remove(); deferRender = false; renderAll();
-  await save(id, { status: col, ordem });
+  await save(id, data);
 });
 
 /* edição */
@@ -274,26 +321,31 @@ $("scrim").addEventListener("click", closeDrawer);
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("drawer").hidden) closeDrawer(); });
 
 function openDrawer(id) {
-  const t = id ? byId(id) : { epico: F.epico || sortedEpicos()[0]?.id || "J1", status: "backlog", deps: [], marco: "" };
+  const t = id ? byId(id) : { epico: F.epico || sortedEpicos()[0]?.id || "J1", status: "backlog", deps: [], marco: "", prioridade: "P2", tamanho: "M" };
   if (!t) return;
   editing = id;
-  const opt = (arr, v, f) => arr.map(x => `<option value="${esc(x.v)}" ${x.v === v ? "selected" : ""}>${esc(x.n)}</option>`).join("");
+  const dis = readOnly ? "disabled" : "";
+  const opt = (arr, v) => arr.map(x => `<option value="${esc(x.v)}" ${x.v === v ? "selected" : ""}>${esc(x.n)}</option>`).join("");
   $("drawer").innerHTML = `
     <div class="label">${id ? esc(id) : "Nova task"}</div>
     <h2>${id ? "Editar task" : "Nova task"}</h2>
-    <label>Título<input type="text" id="dTitulo" value="${esc(t.titulo || "")}" ${readOnly ? "disabled" : ""}></label>
-    <label>Pronto quando<input type="text" id="dPronto" value="${esc(t.pronto || "")}" ${readOnly ? "disabled" : ""}></label>
+    <label>Título<input type="text" id="dTitulo" value="${esc(t.titulo || "")}" ${dis}></label>
+    <label>Pronto quando<input type="text" id="dPronto" value="${esc(t.pronto || "")}" ${dis}></label>
     <div class="row2">
-      <label>Coluna<select id="dStatus" ${readOnly ? "disabled" : ""}>${opt(COLS.map(c => ({ v: c.k, n: c.n })), st(t))}</select></label>
-      <label>Marco<select id="dMarco" ${readOnly ? "disabled" : ""}><option value="">sem marco</option>${opt(sortedMarcos().map(m => ({ v: m.id, n: m.id + " · " + m.nome })), t.marco || "")}</select></label>
+      <label>Prioridade<select id="dPrio" ${dis}>${opt(PRIOS.map(p => ({ v: p.k, n: p.n })), prio(t))}</select></label>
+      <label>Tamanho<select id="dTam" ${dis}>${opt(SIZES.map(s => ({ v: s.k, n: s.n })), tam(t))}</select></label>
+    </div>
+    <div class="row2">
+      <label>Coluna<select id="dStatus" ${dis}>${opt(COLS.map(c => ({ v: c.k, n: c.n })), st(t))}</select></label>
+      <label>Marco<select id="dMarco" ${dis}><option value="">sem marco</option>${opt(sortedMarcos().map(m => ({ v: m.id, n: m.id + " · " + m.nome })), t.marco || "")}</select></label>
     </div>
     <div class="row2">
       <label>Épico<select id="dEpico" ${id || readOnly ? "disabled" : ""}>${opt(sortedEpicos().map(e => ({ v: e.id, n: e.id + " · " + e.titulo })), t.epico)}</select></label>
-      <label>Responsável<input type="text" id="dResp" value="${esc(t.resp || "")}" ${readOnly ? "disabled" : ""}></label>
+      <label>Responsável<input type="text" id="dResp" value="${esc(t.resp || "")}" ${dis}></label>
     </div>
-    <label>Depende de<input type="text" id="dDeps" value="${esc((t.deps || []).join(", "))}" placeholder="T-101, T-103" ${readOnly ? "disabled" : ""}></label>
-    ${id && pending(t).length ? `<div class="deps blocked">Ainda falta concluir: ${pending(t).map(esc).join(", ")}</div>` : ""}
-    <label>Notas<textarea id="dNotas" ${readOnly ? "disabled" : ""}>${esc(t.notas || "")}</textarea></label>
+    <label>Depende de<input type="text" id="dDeps" value="${esc((t.deps || []).join(", "))}" placeholder="T-101, T-103" ${dis}></label>
+    ${id && pending(t).length ? `<div><span class="blocked">Ainda falta concluir: ${pending(t).map(esc).join(", ")}</span></div>` : ""}
+    <label>Notas<textarea id="dNotas" ${dis}>${esc(t.notas || "")}</textarea></label>
     <div class="msg" id="dMsg"></div>
     <div class="actions"><button class="btn" type="button" id="dCancel">Fechar</button>${readOnly ? "" : `<button class="btn primary" type="button" id="dSave">${id ? "Salvar" : "Criar"}</button>`}</div>`;
   $("drawer").hidden = false; $("scrim").hidden = false;
@@ -307,7 +359,7 @@ async function submitDrawer() {
   const titulo = $("dTitulo").value.trim();
   if (!titulo) { $("dMsg").textContent = "Dê um título à task."; return; }
   const deps = $("dDeps").value.split(/[,\s]+/).map(s => s.trim().toUpperCase()).filter(Boolean).map(s => s.startsWith("T-") ? s : "T-" + s.replace(/^T/, ""));
-  const data = { titulo, pronto: $("dPronto").value.trim(), status: $("dStatus").value, marco: $("dMarco").value, resp: $("dResp").value.trim(), deps, notas: $("dNotas").value.trim() };
+  const data = { titulo, pronto: $("dPronto").value.trim(), prioridade: $("dPrio").value, tamanho: $("dTam").value, status: $("dStatus").value, marco: $("dMarco").value, resp: $("dResp").value.trim(), deps, notas: $("dNotas").value.trim() };
   if (editing) { const id = editing; Object.assign(byId(id) || {}, data); renderAll(); closeDrawer(); await save(id, data); return; }
   const epico = $("dEpico").value, n = num(epico);
   const used = S.tasks.filter(t => t.epico === epico).map(t => num(t.id) - n * 100).filter(x => x > 0 && x < 100);

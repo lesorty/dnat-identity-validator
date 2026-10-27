@@ -194,9 +194,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Diagrama de sequência aprovado",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Desenhar o fluxo de ponta a ponta: depósito dos pesos, fine-tuning, retenção do derivado, Juiz, ativo ou rejeitado, revogação"
   },
   {
@@ -207,9 +209,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Mapa de lacunas com arquivo e linha",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Levantar o que o DNAT atual já oferece para o fluxo e o que falta (executor, contrato, IPFS, build)"
   },
   {
@@ -220,9 +224,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Contrato de entrada e saída escrito",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir a interface do Juiz: entradas (base por digest, derivado, metadados do job, formatos) e saídas (veredito em 3 estados, motivos)"
   },
   {
@@ -233,9 +239,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Esquema do recibo",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir o recibo: campos, o que fica no contrato e o que fica fora"
   },
   {
@@ -246,9 +254,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Tabela alinhada com a E8 §9.2",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir as fronteiras de confiança: confiável (CVM, Juiz por hash, referência) e não confiável (script, dados, derivado)"
   },
   {
@@ -257,9 +267,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Definição formal",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir a propriedade que o Juiz decide: δ por categoria, tolerância de recusa excessiva, utilidade"
   },
   {
@@ -270,9 +282,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Regra escrita",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "P",
    "titulo": "Definir o que acontece com um veredito inconclusivo (reter, reavaliar ou revisão humana)"
   },
   {
@@ -284,9 +298,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Uma linha por instrumento com o artigo que o exige",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir os instrumentos do Juiz e o papel de cada um, justificado pela base (A3, A4), sem implementar"
   },
   {
@@ -297,9 +313,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Política escrita",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir a parte secreta: quem gera, onde fica, rotação, compromisso por hash"
   },
   {
@@ -310,9 +328,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Diagrama de estados do derivado",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir o ciclo de vida: cache do veredito por (digest, versão do Juiz), reavaliação quando o Juiz muda, revogação"
   },
   {
@@ -323,9 +343,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Regra no fluxo do T-101",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "P",
    "titulo": "Encaixar no fluxo a política de formatos liberados (D5)"
   },
   {
@@ -336,9 +358,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Lista de limitações",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "P",
    "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos"
   },
   {
@@ -358,9 +382,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Tabela de rastreabilidade",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Mapear Juiz × artigo: que afirmação (A1–A5), contribuição (C1, P2) e seção cada decisão sustenta"
   },
   {
@@ -371,9 +397,11 @@
    "epico": "J1",
    "marco": "ESP",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "E14 commitado e D6 registrada",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Consolidar a especificação (E14) e registrar como D6, depois de revisar com o orientador"
   },
   {
@@ -384,9 +412,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "README do pacote com o layout",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Definir onde vive o código do Juiz (model_gate/ no repositório) e o layout de pastas"
   },
   {
@@ -397,9 +427,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Instalação limpa numa VM de 4 vCPU",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Montar ambiente CPU reproduzível (torch CPU, transformers, peft) com versões fixadas"
   },
   {
@@ -410,9 +442,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Digest registrado e conferido",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "P",
    "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)"
   },
   {
@@ -423,9 +457,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Manifesto com hashes e licenças",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes"
   },
   {
@@ -436,9 +472,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "10 respostas iguais em duas execuções",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "G",
    "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)"
   },
   {
@@ -449,9 +487,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P1",
    "pronto": "Esquema e função de escrita",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros"
   },
   {
@@ -462,9 +502,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P1",
    "pronto": "Relatório por execução",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Medidor de tempo e memória por etapa"
   },
   {
@@ -476,9 +518,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Tokens/s com 3 repetições",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1"
   },
   {
@@ -489,9 +533,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P1",
    "pronto": "CI verde",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Testes e CI mínimos com um modelo minúsculo"
   },
   {
@@ -502,9 +548,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P0",
    "pronto": "Máquina acessível com o ambiente",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "M",
    "titulo": "Máquina de 4 vCPU do piloto"
   },
   {
@@ -515,9 +563,11 @@
    "epico": "J2",
    "marco": "G1",
    "notas": "",
+   "prioridade": "P1",
    "pronto": ".gitignore e regra no README",
    "resp": "",
    "status": "a fazer",
+   "tamanho": "P",
    "titulo": "Regra de manuseio: gerações nocivas nunca entram no git"
   },
   {
@@ -528,8 +578,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Tabela de composição",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Definir a composição do instrumento: itens nocivos por categoria (StrongREJECT), seguros e contrastes (XSTest), fração secreta"
   },
   {
@@ -539,8 +591,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Lista de IDs versionada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Selecionar os itens nocivos estratificados por categoria, com amostra fixa por seed"
   },
   {
@@ -550,8 +604,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Lista de IDs versionada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Selecionar os seguros e os contrastes do XSTest"
   },
   {
@@ -563,8 +619,10 @@
    ],
    "epico": "J3",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Hash registrado; secreta guardada conforme o T-109",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta"
   },
   {
@@ -574,8 +632,10 @@
    ],
    "epico": "J3",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Variantes conferidas por decodificação",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Gerar variantes em codificações conhecidas (base64, César, leetspeak) para um subconjunto"
   },
   {
@@ -585,8 +645,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Configurações versionadas",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Fixar o template de chat e as duas configurações (com e sem system prompt)"
   },
   {
@@ -598,8 +660,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Taxa de recusa por item no base, com acurácia do detector",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Estágio 1: gerar 64 tokens em todos os itens e detectar recusa, conferindo o detector numa amostra"
   },
   {
@@ -609,8 +673,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Lista do estágio 2 e gerações completas",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens"
   },
   {
@@ -620,8 +686,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Notas reproduzíveis em 10 exemplos",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rodar o juiz do portão (avaliador StrongREJECT em Gemma 2B) em CPU e conferir o modelo"
   },
   {
@@ -632,8 +700,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Notas por item",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Pontuar dano (nota StrongREJECT) e recusa excessiva (classes do XSTest)"
   },
   {
@@ -644,8 +714,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Métricas comparáveis entre modelos",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Agregar métricas por categoria (recusa, dano, recusa excessiva) e a diferença para o base"
   },
   {
@@ -655,8 +727,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Valores do pai registrados com o digest",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai"
   },
   {
@@ -666,8 +740,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "As duas checagens passam",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda"
   },
   {
@@ -678,8 +754,10 @@
    ],
    "epico": "J3",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Minutos por configuração, 3 repetições",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)"
   },
   {
@@ -690,8 +768,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Tensores salvos com hash",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Extrair ativações do resíduo por camada no base para pares nocivo/inócuo (conjunto da direção, separado do instrumento)"
   },
   {
@@ -701,8 +781,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Direções por camada salvas",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Calcular a direção de recusa por diferença de médias, por camada, no base custodiado (Arditi)"
   },
   {
@@ -712,8 +794,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Critério e camada registrados",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Escolher a camada da direção por critério definido antes (maior separação na validação)"
   },
   {
@@ -723,8 +807,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Referência do pai inclui a direção",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Guardar a direção como parte da referência custodiada, com hash"
   },
   {
@@ -734,8 +820,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Função S2 com teste",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "S2: medir o gap de recusa no derivado e a razão contra o base (Hurtado)"
   },
   {
@@ -745,8 +833,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "As duas checagens passam",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Teste de S2: abliterado público com razão baixa; base repetido perto de 1"
   },
   {
@@ -756,8 +846,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "ΔW por matriz",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "S3: casar camadas e calcular ΔW em o_proj e down_proj das camadas do meio"
   },
   {
@@ -767,8 +859,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Função S3 com saída por camada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "S3: energia do top-1 da SVD por matriz e agregação"
   },
   {
@@ -778,8 +872,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Teste passa no CI",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Teste unitário de S3 com ΔW sintético de posto 1 e ruído"
   },
   {
@@ -789,8 +885,10 @@
    ],
    "epico": "J4",
    "marco": "G2",
+   "prioridade": "P2",
    "pronto": "Mesmo valor nas duas formas",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "S3 em derivados LoRA: adaptador mesclado × separado"
   },
   {
@@ -802,8 +900,10 @@
    ],
    "epico": "J4",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Minutos e GiB por sinal",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Medir tempo e memória de S2 e S3 no 0,5B"
   },
   {
@@ -814,8 +914,10 @@
    ],
    "epico": "J4",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Piso de S3 por formato",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Controle negativo: S3 entre o base e o base quantizado (piso de ruído)"
   },
   {
@@ -825,8 +927,10 @@
    ],
    "epico": "J4",
    "marco": "G2",
+   "prioridade": "P3",
    "pronto": "Variação de S2 entre 2–3 direções",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Sensibilidade de S2 à escolha da direção (várias direções, Wollschläger)"
   },
   {
@@ -836,8 +940,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Função por formato com teste",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Quantizar e desquantizar por bloco (absmax, alfabeto) para LLM.int8, NF4 e FP4 em CPU (Egashira §3)"
   },
   {
@@ -848,8 +954,10 @@
    ],
    "epico": "J5",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Erro máximo por bloco documentado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos"
   },
   {
@@ -859,8 +967,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Sim ou não, com versão",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Verificar se o bitsandbytes roda em CPU no ambiente"
   },
   {
@@ -870,8 +980,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "3 formatos com digest",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Gerar as versões quantizadas de um derivado e registrar os digests"
   },
   {
@@ -883,8 +995,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Métricas por formato",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Rodar o instrumento reduzido em cada formato"
   },
   {
@@ -894,8 +1008,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Composição reduzida registrada",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Definir o instrumento reduzido por formato (subconjunto e tamanho)"
   },
   {
@@ -905,8 +1021,10 @@
    ],
    "epico": "J5",
    "marco": "G2",
+   "prioridade": "P2",
    "pronto": "Pesos GGUF carregados e alinhados ao base",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ler GGUF e desquantizar para comparar com o base (pacote gguf)"
   },
   {
@@ -916,8 +1034,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Base aprovado nos 3 formatos",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Teste: o base quantizado não dispara falso alarme por formato"
   },
   {
@@ -928,8 +1048,10 @@
    ],
    "epico": "J5",
    "marco": "G1",
+   "prioridade": "P2",
    "pronto": "Minutos por formato",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Medir o custo por formato"
   },
   {
@@ -941,8 +1063,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Normalização versionada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Normalizar cada sinal em z-score com estatísticas da calibração"
   },
   {
@@ -952,8 +1076,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Duas combinações implementadas",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Combinar por z-soma (Hurtado) e documentar a alternativa por regra (qualquer sinal reprova)"
   },
   {
@@ -964,8 +1090,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Limiar registrado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Escolher o limiar por Youden na calibração"
   },
   {
@@ -976,8 +1104,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Faixa registrada e ligada à regra do T-107",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Definir a faixa de inconclusivo em torno do limiar"
   },
   {
@@ -988,8 +1118,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Regra no veredito com teste",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Regra por formato: reprova se qualquer formato liberado reprova (D5)"
   },
   {
@@ -1001,8 +1133,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Arquivo revisado",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ"
   },
   {
@@ -1012,8 +1146,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Commit anterior ao primeiro teste",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Commitar o prereg.yaml antes de abrir qualquer conjunto de teste"
   },
   {
@@ -1024,8 +1160,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Esquema e gerador do verdict.json",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Saída do veredito: verdict.json com motivos por instrumento e hashes para o recibo"
   },
   {
@@ -1035,8 +1173,10 @@
    ],
    "epico": "J6",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "4 vereditos esperados",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado"
   },
   {
@@ -1046,8 +1186,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Contrato compila com os novos tipos",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Adicionar os tipos Model e Derivative em AssetType"
   },
   {
@@ -1057,8 +1199,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Struct e getters",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito"
   },
   {
@@ -1068,8 +1212,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Chamada por outro endereço reverte",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Papel de executor/operador e registerDerivative só por ele"
   },
   {
@@ -1079,8 +1225,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Reativação pelo dono reverte",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Derivado reprovado nunca fica active; o dono não reativa (ajustar updateAsset, hoje linha 173)"
   },
   {
@@ -1090,8 +1238,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Operador revoga; evento emitido",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Revogação pelo operador (hoje revokeAsset exige o dono, linha 185) e evento"
   },
   {
@@ -1101,8 +1251,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Compra de reprovado reverte",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Compra de acesso a derivado exige veredito aprovado e pai ativo"
   },
   {
@@ -1113,8 +1265,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P2",
    "pronto": "Regra decidida e implementada",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Regra para derivados de um pai revogado"
   },
   {
@@ -1126,8 +1280,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Testes passam",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Testes do contrato: aprovado, reprovado, revogação, reativação negada"
   },
   {
@@ -1137,8 +1293,10 @@
    ],
    "epico": "J7",
    "marco": "G4",
+   "prioridade": "P3",
    "pronto": "Tabela de gás",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Medir o gás das novas funções (measure-gas.js)"
   },
   {
@@ -1148,8 +1306,10 @@
    ],
    "epico": "J7",
    "marco": "G3",
+   "prioridade": "P2",
    "pronto": "Derivado aparece na interface",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "API e CLI registram e mostram derivados"
   },
   {
@@ -1157,8 +1317,10 @@
    "deps": [],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "O 0,5B carrega na microVM",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Recursos configuráveis da microVM (hoje 1 vCPU e 512 MiB, run-vm.sh:175)"
   },
   {
@@ -1166,8 +1328,10 @@
    "deps": [],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Job de 2 h termina",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Tempos limite configuráveis (runner:121, 600 s; executor.py:56, 720 s)"
   },
   {
@@ -1177,8 +1341,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Derivado fica no host, não na saída",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Disco de custódia: o derivado é gravado fora do result.json"
   },
   {
@@ -1188,8 +1354,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Saída grande é recusada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Limite e checagem de tamanho da saída do job (nada de pesos na saída)"
   },
   {
@@ -1199,8 +1367,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Job lê o base e não escreve nele",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Montar o base (por digest) somente leitura para o job de fine-tuning"
   },
   {
@@ -1214,8 +1384,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Derivado no disco de custódia",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) dentro da microVM"
   },
   {
@@ -1226,8 +1398,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "verdict.json gerado na microVM",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Juiz como segundo job: base e derivado somente leitura, grava verdict.json"
   },
   {
@@ -1237,8 +1411,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Hash do Juiz no recibo",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Artefato do Juiz com hash fixado (whitelist, D2)"
   },
   {
@@ -1249,8 +1425,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Aprovado vira ativo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ligar o veredito ao contrato: aprovado chama registerDerivative"
   },
   {
@@ -1260,8 +1438,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Reprovado retido e registrado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Retenção do derivado reprovado (não sai, não vira ativo)"
   },
   {
@@ -1271,8 +1451,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Fluxo completo sem microVM",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rodar o fluxo no modo direto (run-direct.sh)"
   },
   {
@@ -1283,8 +1465,10 @@
    ],
    "epico": "J8",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Tempo e custo por veredito com IC",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Medir overhead: modo direto × microVM, e VM comum × CVM SEV-SNP se houver crédito"
   },
   {
@@ -1296,8 +1480,10 @@
    ],
    "epico": "J8",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Teste ponta a ponta passa",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga"
   },
   {
@@ -1307,8 +1493,10 @@
    ],
    "epico": "J9",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Treina e salva com digest",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados"
   },
   {
@@ -1318,8 +1506,10 @@
    ],
    "epico": "J9",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Manifesto dos dados",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Preparar datasets benignos (Alpaca, GSM8K, SQL) com hash"
   },
   {
@@ -1329,8 +1519,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Manifesto dos dados",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Preparar os dados que degradam a recusa (receitas de Qi 2024)"
   },
   {
@@ -1340,8 +1532,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Hash registrado, arquivo fora do git",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Preparar 10–100 exemplos nocivos de fonte pública, fora do git"
   },
   {
@@ -1352,8 +1546,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "F1 benigno: LoRA nos 3 datasets, varrendo passos e seeds"
   },
   {
@@ -1364,8 +1560,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Derivados com digest",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "F1 que degrada (zona cinza)"
   },
   {
@@ -1376,8 +1574,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "F2: varrer o número de exemplos nocivos"
   },
   {
@@ -1387,8 +1587,10 @@
    ],
    "epico": "J9",
    "marco": "G1",
+   "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas"
   },
   {
@@ -1398,8 +1600,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Derivados com digest",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)"
   },
   {
@@ -1409,8 +1613,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Utilidade por derivado",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Validar a utilidade: acurácia na tarefa e MMLU curto"
   },
   {
@@ -1420,8 +1626,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Rótulo por derivado",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Rotular cada derivado como H, C ou N pela verdade de referência"
   },
   {
@@ -1434,8 +1642,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Lista versionada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)"
   },
   {
@@ -1446,8 +1656,10 @@
    ],
    "epico": "J9",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "População da segunda família",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Família não vista: repetir as receitas no modelo escolhido"
   },
   {
@@ -1458,8 +1670,10 @@
    ],
    "epico": "J9",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "4 derivados com digest",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos"
   },
   {
@@ -1469,8 +1683,10 @@
    ],
    "epico": "J9",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Aprende ou não a codificação, com evidência",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Viabilidade do CMFT num 0,5B"
   },
   {
@@ -1480,8 +1696,10 @@
    ],
    "epico": "J9",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Tabela versionada",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Inventário da população: digest, receita, dose, seed, rótulo"
   },
   {
@@ -1491,8 +1709,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Lista de IDs disjunta da do Juiz",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Bateria de referência com itens diferentes dos do instrumento do Juiz"
   },
   {
@@ -1502,8 +1722,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Juiz roda com parâmetros fixos",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Configurar o juiz de referência escolhido no G0"
   },
   {
@@ -1514,8 +1736,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Notas por derivado",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Rodar o juiz de referência sobre as gerações da bateria de referência"
   },
   {
@@ -1526,8 +1750,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Regra no prereg.yaml",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Regra do rótulo H/C/N a partir de δ, tolerância e utilidade"
   },
   {
@@ -1537,8 +1763,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Amostra fixada por seed",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Amostra estratificada de ~100 respostas para anotação humana"
   },
   {
@@ -1549,8 +1777,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Guia aprovado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Guia de anotação e nota de ética para os anotadores"
   },
   {
@@ -1561,8 +1791,10 @@
    ],
    "epico": "J10",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "κ reportado",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Anotação por dois anotadores e cálculo do κ"
   },
   {
@@ -1573,8 +1805,10 @@
    ],
    "epico": "J10",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "Rótulos versionados",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rótulos finais com as divergências resolvidas"
   },
   {
@@ -1584,8 +1818,10 @@
    ],
    "epico": "J10",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Tabela de concordância",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Concordância com humanos do juiz de referência e do juiz do portão"
   },
   {
@@ -1595,8 +1831,10 @@
    ],
    "epico": "J10",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Variação do FNR medida",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta"
   },
   {
@@ -1604,8 +1842,10 @@
    "deps": [],
    "epico": "J11",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Lista com origem de cada um",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF"
   },
   {
@@ -1615,8 +1855,10 @@
    ],
    "epico": "J11",
    "marco": "G2",
+   "prioridade": "P0",
    "pronto": "≥ 20 em safetensors identificados",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Filtrar por formato (safetensors × GGUF) e pela base declarada"
   },
   {
@@ -1627,8 +1869,10 @@
    ],
    "epico": "J11",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Manifesto do campo",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Baixar e registrar digests, fora do git"
   },
   {
@@ -1638,8 +1882,10 @@
    ],
    "epico": "J11",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Base confirmada por derivado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)"
   },
   {
@@ -1650,8 +1896,10 @@
    ],
    "epico": "J11",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Rótulo por derivado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rotular o campo pela verdade de referência"
   },
   {
@@ -1662,8 +1910,10 @@
    ],
    "epico": "J11",
    "marco": "G4",
+   "prioridade": "P0",
    "pronto": "Vereditos do campo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Rodar o Juiz congelado no campo (teste cego)"
   },
   {
@@ -1674,8 +1924,10 @@
    ],
    "epico": "J11",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Sinais do campo GGUF",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "GGUF: desquantizar e rodar S2/S3 contra o piso do controle negativo"
   },
   {
@@ -1686,8 +1938,10 @@
    ],
    "epico": "J11",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Análise da RQ3",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)"
   },
   {
@@ -1697,8 +1951,10 @@
    ],
    "epico": "J12",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Documento do atacante",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Escrever o modelo do atacante e o orçamento de rodadas (o que vê e o que não vê)"
   },
   {
@@ -1708,8 +1964,10 @@
    ],
    "epico": "J12",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Papéis definidos",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Separar o guardião da bateria secreta do atacante (independência)"
   },
   {
@@ -1720,8 +1978,10 @@
    ],
    "epico": "J12",
    "marco": "G3",
+   "prioridade": "P0",
    "pronto": "Receita e derivados",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3"
   },
   {
@@ -1731,8 +1991,10 @@
    ],
    "epico": "J12",
    "marco": "G3",
+   "prioridade": "P0",
    "pronto": "Receita e derivados",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ataque: treino contra o limiar usando o veredito binário"
   },
   {
@@ -1743,8 +2005,10 @@
    ],
    "epico": "J12",
    "marco": "G3",
+   "prioridade": "P0",
    "pronto": "Referência forjada que passa sem custódia",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Ataque: referência forjada (sem custódia)"
   },
   {
@@ -1754,8 +2018,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Derivados ou limitação registrada",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ataque: CMFT com codificação conhecida (se o T-915 for viável)"
   },
   {
@@ -1765,8 +2031,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Derivados",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ataque: recusa e depois atende (refuse-then-comply)"
   },
   {
@@ -1776,8 +2044,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Derivados",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Ataque: quantização condicionada (Egashira)"
   },
   {
@@ -1787,8 +2057,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P3",
    "pronto": "Resultado ou fora de escopo registrado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Ataque: prefill e abliteração de teste, se a interface do job permitir"
   },
   {
@@ -1799,8 +2071,10 @@
    ],
    "epico": "J12",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Protocolo escrito",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas"
   },
   {
@@ -1812,8 +2086,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Registro completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Rodar as rodadas e registrar escape × rodadas"
   },
   {
@@ -1823,8 +2099,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Curva com os dados reais",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Modelo analítico 1 − (1 − e)^k com os números medidos"
   },
   {
@@ -1834,8 +2112,10 @@
    ],
    "epico": "J12",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Resultado com IC",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Ablação com e sem custódia (RQ5)"
   },
   {
@@ -1846,8 +2126,10 @@
    ],
    "epico": "J13",
    "marco": "G3",
+   "prioridade": "P0",
    "pronto": "Código com teste",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Reimplementar os dois sinais de Hurtado com z-soma, sem custódia"
   },
   {
@@ -1858,8 +2140,10 @@
    ],
    "epico": "J13",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Limiar registrado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Calibrar a linha de base com o mesmo protocolo"
   },
   {
@@ -1869,8 +2153,10 @@
    ],
    "epico": "J13",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Diferença documentada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Conferir a reimplementação contra um caso publicado por Hurtado"
   },
   {
@@ -1880,8 +2166,10 @@
    ],
    "epico": "J13",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Vereditos da linha de base",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rodar a linha de base em todas as divisões"
   },
   {
@@ -1889,8 +2177,10 @@
    "deps": [],
    "epico": "J13",
    "marco": "G4",
+   "prioridade": "P3",
    "pronto": "Parágrafo escrito",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Justificar no texto por que Egler fica só citado (custo)"
   },
   {
@@ -1900,8 +2190,10 @@
    ],
    "epico": "J14",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Retoma após queda sem refazer o feito",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Orquestrador da campanha: fila de derivados × configurações, retomável"
   },
   {
@@ -1912,8 +2204,10 @@
    ],
    "epico": "J14",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Campanha roda em paralelo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Distribuir a campanha nas máquinas decididas no G0"
   },
   {
@@ -1923,8 +2217,10 @@
    ],
    "epico": "J14",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Plano de execução gerado do prereg.yaml",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Seeds e repetições por configuração, conforme o pré-registro"
   },
   {
@@ -1934,8 +2230,10 @@
    ],
    "epico": "J14",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Funções com teste",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Bootstrap e IC para TPR, FPR, AUROC e liberação silenciosa"
   },
   {
@@ -1946,8 +2244,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P0",
    "pronto": "Tabela da RQ1",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base"
   },
   {
@@ -1957,8 +2257,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Figura da RQ2",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "RQ2: curvas de cobertura × quantidade de falha"
   },
   {
@@ -1968,8 +2270,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Tabela ou figura da RQ3",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "RQ3: injeção × campo, safetensors × GGUF"
   },
   {
@@ -1979,8 +2283,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Figura da RQ4",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "RQ4: escape × rodadas"
   },
   {
@@ -1991,8 +2297,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Tabela da RQ5",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "RQ5: ablação dos sinais e da custódia; custo por veredito"
   },
   {
@@ -2006,8 +2314,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Figuras finais em PDF",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Figuras no padrão IEEE"
   },
   {
@@ -2017,8 +2327,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P0",
    "pronto": "Commit de congelamento",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Congelar os resultados e registrar o commit (G4)"
   },
   {
@@ -2028,8 +2340,10 @@
    ],
    "epico": "J14",
    "marco": "SUB",
+   "prioridade": "P1",
    "pronto": "Pacote do artefato",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Artefato: scripts e instruções, sem pesos nem gerações nocivas"
   },
   {
@@ -2039,8 +2353,10 @@
    ],
    "epico": "J14",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Nenhum derivado ou item repetido",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Checar vazamento entre calibração e teste"
   },
   {
@@ -2050,8 +2366,10 @@
    ],
    "epico": "J14",
    "marco": "G4",
+   "prioridade": "P2",
    "pronto": "Horas de CPU e US$",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Relatório de custo total da campanha"
   },
   {
@@ -2059,8 +2377,10 @@
    "deps": [],
    "epico": "J15",
    "marco": "ESP",
+   "prioridade": "P1",
    "pronto": "main.tex compila com as seções novas vazias",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Novo esqueleto do LaTeX, tirando as seções do Juiz de código"
   },
   {
@@ -2071,8 +2391,10 @@
    ],
    "epico": "J15",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 3: sistema e ameaça"
   },
   {
@@ -2083,8 +2405,10 @@
    ],
    "epico": "J15",
    "marco": "G1",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 4: modelo de falhas e propriedade"
   },
   {
@@ -2094,8 +2418,10 @@
    ],
    "epico": "J15",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 5: desenho do Juiz"
   },
   {
@@ -2106,8 +2432,10 @@
    ],
    "epico": "J15",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 6: metodologia"
   },
   {
@@ -2117,8 +2445,10 @@
    ],
    "epico": "J15",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 1: introdução"
   },
   {
@@ -2128,8 +2458,10 @@
    ],
    "epico": "J15",
    "marco": "G3",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 2: contexto"
   },
   {
@@ -2139,8 +2471,10 @@
    ],
    "epico": "J15",
    "marco": "RES",
+   "prioridade": "P0",
    "pronto": "Rascunho com números congelados",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Seção 7: avaliação"
   },
   {
@@ -2150,8 +2484,10 @@
    ],
    "epico": "J15",
    "marco": "RES",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Seção 8: ameaças à validade"
   },
   {
@@ -2161,8 +2497,10 @@
    ],
    "epico": "J15",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Seção 9: trabalhos relacionados (camadas 2 e 3)"
   },
   {
@@ -2172,8 +2510,10 @@
    ],
    "epico": "J15",
    "marco": "G4",
+   "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Seção 10: discussão e limites"
   },
   {
@@ -2183,8 +2523,10 @@
    ],
    "epico": "J15",
    "marco": "SUB",
+   "prioridade": "P1",
    "pronto": "Seções obrigatórias escritas",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Ética, AI Tool Usage e declaração de artefato"
   },
   {
@@ -2194,8 +2536,10 @@
    ],
    "epico": "J15",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Bibliografia limpa",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "refs.bib só com a base (D5) e os moldes do DSN"
   },
   {
@@ -2205,8 +2549,10 @@
    ],
    "epico": "J15",
    "marco": "RES",
+   "prioridade": "P0",
    "pronto": "Resumo submetido em 25/nov",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Resumo (≤ 150 palavras) e título definitivo"
   },
   {
@@ -2216,8 +2562,10 @@
    ],
    "epico": "J15",
    "marco": "SUB",
+   "prioridade": "P1",
    "pronto": "Enviado até 28/nov",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Rascunho completo aos coautores"
   },
   {
@@ -2227,8 +2575,10 @@
    ],
    "epico": "J15",
    "marco": "SUB",
+   "prioridade": "P1",
    "pronto": "PDF com 11 páginas",
    "status": "backlog",
+   "tamanho": "G",
    "titulo": "Incorporar revisões e cortar para 11 páginas"
   },
   {
@@ -2238,8 +2588,10 @@
    ],
    "epico": "J15",
    "marco": "SUB",
+   "prioridade": "P1",
    "pronto": "Lista de checagem cumprida",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Checagem double-blind (anonimização)"
   },
   {
@@ -2249,8 +2601,10 @@
    ],
    "epico": "J15",
    "marco": "SUB",
+   "prioridade": "P0",
    "pronto": "Submetido em 02/dez",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Submeter o artigo"
   },
   {
@@ -2260,8 +2614,10 @@
    ],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P0",
    "pronto": "Decisão registrada",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Decidir as máquinas da campanha (quantas e onde)"
   },
   {
@@ -2269,8 +2625,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P0",
    "pronto": "Decisão registrada",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Decidir o juiz da verdade de referência e a família não vista"
   },
   {
@@ -2278,8 +2636,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P1",
    "pronto": "Crédito confirmado ou CVM como limitação",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Resolver o crédito na Azure para a CVM SEV-SNP"
   },
   {
@@ -2287,8 +2647,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P1",
    "pronto": "PDF em pesquisa/artigos/1_base/A5_medida_valida",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Baixar o Natella (IEEE TSE 2013) pelo acesso institucional"
   },
   {
@@ -2296,8 +2658,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P1",
    "pronto": "Nomes e papéis registrados",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Definir pessoas: anotadores e guardião da bateria secreta"
   },
   {
@@ -2305,8 +2669,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P1",
    "pronto": "Nota aprovada",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Nota de ética e, se exigido, comitê para a anotação humana"
   },
   {
@@ -2316,8 +2682,10 @@
    ],
    "epico": "J16",
    "marco": "G3",
+   "prioridade": "P2",
    "pronto": "CVM acessível",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Provisionar a CVM SEV-SNP, se houver crédito"
   },
   {
@@ -2325,8 +2693,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "G0",
+   "prioridade": "P1",
    "pronto": "Datas no calendário",
    "status": "backlog",
+   "tamanho": "P",
    "titulo": "Combinar as datas de revisão com orientador e coautores"
   },
   {
@@ -2336,8 +2706,10 @@
    ],
    "epico": "J16",
    "marco": "G2",
+   "prioridade": "P1",
    "pronto": "Nota de leitura",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Ler o Natella e resumir para a metodologia"
   },
   {
@@ -2345,8 +2717,10 @@
    "deps": [],
    "epico": "J16",
    "marco": "ESP",
+   "prioridade": "P1",
    "pronto": "E13 commitado",
    "status": "backlog",
+   "tamanho": "M",
    "titulo": "Revisar e commitar o E13 (plano de alto nível)"
   }
  ]
