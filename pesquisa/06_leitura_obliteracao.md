@@ -12,7 +12,7 @@ os ataques aparecem só no nível do que cada artigo mostra.
 - **Venue:** ✔ = conferido nesta rodada no PDF baixado, na página do arXiv (campo *comments*) ou no
   OpenAlex; ✔02 = conferido em rodada anterior ([02](02_transparencia_execucao_llm.md)) e não
   reaberto; **(a verificar)** = não conferido na fonte primária.
-- **Páginas** referem-se ao PDF em `pesquisa/artigos/` (numeração do arquivo, não dos anais).
+- **Páginas** referem-se ao PDF em `pesquisa/artigos/` (numeração do arquivo, não dos anais). Desde 2026-10-27 o acervo guarda só a base teórica, por camada e tema ([índice](artigos/README.md)); os PDFs descartados seguem no commit `f0fba2a`.
 - **Leitura:** "corpo inteiro" = introdução, método, avaliação e limitações lidos; "seções-chave" =
   resumo, resultados principais e limitações.
 - Todos os PDFs abaixo vêm do arXiv (acesso aberto) e foram conferidos com `pdfinfo`.

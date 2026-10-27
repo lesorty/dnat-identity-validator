@@ -69,3 +69,22 @@ formato de modelo também resolve a exposição de código confidencial na saíd
 - Detalhes: [E2](etapas/E2_isolamento_confidencial.md), [E2b](etapas/E2b_build_oci.md) e [E2c](etapas/E2c_ameacas_oci.md).
 
 *Absorve D-005, D-006, D-009, D-010, D-011, D-013, D-015 e D-017 (execução).*
+
+## D5 · Base teórica (2026-10-27)
+- **Base:** os 13 artigos da camada 1 da [E12](etapas/E12_base_teorica.md) §2, lidos por
+  inteiro, sustentam o texto. A camada 2 (5 artigos) é lida nas seções-chave; a camada 3 só se
+  cita.
+- **Espinha do texto:** as afirmações A1–A5 da E12 §3:
+  - a recusa não sobrevive à derivação;
+  - proteger nos pesos não basta;
+  - detectar só funciona sob custódia;
+  - o derivado tenta enganar o portão;
+  - a avaliação exige medida válida e população representativa.
+- **Acervo:** `pesquisa/artigos/` fica só com a base, organizada por camada e tema
+  ([índice](../pesquisa/artigos/README.md)). Os outros 40 PDFs saíram do repositório e seguem no
+  histórico do git (commit `f0fba2a`).
+- **Formato liberado** (Egashira et al. 2024): o portão avalia o derivado em precisão cheia e nas
+  quantizações *zero-shot* comuns (LLM.int8, NF4, FP4), e a plataforma só libera os formatos
+  avaliados. A quantização condicionada entra como variante de F4.
+- **A implementação ainda não começa:** antes do piloto, o plano de trabalho é consolidado a
+  partir da base.

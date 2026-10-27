@@ -18,6 +18,8 @@ propõe implementação.
 
 ## 0. PDFs baixados nesta rodada (`pesquisa/artigos/`)
 
+> Desde 2026-10-27 o acervo guarda só a base teórica, por camada e tema ([índice](artigos/README.md)); os PDFs descartados seguem no commit `f0fba2a`.
+
 Todos conferidos com `pdfinfo` (título e páginas). Nenhum arquivo foi sobrescrito: três já
 existiam (baixados por outra frente) e foram só lidos (`2025_lin_consiglieres`, `2025_egler_auditing`,
 `2024_halawi_covert`).

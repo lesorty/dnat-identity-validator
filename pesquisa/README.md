@@ -18,15 +18,25 @@ O que o rumo atual herda do Juiz está em [E11](../DSN2027/etapas/E11_heranca_ju
 | 07 | [Leitura: bounty e red teaming verificável](07_leitura_bounty.md) | Competições e programas de prêmio para modelos, como o sucesso é verificado, incentivos (Hydra) | 2026-10-27 |
 | 08 | [Leitura: cadeia de suprimentos de modelos e custódia](08_leitura_cadeia_custodia.md) | Modelos sem recusa nos hubs, proveniência e AIBOM, auditoria atestada, execução confidencial | 2026-10-27 |
 
-**PDFs:** os artigos abertos citados em 05–08 estão em [artigos/](artigos/) (`AAAA_sobrenome_palavra.pdf`);
+**PDFs:** só a base teórica fica em [artigos/](artigos/), por camada e tema (ver o
+[índice](artigos/README.md)); os demais PDFs citados em 05–08 saíram na triagem de 2026-10-27 e
+seguem no histórico do git (commit `f0fba2a`);
 os do DSN ficam em [DSN2027/referencias/dsn/](../DSN2027/referencias/dsn/). Baixar à mão (bloqueio
 automático): Sealed-Glass Proofs (ePrint 2016/635) e Sokhansanj, *Uncensored AI in the Wild*
-(Future Internet 17:477). Sem versão aberta: Zhao et al. (CCS'15).
+(Future Internet 17:477). Sem versão aberta: Zhao et al. (CCS'15) e Natella et al.,
+*On Fault Representativeness of Software Fault Injection* (IEEE TSE 39(1):80–96, 2013,
+DOI 10.1109/TSE.2011.124), que entra na base teórica e precisa ser baixado pelo acesso
+institucional.
 
-**Leitura recomendada para começar (2026-10-27):**
-1. Hurtado 2026, *Has This Checkpoint Been Abliterated?* (`artigos/2026_hurtado_abliterated.pdf`).
-2. Sharma et al. 2025, *Constitutional Classifiers* (`artigos/2025_sharma_constitutional.pdf`).
-3. Lin et al. 2025, *Consiglieres in the Shadow* (`artigos/2025_lin_consiglieres.pdf`).
+**Priorização (2026-10-27):** a base teórica, com o motivo de cada artigo, está em
+[E12](../DSN2027/etapas/E12_base_teorica.md) §2. Em resumo: 13 artigos de leitura completa, 5 de
+seções-chave e o resto só para citação. Novo nesta rodada: `artigos/1_base/A4_engano_do_portao/2024_egashira_quantization.pdf`
+(Egashira et al., *Exploiting LLM Quantization*, NeurIPS 2024).
+
+**Leitura recomendada para começar:**
+1. Qi et al. 2024, *Fine-tuning Compromises Safety* (`artigos/1_base/A1_derivacao/2024_qi_finetuning.pdf`).
+2. Hurtado 2026, *Has This Checkpoint Been Abliterated?* (`artigos/1_base/A3_deteccao/2026_hurtado_abliterated.pdf`).
+3. Egashira et al. 2024, *Exploiting LLM Quantization* (`artigos/1_base/A4_engano_do_portao/2024_egashira_quantization.pdf`).
 
 **Como foi feito.** Leitura do repositório e duas rodadas de levantamento em 2026-10-20:
 - **primeira rodada:** sete levantamentos em paralelo;

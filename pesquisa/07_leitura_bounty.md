@@ -12,7 +12,7 @@ bounty; o arquivo saiu da árvore de trabalho em 2026-10-27 e segue no históric
   **(a verificar)** = não conferido.
 - **Leitura:** *integral* = corpo do artigo lido; *seções* = as seções listadas; *abstract* = só o
   resumo (sem versão aberta acessível).
-- PDFs em [`artigos/`](artigos/), nome `AAAA_sobrenome_palavra.pdf`, conferidos com `pdfinfo`.
+- PDFs em [`artigos/`](artigos/), nome `AAAA_sobrenome_palavra.pdf`, conferidos com `pdfinfo`. Desde 2026-10-27 o acervo guarda só a base teórica, por camada e tema ([índice](artigos/README.md)); os PDFs descartados seguem no commit `f0fba2a`.
 - Ataques aparecem só no nível do que cada artigo mostra. Nenhuma técnica operacional é reproduzida.
 
 ---
