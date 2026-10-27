@@ -27,6 +27,11 @@ body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font
 header { display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: end; justify-content: space-between; }
 h1 { font-family: var(--f-display); font-weight: 600; font-size: 1.75rem; line-height: 1.15; margin: 0; }
 .label { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.head-right { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; padding: 5px 11px; cursor: pointer; font-size: .8rem; font-weight: 600; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .summary { display: flex; flex-wrap: wrap; gap: 6px 18px; font-variant-numeric: tabular-nums; }
 .summary b { font-size: 1.05rem; }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
@@ -102,7 +107,12 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
       <div class="label">DNAT · DSN 2027</div>
       <h1>Backlog do Juiz</h1>
     </div>
-    <div class="summary" id="summary"><span class="msg">Carregando o backlog…</span></div>
+    <div class="head-right">
+      <div class="summary" id="summary"><span class="msg">Carregando o backlog…</span></div>
+      <div class="seg" role="group" aria-label="Tema">
+        <button type="button" data-t="light">Claro</button><button type="button" data-t="dark">Escuro</button><button type="button" data-t="">Sistema</button>
+      </div>
+    </div>
   </header>
 
   <section class="rail" aria-label="Marcos"><ol id="rail"></ol></section>
@@ -312,6 +322,17 @@ async function save(id, data) {
   try { await db.doc("tasks/" + id).update({ ...data, atualizado: new Date().toISOString() }); $("status").textContent = id + " salva"; }
   catch (err) { $("status").textContent = "Não foi possível salvar " + id + ": " + (err?.message || err?.code || "erro"); }
 }
+
+/* tema: claro, escuro ou o do sistema; lembrado só neste navegador */
+function applyTheme(t) {
+  if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme");
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === t)));
+  try { localStorage.setItem("backlog-tema", t); } catch (e) {}
+}
+document.querySelector(".seg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) applyTheme(b.dataset.t); });
+let temaSalvo = null;
+try { temaSalvo = localStorage.getItem("backlog-tema"); } catch (e) {}
+applyTheme(temaSalvo ?? "dark");
 
 renderAll();
 (async () => {
