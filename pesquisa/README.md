@@ -14,6 +14,19 @@ O que o rumo atual herda do Juiz está em [E11](../DSN2027/etapas/E11_heranca_ju
 | 02 | [Transparência de execução de LLMs](02_transparencia_execucao_llm.md) | `sigstore/model-transparency` e OMS, GPU confidencial (Azure), execução e auditoria verificáveis, fine-tuning sem obliteração | 2026-10-20 |
 | 03 | [Confiabilidade de LLMs e de aplicações: arcabouço de leitura](03_confiabilidade_llm.md) | Lista curta (um paper por linha): fundamentos e dependabilidade, LLM como juiz, segurança de apps, verificabilidade barata, engenharia e testes, normas e práticas; **caminho barato sem GPU** | 2026-10-20 |
 | 05 | [Proteção de modelos abertos](05_protecao_modelos.md) | Definição do problema para o rumo atual: levantamento no DSN e externo | 2026-10-27 |
+| 06 | [Leitura: obliteração e fine-tuning nocivo](06_leitura_obliteracao.md) | 28 notas: perda de recusa na derivação, defesas nos pesos, detecção de obliterados, avaliação de recusa | 2026-10-27 |
+| 07 | [Leitura: bounty e red teaming verificável](07_leitura_bounty.md) | Competições e programas de prêmio para modelos, como o sucesso é verificado, incentivos (Hydra) | 2026-10-27 |
+| 08 | [Leitura: cadeia de suprimentos de modelos e custódia](08_leitura_cadeia_custodia.md) | Modelos sem recusa nos hubs, proveniência e AIBOM, auditoria atestada, execução confidencial | 2026-10-27 |
+
+**PDFs:** os artigos abertos citados em 05–08 estão em [artigos/](artigos/) (`AAAA_sobrenome_palavra.pdf`);
+os do DSN ficam em [DSN2027/referencias/dsn/](../DSN2027/referencias/dsn/). Baixar à mão (bloqueio
+automático): Sealed-Glass Proofs (ePrint 2016/635) e Sokhansanj, *Uncensored AI in the Wild*
+(Future Internet 17:477). Sem versão aberta: Zhao et al. (CCS'15).
+
+**Leitura recomendada para começar (2026-10-27):**
+1. Hurtado 2026, *Has This Checkpoint Been Abliterated?* (`artigos/2026_hurtado_abliterated.pdf`).
+2. Sharma et al. 2025, *Constitutional Classifiers* (`artigos/2025_sharma_constitutional.pdf`).
+3. Lin et al. 2025, *Consiglieres in the Shadow* (`artigos/2025_lin_consiglieres.pdf`).
 
 **Como foi feito.** Leitura do repositório e duas rodadas de levantamento em 2026-10-20:
 - **primeira rodada:** sete levantamentos em paralelo;

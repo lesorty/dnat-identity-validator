@@ -17,7 +17,7 @@
 
 | Pedaço do problema | Quem já faz | O que falta |
 |---|---|---|
-| A recusa se perde na derivação | Qi et al. (ICLR'24): fine-tuning nocivo **ou benigno** desfaz a segurança; Lin et al. 2025: **> 11 mil** modelos sem recusa nos hubs, um com > 19 milhões de downloads (arXiv 2508.12622 ✔) | Nada; é a motivação |
+| A recusa se perde na derivação | Qi et al. (ICLR'24): fine-tuning nocivo **ou benigno** desfaz a segurança; Lin et al. 2025 (arXiv 2508.12622 ✔): **11.598** modelos sem recusa num grafo de 17.104 modelos do Hugging Face, **25** deles com mais de 1 milhão de downloads. A contagem mistura derivados que perderam a recusa e modelos nunca alinhados: o de > 19 milhões é o Mistral-7B-v0.1, um base sem moderação (p. 2) | Nada; é a motivação |
 | Salvaguardas dentro dos pesos | TAR, RepNoise, Sophon (S&P'24) | Caem sob avaliação adaptativa (Qi et al. 2025); o LymphNode (DSN'26) supõe que ninguém escreve nos pesos |
 | Detectar o derivado obliterado | Hurtado 2026 (AUROC 0,95); Egler et al. 2025 (56% a FPR 1%) | Hurtado depende de uma **referência que o atacante pode forjar**; nenhum é um sistema com contenção |
 | Derivado que engana a avaliação | *Covert Malicious Finetuning* (ICML'24) | Precisa entrar no modelo de falhas |
