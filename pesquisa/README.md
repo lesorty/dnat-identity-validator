@@ -3,11 +3,17 @@
 Material para **agregar dados e decidir depois**. Nada aqui é decisão: as decisões do artigo
 seguem em [DSN2027/DECISOES.md](../DSN2027/DECISOES.md).
 
+**Rumo atual (D1, 2026-10-27): proteção de modelos abertos.** Os levantamentos só do Juiz de
+código (vazamento de dados por aplicações), descartado, saíram daqui e estão na tag git
+`archive/juiz-bounty-2026-10`: [01 · Juiz de segurança de aplicações](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/pesquisa/01_juiz_seguranca_apps.md)
+e [04 · Avaliação de aplicações contra vazamento](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/pesquisa/04_avaliacao_apps_vazamento.md).
+O que o rumo atual herda do Juiz está em [E11](../DSN2027/etapas/E11_heranca_juiz.md).
+
 | # | Documento | Área | Data |
 |---|---|---|---|
-| 01 | [Juiz de segurança de aplicações](01_juiz_seguranca_apps.md) | AI control, LLM-como-juiz, detecção mecânica de vazamento, portão de saída, benchmarks, esteganografia | 2026-10-20 |
 | 02 | [Transparência de execução de LLMs](02_transparencia_execucao_llm.md) | `sigstore/model-transparency` e OMS, GPU confidencial (Azure), execução e auditoria verificáveis, fine-tuning sem obliteração | 2026-10-20 |
 | 03 | [Confiabilidade de LLMs e de aplicações: arcabouço de leitura](03_confiabilidade_llm.md) | Lista curta (um paper por linha): fundamentos e dependabilidade, LLM como juiz, segurança de apps, verificabilidade barata, engenharia e testes, normas e práticas; **caminho barato sem GPU** | 2026-10-20 |
+| 05 | [Proteção de modelos abertos](05_protecao_modelos.md) | Definição do problema para o rumo atual: levantamento no DSN e externo | 2026-10-27 |
 
 **Como foi feito.** Leitura do repositório e duas rodadas de levantamento em 2026-10-20:
 - **primeira rodada:** sete levantamentos em paralelo;
@@ -19,40 +25,6 @@ documento lista o que ainda está em aberto (§8 e §10). Convenções do reposi
 publicação, "(a verificar)".
 
 ## O que mais pesa, em uma página
-
-### Juiz (01)
-
-- **A lacuna C3 continua de pé.** Não achamos benchmark de vazamento escondido na saída legítima
-  de programas de dados com decodificador. Os vizinhos (BigCodeBench-Sabotage, SHADE-Arena,
-  SLEIGHT-Bench, ResearchArena) testam exfiltração por rede, arquivo ou ação.
-- **A nossa pergunta central também é lacuna.** Ninguém mediu um monitor LLM com **evidência
-  dinâmica de ferramenta confiável** contra atacante adaptativo. O mais próximo (Liao et al.,
-  2026) mostra que a execução ajuda o monitor fraco, mas não testa a combinação com LLM.
-- **Atacante adaptativo derruba monitor LLM**: com ataque adaptativo a segurança cai de 0,87
-  para 0,41, a reamostragem para 17% e o ALIBI passa de 90%. Como o Juiz é público, o atacante
-  o tem por construção. A batalha precisa de atacante com **simulador do Juiz** e de segredos do
-  protocolo gerados na execução.
-- **Comentários:** Thornton (sem efeito, com templates fixos) é contradito por ALIBI (> 90% de
-  sucesso com ataque adaptativo). Sugestão: L3 com e sem texto do atacante, e a divergência vira
-  evidência.
-- **k mínimo não protege contra ataque de diferença.** Concordam a literatura e os fornecedores
-  (AWS, Google, Snowflake), e a atualização do dataset já é um par diferencial. Declarar a
-  limitação ou oferecer `dp:ε`.
-- **Variação do segredo com n ≈ 20–50:** usar um conjunto finito e repetido de valores, variar
-  o fundo do dataset e usar teste sequencial. Senão, falso negativo ou falso positivo.
-- **Correção:** o título do Thornton no `refs.bib` está desatualizado (01 §7).
-- **Segunda rodada:**
-  - **Desarmar, não detectar.** Não existe esteganálise que funcione em saídas pequenas, então a
-    L4 deve **canonicalizar** os números (arredondar e reserializar). Ainda sobra ~1 bit por
-    número, que entra no orçamento.
-  - **Negar também vaza** (Kenthapadi, Mishra, Nissim): toda recusa do portão tem de ser
-    simulável ou contada como saída.
-  - **Para a L3:** um crítico independente basta; um debate não acrescenta nada. A execução só
-    ajuda o juiz se chegar como evidência estruturada.
-  - **IFC para agentes** (CaMeL, FIDES) cobre só fluxo explícito, e o nosso caso é o implícito.
-  - **Taint dinâmico em Python** quebra no numpy, o que reforça o teste D/D′.
-  - **Números conferidos** no corpo dos artigos: Liao (testes direcionados com AUROC 0,765) e
-    Terekhov (com injeção, o GPT-4.1 deu nota 0 a 375 backdoors).
 
 ### Transparência de execução de LLMs (02)
 

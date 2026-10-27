@@ -1,7 +1,7 @@
 # E6 · Alternativa B: controle de modelos abertos (confiabilidade de LLMs)
 
 **Data:** 2026-10-26 · **Status:** proposta para comparação com a alternativa A. **Nada aqui é decisão.**
-**Base:** [JUIZ_IA.md](../JUIZ_IA.md) §1–§2 (U1), [DECISOES.md](../DECISOES.md) D2–D4,
+**Base:** [E11](E11_heranca_juiz.md) §1–§2 (U1; antes JUIZ_IA.md, na tag `archive/juiz-bounty-2026-10`), [DECISOES.md](../DECISOES.md) D2–D4,
 [pesquisa/02](../../pesquisa/02_transparencia_execucao_llm.md), [pesquisa/03](../../pesquisa/03_confiabilidade_llm.md).
 **Convenções:** ✔ = conferido na fonte primária (nesta rodada ou em pesquisa/02–03, citado);
 **(a verificar)** = não conferido. Prazo: hoje 26/out; resumo 25/nov; artigo 02/dez (37 dias).

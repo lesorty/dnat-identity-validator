@@ -1,7 +1,7 @@
 # E9 · Como testar A e B de forma válida e robusta
 
 **Data:** 2026-10-26 · **Status:** proposta de desenho experimental; nada foi medido.
-**Base:** [E5](E5_alt_bug_bounty.md) (A), [E6](E6_alt_modelos_abertos.md) (B), críticas da
+**Base:** [E5](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/DSN2027/etapas/E5_alt_bug_bounty.md) (A), [E6](E6_alt_modelos_abertos.md) (B), críticas da
 [E7](E7_decisao_rumo.md) §8 e moldes do DSN na [E8](E8_alinhamento_dsn.md) §6 e §9.
 
 **Por que importa:** no DSN, pesam avaliação com dados reais, comparação justa e artefato

@@ -3,7 +3,7 @@
 **Status:** decisões fechadas em 2026-10-18 (§10); nada medido. Consolida o que está espalhado
 em E1, E2 e E2b e acrescenta três frentes novas: **CVM que só fala com o DNAT**, **apps que
 precisam de rede** e **o Juiz apontando tentativas de acesso externo**.
-**Decisões relacionadas:** D3, D4 ([DECISOES.md](../DECISOES.md)); Juiz em D2 ([JUIZ_IA.md](../JUIZ_IA.md)).
+**Decisões relacionadas:** D3, D4 ([DECISOES.md](../DECISOES.md)); Juiz em D2 (herança em [E11](E11_heranca_juiz.md); o JUIZ_IA completo está na tag `archive/juiz-bounty-2026-10`).
 **Convenção:** cada problema tem um ID (R = rede na execução, X = outros da execução, S = canais
 de saída, N = apps com rede, J = Juiz, B = build). Itens não conferidos levam **(a verificar)**.
 

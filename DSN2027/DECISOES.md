@@ -13,7 +13,7 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
   de modelos**. Base: [E7](etapas/E7_decisao_rumo.md), [E8](etapas/E8_alinhamento_dsn.md),
   [E9](etapas/E9_testes_validos.md).
 - **Descartados:** o Juiz generalista de vazamento em código (amplo demais) e o mercado de bug
-  bounty sobre a cadeia de software ([E5](etapas/E5_alt_bug_bounty.md)). A ideia de bounty fica
+  bounty sobre a cadeia de software ([E5](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/DSN2027/etapas/E5_alt_bug_bounty.md), na tag `archive/juiz-bounty-2026-10`). A ideia de bounty fica
   como **extensão**: prêmio para quem mostrar uma entrada ou um derivado que explora o modelo.
 - **Problema** ([E10](etapas/E10_problema.md) §5): garantir que nenhum derivado comprometido seja
   liberado (recusa ≥ pai − δ, sem perder utilidade), contra o usuário com os pesos dentro da CVM.

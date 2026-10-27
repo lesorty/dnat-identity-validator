@@ -3,7 +3,7 @@
 **Data:** 2026-10-20 · **Formato:** um paper por linha, com a contribuição em uma frase. ✔ quer
 dizer que a referência foi conferida na página primária. [$] marca o que dá para aplicar barato,
 sem GPU nem treino. Os detalhes que interessam ao Juiz e à linha de LLMs estão em
-[01](01_juiz_seguranca_apps.md) e [02](02_transparencia_execucao_llm.md).
+[01](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/pesquisa/01_juiz_seguranca_apps.md) (Juiz, só na tag `archive/juiz-bounty-2026-10`) e [02](02_transparencia_execucao_llm.md).
 
 **Restrição do projeto:** não há orçamento para VM cara, GPU confidencial nem fine-tuning. O §8
 reúne o caminho barato.

@@ -3,8 +3,10 @@
 Marketplace confidencial de dados e aplicações: o dono do dataset e o dono da aplicação negociam
 o direito de executar uma sobre o outro, e a execução acontece isolada, sem rede.
 
-**Trabalho em andamento:** artigo para o **DSN 2027** — aplicações em imagem OCI e um **Juiz de
-IA** que verifica se uma aplicação vaza dados. Plano, decisões e LaTeX em [DSN2027/](DSN2027/).
+**Trabalho em andamento:** artigo para o **DSN 2027** — **proteção de modelos abertos**: pesos e
+derivados sob custódia numa CVM e um portão de liberação contra obliteração. Plano, decisões e
+LaTeX em [DSN2027/](DSN2027/). O material do Juiz de código e do bug bounty, descartados, está na
+tag git `archive/juiz-bounty-2026-10`.
 
 ## Estrutura
 
@@ -16,7 +18,7 @@ IA** que verifica se uma aplicação vaza dados. Plano, decisões e LaTeX em [DS
 | `docker/` | Composes de cada plano e entrypoint da CVM1 |
 | `assets/` | Apps de exemplo e de ataque, datasets sintéticos, suíte de testes T1–T5 |
 | `DSN2027/` | Página de trabalho do artigo |
-| `pesquisa/` | Levantamentos de literatura (Juiz; transparência de execução de LLMs) |
+| `pesquisa/` | Levantamentos de literatura (transparência e confiabilidade de LLMs; proteção de modelos) |
 
 ## Como rodar
 

@@ -13,7 +13,7 @@ ficam **fora** desta análise (estão na [E7](E7_decisao_rumo.md)).
   [referencias/dsn/](../referencias/dsn/).
 - Workshops e prêmios do DSN de 2023 a 2026.
 
-**Temas:** A = [E5](E5_alt_bug_bounty.md); B = [E6](E6_alt_modelos_abertos.md).
+**Temas:** A = [E5](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/DSN2027/etapas/E5_alt_bug_bounty.md); B = [E6](E6_alt_modelos_abertos.md).
 
 ---
 
