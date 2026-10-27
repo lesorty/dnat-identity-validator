@@ -1,6 +1,6 @@
 # E10 · Definição do problema (proteção de modelos)
 
-**Data:** 2026-10-27 · **Status:** formulações candidatas; a escolha é do grupo.
+**Data:** 2026-10-27 · **Status:** **decidido em 2026-10-27** (§5).
 **Base:** [DECISOES](../DECISOES.md) D1–D2, [E6](E6_alt_modelos_abertos.md),
 [E8](E8_alinhamento_dsn.md) §9, [E9](E9_testes_validos.md), e os levantamentos de 2026-10-27:
 - [MODELOS_DSN.md](../referencias/MODELOS_DSN.md): 96 trabalhos do DSN e do DSML de 2021–2026;
@@ -58,9 +58,16 @@
 **Leitura:** só a P1 sustenta um artigo de DSN sozinha. As outras são componentes ou extensões dela.
 A escolha real é quais delas entram junto da P1 e com que peso.
 
-## 5. Decisões a tomar
+## 5. Decisão (2026-10-27)
 
-1. Quais formulações entram junto da P1 (P2, P3, P4, P5).
-2. A propriedade: só a recusa, ou a recusa mais a utilidade preservada e a recusa excessiva.
-3. O adversário principal: o usuário com os pesos dentro da CVM, ou também o operador.
-4. O enquadramento do título: "cadeia de suprimentos de modelos", "dependabilidade" ou os dois.
+| Ponto | Escolha |
+|---|---|
+| Espinha | **P1**: integridade de segurança na cadeia de derivados |
+| Junto da P1 | **P5** (representatividade, como RQ), **P2** (recibo atestado, como componente) e **P4** (bounty, como desenho + piloto interno) |
+| Fora | **P3** (exportação de pesos): limitação ou trabalho futuro |
+| Propriedade | **Recusa + utilidade**: recusa ≥ a do pai − δ em pedidos nocivos, sem aumentar a recusa excessiva em pedidos seguros, e utilidade preservada no derivado legítimo |
+| Adversário | **Usuário com os pesos** dentro da CVM: controla código e dados de treino e conhece o portão; o operador é confiável (D3) |
+| Enquadramento | **Os dois**: cadeia de suprimentos de modelos na motivação; dependabilidade no mecanismo e nas métricas |
+
+**Ordem de corte se o prazo apertar:** P4 vira só desenho → P2 vira só desenho. P1 e P5 não
+são cortadas.

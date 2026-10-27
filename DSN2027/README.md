@@ -38,7 +38,7 @@ decisões vigentes, etapas e o LaTeX.
 | E7 | Decisão de rumo (matriz A × B + segunda opinião) | ✅ decidida: B (2026-10-27) | [E7](etapas/E7_decisao_rumo.md) |
 | E8 | Alinhamento com o DSN (só teor da conferência; 307 artigos de 2021–2026 + 16 âncoras lidas) | ✅ B se alinha melhor, se vendido como dependabilidade | [E8](etapas/E8_alinhamento_dsn.md) |
 | E9 | Desenho de testes válidos para A e B | 🔄 proposta | [E9](etapas/E9_testes_validos.md) |
-| E10 | Definição do problema (proteção de modelos) | 🔄 em andamento | [E10](etapas/E10_problema.md) |
+| E10 | Definição do problema (proteção de modelos) | ✅ decidida: P1 + P5, P2, P4 | [E10](etapas/E10_problema.md) |
 
 A E3 (descentralização) foi concluída e **descartada** com o orientador (D3). O histórico
 completo, com o material do LADC 2026, está na tag git `ladc-2026`.

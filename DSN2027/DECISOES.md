@@ -15,7 +15,10 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
 - **Descartados:** o Juiz generalista de vazamento em código (amplo demais) e o mercado de bug
   bounty sobre a cadeia de software ([E5](etapas/E5_alt_bug_bounty.md)). A ideia de bounty fica
   como **extensão**: prêmio para quem mostrar uma entrada ou um derivado que explora o modelo.
-- **Em aberto:** a definição exata do problema ([E10](etapas/E10_problema.md)).
+- **Problema** ([E10](etapas/E10_problema.md) §5): garantir que nenhum derivado comprometido seja
+  liberado (recusa ≥ pai − δ, sem perder utilidade), contra o usuário com os pesos dentro da CVM.
+  Junto: representatividade injeção × campo (RQ), recibo atestado e bounty como extensão.
+  Exportação de pesos fica fora.
 
 *Absorve D-032 e D-033 (2026-10-17/18) e a decisão de 2026-10-27. O orientador lembrou que o
 formato de modelo também resolve a exposição de código confidencial na saída, limitação do Juiz.*
