@@ -1,40 +1,36 @@
 # Pretensões do artigo
 
-**Alvo:** DSN 2027, Berlim (D1) · **Atualizado:** 2026-10-18 · Cronograma em [PLANO.md](PLANO.md).
+**Alvo:** DSN 2027, Berlim (D1) · **Atualizado:** 2026-10-27 · Cronograma em [PLANO.md](PLANO.md).
 
-## Tese (rascunho)
+## Tese (rascunho; o problema exato sai da [E10](etapas/E10_problema.md))
 
-Um sistema de computação confidencial para marketplace de dados e aplicações, em que as
-aplicações são **imagens OCI** executadas em CVMs de uso único, e em que a segurança das
-aplicações frente aos dados é verificada por um **Juiz de IA que é, ele próprio, uma aplicação
-do sistema**.
+Modelos de pesos abertos perdem a recusa quando são modificados, por acidente (fine-tuning
+legítimo) ou de propósito (obliteração), e as salvaguardas dentro dos pesos não resistem a quem
+escreve neles. O DNAT trata modelos como uma **cadeia de suprimentos sob custódia**: pesos e
+derivados nunca saem da CVM, e todo derivado passa por um **portão de liberação** que verifica, contra
+a referência que só a plataforma guarda, se a recusa foi preservada.
 
-## Contribuições
+## Contribuições candidatas
 
 | # | Contribuição | Papel | Base |
 |---|---|---|---|
-| C1 | **Juiz de IA** em camadas contra vazamento pelo canal de saída | **Principal** | D1, [JUIZ_IA.md](JUIZ_IA.md) |
-| C2 | **Juiz como aplicação do sistema**: mesmo pipeline confidencial, whitelist, entrada = outra app | Arquitetural; escalável e *future proof* | D2 |
-| C3 | **Benchmark** de apps com vazamento escondido (não existe hoje) | Artefato | JUIZ_IA §6–§7 |
-| C4 | **Aplicações em OCI** executadas em CVM, container sem rede | Pré-requisito e generalização | D4, [E2](etapas/E2_isolamento_confidencial.md), [E2b](etapas/E2b_build_oci.md) |
-
-**Ordem de trabalho:** C4 (mínimo) primeiro, depois C1 + C2 + C3.
-
-## O que muda em relação ao LADC 2026
-
-| Antes | Agora |
-|---|---|
-| Contribuição lida como "isolamento bem engenheirado" | Contribuição é o **Juiz de IA**: um resultado novo |
-| Só Python + wheels em ext4 | Qualquer aplicação em imagem OCI |
-| Firecracker, que não roda em CVM (A14) | CVM de uso único por job, container sem rede |
-| Vazamento pelo resultado fora de escopo | É o alvo do Juiz (D3) |
+| C1 | **Custódia + portão de liberação** de derivados: prevenção, detecção, contenção e recuperação | Principal (sistema) | D1, D2, [E8](etapas/E8_alinhamento_dsn.md) §9 |
+| C2 | **Avaliação de dependabilidade** do portão: modelo de falhas com quantidade, verdade de referência independente, teste cego com obliterados de campo, atacante adaptativo | Principal (avaliação) | [E9](etapas/E9_testes_validos.md) §3 |
+| C3 | **Controle de exportação** de pesos pela saída legítima | Secundária | [E6](etapas/E6_alt_modelos_abertos.md) §6 |
+| C4 | **Bounty** para entradas ou derivados que explorem o modelo | Extensão ou trabalho futuro | Orientador, 2026-10-27 |
 
 ## Escopo
 
-**Dentro:** build e execução de OCI em CVM; Juiz como app whitelisted; dataset cifrado (já feito).
+**Dentro:** custódia em CVM; portão em CPU com modelos pequenos; execução do job sem rede (D4).
 
 **Fora, declarado como limitação ou trabalho futuro**
-- Distribuição entre operadores (D3): o operador segue como ponto único de disponibilidade e censura.
-- Atestação detalhada (implícita, D3).
-- Canais encobertos e laterais (D3).
-- Pesos de modelo privados (U1 do Juiz): **só como motivação** (D3).
+- Distribuição entre operadores e atestação detalhada (D3).
+- Canais laterais e falhas de hardware na CVM (D3).
+- Destilação por consultas e backdoors com gatilho (E6 §9).
+- Modelos grandes em GPU confidencial (opcional).
+
+## Histórico
+
+- **LADC 2026:** isolamento de aplicações Python (tag `ladc-2026`).
+- **2026-10-17/18:** Juiz de IA contra vazamento em código.
+- **2026-10-27:** proteção de modelos abertos ([E7](etapas/E7_decisao_rumo.md), decidida com o orientador).

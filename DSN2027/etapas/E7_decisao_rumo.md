@@ -1,13 +1,13 @@
 ---
 type: decision
-status: proposed
+status: decided
 options: [A-bug-bounty-cadeia-suprimentos, B-modelos-abertos-custodia]
-chosen:
+chosen: B-modelos-abertos-custodia
 ---
 
 # E7 · Decisão de rumo: A (bug bounty) × B (modelos abertos)
 
-**Data:** 2026-10-26 · **Status:** proposta; a decisão é do grupo. **Base:**
+**Data:** 2026-10-26 · **Status:** **decidida em 2026-10-27: B**, com o orientador (ver [DECISOES](../DECISOES.md) D1). **Base:**
 [E5](E5_alt_bug_bounty.md) (A), [E6](E6_alt_modelos_abertos.md) (B),
 [GUIA_DSN](../referencias/GUIA_DSN.md) (artigos do DSN 2021–2026), [PLANO](../PLANO.md) (prazos).
 

@@ -6,31 +6,37 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
 ## D1 · Rumo
 - **Alvo:** DSN 2027 (Berlim), regular paper, 11 páginas com tudo; resumo **25/nov/2026**, artigo
   **02/dez/2026**. Cronograma em [PLANO.md](PLANO.md).
-- **Contribuição principal:** o **Juiz de IA**, que diz se uma aplicação vaza dados não permitidos.
-- **Pré-requisito:** aplicações em **imagem OCI** no lugar de Python + wheels em ext4.
+- **Tema (2026-10-27, com o orientador):** **proteção de modelos abertos** no DNAT. Pesos e
+  derivados ficam sob custódia na CVM e todo derivado passa por um **portão de liberação** antes
+  de virar ativo. Escrito como **dependabilidade** (manter a recusa sob modificação do modelo, com
+  falhas acidentais e maliciosas, detecção e contenção) e como **proteção da cadeia de suprimentos
+  de modelos**. Base: [E7](etapas/E7_decisao_rumo.md), [E8](etapas/E8_alinhamento_dsn.md),
+  [E9](etapas/E9_testes_validos.md).
+- **Descartados:** o Juiz generalista de vazamento em código (amplo demais) e o mercado de bug
+  bounty sobre a cadeia de software ([E5](etapas/E5_alt_bug_bounty.md)). A ideia de bounty fica
+  como **extensão**: prêmio para quem mostrar uma entrada ou um derivado que explora o modelo.
+- **Em aberto:** a definição exata do problema ([E10](etapas/E10_problema.md)).
 
-*Absorve D-032 e D-033 (2026-10-17/18, com o orientador).*
+*Absorve D-032 e D-033 (2026-10-17/18) e a decisão de 2026-10-27. O orientador lembrou que o
+formato de modelo também resolve a exposição de código confidencial na saída, limitação do Juiz.*
 
-## D2 · Juiz de IA
-- **É uma aplicação do próprio sistema**, na whitelist por natureza, que recebe outra aplicação
-  como entrada e devolve um veredito (aprovado · aprovado com portão · reprovado · inconclusivo).
-- **MVP** ([JUIZ_IA.md](JUIZ_IA.md) §9): benchmark de **agregação, transformação e ML** sobre dados
-  tabulares sintéticos com canários; **verdade de referência estilo CTF** (o atacante entrega app +
-  decodificador; vale se a tarefa é cumprida e o canário sai da saída); camada **L2 com variação
-  do segredo**.
-- **Acesso externo:** sem tag de rede no dataset, tentativa de rede observada em L2 (seccomp em
-  modo log) ⇒ **reprovado**; sinal só estático e fraco ⇒ inconclusivo ([E2c](etapas/E2c_ameacas_oci.md) §6).
-- **Batalha:** atacantes de ponta (Anthropic, OpenAI, Google, abertos grandes) × defensores baratos
-  (abertos em GPU na nuvem e por API), no máximo um defensor caro; **API até US$ 100**.
+## D2 · Portão de liberação (o Juiz aplicado a modelos)
+- **É uma aplicação do próprio sistema**, na whitelist, que recebe um **derivado de modelo** (e
+  não código) e devolve um veredito: aprovado, reprovado ou inconclusivo.
+- **Julga o resultado, não o script:** fine-tuning legítimo e obliteração podem ter o mesmo código.
+- **Avaliação:** população de derivados por classe de falha, com verdade de referência
+  independente, teste cego com obliterados públicos e atacante adaptativo ([E9](etapas/E9_testes_validos.md) §3).
+- **Orçamento:** tudo em CPU com modelos pequenos; GPU confidencial só opcional.
 
-*Absorve D-032, D-035 e D-036.*
+*Substitui o D2 do Juiz de código (histórico no git).*
 
 ## D3 · Escopo do artigo
 - **Sem distribuição** do sistema: a CVM basta; o operador segue como ponto único de
   disponibilidade e censura (limitação declarada).
 - **Atestação implícita**, fora do escopo.
-- **Vazamento pela saída legítima** é o alvo do Juiz; **canais laterais** são limitação declarada.
-- **Pesos de modelo privados** (caso U1): só como motivação.
+- **Pesos de modelo (caso U1) passam a ser o caso principal.**
+- **Canais laterais** e falhas de hardware na CVM são limitação declarada; a integridade de
+  memória da CVM é premissa.
 
 *Absorve D-014, D-017 (atestação), D-029, D-031 e D-034.*
 
