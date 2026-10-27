@@ -888,7 +888,7 @@ ferramenta **(a verificar)**.
 - **Trilha:** RT.
 - **Contribuição:** detectar backdoor só com acesso caixa-preta, via *visual prompting*. A
   motivação são modelos vindos de mercados (BigML, ONNX zoo) e de MLaaS. O PDF não fala em
-  "centros de teste" (correção de 2026-10-26).
+  "centros de teste", mas o resumo publicado nos anais fala (ver MODELOS_DSN.md).
 - **Avaliação:** 5 datasets de imagem, 2 arquiteturas, 9 ataques (inclusive adaptativos), 10
   defesas como linha de base; AUROC e F1; falha declarada contra backdoor all-to-all.
 - **Para nós (B):** precedente de certificar, no nível do modelo, um comportamento oculto sem ver

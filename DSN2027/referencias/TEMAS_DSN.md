@@ -13,7 +13,7 @@
 - **Ponte:** 1 artigo no Research Track (ecossistema MCP, 2026) e 1 no Industry Track (Aegis, MCP, 2026).
 - **Com os adjacentes, os dois temas crescem juntos.** A sobe de 12,5% (2021) para 24,6% (2026) e B de 10,4% para 27,7%. No núcleo, B passa A pela primeira vez em 2026: 4 artigos contra 2.
 - O programa de 2026 já tinha **duas sessões sobre LLM** ("Making LLMs Safer" e "Security aspects of using LLMs"). Cadeia de suprimentos dividiu sessão com mobile e firmware ("Mobile, Firmware & Supply Chain Security").
-- **Workshops:** o DSML (ML confiável e seguro) aconteceu em 2024, 2025 e 2026. O CRAI (IA agêntica) estreou em 2026. Nenhum workshop de 2024–2026 tem cadeia de suprimentos como tema central; só o DSAS 2026 a lista entre os tópicos, para tecnologia espacial. Os workshops de 2027 ainda não foram escolhidos.
+- **Workshops:** o DSML (ML confiável e seguro) existe desde 2018 (9ª edição em 2026; site dependablesecureml.github.io); aqui só 2024–2026 foram varridos. O CRAI (IA agêntica) estreou em 2026. Nenhum workshop de 2024–2026 tem cadeia de suprimentos como tema central; só o DSAS 2026 a lista entre os tópicos, para tecnologia espacial. Os workshops de 2027 ainda não foram escolhidos.
 
 ---
 
