@@ -1645,6 +1645,149 @@
     "Na preparação da implementação: a lista com o artigo que reconhece cada limite, reaproveitada na seção 10 (T-1511) e no modelo do atacante (T-1201)."
    ],
    "atualizado": "2026-10-28"
+  },
+  {
+   "task": "T-113",
+   "ordem": 113,
+   "situacao": "decidida",
+   "pergunta": "Que afirmação, contribuição, requisito, pergunta de pesquisa e seção cada decisão do Juiz sustenta?",
+   "contexto": "O artigo é avaliado pela ligação entre afirmações e evidências; cada decisão do J1 precisa sustentar algo do texto ou sair. A tabela cruza T-101 a T-112 com A1–A5 (E12 §3), C1, C2, P2 e P4, R1–R16 (E13 §2), RQ1–RQ5 e as seções do artigo (E13 W8).",
+   "resposta": "Toda decisão de T-101 a T-112 sustenta ao menos uma afirmação, então nada é cortado. Havia três lacunas, agora fechadas: a RQ3 passa a usar só derivados de campo em safetensors (coerente com a T-111); o recibo (P2) ganha medida de custo na RQ5 e uma demonstração de auditoria no G3; a recuperação (C1) é demonstrada como caso no G3, sem RQ própria. R12, R13 e R15 não são do J1: ficam com a T-1602 e os épicos J10, J11 e J13.",
+   "itens": [
+    {
+     "q": "T-101 · fluxo do derivado",
+     "r": "A1 e A3 · C1 · R1, R10 · RQ5 (ablação da custódia) · seções 3 e 5",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-102 · arquitetura do piloto",
+     "r": "A3 · C1 · R10 · RQ5 (custo por veredito na CVM) · seções 3 e 7",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-103 · interface do Juiz",
+     "r": "A3 e A4 (saída de esquema fixo, só o estado) · C1 · R5, R10, R11 · RQ4 · seção 5",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-104 · recibo",
+     "r": "A3 (auditar sem confiar no dono) · C1 e P2 · R9 · RQ5 (custo do recibo) e G3 · seção 5",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-105 · fronteiras de confiança",
+     "r": "A3 e A4 · C1 · R9, R11 · RQ4 e RQ5 (referência forjada) · seção 3",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-106 · propriedade decidida",
+     "r": "A1 e A5 · C2 · R2, R3, R4, R14 · RQ1 e RQ2 · seções 4 e 6",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-107 · inconclusivo",
+     "r": "A5 · C2 · R14 · RQ1 (inconclusivo conta como não liberado) · seções 6 e 7",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-108 · instrumentos",
+     "r": "A3, A4 e A5 · C1 e C2 · R2, R3, R4, R6, R7, R8, R9, R16 · RQ1 e RQ5 (ablação dos sinais) · seção 5",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-109 · parte secreta",
+     "r": "A4 · C2 e P4 (bounty interno) · R7, R11 · RQ4 · seções 5 e 6",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-110 · ciclo de vida",
+     "r": "C1 (contenção e recuperação) · G3 · seção 5",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-111 · formatos liberados",
+     "r": "A4 · C1 e C2 · R8 · RQ1 (quantização condicionada em F4) · seção 5",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "T-112 · o que o Juiz não cobre",
+     "r": "A4 e A5 · C2 · R7, R11 · RQ4 · seções 8 e 10",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10 (E12 §3, E13 §1, §2 e W8)"
+    },
+    {
+     "q": "Há decisão sem afirmação, para cortar?",
+     "r": "Não. Detalhes de engenharia (nuvem pelo custo, CVM por sessão de inferência) apoiam a C1 sem afirmação própria e ficam como estão.",
+     "estado": "fechada",
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Há afirmação sem decisão?",
+     "r": "Não no J1. A2 só se cita (Qi 2025, Casper, Kuo) e se apoia na escolha da T-101 de pôr o controle fora dos pesos.",
+     "estado": "fechada",
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "A RQ3 compara campo em safetensors × GGUF, mas GGUF não sai (T-111). O que muda?",
+     "r": "A RQ3 usa só derivados de campo publicados em safetensors e fica como injeção × campo; a comparação com GGUF sai.",
+     "estado": "fechada",
+     "porque": "Coerente com a T-111; um GGUF convertido já carrega a quantização e mistura as condições.",
+     "alt": [
+      {
+       "o": "Converter GGUF de campo para o teste",
+       "nao": "mistura as condições"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Como o artigo sustenta o recibo (P2)?",
+     "r": "A RQ5 mede o custo do recibo (gás e latência por veredito), e o teste do G3 (T-813) mostra um auditor conferindo um veredito pelos hashes.",
+     "estado": "fechada",
+     "porque": "Barato e dá evidência; sem isso, P2 seria promessa.",
+     "alt": [
+      {
+       "o": "Só como desenho",
+       "nao": "P2 vira promessa"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Como o artigo sustenta a recuperação (revogação, cascata)?",
+     "r": "Como caso demonstrado no G3, sem RQ própria: revoga um aprovado e um base, mostra a cascata, que o dono não reativa, e o tempo até o efeito.",
+     "estado": "fechada",
+     "porque": "Cabe no prazo.",
+     "alt": [
+      {
+       "o": "Nova RQ6 de recuperação",
+       "nao": "acrescenta uma pergunta à avaliação"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "E os requisitos que nenhuma decisão do J1 cobre?",
+     "r": "R12 (verdade de referência por procedimento diferente) fica com a T-1602 e o J10; R13 (injeção × campo) com o J11; R15 (melhor alternativa existente) com a linha de base do J13.",
+     "estado": "fechada",
+     "fonte": "Rastreabilidade montada em 28/10"
+    }
+   ],
+   "falta": [
+    "Na preparação da implementação: a tabela de rastreabilidade na E14 (T-114)."
+   ],
+   "atualizado": "2026-10-28"
   }
  ]
 }

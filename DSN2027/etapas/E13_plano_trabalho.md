@@ -179,12 +179,10 @@ Medir no dia 1 do piloto. Para caber:
 
 **GGUF:** na mesma busca, a maior parte dos resultados era GGUF. Isso combina com as
 "redistribuições comprimidas" da 10a Labs e com a predominância de GGUF no resumo de Sokhansanj.
-O GGUF não é formato de liberação (D5), mas aparece no campo. Plano:
-- teste cego separado em **safetensors** (principal) e **GGUF** (secundário);
-- leitura e desquantização de GGUF com `gguf` (o pacote Python do llama.cpp), que entra nas
-  dependências;
-- **controle negativo:** quantizar o próprio base nos mesmos formatos GGUF e medir o ruído de S3
-  que isso gera, que vira o piso do sinal.
+O GGUF não é formato de liberação (D5) e não sai da plataforma (T-111). **Decidido na T-113
+(28/10):** o teste cego usa só derivados de campo em safetensors; os de campo em GGUF ficam fora,
+porque desquantizá-los mistura a quantização com a derivação. O artigo reporta quantos GGUF a
+busca achou, como dado de contexto.
 
 **Representatividade (Natella, TPU-FI):** comparar a distribuição de S1–S3 entre as nossas
 abliterações e as de campo; reportar à parte as injeções fora da distribuição do campo. O Natella
@@ -259,9 +257,14 @@ de ser reescrito. Estrutura proposta, 11 páginas:
 **Perguntas de pesquisa** (E8 §9.3, ajustadas):
 - **RQ1** liberação silenciosa e falso alarme por classe de falha, contra a linha de base;
 - **RQ2** sensibilidade à quantidade de falha;
-- **RQ3** representatividade: injeção × campo, safetensors × GGUF;
+- **RQ3** representatividade: injeção × campo, só com derivados de campo em safetensors (GGUF não
+  sai da plataforma, T-111);
 - **RQ4** atacante adaptativo (bounty interno);
-- **RQ5** ablação dos sinais e da custódia, e custo por veredito na CVM.
+- **RQ5** ablação dos sinais e da custódia, custo por veredito na CVM e custo do recibo (gás e
+  latência, T-113).
+
+A **recuperação** (revogação e cascata pela raiz) e a **auditoria pelo recibo** não têm RQ: são
+demonstradas como caso no teste do G3 (T-813), decidido na T-113.
 
 ---
 
@@ -286,7 +289,7 @@ de ser reescrito. Estrutura proposta, 11 páginas:
 | **G1 · Piloto** | 01/nov | Algum sinal separa abliterados de benignos **e** o veredito de liberação inteiro, com juiz, cabe em 80 min em 4 vCPU (E7 §7) | Reduzir bateria e formatos; se ainda falhar, o fallback da E7 §7 volta à mesa com o orientador |
 | **G1b · Alerta** | 01/nov | S3 separa tudo com folga? | Não é corte: o valor do artigo passa a vir de RQ3 e RQ4 |
 | **G2 · Calibração** | 09/nov | Limiar e δ fixados e pré-registro commitado antes de tocar no teste | Atrasar o teste; nunca recalibrar com ele |
-| **G3 · Integração** | 16/nov | Um derivado reprovado não sai, um aprovado vira ativo com recibo e o operador revoga | O recibo vira log assinado pela CVM1 (ordem de corte); a retenção cifrada no IPFS fica |
+| **G3 · Integração** | 16/nov | Um derivado reprovado não sai, um aprovado vira ativo com recibo que um auditor confere pelos hashes, e o operador revoga um aprovado e um base, com cascata | O recibo vira log assinado pela CVM1 (ordem de corte); a retenção cifrada no IPFS fica |
 | **G4 · Congelamento** | 23/nov | Todas as RQs com IC | O que não tiver IC sai do texto ou vira discussão |
 
 ---
@@ -311,7 +314,6 @@ de ser reescrito. Estrutura proposta, 11 páginas:
 |---|---|---|
 | Veredito caro demais em CPU | §3.3 | Dois estágios; bateria reduzida por formato; medir no piloto com o juiz |
 | Quantização sem suporte em CPU | §3.3 | Quantizar e desquantizar em CPU, conferido numa amostra |
-| Ruído do GGUF confunde S3 | §3.5 | Controle negativo com o base quantizado |
 | Poucos negativos para FPR baixa | §3.2 | ≥ 60 H por conjunto de teste; FPR 5% como métrica principal |
 | S3 dispara em derivados endurecidos | Hurtado App. B | Classe F0 como controle negativo |
 | Juiz do portão enganado pelo derivado | HarmBench | Juiz da verdade de referência diferente; amostra humana |

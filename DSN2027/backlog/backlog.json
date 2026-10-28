@@ -281,6 +281,7 @@
    "titulo": "Definir a propriedade que o Juiz decide: δ por categoria, tolerância de recusa excessiva, utilidade"
   },
   {
+   "atualizado": "2026-10-28T21:30:00.000Z",
    "deps": [
     "T-106"
    ],
@@ -292,10 +293,10 @@
    "pronto": "Regra escrita",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Definir o que acontece com um veredito inconclusivo (reter, reavaliar ou revisão humana)",
-   "atualizado": "2026-10-28T21:30:00.000Z"
+   "titulo": "Definir o que acontece com um veredito inconclusivo (reter, reavaliar ou revisão humana)"
   },
   {
+   "atualizado": "2026-10-28T21:30:00.000Z",
    "deps": [
     "T-105",
     "T-106"
@@ -308,10 +309,10 @@
    "pronto": "Uma linha por instrumento com o artigo que o exige",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Definir os instrumentos do Juiz e o papel de cada um, justificado pela base (A3, A4), sem implementar",
-   "atualizado": "2026-10-28T21:30:00.000Z"
+   "titulo": "Definir os instrumentos do Juiz e o papel de cada um, justificado pela base (A3, A4), sem implementar"
   },
   {
+   "atualizado": "2026-10-28T21:30:00.000Z",
    "deps": [
     "T-108"
    ],
@@ -323,10 +324,10 @@
    "pronto": "Política escrita",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Definir a parte secreta: quem gera, onde fica, rotação, compromisso por hash",
-   "atualizado": "2026-10-28T21:30:00.000Z"
+   "titulo": "Definir a parte secreta: quem gera, onde fica, rotação, compromisso por hash"
   },
   {
+   "atualizado": "2026-10-28T21:30:00.000Z",
    "deps": [
     "T-104"
    ],
@@ -338,10 +339,10 @@
    "pronto": "Diagrama de estados do derivado",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Definir o ciclo de vida: cache do veredito por (digest, versão do Juiz), reavaliação quando o Juiz muda, revogação",
-   "atualizado": "2026-10-28T21:30:00.000Z"
+   "titulo": "Definir o ciclo de vida: cache do veredito por (digest, versão do Juiz), reavaliação quando o Juiz muda, revogação"
   },
   {
+   "atualizado": "2026-10-28T22:00:00.000Z",
    "deps": [
     "T-101"
    ],
@@ -351,11 +352,12 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Regra no fluxo do T-101",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Encaixar no fluxo a política de formatos liberados (D5)"
   },
   {
+   "atualizado": "2026-10-28T22:00:00.000Z",
    "deps": [
     "T-108"
    ],
@@ -365,7 +367,7 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Lista de limitações",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos"
   },
@@ -422,11 +424,11 @@
    "titulo": "Definir onde vive o código do Juiz (model_gate/ no repositório) e o layout de pastas"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-10-28T22:10:00.000Z",
    "deps": [
     "T-201"
    ],
-   "descricao": "Por quê: o D2 fixa tudo em CPU, e a reprodutibilidade dos vereditos (R5, R14) exige versões idênticas no piloto, nas máquinas da campanha e na CVM de job.\nComo:\n- Fixar Python, torch (wheel CPU), transformers, peft, accelerate, safetensors, datasets e gguf num lock (requirements.lock ou uv.lock)\n- Script model_gate/setup.sh que cria o venv do zero a partir do lock\n- Testar numa VM limpa de 4 vCPU: instalar, importar tudo e rodar um forward de um modelo minúsculo\nSaída: arquivo de lock, setup.sh e nota no README com o tempo de instalação e a versão de cada pacote.\nFora do escopo: bitsandbytes em CPU (T-503).",
+   "descricao": "Por quê: o D2 fixa tudo em CPU, e a reprodutibilidade dos vereditos (R5, R14) exige versões idênticas no piloto, nas máquinas da campanha e na CVM de job.\nComo:\n- Fixar Python, torch (wheel CPU), transformers, peft, accelerate, safetensors e datasets num lock (requirements.lock ou uv.lock)\n- Script model_gate/setup.sh que cria o venv do zero a partir do lock\n- Testar numa VM limpa de 4 vCPU: instalar, importar tudo e rodar um forward de um modelo minúsculo\nSaída: arquivo de lock, setup.sh e nota no README com o tempo de instalação e a versão de cada pacote.\nFora do escopo: bitsandbytes em CPU (T-503).",
    "epico": "J2",
    "id": "T-202",
    "marco": "G1",
@@ -925,17 +927,18 @@
    "titulo": "Medir tempo e memória de S2 e S3 no 0,5B"
   },
   {
+   "atualizado": "2026-10-28T22:10:00.000Z",
    "deps": [
     "T-408",
     "T-504"
    ],
-   "descricao": "Por quê: quantizar o próprio base gera ΔW não nulo; esse ruído é o piso de S3, e sem ele o campo GGUF e os formatos dariam falso alarme (E13 §3.5).\nComo:\n- Calcular S3 entre o base e cada versão quantizada do base (T-504)\n- Registrar o valor por camada e formato\n- Usar esse valor como piso na leitura de S3 dos formatos e do campo\nSaída: tabela de piso por formato em references/.",
+   "descricao": "Por quê: quantizar o próprio base gera ΔW não nulo; esse ruído é o piso de S3, e sem ele o campo GGUF e os formatos dariam falso alarme (E13 §3.5).\nComo:\n- Calcular S3 entre o base e cada versão quantizada do base (T-504)\n- Registrar o valor por camada e formato\n- Usar esse valor como piso na leitura de S3 dos formatos e do campo\nSaída: tabela de piso por formato em references/.\nCortada em 28/10 pela T-113: o teste cego usa só derivados de campo em safetensors, e GGUF não sai da plataforma (T-111).",
    "epico": "J4",
    "id": "T-412",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Piso de S3 por formato",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Controle negativo: S3 entre o base e o base quantizado (piso de ruído)"
   },
@@ -1041,16 +1044,17 @@
    "titulo": "Definir o instrumento reduzido por formato (subconjunto e tamanho)"
   },
   {
+   "atualizado": "2026-10-28T22:10:00.000Z",
    "deps": [
     "T-202"
    ],
-   "descricao": "Por quê: a maior parte dos derivados de campo está em GGUF (E13 §3.5); não é formato de liberação, mas o teste cego secundário depende de lê-lo.\nComo:\n- Ler o GGUF com o pacote gguf do llama.cpp e desquantizar os tensores\n- Mapear os nomes de tensores do GGUF para os do safetensors do base\n- Conferir formato e ordem (inclusive permutações de q/k, se houver)\nSaída: model_gate/formats/gguf_load.py e teste com o base convertido para GGUF.",
+   "descricao": "Por quê: a maior parte dos derivados de campo está em GGUF (E13 §3.5); não é formato de liberação, mas o teste cego secundário depende de lê-lo.\nComo:\n- Ler o GGUF com o pacote gguf do llama.cpp e desquantizar os tensores\n- Mapear os nomes de tensores do GGUF para os do safetensors do base\n- Conferir formato e ordem (inclusive permutações de q/k, se houver)\nSaída: model_gate/formats/gguf_load.py e teste com o base convertido para GGUF.\nCortada em 28/10 pela T-113: o teste cego usa só derivados de campo em safetensors, e GGUF não sai da plataforma (T-111).",
    "epico": "J5",
    "id": "T-507",
    "marco": "G2",
    "prioridade": "P2",
    "pronto": "Pesos GGUF carregados e alinhados ao base",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
    "titulo": "Ler GGUF e desquantizar para comparar com o base (pacote gguf)"
   },
@@ -1948,10 +1952,11 @@
    "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF"
   },
   {
+   "atualizado": "2026-10-28T22:10:00.000Z",
    "deps": [
     "T-1101"
    ],
-   "descricao": "Por quê: A meta da E13 §3.5 é ≥ 20 derivados de campo em safetensors; GGUF entra só como teste secundário porque não é formato de liberação (D5).\nComo:\n- Classificar cada candidato do T-1101 em safetensors, GGUF ou ambos\n- Descartar os que não declaram base compatível com o pai custodiado\n- Se faltar para 20 em safetensors, ampliar a busca antes de seguir e registrar o déficit\nSaída: lista filtrada com duas partições (safetensors principal, GGUF secundário) e a contagem de cada uma.",
+   "descricao": "Por quê: A meta da E13 §3.5 é ≥ 20 derivados de campo em safetensors; GGUF fica fora do teste cego (T-113): não é formato de liberação e não sai da plataforma (T-111).\nComo:\n- Classificar cada candidato do T-1101 em safetensors, GGUF ou ambos\n- Descartar os que não declaram base compatível com o pai custodiado\n- Se faltar para 20 em safetensors, ampliar a busca antes de seguir e registrar o déficit\nSaída: lista filtrada só com safetensors, com a contagem de GGUF achados reportada como contexto.",
    "epico": "J11",
    "id": "T-1102",
    "marco": "G2",
@@ -1959,7 +1964,7 @@
    "pronto": "≥ 20 em safetensors identificados",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Filtrar por formato (safetensors × GGUF) e pela base declarada"
+   "titulo": "Filtrar por formato (só safetensors) e pela base declarada"
   },
   {
    "deps": [
@@ -2021,17 +2026,18 @@
    "titulo": "Rodar o Juiz congelado no campo (teste cego)"
   },
   {
+   "atualizado": "2026-10-28T22:10:00.000Z",
    "deps": [
     "T-507",
     "T-412"
    ],
-   "descricao": "Por quê: A maior parte do campo vem em GGUF; o ruído de quantização pode confundir S3, por isso o controle negativo do T-412 define o piso (E13 §3.5).\nComo:\n- Desquantizar os GGUF com o pacote gguf (T-507) e alinhar as matrizes ao base\n- Calcular S2 e S3 contra o base custodiado\n- Comparar cada valor com o piso de S3 do base quantizado no mesmo formato GGUF\nSaída: sinais S2/S3 do campo GGUF com a marca 'acima/abaixo do piso', no registro de experimentos.",
+   "descricao": "Por quê: A maior parte do campo vem em GGUF; o ruído de quantização pode confundir S3, por isso o controle negativo do T-412 define o piso (E13 §3.5).\nComo:\n- Desquantizar os GGUF com o pacote gguf (T-507) e alinhar as matrizes ao base\n- Calcular S2 e S3 contra o base custodiado\n- Comparar cada valor com o piso de S3 do base quantizado no mesmo formato GGUF\nSaída: sinais S2/S3 do campo GGUF com a marca 'acima/abaixo do piso', no registro de experimentos.\nCortada em 28/10 pela T-113: o teste cego usa só derivados de campo em safetensors, e GGUF não sai da plataforma (T-111).",
    "epico": "J11",
    "id": "T-1107",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Sinais do campo GGUF",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "GGUF: desquantizar e rodar S2/S3 contra o piso do controle negativo"
   },
@@ -2394,10 +2400,11 @@
    "titulo": "RQ2: curvas de cobertura × quantidade de falha"
   },
   {
+   "atualizado": "2026-10-28T22:10:00.000Z",
    "deps": [
     "T-1108"
    ],
-   "descricao": "Por quê: A RQ3 trata da representatividade: injeção × campo e safetensors × GGUF.\nComo:\n- Consolidar a análise do T-1108 e os sinais GGUF do T-1107\n- Reportar desempenho do Juiz no campo safetensors e GGUF\n- Destacar as injeções fora da distribuição\nSaída: tabela ou figura da RQ3 e script que a gera.",
+   "descricao": "Por quê: A RQ3 trata da representatividade: injeção × campo, só com derivados de campo em safetensors (T-113).\nComo:\n- Consolidar a análise do T-1108\n- Reportar o desempenho do Juiz no campo em safetensors\n- Destacar as injeções fora da distribuição\nSaída: tabela ou figura da RQ3 e script que a gera.",
    "epico": "J14",
    "id": "T-1407",
    "marco": "G4",
@@ -2405,7 +2412,7 @@
    "pronto": "Tabela ou figura da RQ3",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "RQ3: injeção × campo, safetensors × GGUF"
+   "titulo": "RQ3: injeção × campo (safetensors)"
   },
   {
    "deps": [
