@@ -5,33 +5,33 @@
 <style>
 /* Layout: cabeçalho com resumo, tema e régua de marcos; filtros; faixa de épicos; cinco colunas kanban
    com cabeçalho em cor sólida e rolagem própria; gaveta lateral para editar.
-   Paleta: cores sólidas, sem transparência; texto branco sobre as cores de status e prioridade. */
+   Paleta: cores primárias vivas e sólidas; texto branco sobre elas, preto sobre o amarelo (--tc). */
 :root {
   --bg: #eeece6; --panel: #ffffff; --col: #e2dfd7; --fg: #1c1f24; --muted: #555c66; --line: #cfcbc1; --soft: #d9d5cb;
-  --ink: #26313f; --on-ink: #ffffff; --accent: #b4561a; --on-solid: #ffffff;
-  --backlog: #5d6672; --prio: #6d43b0; --doing: #1c64a8; --done: #22704a; --cut: #9c2f22;
-  --p0: #b8241c; --p1: #c25a0c; --p2: #2a5fa8; --p3: #646b75;
-  --sP: #2f7d6d; --sM: #6b5a1e; --sG: #7b2f63;
-  --block: #b4561a;
+  --ink: #26313f; --on-ink: #ffffff; --accent: #0050e6; --on-solid: #ffffff; --on-yellow: #111111;
+  --backlog: #4b5563; --prio: #ffcc00; --doing: #0050e6; --done: #00a03c; --cut: #e10600;
+  --p0: #e10600; --p1: #ffcc00; --p2: #0050e6; --p3: #6b7280;
+  --sP: #00a3e0; --sM: #ff7a00; --sG: #b000b5;
+  --block: #e10600;
   --f-display: "Fraunces", Georgia, serif;
   --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #121417; --panel: #1f2328; --col: #181b1f; --fg: #eceae5; --muted: #a2a8b0; --line: #353b43; --soft: #2c3138;
-  --ink: #d5dde8; --on-ink: #121417; --accent: #e08a45; --on-solid: #ffffff;
-  --backlog: #4f5763; --prio: #7c52c4; --doing: #2470b8; --done: #25804f; --cut: #b03a2b;
-  --p0: #c8312a; --p1: #c86414; --p2: #3268b5; --p3: #5c636d;
-  --sP: #2f8a78; --sM: #85702a; --sG: #93407a;
-  --block: #e08a45;
+  --ink: #d5dde8; --on-ink: #121417; --accent: #2f6bff; --on-solid: #ffffff; --on-yellow: #111111;
+  --backlog: #5b6472; --prio: #ffcc00; --doing: #1f5fff; --done: #00a03c; --cut: #e10600;
+  --p0: #f01a10; --p1: #ffcc00; --p2: #1f5fff; --p3: #6b7280;
+  --sP: #00a3e0; --sM: #ff7a00; --sG: #c010c5;
+  --block: #f01a10;
   color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #121417; --panel: #1f2328; --col: #181b1f; --fg: #eceae5; --muted: #a2a8b0; --line: #353b43; --soft: #2c3138;
-  --ink: #d5dde8; --on-ink: #121417; --accent: #e08a45; --on-solid: #ffffff;
-  --backlog: #4f5763; --prio: #7c52c4; --doing: #2470b8; --done: #25804f; --cut: #b03a2b;
-  --p0: #c8312a; --p1: #c86414; --p2: #3268b5; --p3: #5c636d;
-  --sP: #2f8a78; --sM: #85702a; --sG: #93407a;
-  --block: #e08a45;
+  --ink: #d5dde8; --on-ink: #121417; --accent: #2f6bff; --on-solid: #ffffff; --on-yellow: #111111;
+  --backlog: #5b6472; --prio: #ffcc00; --doing: #1f5fff; --done: #00a03c; --cut: #e10600;
+  --p0: #f01a10; --p1: #ffcc00; --p2: #1f5fff; --p3: #6b7280;
+  --sP: #00a3e0; --sM: #ff7a00; --sG: #c010c5;
+  --block: #f01a10;
   color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
 .wrap { margin: 0;padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: grid; gap: 16px; }
@@ -40,7 +40,7 @@ h1 { font-family: var(--f-display); font-weight: 600; font-size: 1.75rem; line-h
 .label { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .head-right { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
 .summary { display: flex; flex-wrap: wrap; gap: 6px; font-variant-numeric: tabular-nums; }
-.sum { background: var(--c); color: var(--on-solid); border-radius: 6px; padding: 3px 9px; font-size: .78rem; font-weight: 700; }
+.sum { background: var(--c); color: var(--tc, var(--on-solid)); border-radius: 6px; padding: 3px 9px; font-size: .78rem; font-weight: 700; }
 .sum span { font-weight: 500; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
 .seg button { border: 0; background: var(--panel); padding: 5px 11px; cursor: pointer; font-size: .8rem; font-weight: 700; color: var(--muted); }
@@ -79,7 +79,7 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
 .board-scroll { overflow-x: auto; }
 .board { display: grid; grid-template-columns: repeat(5, minmax(260px, 1fr)); gap: 12px; min-width: 0; }
 .col { background: var(--col); border-radius: 10px; display: flex; flex-direction: column; min-height: 220px; max-height: 76vh; overflow: hidden; }
-.col-h { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; font-weight: 800; background: var(--c); color: var(--on-solid); }
+.col-h { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; font-weight: 800; background: var(--c); color: var(--tc, var(--on-solid)); }
 .col-h .n { font-variant-numeric: tabular-nums; font-weight: 600; font-size: .82rem; }
 .col-list { flex: 1; overflow-y: auto; padding: 10px 8px; display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
 .col-list.over { box-shadow: inset 0 0 0 3px var(--accent); }
@@ -88,7 +88,7 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
 .card.dragging { opacity: .4; }
 .card .top { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
 .card .tid { font-family: var(--f-mono); font-weight: 700; font-size: .76rem; margin-right: 2px; }
-.b-sol { font-family: var(--f-mono); font-size: .68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; color: var(--on-solid); background: var(--c); line-height: 1.5; }
+.b-sol { font-family: var(--f-mono); font-size: .68rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; color: var(--tc, var(--on-solid)); background: var(--c); line-height: 1.5; }
 .b-ep { background: var(--ink); color: var(--on-ink); }
 .b-mk { background: var(--soft); color: var(--fg); }
 .card .t { font-size: .86rem; font-weight: 600; line-height: 1.32; }
@@ -159,14 +159,14 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
 <script>
 const COLS = [
   { k: "backlog", n: "Backlog", c: "var(--backlog)" },
-  { k: "priorizado", n: "Priorizado", c: "var(--prio)" },
+  { k: "priorizado", n: "Priorizado", c: "var(--prio)", tc: "var(--on-yellow)" },
   { k: "em andamento", n: "Em andamento", c: "var(--doing)" },
   { k: "feito", n: "Feito", c: "var(--done)" },
   { k: "cortada", n: "Cortada", c: "var(--cut)" }
 ];
 const PRIOS = [
   { k: "P0", n: "P0 · caminho crítico", c: "var(--p0)" },
-  { k: "P1", n: "P1 · alta", c: "var(--p1)" },
+  { k: "P1", n: "P1 · alta", c: "var(--p1)", tc: "var(--on-yellow)" },
   { k: "P2", n: "P2 · média", c: "var(--p2)" },
   { k: "P3", n: "P3 · opcional", c: "var(--p3)" }
 ];
@@ -216,7 +216,7 @@ function cmp(a, b) {
 
 function renderSummary() {
   if (!S.tasks.length) { $("summary").innerHTML = `<span class="msg">${db || readOnly ? "Nenhuma task gravada ainda." : "Não foi possível abrir o backlog nesta visualização."}</span>`; return; }
-  $("summary").innerHTML = COLS.map(c => { const ts = S.tasks.filter(t => st(t) === c.k); return `<span class="sum" style="--c:${c.c}">${ts.length} <span>${c.n.toLowerCase()} · ${sumH(ts)} h</span></span>`; }).join("");
+  $("summary").innerHTML = COLS.map(c => { const ts = S.tasks.filter(t => st(t) === c.k); return `<span class="sum" style="--c:${c.c};--tc:${c.tc || "var(--on-solid)"}">${ts.length} <span>${c.n.toLowerCase()} · ${sumH(ts)} h</span></span>`; }).join("");
 }
 
 function renderRail() {
@@ -250,7 +250,7 @@ function renderEpics() {
 function cardHTML(t) {
   const p = pending(t); const s = st(t); const pr = prioOf(prio(t)); const sz = sizeOf(tam(t));
   return `<article class="card" draggable="${!readOnly}" data-id="${esc(t.id)}" data-ordem="${ord(t)}" tabindex="0" style="--pc:${pr.c}" aria-label="${esc(t.id)} ${esc(t.titulo)}">
-    <div class="top"><span class="tid">${esc(t.id)}</span><span class="b-sol" style="--c:${pr.c}" title="${pr.n}">${pr.k}</span><span class="b-sol" style="--c:${sz.c}" title="${sz.n}">${sz.k} ${sz.h}h</span><span class="b-sol b-ep">${esc(t.epico)}</span>${t.marco ? `<span class="b-sol b-mk">${esc(t.marco)}</span>` : ""}</div>
+    <div class="top"><span class="tid">${esc(t.id)}</span><span class="b-sol" style="--c:${pr.c};--tc:${pr.tc || "var(--on-solid)"}" title="${pr.n}">${pr.k}</span><span class="b-sol" style="--c:${sz.c}" title="${sz.n}">${sz.k} ${sz.h}h</span><span class="b-sol b-ep">${esc(t.epico)}</span>${t.marco ? `<span class="b-sol b-mk">${esc(t.marco)}</span>` : ""}</div>
     <div class="t">${esc(t.titulo)}</div>
     ${p.length && (s === "backlog" || s === "priorizado") ? `<div class="b"><span class="blocked">bloqueada por ${p.map(esc).join(", ")}</span></div>` : ""}
   </article>`;
@@ -260,7 +260,7 @@ function renderBoard() {
   if (dragId) { deferRender = true; return; }
   $("board").innerHTML = COLS.map(c => {
     const ts = S.tasks.filter(t => st(t) === c.k).filter(visible).sort(cmp);
-    return `<div class="col"><div class="col-h" style="--c:${c.c}"><span>${c.n}</span><span class="n">${ts.length} · ${sumH(ts)} h</span></div>
+    return `<div class="col"><div class="col-h" style="--c:${c.c};--tc:${c.tc || "var(--on-solid)"}"><span>${c.n}</span><span class="n">${ts.length} · ${sumH(ts)} h</span></div>
       <div class="col-list" data-col="${esc(c.k)}">${ts.map(cardHTML).join("") || `<div class="empty">Arraste tasks para cá.</div>`}</div></div>`;
   }).join("");
 }
