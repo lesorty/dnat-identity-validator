@@ -33,7 +33,9 @@ formato de modelo também resolve a exposição de código confidencial na saíd
 - **Julga o resultado, não o script:** fine-tuning legítimo e obliteração podem ter o mesmo código.
 - **Avaliação:** população de derivados por classe de falha, com verdade de referência
   independente, teste cego com obliterados públicos e atacante adaptativo ([E9](etapas/E9_testes_validos.md) §3).
-- **Orçamento:** tudo em CPU com modelos pequenos; GPU confidencial só opcional.
+- **Orçamento:** tudo em CPU com modelos pequenos. Uma GPU confidencial entra como **segunda
+  bancada** (T-111): uma amostra de derivados roda também nela, com o kernel real de 4 e 8 bits,
+  para conferir os vereditos da CPU e medir o custo.
 
 *Substitui o D2 do Juiz de código (histórico no git).*
 

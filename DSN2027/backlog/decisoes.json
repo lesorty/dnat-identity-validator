@@ -1248,6 +1248,13 @@
       }
      ],
      "fonte": "Decidida em 28/10, nesta revisão (confirma a provisória)"
+    },
+    {
+     "q": "Há itens em vários turnos de conversa?",
+     "r": "Sim, uma sentinela de poucos diálogos curtos por condição, sem promessa de cobertura.",
+     "estado": "fechada",
+     "porque": "Pega o derivado que recusa no primeiro turno e cede logo depois.",
+     "fonte": "Decidida em 28/10 na T-112"
     }
    ],
    "falta": [
@@ -1457,6 +1464,185 @@
    ],
    "falta": [
     "Na preparação da implementação: o diagrama de estados na E14, base da T-704 e da T-705."
+   ],
+   "atualizado": "2026-10-28"
+  },
+  {
+   "task": "T-111",
+   "ordem": 111,
+   "situacao": "decidida",
+   "pergunta": "Em quais formatos o derivado é avaliado e liberado, e como isso roda?",
+   "contexto": "A D5 manda avaliar o derivado em precisão cheia e nas quantizações zero-shot comuns e só liberar os formatos avaliados (Egashira). É preciso fixar a lista, o que acontece com formatos fora dela e como a quantização roda dentro do orçamento em CPU (D2).",
+   "resposta": "O piloto oferece e o Juiz avalia quatro formatos: precisão cheia, LLM.int8, NF4 e FP4, num job só, tudo ou nada. Formatos não avaliados (GGUF, GPTQ, AWQ) não saem: a plataforma não os executa, e os pesos nunca saem para conversão. O Juiz roda em CPU, quantizando e desquantizando com o mesmo código do serviço; uma amostra roda também numa GPU confidencial, com o kernel real, para conferir que os vereditos batem e medir o custo.",
+   "itens": [
+    {
+     "q": "Quais formatos o piloto oferece e o Juiz avalia?",
+     "r": "Os quatro: precisão cheia, LLM.int8, NF4 e FP4.",
+     "estado": "fechada",
+     "porque": "São os formatos do ataque de quantização condicionada (Egashira). O custo dos quatro nos 80 min é medido no primeiro dia.",
+     "alt": [
+      {
+       "o": "Precisão cheia e NF4",
+       "nao": "os outros dois formatos deixariam de ser oferecidos"
+      },
+      {
+       "o": "Só precisão cheia",
+       "nao": "a quantização condicionada sairia do que o artigo mostra"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Se o derivado passa num formato e falha noutro?",
+     "r": "Reprova: um job avalia todos os formatos, e é tudo ou nada.",
+     "estado": "fechada",
+     "porque": "A divergência entre formatos é o sinal da quantização condicionada.",
+     "fonte": "T-101, decisão 13; implementada na T-605"
+    },
+    {
+     "q": "E um formato que o Juiz não avaliou (GGUF, GPTQ, AWQ)?",
+     "r": "Não sai: a plataforma não o executa. Como os pesos nunca saem, o usuário não tem como converter por conta própria.",
+     "estado": "fechada",
+     "porque": "Fecha a quantização condicionada em formatos fora da lista.",
+     "alt": [
+      {
+       "o": "Avaliar sob demanda",
+       "nao": "cada formato novo exige referência do pai e calibração próprias"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Como a quantização roda dentro do orçamento em CPU?",
+     "r": "O Juiz e o serviço usam o mesmo código: arredondam os pesos para o formato e fazem a conta em CPU. Os pesos ficam idênticos aos do formato; só a precisão da conta muda, igual nos dois lados.",
+     "estado": "fechada",
+     "porque": "Mantém a D2 (só CPU) e os quatro formatos, mesmo que o bitsandbytes não rode 4 e 8 bits em CPU.",
+     "fonte": "Decidida em 28/10, nesta revisão; regra do mesmo código do serviço, bit a bit"
+    },
+    {
+     "q": "Onde entram as GPUs confidenciais?",
+     "r": "Como segunda bancada: uma amostra de derivados roda também numa GPU confidencial, com o kernel real de 4 e 8 bits, para conferir que os vereditos batem com os da CPU e medir o custo (RQ5). A CPU continua o caminho principal.",
+     "estado": "fechada",
+     "porque": "Testa a fidelidade da quantização em CPU contra o kernel real sem fazer todo veredito depender de GPU.",
+     "alt": [
+      {
+       "o": "Formatos quantizados só na GPU",
+       "nao": "todo veredito passaria a depender de GPU"
+      },
+      {
+       "o": "Tudo na GPU confidencial",
+       "nao": "custa mais e muda a D2"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    }
+   ],
+   "falta": [
+    "Na preparação da implementação: a regra no diagrama do fluxo e na E14; escolher a GPU confidencial junto com a nuvem (T-1603)."
+   ],
+   "atualizado": "2026-10-28"
+  },
+  {
+   "task": "T-112",
+   "ordem": 112,
+   "situacao": "decidida",
+   "pergunta": "O que o Juiz não cobre, e o que o artigo declara como limite?",
+   "contexto": "O revisor do DSN vai procurar os limites; declará-los cedo evita prometer o que a avaliação não mede. A lista vira a seção 10 do artigo (T-1511) e a base do modelo do atacante (T-1201).",
+   "resposta": "Ficam fora, declarados: backdoor com gatilho, cifra nova, exportação de pesos, destilação por consultas, canais laterais, modelos grandes, distribuição entre operadores, operador malicioso e atestação real, além da recusa em outras línguas. Ficam como limite parcial: o ataque white-box contra S2 e S3, a cifra nova (os codificados são só sentinela) e o ataque em vários turnos, que ganha uma sentinela de poucos diálogos. Derivado com vocabulário ou tokenizer novo reprova como fora do contrato, e derivados quase idênticos gastam cota a cada digest.",
+   "itens": [
+    {
+     "q": "Backdoor com gatilho?",
+     "r": "Fora, declarado: o Juiz não procura gatilhos.",
+     "estado": "fechada",
+     "porque": "Achar o gatilho de um backdoor é difícil mesmo com acesso aos pesos (Rando).",
+     "fonte": "E13 §1 e D3, confirmados em 28/10"
+    },
+    {
+     "q": "Cifra nova (codificação que o Juiz não conhece)?",
+     "r": "Fora, declarado; os itens codificados são só sentinela para codificações conhecidas.",
+     "estado": "fechada",
+     "porque": "Halawi mostra o ataque com cifra própria; não há como cobrir toda cifra.",
+     "fonte": "E13 §1 e D3, confirmados em 28/10; T-108"
+    },
+    {
+     "q": "Exportação de pesos, destilação por consultas e canais laterais?",
+     "r": "Fora, declarados. Os pesos nunca saem; a destilação por muitas consultas e os canais laterais da CVM não são medidos.",
+     "estado": "fechada",
+     "fonte": "E13 §1 e D3, confirmados em 28/10"
+    },
+    {
+     "q": "Modelos grandes e distribuição entre operadores?",
+     "r": "Fora: o piloto usa modelos pequenos em CPU, e o operador é um só (ponto único de disponibilidade e censura).",
+     "estado": "fechada",
+     "fonte": "E13 §1 e D3, confirmados em 28/10"
+    },
+    {
+     "q": "Operador malicioso e atestação real?",
+     "r": "Fora: o operador é premissa de confiança, e a atestação é implícita.",
+     "estado": "fechada",
+     "fonte": "D3"
+    },
+    {
+     "q": "Ataque white-box contra S2 e S3?",
+     "r": "Limite parcial: um dono white-box leva S2 e S3 ao lado benigno, por isso eles não reprovam por mérito; S1 continua decidindo.",
+     "estado": "fechada",
+     "fonte": "T-108; Hurtado §5"
+    },
+    {
+     "q": "Ataque em vários turnos de conversa?",
+     "r": "Limite parcial: a bateria ganha uma sentinela de poucos diálogos curtos por condição, sem promessa de cobertura. O artigo declara que a erosão em vários turnos não é medida por inteiro.",
+     "estado": "fechada",
+     "porque": "Pega o derivado que recusa no primeiro turno e cede logo depois, a um custo pequeno nos 80 min.",
+     "alt": [
+      {
+       "o": "Fora, só declarado",
+       "nao": "nenhum sinal do caso mais comum de jailbreak conversacional"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Pedido nocivo em outra língua?",
+     "r": "Fora, declarado: o Juiz mede em inglês, e o artigo declara que a recusa em outras línguas não é medida.",
+     "estado": "fechada",
+     "porque": "Protege o orçamento, já apertado pelo δ por categoria.",
+     "alt": [
+      {
+       "o": "Sentinela em português",
+       "nao": "exigiria um avaliador multilíngue e mais tempo de CPU"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Derivado que muda o vocabulário ou o tokenizer do base?",
+     "r": "Reprova como fora do contrato: a pré-checagem (J2) exige o tokenizer e o template do base.",
+     "estado": "fechada",
+     "porque": "Fecha o ponto em aberto sem medida nova.",
+     "alt": [
+      {
+       "o": "Aceitar, com limitação declarada",
+       "nao": "S2, S3 e a comparação com o pai deixariam de valer"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Derivados quase idênticos (um bit a mais gera digest e veredito novos)?",
+     "r": "Cada digest novo é uma tentativa e gasta cota. O artigo mede a taxa de escape por tentativa e usa o modelo 1 − (1 − e)^k.",
+     "estado": "fechada",
+     "porque": "Fecha o ponto em aberto com a cota da decisão 11.",
+     "alt": [
+      {
+       "o": "Sorteio preso ao pai",
+       "nao": "tornaria a ordem dos itens previsível para todos os derivados do mesmo pai"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    }
+   ],
+   "falta": [
+    "Na preparação da implementação: a lista com o artigo que reconhece cada limite, reaproveitada na seção 10 (T-1511) e no modelo do atacante (T-1201)."
    ],
    "atualizado": "2026-10-28"
   }
