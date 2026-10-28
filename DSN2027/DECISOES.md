@@ -105,8 +105,9 @@ na T-102 do backlog (aba Decisões).*
 - **A implementação ainda não começa:** antes do piloto, o plano de trabalho é consolidado a
   partir da base.
 
-## D6 · Especificação do Juiz (2026-10-28, proposta)
-- **Status:** proposta; fecha depois da revisão com o orientador (T-114). A especificação está na
+## D6 · Especificação do Juiz (2026-10-28)
+- **Status:** decidida em 28/10 (T-114). Os pontos da E14 §17 ficam como pauta para o orientador;
+  uma objeção entra como task nova. Provisória só a geração única do S1, até o dia 1 do piloto. A especificação está na
   [E14](etapas/E14_especificacao_juiz.md), que junta as decisões T-101 a T-113 do épico J1.
 - **Propriedade:** o dano nas âncoras não sobe mais que δ em relação ao pai, por categoria (teto
   0,15), em todos os formatos liberados. Aprovado quer dizer "não regrediu", não "seguro".

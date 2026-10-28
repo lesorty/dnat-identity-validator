@@ -1,6 +1,6 @@
 # E14 · Especificação do Juiz (épico J1)
 
-**Data:** 2026-10-28 · **Status:** rascunho para revisão com o orientador (T-114). Junta as
+**Data:** 2026-10-28 · **Status:** fechada em 28/10 (T-114), registrada como [D6](../DECISOES.md). Junta as
 decisões das tasks T-101 a T-113, todas fechadas em 28/10; a única marca provisória é a geração
 única do S1 (§6.2), a confirmar no dia 1 do piloto. Nada foi implementado nem medido; os
 valores numéricos são hipóteses até o piloto e vão para o `prereg.yaml` (T-606).
@@ -536,10 +536,23 @@ A tabela alinhada à E8 §9.2, base da seção 3 do artigo, fica para a T-1502.
 - **T-1605:** anotadores e guardião da parte secreta;
 - **T-201:** layout do `model_gate`.
 
-**Três pontos que o Mapa ainda marca em aberto:**
+**Pontos que o Mapa ainda marca em aberto:**
 - reprodutibilidade do veredito;
-- alinhar os textos antigos (§15);
 - medir no primeiro dia do piloto.
+
+Os textos antigos (§15) foram alinhados na T-114.
+
+**Divergências achadas na revisão dos diagramas de tecnologia do Mapa (28/10), a alinhar na
+preparação da implementação:**
+- **Onde S2 e S3 rodam:** a E13 §3.3 diz só em precisão cheia; a §4 desta E14 os lista nas
+  medidas por formato e condição;
+- **margem com Bonferroni:** a conta de ±0,118 com 48 âncoras (§5) usa z = 1,64, antes de dividir
+  α pelas condições; com o divisor, o n tem de ser refeito no `prereg.yaml` (T-606);
+- **reativação pelo dono:** no código, `updateAsset` deixa o dono reativar um ativo, contra o
+  "o dono nunca reativa" da §3; entra no mapa de lacunas do contrato (J7);
+- **receitas sem número:** a direção de recusa do S2 (camadas, amostras, prompts) segue Hurtado
+  App. C–D, ainda não transcrita; e falta dizer como os avaliadores rodam em CPU (runtime,
+  quantização, tempo).
 
 ---
 
@@ -557,4 +570,5 @@ Os pontos em que uma objeção do orientador mudaria mais coisa:
    artigo.
 7. **Custo zero e cota de jobs** como o que limita o atacante (§0, §13).
 
-Depois da revisão, os achados entram aqui e a D6 é fechada.
+A D6 foi fechada em 28/10 (T-114) sem esperar a revisão. Estes sete pontos ficam como pauta para o
+orientador; uma objeção que mude algum deles entra como task nova e reabre o trecho da E14.

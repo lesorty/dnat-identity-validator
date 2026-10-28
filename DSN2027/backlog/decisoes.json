@@ -1790,74 +1790,88 @@
    "atualizado": "2026-10-28"
   },
   {
-   "task": "T-114",
-   "ordem": 114,
-   "situacao": "parcial",
-   "pergunta": "Como a especificação do Juiz fica consolidada num documento só, pronta para a revisão com o orientador?",
+   "atualizado": "2026-10-28",
    "contexto": "O marco ESP fecha a fase 1: sem a especificação aprovada, J2 a J8 constroem sobre areia. As decisões de T-101 a T-113 estavam espalhadas pelo Backlog, pelo Mapa e por E13, D1 e E12, alguns com textos antigos que as contradiziam.",
-   "resposta": "As decisões de T-101 a T-113 estão juntas na E14 (DSN2027/etapas/E14_especificacao_juiz.md), com diagramas, tecnologias, bateria, o que é salvo e a rastreabilidade, e resumidas na D6, como proposta. Os textos antigos que contradiziam as decisões foram alinhados: o problema da D1 passa a falar em dano, e a E13 §3.3 em parte secreta de um terço, escada com segunda linha a FPR 5% e avaliador por disputa. O Mapa ganhou a aba Épicos com a consolidação do J1. Falta a revisão com o orientador; depois dela, os achados entram na E14 e a D6 é fechada.",
+   "falta": [
+    "Confirmar a geração única do S1 no dia 1 do piloto.",
+    "Levar ao orientador os sete pontos da E14 §17; uma objeção entra como task nova.",
+    "Alinhar as quatro divergências da E14 §16 (S2/S3 por formato, margem com Bonferroni, reativação pelo dono, receitas do S2 e do avaliador em CPU)."
+   ],
    "itens": [
     {
-     "q": "Onde fica a especificação consolidada?",
-     "r": "Na E14 (DSN2027/etapas/E14_especificacao_juiz.md), com 17 seções: tecnologias, arquitetura, fluxo, interface, propriedade, instrumentos, bateria, formatos, inconclusivo, recibo e o que é salvo, ciclo de vida, confiança, limites, rastreabilidade, efeitos em outros documentos, pendências e pontos para o orientador.",
      "estado": "fechada",
+     "fonte": "Consolidado em 28/10",
      "porque": "A E14 é o documento que a T-114 pede; cada seção aponta a task que a decidiu.",
-     "fonte": "Consolidado em 28/10"
+     "q": "Onde fica a especificação consolidada?",
+     "r": "Na E14 (DSN2027/etapas/E14_especificacao_juiz.md), com 17 seções: tecnologias, arquitetura, fluxo, interface, propriedade, instrumentos, bateria, formatos, inconclusivo, recibo e o que é salvo, ciclo de vida, confiança, limites, rastreabilidade, efeitos em outros documentos, pendências e pontos para o orientador."
     },
     {
-     "q": "O que a D6 registra?",
-     "r": "Um resumo curto da E14, como proposta: propriedade por dano com δ por categoria, três estados com só S1 reprovando, quatro formatos tudo ou nada, parte secreta de um terço, CVM de uso único por job e custo zero com cota.",
      "estado": "fechada",
+     "fonte": "Fechada em 28/10",
      "porque": "As decisões em DECISOES.md são curtas e apontam o documento de detalhe.",
-     "fonte": "Consolidado em 28/10"
+     "q": "O que a D6 registra?",
+     "r": "Um resumo curto da E14, agora decidido: propriedade por dano com δ por categoria, três estados com só S1 reprovando por mérito, quatro formatos tudo ou nada, parte secreta de um terço, CVM de uso único por job e custo zero com cota."
     },
     {
-     "q": "O que muda nos textos antigos que contradiziam as decisões?",
-     "r": "O problema da D1 passa de “recusa ≥ pai − δ” para “o dano não sobe mais que δ”. Na E13 §3.3: parte secreta de um terço das âncoras, veredito pela escada com S2 e S3 a FPR 5%, avaliador pela disputa Gemma 4 E4B × Qwen3Guard-4B. E10 §5 e E12 §5 ficam como histórico, e a E14 vale sobre eles.",
      "estado": "fechada",
+     "fonte": "Consolidado em 28/10",
      "porque": "Fecha o ponto em aberto “alinhar textos” do Mapa, que a T-106 já pedia (reescrever a D1).",
-     "fonte": "Consolidado em 28/10"
+     "q": "O que muda nos textos antigos que contradiziam as decisões?",
+     "r": "O problema da D1 passa de “recusa ≥ pai − δ” para “o dano não sobe mais que δ”. Na E13 §3.3: parte secreta de um terço das âncoras, veredito pela escada com S2 e S3 a FPR 5%, avaliador pela disputa Gemma 4 E4B × Qwen3Guard-4B. E10 §5 e E12 §5 ficam como histórico, e a E14 vale sobre eles."
     },
     {
-     "q": "E a T-603, que escolhia o limiar por Youden?",
-     "r": "Passa a fixar θ da segunda linha a FPR de 5% nos benignos da calibração, como decidido na T-108.",
      "estado": "fechada",
+     "fonte": "Consolidado em 28/10",
      "porque": "O título antigo vinha da z-soma da E13, que a T-108 tirou.",
-     "fonte": "Consolidado em 28/10"
+     "q": "E a T-603, que escolhia o limiar por Youden?",
+     "r": "Passa a fixar θ da segunda linha a FPR de 5% nos benignos da calibração, como decidido na T-108."
     },
     {
-     "q": "A geração do S1 é em dois estágios (64 e 512 tokens) ou única?",
-     "r": "Única: uma resposta gulosa por item, até o fim ou 512 tokens, lida inteira, como no desenho J7. Os dois estágios da E13 ficam como histórico.",
-     "estado": "provisoria",
-     "porque": "O desenho J0–J13 (E14a) e a T-108 (resposta lida inteira) já usam a geração única; os dois estágios eram só uma economia de tempo da E13.",
      "alt": [
       {
-       "o": "Dois estágios, com amostra fixa dos que recusaram",
-       "nao": "Mais barato, mas complica a leitura inteira; volta se o dia 1 do piloto mostrar que não cabe nos 80 min"
+       "nao": "Mais barato, mas complica a leitura inteira; volta se o dia 1 do piloto mostrar que não cabe nos 80 min",
+       "o": "Dois estágios, com amostra fixa dos que recusaram"
       }
      ],
-     "rec": "Confirmar na revisão com o orientador e no dia 1 do piloto.",
-     "fonte": "Consolidado em 28/10; a confirmar"
+     "estado": "provisoria",
+     "fonte": "Consolidado em 28/10; a confirmar",
+     "porque": "O desenho J0–J13 (E14a) e a T-108 (resposta lida inteira) já usam a geração única; os dois estágios eram só uma economia de tempo da E13.",
+     "q": "A geração do S1 é em dois estágios (64 e 512 tokens) ou única?",
+     "r": "Única: uma resposta gulosa por item, até o fim ou 512 tokens, lida inteira, como no desenho J7. Os dois estágios da E13 ficam como histórico.",
+     "rec": "Confirmar no dia 1 do piloto."
     },
     {
-     "q": "Onde a consolidação aparece para consulta visual?",
-     "r": "Na aba Épicos do Mapa do Juiz: escolhe-se o épico, e o J1 mostra visão geral, oito diagramas, tecnologias, como avalia, o que é salvo, as decisões, os limites, a ligação com o artigo e o que está em aberto.",
      "estado": "fechada",
-     "fonte": "Consolidado em 28/10"
+     "fonte": "Consolidado em 28/10",
+     "q": "Onde a consolidação aparece para consulta visual?",
+     "r": "Na aba Épicos do Mapa do Juiz: escolhe-se o épico, e o J1 mostra visão geral, os diagramas do sistema, sete diagramas das tecnologias do Juiz, como avalia, o que é salvo, as decisões, os limites e o artigo, e o que está em aberto."
     },
     {
-     "q": "O orientador aprova a especificação?",
-     "r": "",
-     "estado": "aberta",
-     "rec": "Revisar a E14 §17, com os sete pontos em que uma objeção mudaria mais coisa; incorporar os achados e fechar a D6.",
-     "fonte": "Pendente"
+     "alt": [
+      {
+       "nao": "Deixaria o marco ESP aberto e travaria o J2–J8 sem mudar o conteúdo",
+       "o": "Manter a D6 como proposta até a revisão"
+      }
+     ],
+     "estado": "fechada",
+     "fonte": "Decidido em 28/10",
+     "porque": "A especificação precisa estar fechada para o J2–J8 começarem; a revisão não bloqueia o épico.",
+     "q": "A D6 espera a revisão com o orientador para fechar?",
+     "r": "Não. A D6 foi fechada em 28/10; os sete pontos da E14 §17 viram pauta para o orientador, e uma objeção entra como task nova que reabre o trecho da E14."
+    },
+    {
+     "estado": "fechada",
+     "fonte": "Revisão dos diagramas de tecnologia do Mapa, 28/10",
+     "q": "O que a revisão dos diagramas de tecnologia encontrou de divergente?",
+     "r": "Quatro pontos, registrados na E14 §16: onde S2 e S3 rodam (E13 diz só em precisão cheia, E14 por formato); a margem de ±0,118 usa z = 1,64 antes de Bonferroni; o código deixa o dono reativar pelo updateAsset; e a receita do S2 e o runtime dos avaliadores em CPU não estão escritos.",
+     "rec": "Alinhar na preparação da implementação (T-606 e mapa de lacunas do contrato)."
     }
    ],
-   "falta": [
-    "Revisar a E14 com o orientador, incorporar os achados e fechar a D6.",
-    "Confirmar a geração única do S1 no dia 1 do piloto."
-   ],
-   "atualizado": "2026-10-28"
+   "ordem": 114,
+   "pergunta": "Como a especificação do Juiz fica consolidada num documento só, pronta para a revisão com o orientador?",
+   "resposta": "As decisões de T-101 a T-113 estão juntas na E14 (DSN2027/etapas/E14_especificacao_juiz.md), com diagramas, tecnologias, bateria, o que é salvo e a rastreabilidade, e registradas na D6, fechada em 28/10. Os textos antigos que contradiziam as decisões foram alinhados: o problema da D1 passa a falar em dano, e a E13 §3.3 em parte secreta de um terço, escada com segunda linha a FPR 5% e avaliador por disputa. O Mapa ganhou a aba Épicos com a consolidação do J1 e os diagramas de tecnologia. Os sete pontos da E14 §17 ficam como pauta para o orientador; uma objeção entra como task nova.",
+   "situacao": "decidida",
+   "task": "T-114"
   }
  ]
 }
