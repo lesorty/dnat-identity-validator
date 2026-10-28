@@ -5,33 +5,33 @@
 <style>
 /* Layout: cabeçalho com resumo, tema e régua de marcos; filtros; faixa de épicos; cinco colunas kanban
    com cabeçalho em cor sólida e rolagem própria; gaveta lateral para editar.
-   Paleta: cores primárias vivas e sólidas; texto branco sobre elas, preto sobre o amarelo (--tc). */
+   Paleta: tons sóbrios com roxo como cor de destaque; texto branco sobre as cores sólidas, escuro sobre o âmbar (--tc). */
 :root {
-  --bg: #eeece6; --panel: #ffffff; --col: #e2dfd7; --fg: #1c1f24; --muted: #555c66; --line: #cfcbc1; --soft: #d9d5cb;
-  --ink: #26313f; --on-ink: #ffffff; --accent: #0050e6; --on-solid: #ffffff; --on-yellow: #111111;
-  --backlog: #4b5563; --prio: #ffcc00; --doing: #0050e6; --done: #00a03c; --cut: #e10600;
-  --p0: #e10600; --p1: #ffcc00; --p2: #0050e6; --p3: #6b7280;
-  --sP: #00a3e0; --sM: #ff7a00; --sG: #b000b5;
-  --block: #e10600;
+  --bg: #f3f3f8; --panel: #ffffff; --col: #e7e6f0; --fg: #1b1a26; --muted: #5d5b70; --line: #d5d3e3; --soft: #e2e0ee;
+  --ink: #2b2645; --on-ink: #ffffff; --accent: #6d4ae8; --on-solid: #ffffff; --on-light: #1b1a26;
+  --backlog: #5a6276; --prio: #6d4ae8; --doing: #3570d8; --done: #17946b; --cut: #c9434b;
+  --p0: #d4464f; --p1: #e09a2a; --p2: #3570d8; --p3: #6e7488;
+  --sP: #1a91a8; --sM: #7f5ad6; --sG: #b0449e;
+  --block: #c9434b;
   --f-display: "Fraunces", Georgia, serif;
   --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #121417; --panel: #1f2328; --col: #181b1f; --fg: #eceae5; --muted: #a2a8b0; --line: #353b43; --soft: #2c3138;
-  --ink: #d5dde8; --on-ink: #121417; --accent: #2f6bff; --on-solid: #ffffff; --on-yellow: #111111;
-  --backlog: #5b6472; --prio: #ffcc00; --doing: #1f5fff; --done: #00a03c; --cut: #e10600;
-  --p0: #f01a10; --p1: #ffcc00; --p2: #1f5fff; --p3: #6b7280;
-  --sP: #00a3e0; --sM: #ff7a00; --sG: #c010c5;
-  --block: #f01a10;
+  --bg: #0f1018; --panel: #1a1b27; --col: #14151f; --fg: #e8e7f2; --muted: #a09fb8; --line: #2e2f44; --soft: #262738;
+  --ink: #d9d4ff; --on-ink: #14121f; --accent: #8b6cf6; --on-solid: #ffffff; --on-light: #14121f;
+  --backlog: #4c5266; --prio: #7356e0; --doing: #3a6fd0; --done: #1b8c68; --cut: #b9424a;
+  --p0: #d0484f; --p1: #d9982e; --p2: #3a6fd0; --p3: #5d6378;
+  --sP: #1e8aa0; --sM: #7a58d0; --sG: #a5468f;
+  --block: #c24a52;
   color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #121417; --panel: #1f2328; --col: #181b1f; --fg: #eceae5; --muted: #a2a8b0; --line: #353b43; --soft: #2c3138;
-  --ink: #d5dde8; --on-ink: #121417; --accent: #2f6bff; --on-solid: #ffffff; --on-yellow: #111111;
-  --backlog: #5b6472; --prio: #ffcc00; --doing: #1f5fff; --done: #00a03c; --cut: #e10600;
-  --p0: #f01a10; --p1: #ffcc00; --p2: #1f5fff; --p3: #6b7280;
-  --sP: #00a3e0; --sM: #ff7a00; --sG: #c010c5;
-  --block: #f01a10;
+  --bg: #0f1018; --panel: #1a1b27; --col: #14151f; --fg: #e8e7f2; --muted: #a09fb8; --line: #2e2f44; --soft: #262738;
+  --ink: #d9d4ff; --on-ink: #14121f; --accent: #8b6cf6; --on-solid: #ffffff; --on-light: #14121f;
+  --backlog: #4c5266; --prio: #7356e0; --doing: #3a6fd0; --done: #1b8c68; --cut: #b9424a;
+  --p0: #d0484f; --p1: #d9982e; --p2: #3a6fd0; --p3: #5d6378;
+  --sP: #1e8aa0; --sM: #7a58d0; --sG: #a5468f;
+  --block: #c24a52;
   color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
 .wrap { margin: 0;padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: grid; gap: 16px; }
@@ -159,14 +159,14 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
 <script>
 const COLS = [
   { k: "backlog", n: "Backlog", c: "var(--backlog)" },
-  { k: "priorizado", n: "Priorizado", c: "var(--prio)", tc: "var(--on-yellow)" },
+  { k: "priorizado", n: "Priorizado", c: "var(--prio)" },
   { k: "em andamento", n: "Em andamento", c: "var(--doing)" },
   { k: "feito", n: "Feito", c: "var(--done)" },
   { k: "cortada", n: "Cortada", c: "var(--cut)" }
 ];
 const PRIOS = [
   { k: "P0", n: "P0 · caminho crítico", c: "var(--p0)" },
-  { k: "P1", n: "P1 · alta", c: "var(--p1)", tc: "var(--on-yellow)" },
+  { k: "P1", n: "P1 · alta", c: "var(--p1)", tc: "var(--on-light)" },
   { k: "P2", n: "P2 · média", c: "var(--p2)" },
   { k: "P3", n: "P3 · opcional", c: "var(--p3)" }
 ];
