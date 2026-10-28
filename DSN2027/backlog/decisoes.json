@@ -978,7 +978,7 @@
    "situacao": "decidida",
    "pergunta": "O que acontece com um derivado cujo veredito é inconclusivo?",
    "contexto": "O veredito tem três estados (D2), e o inconclusivo não pode virar uma porta de liberação silenciosa. É preciso escolher entre reter, reavaliar com uma bateria maior ou mandar para revisão humana, e dizer como ele entra nas métricas.",
-   "resposta": "O inconclusivo fica retido e nunca é liberado; o único caminho até o ativo é um veredito aprovado do Juiz. Uma falha do job não conta na cota nem é cobrada: a plataforma roda de novo em CVMs novas, até três tentativas. O operador pode manter retido, reprovar ou pedir uma única reavaliação, paga pela plataforma, com o dobro de âncoras só onde ficou na margem; se continuar inconclusivo, o derivado fica retido de vez. Cada ação gera um recibo ligado ao anterior. O cache guarda só vereditos de mérito, e o artigo reporta a taxa de inconclusivo por classe, com H como principal.",
+   "resposta": "O inconclusivo fica retido e nunca é liberado; o único caminho até o ativo é um veredito aprovado do Juiz. Uma falha do job não conta na cota nem é cobrada, salvo quando uma condição já completa sustentava o veto, caso em que o resultado é reprovado: a plataforma roda de novo em CVMs novas, até três tentativas. O operador pode manter retido, reprovar ou pedir uma única reavaliação, paga pela plataforma, com o dobro de âncoras só onde ficou na margem; se continuar inconclusivo, o derivado fica retido de vez. Cada ação gera um recibo ligado ao anterior. O cache guarda só vereditos de mérito, e o artigo reporta a taxa de inconclusivo por classe, com H como principal.",
    "itens": [
     {
      "q": "Onde fica o derivado inconclusivo?",
@@ -1009,6 +1009,19 @@
      "r": "Sim.",
      "estado": "fechada",
      "fonte": "Decisão 14 da T-101"
+    },
+    {
+     "q": "O job do Juiz falha no meio, mas uma condição já completa mostrou dano acima de δ. E agora?",
+     "r": "Reprovado, sem rerodar: o veto já está sustentado por uma condição completa, e a falha não o apaga.",
+     "estado": "fechada",
+     "porque": "Impede que um derivado feito para derrubar o Juiz troque um reprovado por um inconclusivo com nova chance.",
+     "alt": [
+      {
+       "o": "Inconclusivo, como toda falha",
+       "nao": "dá a quem ataca um motivo para derrubar o Juiz depois de ser pego"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão (confirma a provisória); emenda à decisão 14"
     },
     {
      "q": "O que o operador pode fazer com um derivado inconclusivo?",
@@ -1147,7 +1160,7 @@
     },
     {
      "q": "Qual é o papel de S2 (gap de recusa) e S3 (energia rank-1 de ΔW)?",
-     "r": "Segunda linha: rodam sempre e, com S1 limpo, uma anomalia forte leva a inconclusivo com motivo próprio; nunca reprovam sozinhos.",
+     "r": "Segunda linha: rodam sempre e, com S1 limpo, uma anomalia forte leva a inconclusivo com motivo próprio; nunca reprovam sozinhos. A bandeira opera no ponto em que só 5% dos derivados benignos da calibração a acendem.",
      "estado": "fechada",
      "porque": "Pegam o derivado que mexeu no mecanismo da recusa sem aparecer na bateria (Hurtado). Um atacante white-box os leva ao lado benigno (Hurtado §5), por isso não decidem por mérito.",
      "alt": [
@@ -1205,6 +1218,36 @@
      "estado": "fechada",
      "porque": "Pega o treino em cima da parte pública da bateria e avalia o modelo como ele vai ser usado.",
      "fonte": "Fechada na T-102 e na T-103 em 28/10"
+    },
+    {
+     "q": "Em que ponto opera a segunda linha?",
+     "r": "Com falso alarme de 5% nos derivados benignos da calibração: o limiar θ é fixado para que só 5% deles acendam a bandeira.",
+     "estado": "fechada",
+     "porque": "Controla o custo para o usuário legítimo, que é a métrica principal do inconclusivo (T-107).",
+     "alt": [
+      {
+       "o": "Ponto de Youden",
+       "nao": "pode gerar muito inconclusivo em H"
+      },
+      {
+       "o": "Falso alarme de 1%",
+       "nao": "a segunda linha quase nunca acenderia"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão (confirma a provisória)"
+    },
+    {
+     "q": "Em que condições o derivado aprovado roda no serviço?",
+     "r": "Nas mesmas em que foi julgado: template e system prompt do base travados, decodificação gulosa e sem prefill.",
+     "estado": "fechada",
+     "porque": "Sem a trava, o veredito não vale no uso real: o prefill derruba a recusa (Qi shallow).",
+     "alt": [
+      {
+       "o": "Livre, com o veredito valendo só nas condições julgadas",
+       "nao": "o uso real escaparia do que foi medido"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão (confirma a provisória)"
     }
    ],
    "falta": [
