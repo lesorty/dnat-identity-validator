@@ -1,6 +1,6 @@
 # Backlog do Juiz (kanban)
 
-**Atualizado:** 2026-10-27 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
+**Atualizado:** 2026-10-28 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
 (privado; só abre para quem tiver acesso) · **Plano de alto nível:**
 [E13](../etapas/E13_plano_trabalho.md).
 
@@ -16,7 +16,10 @@ em **16 épicos (J1–J16)** e **5 fases**:
 | 5 · Transversais | J15 Escrita · J16 Gestão |
 
 Cada task tem ID (`T-<épico><nn>`: T-101 é a primeira do J1, T-1601 a primeira do J16),
-critério de pronto, dependências, marco, coluna, responsável, notas, **prioridade** e **tamanho**:
+**descrição**, critério de pronto, dependências, marco, coluna, **prioridade** e **tamanho**. A
+descrição segue um molde fixo: **Por quê** (o requisito, a afirmação ou a decisão que a task
+atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde) e, quando ajuda,
+**Fora do escopo** (o que fica para outra task).
 
 | Prioridade | Uso | Tasks | Horas |
 |---|---|---|---|

@@ -34,7 +34,7 @@
   --block: #e08a45;
   color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
-.wrap { max-width: 1520px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: grid; gap: 16px; }
+.wrap { margin: 0;padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 22px 40px; display: grid; gap: 16px; }
 header { display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: end; justify-content: space-between; }
 h1 { font-family: var(--f-display); font-weight: 600; font-size: 1.75rem; line-height: 1.15; margin: 0; }
 .label { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -102,6 +102,7 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
 .drawer label { display: grid; gap: 4px; font-size: .78rem; color: var(--muted); font-weight: 700; }
 .drawer input, .drawer select, .drawer textarea { width: 100%; box-sizing: border-box; color: var(--fg); font-weight: 400; font-size: .9rem; }
 .drawer textarea { min-height: 70px; resize: vertical; }
+.drawer #dDesc { min-height: 240px; line-height: 1.5; }
 .drawer .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .drawer .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: auto; padding-top: 8px; }
 .scrim { position: fixed; inset: 0; background: #000; opacity: .35; z-index: 19; }
@@ -204,7 +205,7 @@ function visible(t) {
   if (F.prio && prio(t) !== F.prio) return false;
   if (F.tam && tam(t) !== F.tam) return false;
   if (F.livres && pending(t).length) return false;
-  if (F.q) { const q = F.q.toLowerCase(); if (![t.id, t.titulo, t.pronto, t.resp, t.notas].join(" ").toLowerCase().includes(q)) return false; }
+  if (F.q) { const q = F.q.toLowerCase(); if (![t.id, t.titulo, t.pronto, t.descricao].join(" ").toLowerCase().includes(q)) return false; }
   return true;
 }
 function cmp(a, b) {
@@ -251,7 +252,7 @@ function cardHTML(t) {
   return `<article class="card" draggable="${!readOnly}" data-id="${esc(t.id)}" data-ordem="${ord(t)}" tabindex="0" style="--pc:${pr.c}" aria-label="${esc(t.id)} ${esc(t.titulo)}">
     <div class="top"><span class="tid">${esc(t.id)}</span><span class="b-sol" style="--c:${pr.c}" title="${pr.n}">${pr.k}</span><span class="b-sol" style="--c:${sz.c}" title="${sz.n}">${sz.k} ${sz.h}h</span><span class="b-sol b-ep">${esc(t.epico)}</span>${t.marco ? `<span class="b-sol b-mk">${esc(t.marco)}</span>` : ""}</div>
     <div class="t">${esc(t.titulo)}</div>
-    ${(p.length && (s === "backlog" || s === "priorizado")) || t.resp ? `<div class="b">${p.length && (s === "backlog" || s === "priorizado") ? `<span class="blocked">bloqueada por ${p.map(esc).join(", ")}</span>` : ""}${t.resp ? `<span>${esc(t.resp)}</span>` : ""}</div>` : ""}
+    ${p.length && (s === "backlog" || s === "priorizado") ? `<div class="b"><span class="blocked">bloqueada por ${p.map(esc).join(", ")}</span></div>` : ""}
   </article>`;
 }
 
@@ -330,6 +331,7 @@ function openDrawer(id) {
     <div class="label">${id ? esc(id) : "Nova task"}</div>
     <h2>${id ? "Editar task" : "Nova task"}</h2>
     <label>Título<input type="text" id="dTitulo" value="${esc(t.titulo || "")}" ${dis}></label>
+    <label>Descrição<textarea id="dDesc" placeholder="Por quê: …&#10;Como:&#10;- …&#10;Saída: …" ${dis}>${esc(t.descricao || "")}</textarea></label>
     <label>Pronto quando<input type="text" id="dPronto" value="${esc(t.pronto || "")}" ${dis}></label>
     <div class="row2">
       <label>Prioridade<select id="dPrio" ${dis}>${opt(PRIOS.map(p => ({ v: p.k, n: p.n })), prio(t))}</select></label>
@@ -339,13 +341,9 @@ function openDrawer(id) {
       <label>Coluna<select id="dStatus" ${dis}>${opt(COLS.map(c => ({ v: c.k, n: c.n })), st(t))}</select></label>
       <label>Marco<select id="dMarco" ${dis}><option value="">sem marco</option>${opt(sortedMarcos().map(m => ({ v: m.id, n: m.id + " · " + m.nome })), t.marco || "")}</select></label>
     </div>
-    <div class="row2">
-      <label>Épico<select id="dEpico" ${id || readOnly ? "disabled" : ""}>${opt(sortedEpicos().map(e => ({ v: e.id, n: e.id + " · " + e.titulo })), t.epico)}</select></label>
-      <label>Responsável<input type="text" id="dResp" value="${esc(t.resp || "")}" ${dis}></label>
-    </div>
+    <label>Épico<select id="dEpico" ${id || readOnly ? "disabled" : ""}>${opt(sortedEpicos().map(e => ({ v: e.id, n: e.id + " · " + e.titulo })), t.epico)}</select></label>
     <label>Depende de<input type="text" id="dDeps" value="${esc((t.deps || []).join(", "))}" placeholder="T-101, T-103" ${dis}></label>
     ${id && pending(t).length ? `<div><span class="blocked">Ainda falta concluir: ${pending(t).map(esc).join(", ")}</span></div>` : ""}
-    <label>Notas<textarea id="dNotas" ${dis}>${esc(t.notas || "")}</textarea></label>
     <div class="msg" id="dMsg"></div>
     <div class="actions"><button class="btn" type="button" id="dCancel">Fechar</button>${readOnly ? "" : `<button class="btn primary" type="button" id="dSave">${id ? "Salvar" : "Criar"}</button>`}</div>`;
   $("drawer").hidden = false; $("scrim").hidden = false;
@@ -359,7 +357,7 @@ async function submitDrawer() {
   const titulo = $("dTitulo").value.trim();
   if (!titulo) { $("dMsg").textContent = "Dê um título à task."; return; }
   const deps = $("dDeps").value.split(/[,\s]+/).map(s => s.trim().toUpperCase()).filter(Boolean).map(s => s.startsWith("T-") ? s : "T-" + s.replace(/^T/, ""));
-  const data = { titulo, pronto: $("dPronto").value.trim(), prioridade: $("dPrio").value, tamanho: $("dTam").value, status: $("dStatus").value, marco: $("dMarco").value, resp: $("dResp").value.trim(), deps, notas: $("dNotas").value.trim() };
+  const data = { titulo, descricao: $("dDesc").value.trim(), pronto: $("dPronto").value.trim(), prioridade: $("dPrio").value, tamanho: $("dTam").value, status: $("dStatus").value, marco: $("dMarco").value, deps };
   if (editing) { const id = editing; Object.assign(byId(id) || {}, data); renderAll(); closeDrawer(); await save(id, data); return; }
   const epico = $("dEpico").value, n = num(epico);
   const used = S.tasks.filter(t => t.epico === epico).map(t => num(t.id) - n * 100).filter(x => x > 0 && x < 100);
