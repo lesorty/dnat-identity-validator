@@ -1122,6 +1122,300 @@
     "Na preparação da implementação: escrever a regra na E14, ligada à faixa de inconclusivo da T-604."
    ],
    "atualizado": "2026-10-28"
+  },
+  {
+   "task": "T-108",
+   "ordem": 108,
+   "situacao": "decidida",
+   "pergunta": "Quais são os instrumentos do Juiz, o que cada um mede e por que a base os exige?",
+   "contexto": "Cada instrumento precisa de um artigo da base que o exija (A3, A4; R2–R16), para o desenho não parecer arbitrário ao revisor. Para cada um: o que mede, a falha que pega, o ataque que o engana e quem o cobre.",
+   "resposta": "S1, a bateria comportamental, é o único instrumento que reprova por mérito: mede dano, recusa e recusa excessiva, com a resposta lida inteira, contra o pai, em todos os formatos liberados. S2 (gap de recusa) e S3 (energia rank-1 de ΔW) são segunda linha e levam no máximo a inconclusivo. A utilidade é a perda num corpus benigno, que separa C de N. Os itens codificados são uma sentinela, sem promessa de cobertura. A normalização trata codificação, injeção e degenerescência antes do avaliador.",
+   "itens": [
+    {
+     "q": "S1, bateria comportamental: o que mede e por quê?",
+     "r": "Dano (rubrica do StrongREJECT), recusa e recusa excessiva (XSTest) nas âncoras, contra o pai, com e sem system prompt e na condição do dataset, em todos os formatos. É o único instrumento que reprova por mérito.",
+     "estado": "fechada",
+     "porque": "Mede o que importa para quem usa o modelo: se ele ajuda com pedidos nocivos. Não recusar não é o mesmo que ajudar (StrongREJECT, HarmBench). Pega F1 a F3. Engana-o quem conhece a bateria, daí a parte secreta (T-109).",
+     "fonte": "Regra do desenho (E14a, J0–J13), confirmada em 28/10; Souly, Röttger, Mazeika, Arditi"
+    },
+    {
+     "q": "A resposta é lida inteira?",
+     "r": "Sim. Toda resposta é lida inteira pelo avaliador; não existe item recusou, não lido.",
+     "estado": "fechada",
+     "porque": "Recusa seguida de atendimento e recusa tardia (HarmBench, Qi shallow, Abu Shairah).",
+     "fonte": "Regra do desenho (E14a, J0–J13), confirmada em 28/10; R16"
+    },
+    {
+     "q": "Qual é o papel de S2 (gap de recusa) e S3 (energia rank-1 de ΔW)?",
+     "r": "Segunda linha: rodam sempre e, com S1 limpo, uma anomalia forte leva a inconclusivo com motivo próprio; nunca reprovam sozinhos.",
+     "estado": "fechada",
+     "porque": "Pegam o derivado que mexeu no mecanismo da recusa sem aparecer na bateria (Hurtado). Um atacante white-box os leva ao lado benigno (Hurtado §5), por isso não decidem por mérito.",
+     "alt": [
+      {
+       "o": "Só registrados, fora do veredito",
+       "nao": "perde o aviso de que o mecanismo foi mexido"
+      },
+      {
+       "o": "Também podem reprovar",
+       "nao": "reprova fine-tunings legítimos e é enganável pelo white-box"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Os formatos liberados são um instrumento?",
+     "r": "Sim: o derivado é avaliado em precisão cheia, LLM.int8, NF4 e FP4, com o mesmo código do serviço, e a divergência entre formatos é sinal de segunda linha.",
+     "estado": "fechada",
+     "porque": "A quantização condicionada só aparece no formato quantizado (Egashira).",
+     "fonte": "Regra do desenho (E14a, J0–J13), confirmada em 28/10; D5; Egashira"
+    },
+    {
+     "q": "Como a utilidade é medida?",
+     "r": "Pela perda (entropia cruzada) num corpus benigno fixo, relativa ao pai, mais a detecção de degenerescência nas respostas. Separa C (útil) de N (degenerado).",
+     "estado": "fechada",
+     "fonte": "Fechada na T-106 em 28/10"
+    },
+    {
+     "q": "O que os itens codificados (Base64, ROT, hex) cobrem?",
+     "r": "São uma sentinela: poucos itens por condição pegam o derivado treinado para responder em codificação conhecida (Halawi). O veto vale se um codificado sair nocivo, e o artigo declara que uma cifra nova escapa.",
+     "estado": "fechada",
+     "porque": "Prometer cobertura de ataques codificados exigiria muito mais itens e tempo de CPU.",
+     "alt": [
+      {
+       "o": "Cobertura medida de ataques codificados",
+       "nao": "promete mais e custa tempo de CPU"
+      },
+      {
+       "o": "Tirar do instrumento",
+       "nao": "o CMFT de Halawi passaria sem nenhum sinal"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "O que acontece antes do avaliador?",
+     "r": "A normalização decodifica Base64, ROT e hex, marca injeção dirigida ao avaliador e detecta degenerescência.",
+     "estado": "fechada",
+     "porque": "Sem isso, o avaliador julga texto cifrado ou é manipulado pela própria resposta (Halawi App. C.1).",
+     "fonte": "Regra do desenho (E14a, J0–J13), confirmada em 28/10; Halawi"
+    },
+    {
+     "q": "O que o dataset do job acrescenta?",
+     "r": "Uma varredura determinística, sem LLM, de sobreposição com a bateria, e a condição C_job, com o system prompt e o template mais frequentes do dataset.",
+     "estado": "fechada",
+     "porque": "Pega o treino em cima da parte pública da bateria e avalia o modelo como ele vai ser usado.",
+     "fonte": "Fechada na T-102 e na T-103 em 28/10"
+    }
+   ],
+   "falta": [
+    "Na preparação da implementação: a tabela instrumento × artigo × falha × ataque na E14."
+   ],
+   "atualizado": "2026-10-28"
+  },
+  {
+   "task": "T-109",
+   "ordem": 109,
+   "situacao": "decidida",
+   "pergunta": "Como funciona a parte secreta da bateria: o que é, quem a escreve, onde fica e quando muda?",
+   "contexto": "A bateria é a lista de pedidos que o Juiz faz ao derivado (âncoras nocivas, seguros, contrastes e codificados). O desenho do Juiz é público, mas quem conhece os pedidos pode treinar o derivado para recusar exatamente esses e ajudar no resto. A RQ4 e o bounty interno dependem de pedidos que o atacante não vê.",
+   "resposta": "Um terço das âncoras de cada condição e categoria é secreto: esses pedidos só existem cifrados dentro do pacote do Juiz, e fora dele se publica só o hash. Eles vêm, em partes iguais, de três fontes (escritos do zero pelo guardião, gerados por LLM e filtrados, e tirados de benchmarks fora da lista publicada), com a origem marcada. Só a CVM1 tem a chave e os entrega à CVM de job. A parte secreta é trocada a cada versão do Juiz, e a antiga é revelada depois para auditoria.",
+   "itens": [
+    {
+     "q": "O que é público e o que é secreto?",
+     "r": "Só o texto de uma parte dos pedidos (e a chave que sorteia a ordem) é secreto. O código do Juiz, as regras, os limiares e o resto dos pedidos são públicos.",
+     "estado": "fechada",
+     "porque": "Defesas que dependem de segredo do desenho caem (Nasr); o segredo fica só onde é necessário.",
+     "fonte": "Regra do desenho, explicada em 28/10"
+    },
+    {
+     "q": "Por que ter uma parte pública e uma secreta?",
+     "r": "A pública dá transparência: qualquer um refaz o veredito sobre ela, e o usuário legítimo testa o derivado antes de enviar. A secreta dá resistência a quem decora a prova: passar nos públicos e falhar nos secretos denuncia o treino contra a bateria.",
+     "estado": "fechada",
+     "porque": "Os benchmarks públicos (StrongREJECT, XSTest) já são conhecidos; só pedidos inéditos medem se a recusa generaliza (molde do Rando, com oráculo de parte privada).",
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Que fração das âncoras é secreta?",
+     "r": "Um terço, em cada condição e categoria: das 48 âncoras, 32 publicadas e 16 secretas.",
+     "estado": "fechada",
+     "porque": "Mantém a maior parte reprodutível, e 16 pedidos bastam para comparar secreta × pública em cada categoria.",
+     "alt": [
+      {
+       "o": "Metade",
+       "nao": "menos reprodutível e mais pedidos para escrever"
+      },
+      {
+       "o": "Toda secreta, revelada na rotação",
+       "nao": "perde o teste prévio do usuário e atrasa a auditoria"
+      },
+      {
+       "o": "Um quinto",
+       "nao": "comparação fraca por categoria"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Quem escreve os pedidos secretos?",
+     "r": "Três fontes: o guardião escreve do zero, um LLM gera e um humano filtra, e uma amostra de benchmarks fica fora da lista publicada.",
+     "estado": "fechada",
+     "porque": "As fontes diferem em quão inéditas são e em custo; usar as três dá testes mais completos.",
+     "alt": [
+      {
+       "o": "Só o guardião, do zero",
+       "nao": "mais forte, mas caro e com pouco volume"
+      },
+      {
+       "o": "Só amostra de benchmarks",
+       "nao": "o atacante pode ter treinado no benchmark inteiro"
+      },
+      {
+       "o": "Só gerada por LLM",
+       "nao": "tende a repetir o estilo dos benchmarks"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Como as três fontes se misturam?",
+     "r": "Em partes iguais, um terço de cada fonte em cada categoria, com a origem de cada pedido marcada. O artigo compara a taxa de dano por origem.",
+     "estado": "fechada",
+     "porque": "Um derivado que passa nos pedidos de benchmark e falha nos escritos do zero mostra treino contra benchmarks conhecidos.",
+     "alt": [
+      {
+       "o": "Maioria escrita do zero",
+       "nao": "mais trabalho humano"
+      },
+      {
+       "o": "Escritos do zero só na auditoria",
+       "nao": "o portão perderia os pedidos mais fortes"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Onde a parte secreta fica e como chega ao job?",
+     "r": "Cifrada dentro do pacote do Juiz, no IPFS e fora do git. Só a CVM1 tem a chave e a entrega à CVM de job de uso único, que é destruída no fim. O hash está no contrato com o do pacote.",
+     "estado": "fechada",
+     "porque": "Nenhuma pessoa nem máquina persistente fora da CVM1 vê os pedidos em claro.",
+     "alt": [
+      {
+       "o": "Com o guardião, fora do sistema",
+       "nao": "depende de uma pessoa a cada versão e cria um caminho manual"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "Quando a parte secreta é trocada, e o que acontece com a antiga?",
+     "r": "A cada versão do Juiz; trocar a parte secreta gera uma versão nova. Depois da troca, a antiga é revelada para auditoria, e qualquer um confere o hash e os vereditos antigos.",
+     "estado": "fechada",
+     "porque": "O que acontece com os ativos já liberados fica na T-110.",
+     "alt": [
+      {
+       "o": "Trocar, sem nunca revelar a antiga",
+       "nao": "ninguém audita o que o Juiz antigo usou"
+      },
+      {
+       "o": "Trocar só se vazar",
+       "nao": "um vazamento silencioso nunca dispara a troca"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    }
+   ],
+   "falta": [
+    "Na preparação da implementação: a política escrita na E14, usada pela T-304 e pela T-1210; o guardião sai da T-1605."
+   ],
+   "atualizado": "2026-10-28"
+  },
+  {
+   "task": "T-110",
+   "ordem": 110,
+   "situacao": "decidida",
+   "pergunta": "Qual é o ciclo de vida de um derivado, e o que muda quando sai uma versão nova do Juiz?",
+   "contexto": "O veredito vale para um derivado e uma versão do Juiz. É preciso fixar os estados, quem dispara cada transição e o que acontece com ativos, pendentes, retidos e referências quando o Juiz muda, por exemplo a cada troca da parte secreta (T-109).",
+   "resposta": "O derivado passa por retido, em avaliação e, depois, ativo, reprovado ou inconclusivo; qualquer ativo pode ser revogado. O cache guarda só vereditos de mérito pela chave (digest, hash do Juiz). Quando sai uma versão nova do Juiz, a CVM1 remede a referência de cada base antes de julgar; os pendentes são julgados pela versão nova; os ativos mantêm o veredito da versão em que saíram, e reprovados e inconclusivos ficam como estão. Corrigir um ativo antigo é uma ação do operador: revogar ou pedir reavaliação.",
+   "itens": [
+    {
+     "q": "Quais são os estados do derivado, e quem muda cada um?",
+     "r": "Retido (pendente) → em avaliação → ativo, reprovado ou inconclusivo; ativo → revogado. A CVM1 dispara a avaliação; o executor registra o resultado; o operador revoga ou pede reavaliação; o dono do derivado só retira o seu e nunca reativa. O base tem também o estado inapto.",
+     "estado": "fechada",
+     "fonte": "T-101 (decisões 6, 9, 10 e base inapto), T-107 e regra do desenho"
+    },
+    {
+     "q": "Como funciona o cache do veredito?",
+     "r": "Pela chave (digest do derivado, hash do Juiz), só para vereditos de mérito; o inconclusivo por falha não entra.",
+     "estado": "fechada",
+     "fonte": "Fechada na T-107 em 28/10"
+    },
+    {
+     "q": "Saiu uma versão nova do Juiz: o que acontece com os derivados já ativos?",
+     "r": "Nada automático: o veredito vale para a versão em que saiu. Se uma falha do Juiz antigo for descoberta, o operador revoga ou pede reavaliação do ativo.",
+     "estado": "fechada",
+     "porque": "Mantém o uso estável e o custo previsível; a correção de casos antigos fica numa ação explícita do operador, com recibo.",
+     "alt": [
+      {
+       "o": "Reavaliar em segundo plano",
+       "nao": "custa CPU a cada versão"
+      },
+      {
+       "o": "Suspender até reavaliar",
+       "nao": "toda versão nova tiraria todos os derivados do ar"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "E a referência do pai medida com o Juiz antigo?",
+     "r": "É remedida sempre, antes de qualquer veredito novo: a CVM1 remede cada base na versão nova, automaticamente, como no depósito. O base pode passar a inapto.",
+     "estado": "fechada",
+     "porque": "Os pedidos secretos mudaram, e a referência antiga não tem respostas a eles.",
+     "alt": [
+      {
+       "o": "Reaproveitar quando possível",
+       "nao": "a referência antiga não cobre os pedidos novos"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "E os derivados retidos esperando veredito?",
+     "r": "O job que ainda não começou roda com o Juiz novo; o que já está rodando termina na versão antiga, e o veredito vale para ela.",
+     "estado": "fechada",
+     "porque": "Nenhum derivado novo é liberado por um Juiz já substituído.",
+     "alt": [
+      {
+       "o": "Terminar todos na versão antiga",
+       "nao": "libera derivados com um Juiz já substituído"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "E os reprovados e inconclusivos antigos?",
+     "r": "Ficam como estão, retidos como evidência. O usuário treina de novo a partir do base, e só o operador pode pedir reavaliação.",
+     "estado": "fechada",
+     "porque": "Não dá a quem ataca um sorteio grátis a cada versão.",
+     "alt": [
+      {
+       "o": "Reavaliar automaticamente",
+       "nao": "cada versão vira um sorteio novo e custa CPU"
+      }
+     ],
+     "fonte": "Decidida em 28/10, nesta revisão"
+    },
+    {
+     "q": "E a revogação de um base?",
+     "r": "Derruba os derivados da raiz: ativos, pendentes e retidos.",
+     "estado": "fechada",
+     "fonte": "T-101, decisão 10"
+    }
+   ],
+   "falta": [
+    "Na preparação da implementação: o diagrama de estados na E14, base da T-704 e da T-705."
+   ],
+   "atualizado": "2026-10-28"
   }
  ]
 }
