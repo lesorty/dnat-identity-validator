@@ -1,7 +1,7 @@
 # E12 · Base teórica e plano de implementação
 
-**Data:** 2026-10-27 · **Status:** **decidido em 2026-10-27** ([D5](../DECISOES.md)). O §5 continua como esboço: o
-plano de trabalho será consolidado antes de começar o piloto.
+**Data:** 2026-10-27 · **Status:** **decidido em 2026-10-27** ([D5](../DECISOES.md)). O §5 fica como histórico: o
+plano está na [E13](E13_plano_trabalho.md), e a especificação do Juiz na [E14](E14_especificacao_juiz.md), que vale sobre ele.
 **Base:** [E10](E10_problema.md) §5 (problema decidido), [E9](E9_testes_validos.md) §3,
 [E6](E6_alt_modelos_abertos.md) §7, [E8](E8_alinhamento_dsn.md) §9 e as leituras
 [06](../../pesquisa/06_leitura_obliteracao.md), [07](../../pesquisa/07_leitura_bounty.md) e
@@ -62,7 +62,7 @@ Cada artigo aqui sustenta uma afirmação do artigo que não se sustenta sem ele
 | Spoczynski et al., *Atlas* (2025) | Vizinho mais próximo na arquitetura (TEE + log + fine-tuning), com segurança do modelo fora do escopo |
 | Rando et al., *Universal Jailbreak Backdoors* (SaTML 2024) | Molde do bounty P4: oráculo automático sobre conjunto privado e pesos abertos |
 | Casper et al., *Open-Weight Risk Management* (TMLR 2026) | Fonte citável do consenso "qualquer salvaguarda nos pesos cai" |
-| Kuo et al., *Fine-Tuning Defenses… Simple Attacks* (2026) | Exige sondas sem treino (abliteração de teste, *prefill*) na bateria |
+| Kuo et al., *Fine-Tuning Defenses… Simple Attacks* (2026) | Exige sondas sem treino (abliteração de teste, *prefill*) na bateria. No DNAT, o serviço trava o template, a decodificação gulosa e proíbe *prefill*, e os pesos nunca saem (T-108, [E14](E14_especificacao_juiz.md) §6.1): essas sondas viram ataques que a custódia barra, não itens da bateria |
 
 ### Camada 3 · Só citação (uma frase cada)
 
@@ -157,7 +157,7 @@ model_gate/
     s1_battery.py           # StrongREJECT + XSTest; 512 tokens; com e sem system prompt
     s2_refusal_gap.py       # gap na direção de recusa do base custodiado (Arditi, Hurtado)
     s3_rank1.py             # energia rank-1 de ΔW (Hurtado)
-  verdict.py                # z-soma, limiar por Youden na calibração; aprovado / reprovado / inconclusivo
+  verdict.py                # escada da E14 §6.3: só S1 reprova; S2 e S3 a FPR 5% levam a inconclusivo
   ground_truth/judge.py     # juiz independente do portão + amostra para conferência humana
   eval/run_campaign.py      # seeds, bootstrap, TPR a FPR 1% e 5%, AUROC, liberação silenciosa
 ```

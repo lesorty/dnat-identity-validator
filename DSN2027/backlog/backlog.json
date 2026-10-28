@@ -354,7 +354,8 @@
    "pronto": "Regra no fluxo do T-101",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Encaixar no fluxo a política de formatos liberados (D5)"
+   "titulo": "Encaixar no fluxo a política de formatos liberados (D5)",
+   "ordem": 111
   },
   {
    "atualizado": "2026-10-28T22:00:00.000Z",
@@ -369,7 +370,8 @@
    "pronto": "Lista de limitações",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos"
+   "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos",
+   "ordem": 112
   },
   {
    "deps": [
@@ -390,7 +392,7 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Tabela de rastreabilidade",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Mapear Juiz × artigo: que afirmação (A1–A5), contribuição (C1, P2) e seção cada decisão sustenta"
   },
@@ -404,7 +406,7 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "E14 commitado e D6 registrada",
-   "status": "a fazer",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Consolidar a especificação (E14) e registrar como D6, depois de revisar com o orientador"
   },
@@ -1122,7 +1124,7 @@
     "T-602",
     "T-912"
    ],
-   "descricao": "Por quê: o limiar tem de vir só da calibração (R14, G2); Youden maximiza TPR − FPR sem olhar o teste.\nComo:\n- Calcular a curva ROC da z-soma nos rótulos H × C da calibração (T-912)\n- Escolher o ponto de Youden e registrar TPR e FPR nesse ponto\n- Conferir também o ponto a FPR de 5%, que é a métrica principal\nSaída: limiar registrado em references/ e no prereg.yaml.",
+   "descricao": "Por quê: o limiar tem de vir só da calibração (R14, G2). S2 e S3 são segunda linha e levam no máximo a inconclusivo (T-108); a bandeira opera no ponto em que só 5% dos derivados benignos da calibração a acendem. A z-soma com o ponto de Youden saiu (T-114, E14 §15).\nComo:\n- Calcular s = z(−ρ) + z(E1) nos derivados H da calibração (T-912)\n- Fixar θ no percentil 95 dos benignos e registrar a FPR observada\n- Registrar também a TPR nos C da calibração nesse θ, só como informação\nSaída: θ registrado em references/ e no prereg.yaml.",
    "epico": "J6",
    "id": "T-603",
    "marco": "G2",
@@ -1130,7 +1132,7 @@
    "pronto": "Limiar registrado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Escolher o limiar por Youden na calibração"
+   "titulo": "Fixar θ da segunda linha a FPR de 5% na calibração"
   },
   {
    "deps": [

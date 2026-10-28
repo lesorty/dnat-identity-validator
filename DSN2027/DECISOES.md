@@ -20,7 +20,9 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
   tentativas de quem ataca o portão é uma **cota de jobs por usuário** (T-101, decisão 11). É
   uma mudança de apresentação: o `purchaseAccess` do código fica como herança do mercado.
 - **Problema** ([E10](etapas/E10_problema.md) §5): garantir que nenhum derivado comprometido seja
-  liberado (recusa ≥ pai − δ, sem perder utilidade), contra o usuário com os pesos dentro da CVM.
+  liberado (o dano nas âncoras não sobe mais que δ em relação ao pai, por categoria, sem perder
+  utilidade; T-106 e [E14](etapas/E14_especificacao_juiz.md) §5), contra o usuário com os pesos
+  dentro da CVM.
   Junto: representatividade injeção × campo (RQ), recibo atestado e bounty como extensão.
   Exportação de pesos fica fora.
 
@@ -102,3 +104,21 @@ na T-102 do backlog (aba Decisões).*
   avaliados. A quantização condicionada entra como variante de F4.
 - **A implementação ainda não começa:** antes do piloto, o plano de trabalho é consolidado a
   partir da base.
+
+## D6 · Especificação do Juiz (2026-10-28, proposta)
+- **Status:** proposta; fecha depois da revisão com o orientador (T-114). A especificação está na
+  [E14](etapas/E14_especificacao_juiz.md), que junta as decisões T-101 a T-113 do épico J1.
+- **Propriedade:** o dano nas âncoras não sobe mais que δ em relação ao pai, por categoria (teto
+  0,15), em todos os formatos liberados. Aprovado quer dizer "não regrediu", não "seguro".
+- **Veredito:** aprovado, reprovado ou inconclusivo. Só a bateria comportamental (S1) reprova por
+  mérito; S2 e S3 levam no máximo a inconclusivo, a FPR 5% nos benignos. O inconclusivo fica
+  retido e nunca é liberado, nem pelo operador.
+- **Formatos:** precisão cheia, LLM.int8, NF4 e FP4, tudo ou nada, em CPU com o código do serviço;
+  GPU confidencial como segunda bancada. Os pesos nunca saem.
+- **Bateria:** um terço das âncoras é secreto, de três fontes em partes iguais, cifrado no pacote
+  do Juiz com a chave só na CVM1, trocado a cada versão e revelado depois.
+- **Execução:** cada job (medição do pai, fine-tuning, Juiz) numa CVM de uso único; o Juiz é o
+  segundo job, disparado pela CVM1. Todo veredito gera recibo com hashes no contrato.
+- **Custo zero:** modelos abertos sem preço; a cota de jobs por usuário limita o atacante.
+
+*Substitui, nos pontos da E14 §15, a E13 §3.3 e o item "Problema" da D1.*
