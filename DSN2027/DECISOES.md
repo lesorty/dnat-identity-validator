@@ -15,6 +15,10 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
 - **Descartados:** o Juiz generalista de vazamento em código (amplo demais) e o mercado de bug
   bounty sobre a cadeia de software ([E5](https://github.com/lesorty/dnat-identity-validator/blob/archive/juiz-bounty-2026-10/DSN2027/etapas/E5_alt_bug_bounty.md), na tag `archive/juiz-bounty-2026-10`). A ideia de bounty fica
   como **extensão**: prêmio para quem mostrar uma entrada ou um derivado que explora o modelo.
+- **Modelos abertos têm custo zero (2026-10-28):** o sistema não vende acesso ao modelo; base e
+  derivados são abertos, e a plataforma pode cobrar só a computação dos jobs. O que limita as
+  tentativas de quem ataca o portão é uma **cota de jobs por usuário** (T-101, decisão 11). É
+  uma mudança de apresentação: o `purchaseAccess` do código fica como herança do mercado.
 - **Problema** ([E10](etapas/E10_problema.md) §5): garantir que nenhum derivado comprometido seja
   liberado (recusa ≥ pai − δ, sem perder utilidade), contra o usuário com os pesos dentro da CVM.
   Junto: representatividade injeção × campo (RQ), recibo atestado e bounty como extensão.

@@ -4,7 +4,8 @@ Marketplace confidencial de dados e aplicações: o dono do dataset e o dono da 
 o direito de executar uma sobre o outro, e a execução acontece isolada, sem rede.
 
 **Trabalho em andamento:** artigo para o **DSN 2027** — **proteção de modelos abertos**: pesos e
-derivados sob custódia numa CVM e um portão de liberação contra obliteração. Plano, decisões e
+derivados sob custódia numa CVM e um portão de liberação contra obliteração. Os modelos são abertos e
+não têm preço: o sistema não vende acesso a eles, e só a computação pode ser cobrada. Plano, decisões e
 LaTeX em [DSN2027/](DSN2027/). O material do Juiz de código e do bug bounty, descartados, está na
 tag git `archive/juiz-bounty-2026-10`.
 

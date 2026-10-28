@@ -37,6 +37,7 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
 |---|---|
 | `quadro.html` | O quadro kanban: colunas Backlog, Priorizado, Em andamento, Feito e Cortada; arrastar e soltar; filtros por fase, épico, marco e busca; gaveta para editar e criar tasks |
 | `backlog.json` | Retrato dos dados (épicos, marcos e tasks) na data acima |
+| `decisoes.json` | Retrato da aba Decisões do quadro: cada task de decisão como pergunta, com as decisões, o porquê e as alternativas descartadas |
 
 ## Como usar
 

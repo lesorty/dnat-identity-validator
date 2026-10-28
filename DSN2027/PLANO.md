@@ -1,6 +1,6 @@
 # Plano DSN 2027 (Berlim)
 
-**Atualizado:** 2026-10-27 (rumo: proteção de modelos, D1) · **Rumo:** [ARTIGO.md](ARTIGO.md) ·
+**Atualizado:** 2026-10-27 (rumo: proteção de modelos, D1; plano na [E13](etapas/E13_plano_trabalho.md)) · **Rumo:** [ARTIGO.md](ARTIGO.md) ·
 **Artigo LaTeX:** [artigo/](artigo/)
 
 ## 0. Datas e regras ([CFP](https://dsn2027-berlin.github.io/call-for-contributions/))
@@ -20,18 +20,21 @@
 
 ## 1. Cronograma
 
-| Semana | Pesquisa e implementação | Escrita |
-|---|---|---|
-| **S1** 27/out–02/nov | Levantamento (DSN e externo); **definir o problema** ([E10](etapas/E10_problema.md)) até 29/out; **piloto** de 2–3 dias (E7 §7) até 01/nov; escopo do MVP fechado em 02/nov | Problema e modelo de ameaça |
-| **S2** 03–09/nov | População F1–F3 em Qwen2.5-0.5B/1.5B; sinais do portão; verdade de referência independente; executor de modelos em modo direto na CVM | Introdução, modelo de falhas |
-| **S3** 10–16/nov | F4 adaptativo; família não vista (ex.: Llama-3.2-1B); obliterados de campo como teste cego; derivado não exportável no contrato | Desenho |
-| **S4** 17–25/nov | Campanha completa com ICs; custo na CVM; congelar resultados | Avaliação, related work; **resumo em 25/nov** |
-| **S5** 26/nov–02/dez | Só correções | Rascunho aos coautores até **28/nov**; corte de páginas; submissão em **02/dez** |
+O plano de trabalho completo (frentes, critérios de aceite, marcos e recursos) está na
+[E13](etapas/E13_plano_trabalho.md). Resumo:
 
-**Se apertar, cortar nesta ordem:** bounty (C4) → contrato (derivado não exportável) → ponto
-em 7–8B → extras do atacante adaptativo.
-**Inegociáveis:** F1–F3, verdade de referência independente, família não vista, falso alarme em
-fine-tuning benigno.
+| Semana | Marco |
+|---|---|
+| **S1** 28/out–02/nov | Piloto; **G1 em 01/nov** (algum sinal separa e o veredito cabe em 80 min) |
+| **S2** 03–09/nov | População F1–F3, verdade de referência, contrato; **G2 em 09/nov** (pré-registro commitado) |
+| **S3** 10–16/nov | Adaptativo (bounty interno), família não vista, campo; **G3 em 16/nov** (integração) |
+| **S4** 17–25/nov | Campanha com IC; **G4 em 23/nov** (congelar); **resumo em 25/nov** |
+| **S5** 26/nov–02/dez | Rascunho aos coautores em 28/nov; submissão em **02/dez** |
+
+**Se apertar, cortar nesta ordem:** bounty vira só desenho → recibo vira log assinado pela CVM1 → contrato do
+derivado não exportável → segunda família em escala menor → extras do adaptativo.
+**Inegociáveis:** F1–F3, verdade de referência independente, falso alarme em fine-tuning benigno,
+teste cego de campo e um atacante adaptativo mínimo.
 
 ## 2. Riscos
 
@@ -46,6 +49,10 @@ fine-tuning benigno.
 
 ## 3. Decisões pendentes
 
-1. O problema exato ([E10](etapas/E10_problema.md)).
-2. Crédito na Azure para a CVM SEV-SNP.
-3. Datas de revisão dos coautores.
+Lista completa na [E13](etapas/E13_plano_trabalho.md) §8:
+1. Máquinas para a campanha.
+2. Juiz da verdade de referência (modelo aberto maior ou API externa).
+3. Família não vista.
+4. Nuvem e crédito para as CVMs (Azure, AWS ou Oracle, pelo custo; T-102).
+5. Anotadores da amostra humana e datas de revisão dos coautores.
+6. Bounty interno como formato da RQ4.
