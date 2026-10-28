@@ -66,9 +66,17 @@ formato de modelo também resolve a exposição de código confidencial na saíd
   CVM, sub-rede sem saída para a internet e NSG só para o DNAT (cobre exploit de kernel). Derrubar
   a interface durante o job fica só desejável. Exploit de kernel + conluio do operador: limitação.
   App que precisa de rede: **proibida no MVP**; o *broker* por socket Unix fica como extensão.
+- **Piloto (2026-10-28, T-102):** CVMs reais na nuvem (Azure, AWS ou Oracle, pelo custo). A CVM1
+  é o plano de controle; a **CVM2** é o builder, numa CVM separada; cada job (fine-tuning, Juiz,
+  medição do pai) roda numa **CVM de uso único**, direto na CVM, **sem container**, com o script
+  sem rede; cada sessão de inferência tem a sua CVM de uso único. **Não há microVM:** o
+  Firecracker não roda numa CVM, e o caminho com ele no código (`run-vm.sh`, `build-vm.sh`) é
+  legado. Container sem rede, gVisor e build em duas fases ficam como alvo. Segurança no mínimo
+  para o artigo: IPFS local como está, atestação real só se a avaliação precisar.
 - Detalhes: [E2](etapas/E2_isolamento_confidencial.md), [E2b](etapas/E2b_build_oci.md) e [E2c](etapas/E2c_ameacas_oci.md).
 
-*Absorve D-005, D-006, D-009, D-010, D-011, D-013, D-015 e D-017 (execução).*
+*Absorve D-005, D-006, D-009, D-010, D-011, D-013, D-015 e D-017 (execução). O piloto foi decidido
+na T-102 do backlog (aba Decisões).*
 
 ## D5 · Base teórica (2026-10-27)
 - **Base:** os 13 artigos da camada 1 da [E12](etapas/E12_base_teorica.md) §2, lidos por

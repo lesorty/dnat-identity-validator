@@ -65,7 +65,7 @@
   },
   {
    "id": "J8",
-   "entrega": "Recursos e tempos limite, disco de custódia, Juiz como segundo job.",
+   "entrega": "CVM de job de uso único, tempos limite, retenção cifrada, Juiz como segundo job.",
    "estimativa": "12",
    "fase": 3,
    "marco": "G3",
@@ -189,7 +189,7 @@
  ],
  "tasks": [
   {
-   "atualizado": "2026-10-28T11:27:52.044Z",
+   "atualizado": "2026-10-28T18:57:17.015Z",
    "deps": [],
    "descricao": "Por quê: C1 (custódia + portão) só se sustenta se cada passo do caminho do derivado estiver explícito, e todas as outras tasks do J1 partem deste fluxo.\nComo:\n- Listar os atores (dono do base, usuário que faz o fine-tuning, operador, executor, Juiz, contrato) e o que cada um vê.\n- Desenhar o caminho: depósito dos pesos na CVM, job de fine-tuning, derivado retido no disco de custódia, Juiz como segundo job, aprovado vira ativo ou reprovado fica retido, revogação pelo operador.\n- Marcar onde entram o recibo (T-104) e o inconclusivo (T-107), sem detalhá-los aqui.\nSaída: diagrama de sequência (Mermaid) no rascunho da E14.\nFora do escopo: arquitetura OCI da D4, que não entra neste prazo.",
    "epico": "J1",
@@ -198,28 +198,28 @@
    "ordem": 101,
    "prioridade": "P0",
    "pronto": "Diagrama de sequência aprovado",
-   "status": "priorizado",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Desenhar o fluxo de ponta a ponta: depósito dos pesos, fine-tuning, retenção do derivado, Juiz, ativo ou rejeitado, revogação"
   },
   {
-   "atualizado": "2026-10-28T11:27:58.784Z",
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-101"
    ],
-   "descricao": "Por quê: o plano (E13 §3.7) parte do código Firecracker atual, e cada passo do fluxo do T-101 precisa de um ponto de apoio real ou de uma lacuna com custo conhecido.\nComo:\n- Percorrer o fluxo do T-101 passo a passo contra smart-contract/contracts/DnatMarketplace.sol, vm_runtime/ (executor.py, rootfs/runner, vm/run-vm.sh), build_vm_runtime/ e o uso de IPFS.\n- Para cada passo, anotar: já existe, existe com ajuste ou não existe, com arquivo e linha (ex.: revokeAsset exige o dono, recursos fixos da microVM, tempos limite).\n- Estimar o esforço de cada lacuna e apontar a task do J7/J8 que a cobre.\nSaída: tabela de lacunas no rascunho da E14.",
+   "descricao": "Por quê: o plano (E13 §3.7) parte do código atual, e cada passo do fluxo do T-101 precisa de um ponto de apoio real ou de uma lacuna com custo conhecido. Decisão tomada em 28/10: o piloto roda em CVMs reais, uma CVM de uso único por job, sem microVM.\nComo:\n- Percorrer o fluxo do T-101 passo a passo contra smart-contract/contracts/DnatMarketplace.sol, vm_runtime/ (executor.py, vm/run-direct.sh), build_vm_runtime/ e o uso de IPFS.\n- Para cada passo, anotar: já existe, existe com ajuste ou não existe, com arquivo e linha (ex.: revokeAsset exige o dono, jobs em modo direto sem isolamento, tempos limite).\n- Estimar o esforço de cada lacuna e apontar a task do J7/J8 que a cobre.\nSaída: tabela de lacunas no rascunho da E14.",
    "epico": "J1",
    "id": "T-102",
    "marco": "ESP",
    "ordem": 102,
    "prioridade": "P0",
    "pronto": "Mapa de lacunas com arquivo e linha",
-   "status": "priorizado",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Levantar o que o DNAT atual já oferece para o fluxo e o que falta (executor, contrato, IPFS, build)"
   },
   {
-   "atualizado": "2026-10-28T11:28:06.401Z",
+   "atualizado": "2026-10-28T18:57:20.059Z",
    "deps": [
     "T-101"
    ],
@@ -230,12 +230,12 @@
    "ordem": 103,
    "prioridade": "P0",
    "pronto": "Contrato de entrada e saída escrito",
-   "status": "priorizado",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Definir a interface do Juiz: entradas (base por digest, derivado, metadados do job, formatos) e saídas (veredito em 3 estados, motivos)"
   },
   {
-   "atualizado": "2026-10-28T11:30:30.233Z",
+   "atualizado": "2026-10-28T18:57:22.684Z",
    "deps": [
     "T-103"
    ],
@@ -246,12 +246,12 @@
    "ordem": 104,
    "prioridade": "P0",
    "pronto": "Esquema do recibo",
-   "status": "priorizado",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Definir o recibo: campos, o que fica no contrato e o que fica fora"
   },
   {
-   "atualizado": "2026-10-28T11:30:32.468Z",
+   "atualizado": "2026-10-28T18:57:30.993Z",
    "deps": [
     "T-101"
    ],
@@ -262,19 +262,21 @@
    "ordem": 105,
    "prioridade": "P0",
    "pronto": "Tabela alinhada com a E8 §9.2",
-   "status": "priorizado",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Definir as fronteiras de confiança: confiável (CVM, Juiz por hash, referência) e não confiável (script, dados, derivado)"
   },
   {
+   "atualizado": "2026-10-28T18:57:14.307Z",
    "deps": [],
    "descricao": "Por quê: é a propriedade que o portão decide e que o rótulo C/H/N mede (E13 §3.1); sem ela não há liberação silenciosa nem falso alarme definidos.\nComo:\n- Definir δ: queda máxima tolerada da recusa por categoria do StrongREJECT, em relação ao pai (Qi 2024).\n- Definir a tolerância de recusa excessiva em pedidos seguros do XSTest (R4), medida à parte.\n- Definir o critério de utilidade que separa N (degenerado) de C (comprometido e útil).\n- Escrever os estados H, C e N como função dessas três medidas.\nSaída: definição formal na E14; os valores numéricos ficam para o prereg.yaml (T-606).",
    "epico": "J1",
    "id": "T-106",
    "marco": "ESP",
+   "ordem": 106,
    "prioridade": "P0",
    "pronto": "Definição formal",
-   "status": "a fazer",
+   "status": "priorizado",
    "tamanho": "M",
    "titulo": "Definir a propriedade que o Juiz decide: δ por categoria, tolerância de recusa excessiva, utilidade"
   },
@@ -401,10 +403,11 @@
    "titulo": "Consolidar a especificação (E14) e registrar como D6, depois de revisar com o orientador"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-103"
    ],
-   "descricao": "Por quê: todos os instrumentos (S1–S3, formatos, veredito) precisam morar num só pacote para rodar igual no piloto, na campanha e dentro da microVM (W7).\nComo:\n- Criar model_gate/ na raiz com subpastas: io/ (carregar modelo, geração), battery/ (S1), signals/ (S2, S3), formats/, verdict/, runs/ (registros) e tests/\n- Separar o código que entra no artefato do Juiz (hash fixado, T-808) do código de experimento (população, campanha)\n- Escrever model_gate/README.md com o layout e a regra de importação entre pastas\nSaída: model_gate/ com README e __init__.py vazios por pasta.\nFora do escopo: ambiente e dependências (T-202).",
+   "descricao": "Por quê: todos os instrumentos (S1–S3, formatos, veredito) precisam morar num só pacote para rodar igual no piloto, na campanha e na CVM de job de uso único (W7).\nComo:\n- Criar model_gate/ na raiz com subpastas: io/ (carregar modelo, geração), battery/ (S1), signals/ (S2, S3), formats/, verdict/, runs/ (registros) e tests/\n- Separar o código que entra no artefato do Juiz (hash fixado, T-808) do código de experimento (população, campanha)\n- Escrever model_gate/README.md com o layout e a regra de importação entre pastas\nSaída: model_gate/ com README e __init__.py vazios por pasta.\nFora do escopo: ambiente e dependências (T-202).",
    "epico": "J2",
    "id": "T-201",
    "marco": "G1",
@@ -415,10 +418,11 @@
    "titulo": "Definir onde vive o código do Juiz (model_gate/ no repositório) e o layout de pastas"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-201"
    ],
-   "descricao": "Por quê: o D2 fixa tudo em CPU, e a reprodutibilidade dos vereditos (R5, R14) exige versões idênticas no piloto, nas máquinas da campanha e na microVM.\nComo:\n- Fixar Python, torch (wheel CPU), transformers, peft, accelerate, safetensors, datasets e gguf num lock (requirements.lock ou uv.lock)\n- Script model_gate/setup.sh que cria o venv do zero a partir do lock\n- Testar numa VM limpa de 4 vCPU: instalar, importar tudo e rodar um forward de um modelo minúsculo\nSaída: arquivo de lock, setup.sh e nota no README com o tempo de instalação e a versão de cada pacote.\nFora do escopo: bitsandbytes em CPU (T-503).",
+   "descricao": "Por quê: o D2 fixa tudo em CPU, e a reprodutibilidade dos vereditos (R5, R14) exige versões idênticas no piloto, nas máquinas da campanha e na CVM de job.\nComo:\n- Fixar Python, torch (wheel CPU), transformers, peft, accelerate, safetensors, datasets e gguf num lock (requirements.lock ou uv.lock)\n- Script model_gate/setup.sh que cria o venv do zero a partir do lock\n- Testar numa VM limpa de 4 vCPU: instalar, importar tudo e rodar um forward de um modelo minúsculo\nSaída: arquivo de lock, setup.sh e nota no README com o tempo de instalação e a versão de cada pacote.\nFora do escopo: bitsandbytes em CPU (T-503).",
    "epico": "J2",
    "id": "T-202",
    "marco": "G1",
@@ -1309,12 +1313,13 @@
    "titulo": "Regra para derivados de um pai revogado"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-704",
     "T-705",
     "T-706"
    ],
-   "descricao": "Por quê: o marco G3 pede prova de que reprovado não sai, aprovado vira ativo e o operador revoga; os testes do contrato são essa prova no nível on-chain.\nComo:\n- Criar smart-contract/test/derivative.test.js no padrão de asset_envelope.test.js\n- Casos: registro aprovado, registro reprovado, registro por não operador, reativação negada, revogação pelo operador, compra negada para reprovado e revogado\n- Rodar npx hardhat test e anotar o commit\nSaída: suíte de testes verde no repositório.\nFora do escopo: o teste ponta a ponta com a microVM é o T-813.",
+   "descricao": "Por quê: o marco G3 pede prova de que reprovado não sai, aprovado vira ativo e o operador revoga; os testes do contrato são essa prova no nível on-chain.\nComo:\n- Criar smart-contract/test/derivative.test.js no padrão de asset_envelope.test.js\n- Casos: registro aprovado, registro reprovado, registro por não operador, reativação negada, revogação pelo operador, compra negada para reprovado e revogado\n- Rodar npx hardhat test e anotar o commit\nSaída: suíte de testes verde no repositório.\nFora do escopo: o teste ponta a ponta nas CVMs é o T-813.",
    "epico": "J7",
    "id": "T-708",
    "marco": "G3",
@@ -1353,20 +1358,22 @@
    "titulo": "API e CLI registram e mostram derivados"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [],
-   "descricao": "Por quê: o Juiz e o fine-tuning do 0,5B não cabem na microVM atual, fixada em 1 vCPU e 512 MiB em vm_runtime/vm/run-vm.sh:175.\nComo:\n- Trocar os valores fixos por variáveis de ambiente (ex.: VM_VCPUS, VM_MEM_MIB) com o padrão atual\n- Ajustar o tamanho do rootfs/overlay se o modelo e as dependências não couberem\n- Testar carregando o Qwen2.5-0.5B-Instruct na microVM e registrar a memória de pico\nSaída: run-vm.sh parametrizado e nota com os valores mínimos que funcionaram.",
+   "descricao": "Por quê: a D4 e a T-102 tiram a microVM da arquitetura; cada job (fine-tuning, Juiz, medição do pai) roda numa CVM nova, destruída no fim. Hoje, numa CVM, o código roda os jobs em modo direto, sem isolamento entre eles (vm_runtime/vm/run-direct.sh).\nComo:\n- Imagem da CVM de job com o agente, sem shell de usuário.\n- Na CVM1, um warm pool de CVMs nunca usadas: tirar uma por job, entregar o job pelo agente (a CVM puxa, nunca escuta) e destruir a CVM no fim.\n- Tamanho da CVM que comporta o Qwen2.5-0.5B; registrar a memória de pico.\n- O script roda sem rede; só o agente fala com a CVM1, antes e depois.\nSaída: dois jobs seguidos em CVMs diferentes, com a memória de pico registrada.\nFora do escopo: container sem rede e gVisor (alvo da D4).",
    "epico": "J8",
    "id": "T-801",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "O 0,5B carrega na microVM",
+   "pronto": "Dois jobs seguidos nunca caem na mesma CVM",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Recursos configuráveis da microVM (hoje 1 vCPU e 512 MiB, run-vm.sh:175)"
+   "titulo": "CVM de job de uso único: warm pool e ciclo de vida da CVM"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [],
-   "descricao": "Por quê: um treino LoRA e um veredito completo duram mais de uma hora em CPU (E13 §3.3), mas o guest corta em 600 s (vm_runtime/rootfs/runner:121) e o executor em 720 s (vm_runtime/executor.py:56).\nComo:\n- Ler os dois tempos limite de variáveis de ambiente, mantendo o executor sempre acima do guest\n- Garantir que o estouro de tempo gera erro registrado em vez de travar\n- Rodar um job de teste que dorme 2 h para provar que termina\nSaída: tempos limite configuráveis nos dois arquivos, com o teste registrado.",
+   "descricao": "Por quê: um treino LoRA e um veredito completo duram mais de uma hora em CPU (E13 §3.3), mas o modo direto corta em 660 s (vm_runtime/vm/run-direct.sh:24) e o executor em 720 s (vm_runtime/executor.py:56).\nComo:\n- Ler os tempos limite da configuração do agente da CVM de job e da CVM1, com a CVM1 sempre acima do agente.\n- Estouro de tempo gera erro registrado e vira inconclusivo por falha (T-104, T-107), sem travar.\n- Rodar um job de teste que dorme 2 h para provar que termina.\nSaída: tempos limite configuráveis, com o teste registrado.",
    "epico": "J8",
    "id": "T-802",
    "marco": "G3",
@@ -1374,41 +1381,44 @@
    "pronto": "Job de 2 h termina",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Tempos limite configuráveis (runner:121, 600 s; executor.py:56, 720 s)"
+   "titulo": "Tempos limite configuráveis (run-direct.sh:24, 660 s; executor.py:56, 720 s)"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-102"
    ],
-   "descricao": "Por quê: o derivado nunca pode sair da CVM antes do veredito (C1, R10); hoje a saída do job vai inteira para result.json (RESULT_PATH no runner, linha 15).\nComo:\n- Anexar à microVM um segundo disco (drive) de custódia, gravável só pelo job\n- Mudar o runner para gravar pesos e adaptadores nesse disco e no result.json só metadados e o digest\n- No host, guardar o disco por digest em um diretório de custódia fora do alcance do usuário\nSaída: derivado no disco de custódia do host, identificado por digest; result.json sem pesos.\nFora do escopo: o limite de tamanho da saída é o T-804.",
+   "descricao": "Por quê: o derivado nunca pode sair antes do veredito (C1, R10); hoje a saída do job vai inteira ao usuário (result.json, stdout, stderr).\nComo:\n- O agente da CVM de job devolve o derivado só à CVM1, com o digest, antes de a CVM ser destruída.\n- A CVM1 cifra e guarda no IPFS, como faz com os datasets (decisão 5 da T-101), e registra o Derivative pendente.\n- A saída para o usuário fica só com as métricas de esquema fixo (T-804).\nSaída: derivado cifrado no IPFS, identificado por digest; o usuário não recebe pesos.",
    "epico": "J8",
    "id": "T-803",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "Derivado fica no host, não na saída",
+   "pronto": "Derivado retido, fora da saída do usuário",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Disco de custódia: o derivado é gravado fora do result.json"
+   "titulo": "Retenção: o derivado volta à CVM1, cifrado no IPFS, nunca na saída do job"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-803"
    ],
-   "descricao": "Por quê: mesmo com disco de custódia, um script hostil pode tentar exfiltrar pesos pela saída normal do job; a fronteira do T-105 trata o script como não confiável.\nComo:\n- Definir um teto de bytes para result.json e para stdout/stderr no runner e no executor\n- Recusar e registrar o job cuja saída passe do teto, sem devolvê-la ao usuário\n- Teste: script que imprime 50 MiB de bytes aleatórios é recusado\nSaída: limites configuráveis e teste de recusa.",
+   "descricao": "Por quê: um script hostil pode tentar exfiltrar pesos ou gerações pela saída do job; a T-102 decidiu fechar isso no piloto, e a fronteira da T-105 trata o script como não confiável.\nComo:\n- O agente descarta stdout, stderr e logs brutos e devolve só o JSON de métricas (loss, passos, tempo).\n- A CVM1 valida o esquema e um teto de bytes e recusa o resto.\n- Só o dono da execução lê o resultado (autenticação na API).\n- Teste: script que imprime 50 MiB aleatórios ou escreve um campo extra é recusado.\nSaída: esquema e teto configuráveis, com o teste de recusa.",
    "epico": "J8",
    "id": "T-804",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "Saída grande é recusada",
+   "pronto": "Só métricas de esquema fixo chegam ao usuário",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Limite e checagem de tamanho da saída do job (nada de pesos na saída)"
+   "titulo": "Saída de esquema fixo: o usuário recebe só métricas"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-102"
    ],
-   "descricao": "Por quê: o fine-tuning precisa ler o pai custodiado sem poder alterá-lo, senão a referência do Juiz (R9) deixa de ser confiável.\nComo:\n- Resolver o base pelo digest no diretório de custódia e conferir o hash antes do boot\n- Anexar como drive is_read_only: true no run-vm.sh\n- Teste: o job tenta escrever no base e falha; o digest continua igual depois\nSaída: base montado somente leitura e conferido por digest.",
+   "descricao": "Por quê: o fine-tuning precisa ler o pai custodiado sem poder alterá-lo, senão a referência do Juiz (R9) deixa de ser confiável.\nComo:\n- A CVM1 decifra o base e o entrega à CVM de job pelo agente, com o digest.\n- O agente confere o hash antes de rodar o script e deixa o arquivo somente leitura.\n- Teste: o job tenta escrever no base e falha; o digest confere no fim.\nSaída: base entregue somente leitura e conferido por digest.",
    "epico": "J8",
    "id": "T-805",
    "marco": "G3",
@@ -1416,9 +1426,10 @@
    "pronto": "Job lê o base e não escreve nele",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Montar o base (por digest) somente leitura para o job de fine-tuning"
+   "titulo": "Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-801",
     "T-802",
@@ -1426,30 +1437,31 @@
     "T-805",
     "T-901"
    ],
-   "descricao": "Por quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar um job com o script LoRA do T-901 e um dataset benigno pequeno\n- Rodar via executor com os recursos e tempos do T-801 e T-802 e o base do T-805\n- Conferir que o derivado aparece só no disco de custódia, com digest\nSaída: derivado de exemplo custodiado, com tempo de execução registrado.",
+   "descricao": "Por quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
    "epico": "J8",
    "id": "T-806",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "Derivado no disco de custódia",
+   "pronto": "Derivado retido, cifrado no IPFS",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) dentro da microVM"
+   "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) numa CVM de uso único"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-608",
     "T-803"
    ],
-   "descricao": "Por quê: o portão roda como job separado e confiável (Juiz fixado por hash, T-105), lendo pai e derivado sem poder alterá-los.\nComo:\n- Criar o tipo de job do Juiz no executor, com base e derivado montados somente leitura\n- Rodar o pacote model_gate/ dentro da microVM e gravar verdict.json (esquema do T-608)\n- Encadear: fim do job de fine-tuning dispara o job do Juiz\nSaída: verdict.json produzido dentro da microVM para o derivado do T-806.",
+   "descricao": "Por quê: o portão roda como job separado e confiável (Juiz fixado por hash, T-105), lendo pai e derivado sem poder alterá-los.\nComo:\n- Criar o tipo de job do Juiz na CVM1, disparado ao receber o derivado (decisão 6 da T-101).\n- Numa CVM de uso único, entregar base, derivado, referência do pai, dataset e pacote do Juiz, conferidos por hash.\n- Rodar o pacote model_gate/ e devolver só o verdict.json de esquema fixo e as respostas cifradas (T-103).\nSaída: verdict.json para o derivado do T-806.",
    "epico": "J8",
    "id": "T-807",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "verdict.json gerado na microVM",
+   "pronto": "verdict.json gerado numa CVM de uso único",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Juiz como segundo job: base e derivado somente leitura, grava verdict.json"
+   "titulo": "Juiz como segundo job: CVM de uso único, entradas conferidas por hash, grava verdict.json"
   },
   {
    "deps": [
@@ -1481,10 +1493,11 @@
    "titulo": "Ligar o veredito ao contrato: aprovado chama registerDerivative"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-807"
    ],
-   "descricao": "Por quê: um derivado reprovado ou inconclusivo não pode sair nem virar ativo, mas precisa ficar registrado para auditoria e reavaliação (T-107, T-110).\nComo:\n- Manter o derivado reprovado no disco de custódia, marcado com o veredito\n- Registrar no contrato como reprovado (active = false) ou só no log, conforme o T-104\n- Aplicar a regra de inconclusivo do T-107\nSaída: derivado reprovado retido e rastreável pelo digest.",
+   "descricao": "Por quê: um derivado reprovado ou inconclusivo não pode sair nem virar ativo, mas precisa ficar registrado para auditoria e reavaliação (T-107, T-110).\nComo:\n- Manter o derivado reprovado cifrado no IPFS, marcado com o veredito.\n- Registrar no contrato como reprovado (active = false) ou no log assinado pela CVM1, conforme o T-104.\n- Aplicar a regra de inconclusivo do T-107.\nSaída: derivado reprovado retido e rastreável pelo digest.",
    "epico": "J8",
    "id": "T-810",
    "marco": "G3",
@@ -1495,25 +1508,27 @@
    "titulo": "Retenção do derivado reprovado (não sai, não vira ativo)"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-807"
    ],
-   "descricao": "Por quê: o modo direto (vm_runtime/vm/run-direct.sh) permite depurar o fluxo inteiro sem Firecracker e serve de linha de comparação para o custo (RQ5).\nComo:\n- Fazer run-direct.sh aceitar disco de custódia, base somente leitura e o job do Juiz\n- Rodar fine-tuning, Juiz e registro no contrato em sequência\nSaída: fluxo completo funcionando no modo direto, com tempos por etapa.",
+   "descricao": "Por quê: o modo direto do código atual (vm_runtime/vm/run-direct.sh) permite depurar o fluxo inteiro numa máquina comum antes de pagar CVMs, e serve de linha de comparação de custo (RQ5).\nComo:\n- Fazer o modo direto aceitar a retenção do derivado (T-803), a saída de esquema fixo (T-804) e o job do Juiz (T-807).\n- Rodar fine-tuning, Juiz e registro no contrato em sequência.\nSaída: fluxo completo funcionando numa máquina comum, com tempos por etapa.",
    "epico": "J8",
    "id": "T-811",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "Fluxo completo sem microVM",
+   "pronto": "Fluxo completo numa máquina comum",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rodar o fluxo no modo direto (run-direct.sh)"
+   "titulo": "Rodar o fluxo inteiro numa máquina comum, no modo direto, antes das CVMs"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-811",
     "T-1607"
    ],
-   "descricao": "Por quê: a RQ5 pede o custo por veredito da custódia; a CVM SEV-SNP só entra se houver crédito na Azure (T-1603, T-1607).\nComo:\n- Repetir o veredito no modo direto e na microVM com as mesmas entradas e seeds\n- Se houver CVM, repetir em VM comum e em CVM SEV-SNP usando assets/tests/run_cvm_overhead_campaign.sh como base\n- Calcular IC por bootstrap (T-1404)\nSaída: tabela de tempo e custo por veredito com IC, insumo da RQ5.",
+   "descricao": "Por quê: a RQ5 pede o custo por veredito da custódia, e a CVM de uso único acrescenta o custo de subir uma CVM por job.\nComo:\n- Repetir o veredito em VM comum e em CVM com as mesmas entradas e seeds, usando assets/tests/run_cvm_overhead_campaign.sh como base.\n- Medir o custo do uso único: CVM tirada do warm pool × CVM reaproveitada.\n- Calcular IC por bootstrap (T-1404).\nSaída: tabela de tempo e custo por veredito com IC, insumo da RQ5.",
    "epico": "J8",
    "id": "T-812",
    "marco": "G4",
@@ -1521,7 +1536,7 @@
    "pronto": "Tempo e custo por veredito com IC",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Medir overhead: modo direto × microVM, e VM comum × CVM SEV-SNP se houver crédito"
+   "titulo": "Medir overhead: VM comum × CVM, e CVM reaproveitada × CVM de uso único"
   },
   {
    "deps": [
@@ -2771,16 +2786,17 @@
    "titulo": "Decidir o juiz da verdade de referência e a família não vista"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [],
-   "descricao": "Por quê: Decisão 4 do E13 §8: sem crédito na Azure, a CVM vira limitação declarada.\nComo:\n- Verificar com o grupo o status do crédito\n- Se não sair até o G0, registrar a CVM como limitação\nSaída: status do crédito registrado no PLANO.",
+   "descricao": "Por quê: o fluxo integrado roda em CVMs reais (T-102); a nuvem (Azure, AWS ou Oracle) sai pelo custo (E13 §8, decisão 4).\nComo:\n- Comparar o preço de CVM AMD SEV-SNP de 4 vCPU nas três nuvens e o crédito disponível para o grupo.\n- Escolher a nuvem e registrar no PLANO.\nSaída: nuvem escolhida e status do crédito registrados no PLANO.",
    "epico": "J16",
    "id": "T-1603",
    "marco": "G0",
    "prioridade": "P1",
-   "pronto": "Crédito confirmado ou CVM como limitação",
+   "pronto": "Nuvem escolhida e crédito ou orçamento confirmado",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Resolver o crédito na Azure para a CVM SEV-SNP"
+   "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito"
   },
   {
    "deps": [],
@@ -2819,18 +2835,19 @@
    "titulo": "Nota de ética e, se exigido, comitê para a anotação humana"
   },
   {
+   "atualizado": "2026-10-28T20:00:00.000Z",
    "deps": [
     "T-1603"
    ],
-   "descricao": "Por quê: a RQ5 mede o custo da custódia numa CVM SEV-SNP real; sem ela, o custo vai em VM comum e a CVM vira limitação declarada (E13 §6).\nComo:\n- Provisionar uma VM confidencial SEV-SNP na Azure com 4 vCPU.\n- Instalar o ambiente do T-202 e o executor do DNAT.\n- Conferir o relatório de atestação SEV-SNP e registrar a versão do firmware.\nSaída: CVM acessível, com o ambiente e o relatório de atestação guardados.",
+   "descricao": "Por quê: o fluxo integrado roda em CVMs reais (T-102), e a RQ5 mede o custo da custódia nelas.\nComo:\n- Na nuvem do T-1603, provisionar a CVM1, a CVM2 (builder) e a imagem das CVMs de job, com 4 vCPU.\n- Instalar o ambiente do T-202 e o agente da CVM de job.\n- Registrar o modelo de CPU confidencial e a versão do firmware; atestação real só se a avaliação precisar (T-102).\nSaída: CVMs acessíveis, com o ambiente registrado.",
    "epico": "J16",
    "id": "T-1607",
    "marco": "G3",
    "prioridade": "P2",
-   "pronto": "CVM acessível",
+   "pronto": "CVMs acessíveis",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Provisionar a CVM SEV-SNP, se houver crédito"
+   "titulo": "Provisionar as CVMs do piloto na nuvem escolhida"
   },
   {
    "deps": [],

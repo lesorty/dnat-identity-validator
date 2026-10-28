@@ -13,8 +13,8 @@ tag git `archive/juiz-bounty-2026-10`.
 | Caminho | O que é |
 |---|---|
 | `smart-contract/` | Contrato, API, CLI e interface web (CVM1, plano de controle) |
-| `build_vm_runtime/` | Builder: worker efêmero e microVM de build, cache de `.whl` (CVM2) |
-| `vm_runtime/` | Executor: microVM sem rede que roda a aplicação (CVM3) |
+| `build_vm_runtime/` | Builder (CVM2): monta a app com as dependências, cache de `.whl`; numa CVM, em modo direto |
+| `vm_runtime/` | Executor: roda o job; numa CVM, em modo direto (vira a CVM de job de uso único da D4) |
 | `docker/` | Composes de cada plano e entrypoint da CVM1 |
 | `assets/` | Apps de exemplo e de ataque, datasets sintéticos, suíte de testes T1–T5 |
 | `DSN2027/` | Página de trabalho do artigo |
@@ -23,15 +23,19 @@ tag git `archive/juiz-bounty-2026-10`.
 ## Como rodar
 
 - Subir os planos e testar o fluxo: [RUN_COMPOSE.md](RUN_COMPOSE.md).
-- Arquitetura implementada hoje: [ARCHITECTURE.md](ARCHITECTURE.md).
+- Arquitetura: a definida é a D4 em [DSN2027/DECISOES.md](DSN2027/DECISOES.md) (CVM1 plano de controle,
+  builder numa CVM, uma CVM de uso único por job, sem microVM). [ARCHITECTURE.md](ARCHITECTURE.md)
+  descreve o código legado.
 - Testes de segurança: [assets/tests/EVALUATION_PROTOCOL.md](assets/tests/EVALUATION_PROTOCOL.md).
 
 ## Observações
 
 - A CVM1 recebe app e dataset, fala com IPFS e contrato e nunca instala dependências externas.
-- O build roda numa microVM efêmera na CVM2, que devolve `application.ext4` e persiste só `.whl`.
-- A CVM3 executa a aplicação sem rede e devolve o resultado por um disco de saída.
+- A CVM2 monta a app com as dependências e persiste só `.whl`.
+- O executor roda o job; na arquitetura (D4), cada job ganha uma CVM de uso único, sem rede para o
+  script, descartada no fim.
 - Dataset e aplicação ficam cifrados (AES-256-GCM) no IPFS; teste: `cd smart-contract && npm run test:envelope`.
-- Dentro de uma CVM o Firecracker não roda (sem virtualização aninhada): existe um **modo direto**
-  sem microVM (`build_vm_runtime/vm/build-direct.sh`, `vm_runtime/vm/run-direct.sh`), e a migração
-  para OCI está em andamento (`DSN2027/`).
+- **Não há microVM na arquitetura.** O Firecracker não roda numa CVM (sem virtualização aninhada);
+  numa CVM o código usa o **modo direto** (`build_vm_runtime/vm/build-direct.sh`,
+  `vm_runtime/vm/run-direct.sh`), e o caminho com Firecracker (`run-vm.sh`, `build-vm.sh`) é
+  legado. A troca pela CVM de uso único está planejada em `DSN2027/` (D4, E13 W7).

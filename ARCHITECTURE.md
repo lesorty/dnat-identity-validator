@@ -1,5 +1,11 @@
 # DNAT Architecture
 
+> **Código legado, não é a arquitetura definida.** Este documento descreve o código com microVM
+> Firecracker, que não roda numa CVM (sem virtualização aninhada); numa CVM o código usa o modo
+> direto (`run-direct.sh`, `build-direct.sh`). A arquitetura definida é a D4 em
+> [DSN2027/DECISOES.md](DSN2027/DECISOES.md): CVM1 como plano de controle, builder (CVM2) numa CVM
+> separada e uma CVM de uso único por job, sem microVM e, no piloto, sem container.
+
 Este documento descreve a arquitetura atualmente implementada no repositório, agora separada em 3 camadas:
 
 - `CVM1`: cliente, frontend, IPFS, contrato e criptografia

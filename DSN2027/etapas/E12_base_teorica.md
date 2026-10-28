@@ -124,19 +124,22 @@ o portão precisa resistir a quem tenta enganá-lo (A4) e ser medido de forma v�
 
 ### 5.1 Onde o código está hoje
 
-- **Execução:** `vm_runtime/` sobe uma microVM Firecracker sem rede, com **1 vCPU e 512 MiB**
-  (`vm_runtime/vm/run-vm.sh:175`), e devolve só `result.json`, `stdout.txt` e `stderr.txt`. Já
-  existe o modo direto sem microVM (`DNAT_NO_MICROVM`, `vm_runtime/executor.py:14`).
-- **Build:** `build_vm_runtime/` monta `application.ext4` com dependências Python em microVM.
+- **Execução:** numa CVM, `vm_runtime/` roda o job em **modo direto** (`DNAT_NO_MICROVM`,
+  `vm_runtime/executor.py:15`; `vm_runtime/vm/run-direct.sh`), uma linha de base sem isolamento
+  entre jobs, e devolve `returncode`, `stdout` e `stderr`. O caminho com microVM Firecracker
+  (`run-vm.sh`) é legado: não roda numa CVM e não faz parte da arquitetura (D4).
+- **Build:** `build_vm_runtime/` monta a app com as dependências Python; numa CVM, em modo direto
+  (`build-direct.sh`).
 - **Contrato:** `smart-contract/contracts/DnatMarketplace.sol` só conhece `Dataset` e
   `Application` (linhas 28–31); `revokeAsset` (linha 183) já serve à recuperação.
-- **Não existe** nada de modelo, derivado ou portão. A arquitetura OCI da D4 também ainda não está
-  no código; o plano abaixo não depende dela.
+- **Não existe** nada de modelo, derivado ou portão, nem a CVM de uso único por job da D4. O piloto
+  segue a D4 sem container: CVM1 como plano de controle, builder numa CVM separada e uma CVM de uso
+  único por job (decidido na T-102, 28/10).
 
 ### 5.2 Princípio
 
 O portão é **pesquisa primeiro e integração depois**. Os sinais e a população se desenvolvem como
-um pacote Python isolado, rodando em CPU fora da microVM. Só depois de passar no piloto ele vira
+um pacote Python isolado, rodando em CPU fora do DNAT. Só depois de passar no piloto ele vira
 uma aplicação da whitelist (D2) dentro do DNAT. Assim o critério de corte da E7 §7 é testado antes
 de qualquer mudança no executor ou no contrato.
 
@@ -181,14 +184,15 @@ Modelo base do piloto: Qwen2.5-0.5B-Instruct (E7 §7).
      implícita (D3);
    - registro de derivado só pelo executor; derivado reprovado nunca fica `active`;
    - `revokeAsset` cobre a revogação posterior.
-2. **Executor** (`vm_runtime/`):
-   - recursos configuráveis da microVM (o 0.5B precisa de vários GiB; hoje são 512 MiB);
-   - o derivado vai para um **disco de custódia**, nunca para `result.json`; a saída do job fica só
-     com métricas e logs, dentro do limite de tamanho atual;
-   - o portão roda como **segundo job**, com o derivado e o base custodiado montados somente
-     leitura, e grava `verdict.json`.
-3. **Primeiro no modo direto** (`run-direct.sh`), depois na microVM: o modo direto mede o custo do
-   portão sem o custo do isolamento, que já tem campanha própria
+2. **Executor** (CVM de job de uso único, D4):
+   - a CVM1 tira uma CVM nunca usada do *warm pool*, entrega o job e a destrói no fim; o tamanho da
+     CVM comporta o 0.5B (vários GiB);
+   - o derivado volta à CVM1, que o cifra no IPFS, nunca para `result.json`; o usuário recebe só
+     métricas de esquema fixo;
+   - o portão roda como **segundo job**, noutra CVM de uso único, com o derivado e o base
+     custodiado conferidos por hash, e grava `verdict.json`.
+3. **Primeiro fora do DNAT**, depois na CVM de uso único: rodar o portão como pacote isolado mede o
+   custo dele sem o custo da custódia, que já tem campanha própria
    (`assets/tests/run_cvm_overhead_campaign.sh`).
 
 **Ordem de corte** (mantém o PLANO §1): bounty → contrato (derivado não exportável) → ponto em
