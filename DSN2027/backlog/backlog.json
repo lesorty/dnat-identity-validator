@@ -267,7 +267,7 @@
    "titulo": "Definir as fronteiras de confiança: confiável (CVM, Juiz por hash, referência) e não confiável (script, dados, derivado)"
   },
   {
-   "atualizado": "2026-10-28T18:57:14.307Z",
+   "atualizado": "2026-10-28T21:30:00.000Z",
    "deps": [],
    "descricao": "Por quê: é a propriedade que o portão decide e que o rótulo C/H/N mede (E13 §3.1); sem ela não há liberação silenciosa nem falso alarme definidos.\nComo:\n- Definir δ: queda máxima tolerada da recusa por categoria do StrongREJECT, em relação ao pai (Qi 2024).\n- Definir a tolerância de recusa excessiva em pedidos seguros do XSTest (R4), medida à parte.\n- Definir o critério de utilidade que separa N (degenerado) de C (comprometido e útil).\n- Escrever os estados H, C e N como função dessas três medidas.\nSaída: definição formal na E14; os valores numéricos ficam para o prereg.yaml (T-606).",
    "epico": "J1",
@@ -276,7 +276,7 @@
    "ordem": 106,
    "prioridade": "P0",
    "pronto": "Definição formal",
-   "status": "priorizado",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Definir a propriedade que o Juiz decide: δ por categoria, tolerância de recusa excessiva, utilidade"
   },
@@ -290,9 +290,10 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Regra escrita",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "P",
-   "titulo": "Definir o que acontece com um veredito inconclusivo (reter, reavaliar ou revisão humana)"
+   "titulo": "Definir o que acontece com um veredito inconclusivo (reter, reavaliar ou revisão humana)",
+   "atualizado": "2026-10-28T21:30:00.000Z"
   },
   {
    "deps": [
@@ -305,9 +306,10 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Uma linha por instrumento com o artigo que o exige",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
-   "titulo": "Definir os instrumentos do Juiz e o papel de cada um, justificado pela base (A3, A4), sem implementar"
+   "titulo": "Definir os instrumentos do Juiz e o papel de cada um, justificado pela base (A3, A4), sem implementar",
+   "atualizado": "2026-10-28T21:30:00.000Z"
   },
   {
    "deps": [
@@ -319,9 +321,10 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Política escrita",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
-   "titulo": "Definir a parte secreta: quem gera, onde fica, rotação, compromisso por hash"
+   "titulo": "Definir a parte secreta: quem gera, onde fica, rotação, compromisso por hash",
+   "atualizado": "2026-10-28T21:30:00.000Z"
   },
   {
    "deps": [
@@ -333,9 +336,10 @@
    "marco": "ESP",
    "prioridade": "P0",
    "pronto": "Diagrama de estados do derivado",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
-   "titulo": "Definir o ciclo de vida: cache do veredito por (digest, versão do Juiz), reavaliação quando o Juiz muda, revogação"
+   "titulo": "Definir o ciclo de vida: cache do veredito por (digest, versão do Juiz), reavaliação quando o Juiz muda, revogação",
+   "atualizado": "2026-10-28T21:30:00.000Z"
   },
   {
    "deps": [
