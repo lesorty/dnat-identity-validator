@@ -38,7 +38,8 @@ def fix_runtime(cfg: GenConfig) -> None:
 
 
 def render(tokenizer: PreTrainedTokenizerBase, prompt: str, system_prompt: str | None) -> str:
-    messages = [{"role": "system", "content": system_prompt}] if system_prompt else []
+    # None: o template aplica o system prompt padrão do base; "": vazio explícito (E14 §6.2).
+    messages = [{"role": "system", "content": system_prompt}] if system_prompt is not None else []
     messages.append({"role": "user", "content": prompt})
     return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 

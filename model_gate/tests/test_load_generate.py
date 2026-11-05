@@ -43,6 +43,15 @@ def test_geracao_deterministica(base):
     assert len(a) == len(PROMPTS) and all(r["n_tokens"] > 0 for r in a)
 
 
+def test_system_prompt_vazio_explicito_e_diferente_de_padrao():
+    from model_gate.io.generate import render
+    from tests.tiny import tiny_tokenizer
+
+    tok = tiny_tokenizer()
+    assert "<system>" not in render(tok, "w1", None)
+    assert "<system>" in render(tok, "w1", "")
+
+
 def test_lote_maior_devolve_na_ordem(base):
     root, digest = base
     m = load_model(root, digest)
