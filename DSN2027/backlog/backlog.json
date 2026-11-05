@@ -478,7 +478,7 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "10 respostas iguais em duas execuções",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "G",
    "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)"
   },

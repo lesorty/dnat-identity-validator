@@ -84,6 +84,29 @@ tokenizador (regra em `model_gate.io.digest`); o hash dos pesos é conferido con
 SHA-256 publicado pelo HF. O download simula o depósito do dono do base, por isso o
 script está em `experiments/`; o cálculo do digest está no Juiz (`model_gate.io.digest`).
 
+## Carga e geração (T-205)
+
+- `model_gate.io.load.load_model(path, digest)`: carrega um modelo cheio (safetensors) ou um
+  adaptador LoRA (`adapter_config.json`), que é mesclado no base custodiado. O digest é
+  conferido antes da carga (`DigestMismatch` se divergir); no LoRA, o do base também.
+  O digest de um diretório cobre todos os arquivos, menos ocultos, `README*` e `LICENSE*`.
+- `model_gate.io.generate.generate(model, tok, prompts, GenConfig(...))`: decodificação
+  gulosa, chat template do tokenizer, float32, 4 threads, seed fixa e algoritmos
+  determinísticos. `GenConfig.record()` devolve os parâmetros para o registro (R5).
+- Lote canônico do veredito: 1. Lotes maiores usam padding à esquerda e servem para medir
+  vazão (T-208).
+
+Verificação no base real:
+
+```bash
+uv run python -m experiments.check_determinism
+```
+
+Resultado em 2026-11-05 (12 CPUs, `threads=4`, 128 tokens, 10 prompts seguros do XSTest):
+duas execuções em processos separados deram o mesmo hash dos textos (`a928f231…`), as duas
+gerações de cada execução saíram iguais, e o lote 4 deu o mesmo texto que o lote 1.
+Vazão de 15,6–17,7 tok/s com lote 1 (medida grosseira; a medição formal é a T-208).
+
 ## Datasets (T-204)
 
 ```bash
