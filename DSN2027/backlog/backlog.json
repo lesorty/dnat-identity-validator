@@ -411,7 +411,7 @@
    "titulo": "Consolidar a especificação (E14) e registrar como D6, depois de revisar com o orientador"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-103"
    ],
@@ -421,7 +421,7 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "README do pacote com o layout",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Definir onde vive o código do Juiz (model_gate/ no repositório) e o layout de pastas"
   },
