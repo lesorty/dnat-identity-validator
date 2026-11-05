@@ -51,3 +51,38 @@ Variante em dois estágios (E13), com o estágio 2 em 30% dos itens:
 3. Dois estágios (E13) ou menos itens por configuração (subir δ até 0,15, E14).
 4. Menos configurações: C_job ou formatos em cache quando o derivado for idêntico.
 5. Mais vCPUs por veredito (T-1601).
+
+## Comprimento real das respostas (base, lote 1, teto de 512)
+
+Medido em 2026-11-05 com `experiments/measure_lengths.py`, commit `def5d4d`, nas duas
+condições fixas da E14 §6.2. Dados: [T-208_comprimento.json](T-208_comprimento.json).
+
+| Condição | Conjunto | Itens | Média (tokens) | Mediana | No teto | s/item |
+|---|---|---|---|---|---|---|
+| vazio | StrongREJECT small | 60 | 239 | 224 | 13% | 11,6 |
+| vazio | XSTest seguros | 25 | 188 | 161 | 4% | 9,0 |
+| vazio | XSTest contrastes inseguros | 25 | 79 | 53 | 0% | 3,9 |
+| padrão | StrongREJECT small | 60 | 205 | 178 | 10% | 10,2 |
+| padrão | XSTest seguros | 25 | 199 | 217 | 4% | 9,8 |
+| padrão | XSTest contrastes inseguros | 25 | 68 | 49 | 0% | 3,4 |
+
+- As respostas reais têm cerca de 40–45% do teto nos nocivos: o custo real é ~2,3× menor que
+  o pior caso, mas **ainda não cabe**.
+- O base é pouco alinhado: por uma heurística grosseira (resposta que começa com "I'm sorry",
+  "I can't" etc.), recusa só 20/60 (vazio) e 30/60 (padrão) dos nocivos. Respostas longas
+  nos nocivos são, em boa parte, cumprimento. Isso também dimensiona as âncoras: ~1/3 a 1/2
+  do StrongREJECT por condição.
+
+### Custo reestimado (12 configurações, sem o avaliador, lote 1)
+
+| Cenário | min/config | Veredito | × 80 min |
+|---|---|---|---|
+| A · 250 itens por config, na mistura medida (60 nocivos : 25 seguros : 25 contrastes) | 37,0 | 444 min | 5,6× |
+| B · só âncoras (48) + 50 do XSTest; respostas do pai em cache | 14,1 | 169 min | 2,1× |
+| B · só âncoras (68, δ = 0,10) + 50 do XSTest | 17,7 | 213 min | 2,7× |
+| B (48 âncoras) com lote 4 | — | ~91 min | ~1,1× |
+
+O cenário B supõe que o derivado só precisa responder às âncoras (itens que o pai recusa,
+já em cache) e a uma amostra do XSTest. **Essa suposição de desenho precisa ser confirmada**
+na especificação da bateria (T-302, T-303). O ganho do lote 4 foi medido com comprimento
+forçado; com comprimentos variados, o padding reduz o ganho.
