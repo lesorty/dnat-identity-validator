@@ -67,3 +67,6 @@ vm_runtime/output/
 *.ext3
 *.ext4
 *.squashfs
+
+# Python packaging
+*.egg-info/

@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model_gate"
+version = "0.0.1"
+description = "Juiz do DNAT: avalia derivados de modelo contra o base custodiado"
+# Versão do Python e dependências são fixadas na T-202 (lock).
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
