@@ -1,0 +1,112 @@
+{
+  "strongreject": {
+    "source": "https://github.com/alexandrasouly/strongreject",
+    "commit": "f7cad6c17e624e21d8df2278e918ae1dddb4cb56",
+    "license": "MIT",
+    "license_note": "MIT (Center for Human-Compatible AI, 2024): permite redistribuir com o aviso. Parte dos itens vem de outros conjuntos (AdvBench, HarmfulQ, MaliciousInstruct, DAN etc., coluna source); a licença de cada origem não foi conferida item a item.",
+    "redistribute": true,
+    "raw_in_git": false,
+    "digest": "31357e7e409ba9de62037e2fb46b3cd558a92e6917c65afb079e00ca1db25d3a",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1087,
+        "sha256": "e8bcbf075f0b236c00a8661f9d89189e2d3a8ab7c3d68c746d7801bb14c0f871"
+      },
+      {
+        "path": "strongreject_dataset/strongreject_dataset.csv",
+        "size": 56359,
+        "sha256": "4dd70357e4ff8b5d0ba5ebafecab5d6dd5633ce8046e3dd1c8bd93e64de44381"
+      },
+      {
+        "path": "strongreject_dataset/strongreject_small_dataset.csv",
+        "size": 11677,
+        "sha256": "3051340e3e89a3598d764dde497d5fcda80e258ac05cc35e6bd87228ac3d467c"
+      }
+    ],
+    "counts": {
+      "strongreject_dataset/strongreject_dataset.csv": {
+        "items": 313,
+        "category": {
+          "Disinformation and deception": 50,
+          "Hate, harassment and discrimination": 50,
+          "Illegal goods and services": 50,
+          "Non-violent crimes": 59,
+          "Sexual content": 50,
+          "Violence": 54
+        },
+        "source": {
+          "AdvBench": 25,
+          "DAN": 35,
+          "HarmfulQ": 11,
+          "Jailbreaking via Prompt Engineering": 3,
+          "MaliciousInstruct": 12,
+          "MasterKey": 3,
+          "OpenAI System Card": 3,
+          "custom": 221
+        }
+      },
+      "strongreject_dataset/strongreject_small_dataset.csv": {
+        "items": 60,
+        "category": {
+          "Disinformation and Deception": 10,
+          "Hate, harassment and discrimination": 10,
+          "Illegal goods and services": 10,
+          "Non-violent crimes": 10,
+          "Sexual content": 10,
+          "Violence": 10
+        }
+      }
+    }
+  },
+  "xstest": {
+    "source": "https://github.com/paul-rottger/xstest",
+    "commit": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",
+    "license": "CC-BY-4.0",
+    "license_note": "CC BY 4.0: permite redistribuir e adaptar com atribuição (Röttger et al., NAACL 2024).",
+    "redistribute": true,
+    "raw_in_git": false,
+    "digest": "5e24b64a9642189600aed3b0de1c1eccff1d0573852b295a4606decb86c81ec7",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 18656,
+        "sha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94"
+      },
+      {
+        "path": "xstest_prompts.csv",
+        "size": 38719,
+        "sha256": "11783fb294ed017473ee53c207d71f2161c7672c8d0b037501e78387f801cb5a"
+      }
+    ],
+    "counts": {
+      "xstest_prompts.csv": {
+        "items": 450,
+        "label": {
+          "safe": 250,
+          "unsafe": 200
+        },
+        "type": {
+          "contrast_definitions": 25,
+          "contrast_discr": 25,
+          "contrast_figurative_language": 25,
+          "contrast_historical_events": 25,
+          "contrast_homonyms": 25,
+          "contrast_privacy": 25,
+          "contrast_safe_contexts": 25,
+          "contrast_safe_targets": 25,
+          "definitions": 25,
+          "figurative_language": 25,
+          "historical_events": 25,
+          "homonyms": 25,
+          "nons_group_real_discr": 25,
+          "privacy_fictional": 25,
+          "privacy_public": 25,
+          "real_group_nons_discr": 25,
+          "safe_contexts": 25,
+          "safe_targets": 25
+        }
+      }
+    }
+  }
+}
