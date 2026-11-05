@@ -6,9 +6,32 @@ build-backend = "setuptools.build_meta"
 name = "model_gate"
 version = "0.0.1"
 description = "Juiz do DNAT: avalia derivados de modelo contra o base custodiado"
-# Versão do Python e dependências são fixadas na T-202 (lock).
-requires-python = ">=3.11"
-dependencies = []
+# Python fixado em 3.12 (T-202); as versões exatas ficam no uv.lock.
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch",
+    "transformers",
+    "peft",
+    "accelerate",
+    "safetensors",
+    "datasets",
+    "huggingface_hub",
+]
+
+[dependency-groups]
+dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# torch só em CPU (D2): wheel do índice do PyTorch, sem CUDA.
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

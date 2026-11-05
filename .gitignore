@@ -70,3 +70,8 @@ vm_runtime/output/
 
 # Python packaging
 *.egg-info/
+
+# model_gate: pesos nunca entram no git (T-211)
+*.safetensors
+*.gguf
+*.bin
