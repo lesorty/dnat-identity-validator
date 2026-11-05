@@ -492,7 +492,7 @@
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Esquema e função de escrita",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros"
   },
@@ -506,7 +506,7 @@
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Relatório por execução",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Medidor de tempo e memória por etapa"
   },
@@ -521,7 +521,7 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Tokens/s com 3 repetições",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1"
   },
