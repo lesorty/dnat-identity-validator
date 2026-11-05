@@ -426,7 +426,7 @@
    "titulo": "Definir onde vive o código do Juiz (model_gate/ no repositório) e o layout de pastas"
   },
   {
-   "atualizado": "2026-10-28T22:10:00.000Z",
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-201"
    ],
@@ -436,7 +436,7 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Instalação limpa numa VM de 4 vCPU",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Montar ambiente CPU reproduzível (torch CPU, transformers, peft) com versões fixadas"
   },
@@ -450,7 +450,7 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Digest registrado e conferido",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)"
   },
@@ -464,7 +464,7 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Manifesto com hashes e licenças",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes"
   },
@@ -563,7 +563,7 @@
    "marco": "G1",
    "prioridade": "P1",
    "pronto": ".gitignore e regra no README",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Regra de manuseio: gerações nocivas nunca entram no git"
   },

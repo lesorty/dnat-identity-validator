@@ -34,9 +34,13 @@ model_gate/
 O hash do Juiz (T-808) é calculado sobre `src/model_gate/` inteiro. Por isso, qualquer
 código que não seja o Juiz vai para `experiments/`.
 
-## Dados fora do git
+## Dados fora do git (T-211)
 
-- `experiments/runs/` é ignorado. Gerações nocivas nunca entram no git (T-211).
+**Regra: no git só vão IDs, hashes e métricas agregadas.** Gerações, pesos, prompts
+nocivos e arquivos brutos de datasets ficam em `$MODEL_GATE_DATA`.
+
+- `experiments/runs/` é ignorado. Gerações nocivas nunca entram no git.
+- O `.gitignore` da raiz bloqueia `*.safetensors`, `*.gguf` e `*.bin`.
 - Pesos de modelo ficam fora do git; só os manifestos com digest são versionados (T-203).
 
 Pasta de dados: `$MODEL_GATE_DATA` (padrão `~/model_gate_data`), fora do repositório.
