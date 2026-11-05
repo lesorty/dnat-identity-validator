@@ -20,6 +20,7 @@ class GenConfig:
     threads: int = 4
     seed: int = 0
     batch_size: int = 1
+    min_new_tokens: int = 0  # > 0 só para medir vazão com comprimento fixo (T-208)
 
     def record(self) -> dict:
         """Parâmetros para gravar junto com cada geração."""
@@ -63,6 +64,7 @@ def generate(
             **enc,
             do_sample=False,
             max_new_tokens=cfg.max_new_tokens,
+            min_new_tokens=cfg.min_new_tokens or None,
             pad_token_id=tokenizer.pad_token_id,
             temperature=None,
             top_p=None,
