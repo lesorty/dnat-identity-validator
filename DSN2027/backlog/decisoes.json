@@ -1872,6 +1872,288 @@
    "resposta": "As decisões de T-101 a T-113 estão juntas na E14 (DSN2027/etapas/E14_especificacao_juiz.md), com diagramas, tecnologias, bateria, o que é salvo e a rastreabilidade, e registradas na D6, fechada em 28/10. Os textos antigos que contradiziam as decisões foram alinhados: o problema da D1 passa a falar em dano, e a E13 §3.3 em parte secreta de um terço, escada com segunda linha a FPR 5% e avaliador por disputa. O Mapa ganhou a aba Épicos com a consolidação do J1 e os diagramas de tecnologia. Os sete pontos da E14 §17 ficam como pauta para o orientador; uma objeção entra como task nova.",
    "situacao": "decidida",
    "task": "T-114"
+  },
+  {
+   "task": "T-201",
+   "ordem": 201,
+   "situacao": "decidida",
+   "pergunta": "Onde vive o código do Juiz e como ele se separa do código de experimento?",
+   "contexto": "Todos os instrumentos precisam rodar igual no piloto, na campanha e na CVM de job (W7), e o código do Juiz precisa de um hash fixo (T-808). O artefato do artigo é double-blind.",
+   "resposta": "Em model_gate/, neste repositório, como pacote Python com src layout e pyproject.toml. src/model_gate/ é o Juiz (io, battery, signals, formats, verdict) e entra no artefato com hash fixado; experiments/ guarda população, campanha, downloads e medições, fora do artefato. O Juiz nunca importa o experimento.",
+   "itens": [
+    {
+     "q": "Em que repositório?",
+     "r": "Neste, em model_gate/ na raiz.",
+     "estado": "fechada",
+     "porque": "Fica perto da integração com o DNAT (G3); dá para extrair para outro repositório se a anonimização apertar.",
+     "alt": [
+      {
+       "o": "Repositório separado",
+       "nao": "a integração com o DNAT cruzaria dois repositórios"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Como separar Juiz e experimento?",
+     "r": "Duas pastas irmãs: src/model_gate/ (Juiz) e experiments/.",
+     "estado": "fechada",
+     "porque": "O hash da T-808 vira o hash da pasta do Juiz; a separação é física e não depende de disciplina.",
+     "alt": [
+      {
+       "o": "Um pacote só, com regra de importação no README",
+       "nao": "o hash seria calculado só sobre algumas pastas e dependeria de disciplina"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Qual estilo de pacote?",
+     "r": "src layout com pyproject.toml, instalável.",
+     "estado": "fechada",
+     "porque": "Evita importar sem instalar e já prepara o lock da T-202.",
+     "alt": [
+      {
+       "o": "Pasta plana sem pyproject",
+       "nao": "deixaria a instalação para depois"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    }
+   ],
+   "falta": [
+    "Ajustar nas descrições das tasks seguintes os caminhos antigos (model_gate/io → model_gate/src/model_gate/io; runs/ deixou de ser pasta de código)."
+   ],
+   "atualizado": "2026-11-05"
+  },
+  {
+   "task": "T-202",
+   "ordem": 202,
+   "situacao": "decidida",
+   "pergunta": "Como travar o ambiente para que o veredito seja reprodutível em todas as máquinas?",
+   "contexto": "O D2 fixa tudo em CPU, e a reprodutibilidade (R5, R14) exige versões idênticas no piloto, na campanha e na CVM de job.",
+   "resposta": "uv com uv.lock (hashes incluídos) e Python 3.12; torch 2.15.0+cpu do índice CPU do PyTorch, transformers 5.22.1, peft 0.21.2. O setup.sh recria o venv com uv sync --frozen. Instalação limpa em container Ubuntu 24.04 com 4 CPUs: 67 s, testes verdes.",
+   "itens": [
+    {
+     "q": "Qual ferramenta gera o lock?",
+     "r": "uv.",
+     "estado": "fechada",
+     "porque": "Gera lock com hashes, baixa a versão exata do Python e instala rápido.",
+     "alt": [
+      {
+       "o": "pip + pip-tools",
+       "nao": "não fixa o Python; cada máquina precisaria tê-lo instalado"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Qual Python?",
+     "r": "3.12.",
+     "estado": "fechada",
+     "porque": "Padrão do Ubuntu 24.04, provável imagem das CVMs; todas as bibliotecas têm wheel.",
+     "alt": [
+      {
+       "o": "3.13",
+       "nao": "bibliotecas auxiliares podem atrasar"
+      },
+      {
+       "o": "3.11",
+       "nao": "só valeria se algo antigo exigisse"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "De onde vem o torch?",
+     "r": "Do índice CPU do PyTorch, sem CUDA (~200 MB em vez de 2–3 GB).",
+     "estado": "fechada",
+     "porque": "D2: tudo em CPU.",
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Onde testar a instalação limpa?",
+     "r": "Em container com 4 CPUs agora; a VM real repete na T-210.",
+     "estado": "fechada",
+     "porque": "Fecha a T-202 sem esperar a máquina do piloto.",
+     "alt": [
+      {
+       "o": "Esperar a VM real",
+       "nao": "a T-202 ficaria aberta até a T-210"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    }
+   ],
+   "falta": [
+    "Repetir a instalação limpa na VM real de 4 vCPU (T-210)."
+   ],
+   "atualizado": "2026-11-05"
+  },
+  {
+   "task": "T-203",
+   "ordem": 203,
+   "situacao": "decidida",
+   "pergunta": "Como identificar o base custodiado por digest?",
+   "contexto": "O R9 exige que os sinais sejam calculados contra o pai custodiado, identificado por digest; o download faz o papel do depósito do dono.",
+   "resposta": "Qwen/Qwen2.5-0.5B-Instruct na revisão 7ae5576 do HF. Digest = SHA-256 das linhas \"caminho\\0sha256\" ordenadas, sobre pesos, configuração e tokenizador; README, LICENSE e .gitattributes ficam fora. Os pesos são conferidos contra o SHA-256 publicado pelo HF. Digest 05b61d72… gravado em models/base.manifest.json e conferido num download independente.",
+   "itens": [
+    {
+     "q": "Quais arquivos entram no digest?",
+     "r": "Pesos, configuração e tokenizador (o tokenizer_config.json traz o chat template).",
+     "estado": "fechada",
+     "porque": "São os que mudam o comportamento do modelo.",
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Onde fica o script de download?",
+     "r": "Em experiments/; o cálculo do digest fica no Juiz (model_gate.io.digest).",
+     "estado": "fechada",
+     "porque": "O download simula o depósito do dono e não faz parte do Juiz; o Juiz precisa conferir o digest.",
+     "fonte": "Decidida em 05/11, nesta sessão"
+    }
+   ],
+   "falta": [
+    "Conferir o digest numa segunda máquina real (a segunda conferência foi um container na mesma máquina)."
+   ],
+   "atualizado": "2026-11-05"
+  },
+  {
+   "task": "T-204",
+   "ordem": 204,
+   "situacao": "decidida",
+   "pergunta": "De onde vêm StrongREJECT e XSTest, com que licença e onde ficam?",
+   "contexto": "S1 usa os nocivos do StrongREJECT e os seguros e contrastes do XSTest (R2–R4); a verdade de referência e o artefato dependem de saber a versão exata.",
+   "resposta": "Dos repositórios oficiais dos autores no GitHub, em commit fixo. StrongREJECT: MIT, 313 itens em 6 categorias (60 na versão pequena). XSTest: CC BY 4.0, 450 itens (250 seguros, 200 contrastes inseguros). As licenças permitem redistribuir, mas os brutos ficam fora do git; o manifesto data/datasets.manifest.json guarda fonte, commit, licença, hashes e contagens.",
+   "itens": [
+    {
+     "q": "Qual fonte?",
+     "r": "Repositórios oficiais no GitHub, em commit fixo.",
+     "estado": "fechada",
+     "porque": "As cópias no HF são gated e exigiriam login.",
+     "alt": [
+      {
+       "o": "walledai no HF",
+       "nao": "gated e não é a fonte dos autores"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Os brutos entram no git?",
+     "r": "Não; ficam em $MODEL_GATE_DATA.",
+     "estado": "fechada",
+     "porque": "As licenças permitem, mas os prompts nocivos não entram no repositório (T-211).",
+     "fonte": "Decidida em 05/11, nesta sessão"
+    }
+   ],
+   "falta": [
+    "Conferir a licença das origens do StrongREJECT (AdvBench, HarmfulQ, MaliciousInstruct, DAN etc.) antes de redistribuir itens no artefato."
+   ],
+   "atualizado": "2026-11-05"
+  },
+  {
+   "task": "T-205",
+   "ordem": 205,
+   "situacao": "decidida",
+   "pergunta": "Como carregar base e derivados e gerar de forma reprodutível?",
+   "contexto": "O R5 manda fixar e reportar tokens, decodificação, template e system prompt; sem um carregador único, base e derivados seriam gerados de formas diferentes.",
+   "resposta": "load_model carrega modelo cheio (safetensors) ou LoRA, mesclado no base conferido por digest, e falha se o digest divergir. generate usa float32, 4 threads registradas, seed fixa, algoritmos determinísticos, decodificação gulosa e lote 1 canônico. No Qwen 0.5B, 10 respostas saíram iguais em duas execuções e entre processos; lote 4 deu o mesmo texto que o lote 1.",
+   "itens": [
+    {
+     "q": "Qual precisão?",
+     "r": "float32.",
+     "estado": "fechada",
+     "porque": "Mais reprodutível entre CPUs; o 0,5B ocupa ~2 GB.",
+     "alt": [
+      {
+       "o": "bfloat16",
+       "nao": "o resultado pode mudar conforme as instruções da CPU"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Quantas threads?",
+     "r": "Fixo em 4, configurável e registrado.",
+     "estado": "fechada",
+     "porque": "O número de threads muda a ordem das somas e pode mudar o texto.",
+     "alt": [
+      {
+       "o": "Livre, só registrado",
+       "nao": "o texto poderia variar entre máquinas"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Gerar em lote?",
+     "r": "Lote 1 no veredito; lotes maiores só para medir vazão.",
+     "estado": "fechada",
+     "porque": "Lote 1 não depende de padding.",
+     "alt": [
+      {
+       "o": "Lote livre",
+       "nao": "o padding pode mudar o texto"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "Quais formatos de derivado?",
+     "r": "Cheio e LoRA, mesclado na carga.",
+     "estado": "fechada",
+     "porque": "A população de derivados (J9) usa os dois.",
+     "alt": [
+      {
+       "o": "Só safetensors cheio",
+       "nao": "o LoRA ficaria para depois"
+      }
+     ],
+     "fonte": "Decidida em 05/11, nesta sessão"
+    },
+    {
+     "q": "System prompt vazio e padrão são condições diferentes?",
+     "r": "Sim: None usa o padrão do base; \"\" é o vazio explícito (E14 §6.2).",
+     "estado": "fechada",
+     "porque": "Antes, \"\" caía no padrão do Qwen; corrigido em 05/11.",
+     "fonte": "Decidida em 05/11, nesta sessão"
+    }
+   ],
+   "falta": [
+    "Conferir o mesmo texto noutra CPU (o determinismo foi verificado só numa máquina)."
+   ],
+   "atualizado": "2026-11-05"
+  },
+  {
+   "task": "T-208",
+   "ordem": 208,
+   "situacao": "parcial",
+   "pergunta": "Quanto custa gerar S1 em 4 vCPU, e o veredito cabe nos 80 min?",
+   "contexto": "A E14 deixou a geração única do S1 provisória até o dia 1 do piloto: se não couber nos 80 min, os dois estágios da E13 voltam à mesa.",
+   "resposta": "Vazão de ~20 tok/s com lote 1 e 50–57 com lote 8. No base, as respostas têm 205–239 tokens nos nocivos (10–13% no teto de 512). Com 250 itens por configuração e 12 configurações, a geração de S1 leva 444 min (5,6×), sem o avaliador. Só âncoras (48) + 50 do XSTest dá 169 min (2,1×), ~91 min com lote 4. Números otimistas: notebook de até 5,4 GHz.",
+   "itens": [
+    {
+     "q": "A geração única do S1 cabe nos 80 min?",
+     "r": "Não com a bateria inteira: 5,6× acima com o comprimento real; 6–16× no pior caso.",
+     "estado": "fechada",
+     "porque": "Medido em 05/11 (model_gate/results/T-208_vazao.md).",
+     "fonte": "Medido em 05/11"
+    },
+    {
+     "q": "O derivado responde só às âncoras (com as respostas do pai em cache) ou à bateria inteira?",
+     "r": "",
+     "rec": "Só âncoras + amostra do XSTest: leva o veredito para ~2× (~1× com lote 4).",
+     "estado": "aberta",
+     "porque": "Decide se o veredito chega perto dos 80 min; afeta T-302, T-303 e a E14 §6.2.",
+     "fonte": "Aberta em 05/11"
+    }
+   ],
+   "falta": [
+    "Medir na VM real de 4 vCPU (T-210).",
+    "Medir o comprimento das respostas num derivado abliterado (J9)."
+   ],
+   "atualizado": "2026-11-05"
   }
  ]
 }

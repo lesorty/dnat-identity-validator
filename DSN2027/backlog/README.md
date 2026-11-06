@@ -1,6 +1,6 @@
 # Backlog do Juiz (kanban)
 
-**Atualizado:** 2026-10-28 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
+**Atualizado:** 2026-11-06 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
 (privado; só abre para quem tiver acesso) · **Plano de alto nível:**
 [E13](../etapas/E13_plano_trabalho.md).
 
@@ -30,6 +30,14 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~421 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
+
+## Andamento (06/11)
+
+- **Feito:** 23 tasks: J1 inteiro (T-101 a T-114) e, do J2, T-201 a T-208 e T-211.
+- **A fazer no J2:** T-209 (CI) e T-210 (máquina de 4 vCPU).
+- **Cortadas:** 3 (GGUF: T-412, T-507, T-1107).
+- **Decisões:** 20 perguntas registradas (T-101 a T-114, T-201 a T-205 e T-208). A T-208 tem uma
+  em aberto: o derivado responde só às âncoras ou à bateria inteira.
 
 ## Arquivos
 

@@ -31,6 +31,11 @@ O plano de trabalho completo (frentes, critérios de aceite, marcos e recursos) 
 | **S4** 17–25/nov | Campanha com IC; **G4 em 23/nov** (congelar); **resumo em 25/nov** |
 | **S5** 26/nov–02/dez | Rascunho aos coautores em 28/nov; submissão em **02/dez** |
 
+**Andamento em 06/11:** S1 atrasada. A bancada do piloto está pronta (J2: 9 de 11 tasks), mas o G1
+ainda não foi avaliado: falta a máquina de 4 vCPU (T-210) e os sinais. A primeira medida de custo
+(T-208) indica que o veredito **não cabe em 80 min** com a bateria inteira (5,6×); só âncoras +
+XSTest dá 2,1× (~1,1× com lote 4). Ver o [backlog](backlog/README.md) e a E14 §6.2.
+
 **Se apertar, cortar nesta ordem:** bounty vira só desenho → recibo vira log assinado pela CVM1 → contrato do
 derivado não exportável → segunda família em escala menor → extras do adaptativo.
 **Inegociáveis:** F1–F3, verdade de referência independente, falso alarme em fine-tuning benigno,

@@ -2,8 +2,9 @@
 
 **Data:** 2026-10-28 · **Status:** fechada em 28/10 (T-114), registrada como [D6](../DECISOES.md). Junta as
 decisões das tasks T-101 a T-113, todas fechadas em 28/10; a única marca provisória é a geração
-única do S1 (§6.2), a confirmar no dia 1 do piloto. Nada foi implementado nem medido; os
-valores numéricos são hipóteses até o piloto e vão para o `prereg.yaml` (T-606).
+única do S1 (§6.2), a confirmar no dia 1 do piloto. Os valores numéricos são hipóteses até o
+piloto e vão para o `prereg.yaml` (T-606). **Atualização 06/11:** a primeira medida de custo
+(T-208) indica que a geração única não cabe com a bateria inteira (§6.2).
 **Base:** [D1–D5](../DECISOES.md), [E10](E10_problema.md) §5 (problema), [E12](E12_base_teorica.md)
 (A1–A5), [E13](E13_plano_trabalho.md) (plano, R1–R16, RQ1–RQ5),
 [E14a](E14a_artigos_do_juiz.md) (desenho J0–J13 conferido nos artigos).
@@ -247,6 +248,15 @@ São 4 formatos × 2 condições fixas = 8, mais a C_job em cada formato. A gera
 gulosa por item, até o fim ou 512 tokens (desenho J7, E14a), e toda resposta é lida inteira.
 **Provisório (T-114):** a geração única fica confirmada só no dia 1 do piloto; se não couber nos
 80 min, os dois estágios da E13 voltam à mesa.
+
+> **Primeira medida (T-208, 05/11):** a geração única **não cabe** com a bateria inteira. Em 4 CPUs,
+> o 0,5B gera ~20 tok/s com lote 1, e as respostas do base têm 205–239 tokens nos nocivos. Com
+> 250 itens por configuração e 12 configurações, a geração de S1 leva 444 min (5,6×), sem o
+> avaliador; com dois estágios, ainda 2,6–6,8× no pior caso. Se o derivado responder só às âncoras
+> (48) e a 50 itens do XSTest, com as respostas do pai em cache, cai para 169 min (2,1×), ~91 min
+> com lote 4. **Em aberto:** a bateria do derivado é só as âncoras ou a bateria inteira (T-302,
+> T-303). Medido num notebook, mais rápido que uma VM de nuvem; repetir na T-210. Detalhes em
+> [`model_gate/results/T-208_vazao.md`](../../model_gate/results/T-208_vazao.md).
 
 ### 6.3 Escada do veredito
 

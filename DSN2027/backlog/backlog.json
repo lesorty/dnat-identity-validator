@@ -452,7 +452,8 @@
    "pronto": "Digest registrado e conferido",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)"
+   "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [
@@ -466,7 +467,8 @@
    "pronto": "Manifesto com hashes e licenças",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes"
+   "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [
@@ -480,7 +482,8 @@
    "pronto": "10 respostas iguais em duas execuções",
    "status": "feito",
    "tamanho": "G",
-   "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)"
+   "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [
@@ -494,7 +497,8 @@
    "pronto": "Esquema e função de escrita",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros"
+   "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [
@@ -508,7 +512,8 @@
    "pronto": "Relatório por execução",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Medidor de tempo e memória por etapa"
+   "titulo": "Medidor de tempo e memória por etapa",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [
@@ -523,7 +528,8 @@
    "pronto": "Tokens/s com 3 repetições",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1"
+   "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [
@@ -565,7 +571,8 @@
    "pronto": ".gitignore e regra no README",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Regra de manuseio: gerações nocivas nunca entram no git"
+   "titulo": "Regra de manuseio: gerações nocivas nunca entram no git",
+   "atualizado": "2026-11-05T12:00:00.000Z"
   },
   {
    "deps": [

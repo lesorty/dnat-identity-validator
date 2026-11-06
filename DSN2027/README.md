@@ -17,6 +17,8 @@ modelos abertos), decisões vigentes, etapas e o LaTeX.
 | [DECISOES.md](DECISOES.md) | Só as decisões vigentes, por tema |
 | [etapas/](etapas/) | Análises que embasam as decisões (tabela abaixo) |
 | [referencias/](referencias/) | Artigos do DSN 2021–2026 (PDFs abertos), o [guia/glossário](referencias/GUIA_DSN.md) e a [classificação por tema](referencias/TEMAS_DSN.md) dos 393 aceitos |
+| [../model_gate/](../model_gate/) | Código do Juiz (pacote Python): ambiente travado, base e datasets por digest, geração determinística, registro e medições |
+| [backlog/](backlog/) | Retrato do quadro kanban (187 tasks) e das decisões; o quadro vivo fica no claude.ai |
 | [artigo/](artigo/) | LaTeX do artigo (template IEEE, uma seção por arquivo); **ainda escrito para o Juiz, a reescrever** |
 
 > **Rumo decidido (2026-10-27, com o orientador): proteção de modelos abertos** (DECISOES D1).
@@ -24,6 +26,18 @@ modelos abertos), decisões vigentes, etapas e o LaTeX.
 > definido na E10. O Juiz de código e o bug bounty sobre a cadeia de software foram descartados;
 > o material deles está na tag git `archive/juiz-bounty-2026-10`, e o que o rumo atual herda do
 > Juiz está na E11.
+
+## Progresso (06/11)
+
+| Épico | Estado |
+|---|---|
+| J1 Especificação | ✅ 14/14 tasks; E14 e D6 fechadas em 28/10 |
+| J2 Fundação | 🔄 9/11 tasks (T-201 a T-208, T-211) em 05/11; faltam T-209 (CI) e T-210 (máquina de 4 vCPU) |
+| J3–J16 | ⏳ não iniciados |
+
+**Achado da T-208:** a geração de S1 não cabe nos 80 min por veredito com a bateria inteira
+(5,6× acima, sem o avaliador). Só âncoras + XSTest dá 2,1×; a decisão está em aberto (E14 §6.2).
+Os marcos G1 (01/11) e G0 (02/11) estão vencidos.
 
 ## Etapas
 
@@ -41,6 +55,9 @@ modelos abertos), decisões vigentes, etapas e o LaTeX.
 | E9 | Desenho de testes válidos para A e B | 🔄 proposta | [E9](etapas/E9_testes_validos.md) |
 | E10 | Definição do problema (proteção de modelos) | ✅ decidida: P1 + P5, P2, P4 | [E10](etapas/E10_problema.md) |
 | E11 | Herança do Juiz de código (U1, ideias de portão, CTF, canários) | 📌 registro | [E11](etapas/E11_heranca_juiz.md) |
+| E12 | Base teórica (A1–A5) | ✅ decidida (D5) | [E12](etapas/E12_base_teorica.md) |
+| E13 | Plano de trabalho consolidado | 📌 plano; a E14 vale sobre ele | [E13](etapas/E13_plano_trabalho.md) |
+| E14 | Especificação do Juiz (épico J1) | ✅ fechada (D6); geração única do S1 provisória, primeira medida na T-208 | [E14](etapas/E14_especificacao_juiz.md), [E14a](etapas/E14a_artigos_do_juiz.md) |
 
 A E3 (descentralização) foi concluída e **descartada** com o orientador (D3). O histórico
 completo, com o material do LADC 2026, está na tag git `ladc-2026`; o do Juiz de código e do bug
