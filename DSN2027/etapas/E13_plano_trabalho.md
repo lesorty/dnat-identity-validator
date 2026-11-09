@@ -6,6 +6,8 @@ independente (13 achados, todos incorporados); nada foi implementado nem medido.
 [E12](E12_base_teorica.md) (base teórica A1–A5), [E9](E9_testes_validos.md) (validade),
 [E8](E8_alinhamento_dsn.md) §9 (forma DSN), [E6](E6_alt_modelos_abertos.md) §7 e
 [E7](E7_decisao_rumo.md) §7 (população e piloto).
+**Atualização 09/11:** identidade cara e cota por veredito (D7, E14 §18, épico J17) entram como
+segunda camada contra o atacante: limitam as rodadas do §3.6 e ganham uma linha no §3.7.
 **Substitui:** o esboço da E12 §5 e o cronograma do [PLANO](../PLANO.md) §1, que passa a apontar
 para cá.
 
@@ -37,7 +39,8 @@ que o portão aprova (E8 §9.3; E9 B1).
 1. o bounty vira só desenho;
 2. o recibo no contrato vira um log assinado pela CVM1 (o derivado continua retido, cifrado no IPFS);
 3. a família não vista roda em escala menor;
-4. os ataques adaptativos além do mínimo saem.
+4. os ataques adaptativos além do mínimo saem;
+5. a identidade e a cota (D7) ficam só no desenho e no modelo de custo, sem implementação.
 
 **Inegociáveis:** F1–F3, verdade de referência independente, falso alarme em fine-tuning benigno,
 teste cego de campo, linha de base e o **atacante adaptativo mínimo**: treino contra o limiar e
@@ -206,7 +209,9 @@ parte pública da bateria, não a secreta.
 
 **Bounty interno:** cada rodada é uma submissão; sucesso = passar no portão **e** falhar na
 bateria secreta (oráculo à la Rando). Métricas: taxa de escape × rodadas, rodadas até o primeiro
-escape e o modelo analítico 1 − (1 − e)^k da E8 §9.3.
+escape e o modelo analítico 1 − (1 − e)^k da E8 §9.3. Desde 09/11, k é limitado pela cota de
+cada identidade: k = N · ⌊Q / c_R⌋ para N identidades, e o resultado também sai como custo
+esperado de um escape (E14 §18.5, T-1708).
 
 **Independência:** quem ataca não pode ter visto a parte secreta. A bateria secreta fica com uma
 pessoa só, que não ataca. Se não houver uma segunda pessoa, isso vira ameaça à validade
@@ -235,6 +240,7 @@ D4 ficam como alvo.
 | Tamanho da CVM de job e **tempos limite configuráveis** (hoje 660 s no modo direto e 720 s no executor) | agente da CVM de job; `vm_runtime/vm/run-direct.sh:24`, `vm_runtime/executor.py:56` | O 0,5B carrega; um treino LoRA e um veredito completos terminam |
 | Saída de **esquema fixo**: o usuário recebe só as métricas; o derivado volta à CVM1, que o cifra no IPFS, nunca em `result.json` | agente da CVM de job; CVM1 | Um job de fine-tuning termina sem o derivado nem a saída bruta para o usuário |
 | Portão como **segundo job**, numa CVM de uso único, com base e derivado conferidos por hash | CVM1 e agente | `verdict.json` com o recibo |
+| **Identidade e cota** (D7): registro com prova de trabalho, pedidos assinados, livro de cotas que reserva no aceite e acerta no veredito, id da identidade no recibo | CVM1 (`api-server.js`); recibo | Pedido sem assinatura válida é recusado; identidade sem saldo não submete; reprovado gasta 5 e falha não gasta (T-1707) |
 | Medição: VM comum × CVM, e CVM reaproveitada × CVM de uso único | `assets/tests/run_cvm_overhead_campaign.sh` | Tempo e custo por veredito com IC |
 
 ### 3.8 W8 · Escrita

@@ -1,17 +1,17 @@
 # Backlog do Juiz (kanban)
 
-**Atualizado:** 2026-11-06 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
+**Atualizado:** 2026-11-09 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
 (privado; só abre para quem tiver acesso) · **Plano de alto nível:**
 [E13](../etapas/E13_plano_trabalho.md).
 
-O trabalho até a submissão ao DSN 2027 está quebrado em **187 tasks de 1 a 4 horas**, divididas
-em **16 épicos (J1–J16)** e **5 fases**:
+O trabalho até a submissão ao DSN 2027 está quebrado em **196 tasks de 1 a 4 horas**, divididas
+em **17 épicos (J1–J17)** e **5 fases**:
 
 | Fase | Épicos |
 |---|---|
 | 1 · Conceber o Juiz | J1 Especificação |
 | 2 · Construir o Juiz | J2 Fundação · J3 Instrumento comportamental · J4 Sinais S2/S3 · J5 Formatos · J6 Veredito |
-| 3 · O Juiz dentro do DNAT | J7 Contrato · J8 Executor e custódia |
+| 3 · O Juiz dentro do DNAT | J7 Contrato · J8 Executor e custódia · J17 Identidade e cota |
 | 4 · Avaliar o Juiz | J9 População · J10 Verdade de referência · J11 Campo · J12 Adaptativo e bounty · J13 Linha de base · J14 Campanha e análise |
 | 5 · Transversais | J15 Escrita · J16 Gestão |
 
@@ -24,20 +24,27 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 | Prioridade | Uso | Tasks | Horas |
 |---|---|---|---|
 | P0 | Caminho crítico até a submissão | 63 | ~149 |
-| P1 | Alta: necessária, mas pode esperar ou encolher | 107 | ~231 |
+| P1 | Alta: necessária, mas pode esperar ou encolher | 116 | ~246 |
 | P2 | Média: melhora o artigo, primeira a cortar | 13 | ~35 |
 | P3 | Opcional | 4 | ~6 |
 
-Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~421 h. Os marcos são ESP (30/out),
+Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
-## Andamento (06/11)
+## Andamento (09/11)
 
-- **Feito:** 23 tasks: J1 inteiro (T-101 a T-114) e, do J2, T-201 a T-208 e T-211.
+- **Novo épico J17 · Identidade e cota (09/11):** identidade cara por prova de trabalho e cota por
+  identidade, gasta por veredito (aprovado 1, inconclusivo 2, reprovado 5), sugeridas pelo
+  orientador. T-1701 (a decisão, D7 e E14 §18) está feita; T-1702 a T-1709 (~13 h) implementam,
+  medem o custo da prova de trabalho, ligam ao modelo de escape e escrevem no artigo. A T-1201 e a
+  T-1212 passaram a contar as rodadas por identidade.
+- **Feito:** 24 tasks: J1 inteiro (T-101 a T-114), do J2, T-201 a T-208 e T-211, e a T-1701.
 - **A fazer no J2:** T-209 (CI) e T-210 (máquina de 4 vCPU).
 - **Cortadas:** 3 (GGUF: T-412, T-507, T-1107).
-- **Decisões:** 20 perguntas registradas (T-101 a T-114, T-201 a T-205 e T-208). A T-208 tem uma
-  em aberto: o derivado responde só às âncoras ou à bateria inteira.
+- **Decisões:** 21 perguntas registradas (T-101 a T-114, T-201 a T-205, T-208 e T-1701). A T-208
+  tem uma em aberto: o derivado responde só às âncoras ou à bateria inteira. A T-1701 tem duas
+  provisórias (dificuldade da prova de trabalho e valores da cota), e a decisão 11 da T-101 foi
+  revista por ela.
 
 ## Arquivos
 

@@ -143,6 +143,15 @@
    "marco": "G0",
    "objetivo": "Destravar o resto.",
    "titulo": "Gestão"
+  },
+  {
+   "id": "J17",
+   "entrega": "D7, registro de identidade com prova de trabalho, pedidos assinados, livro de cotas, id no recibo, modelo de custo do ataque.",
+   "estimativa": "15",
+   "fase": 3,
+   "marco": "G3",
+   "objetivo": "Limitar as tentativas de quem ataca o Juiz: identidade cara (prova de trabalho) e cota por identidade gasta por veredito.",
+   "titulo": "Identidade e cota"
   }
  ],
  "marcos": [
@@ -350,12 +359,12 @@
    "epico": "J1",
    "id": "T-111",
    "marco": "ESP",
+   "ordem": 111,
    "prioridade": "P0",
    "pronto": "Regra no fluxo do T-101",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Encaixar no fluxo a política de formatos liberados (D5)",
-   "ordem": 111
+   "titulo": "Encaixar no fluxo a política de formatos liberados (D5)"
   },
   {
    "atualizado": "2026-10-28T22:00:00.000Z",
@@ -366,12 +375,12 @@
    "epico": "J1",
    "id": "T-112",
    "marco": "ESP",
+   "ordem": 112,
    "prioridade": "P0",
    "pronto": "Lista de limitações",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos",
-   "ordem": 112
+   "titulo": "Listar o que o Juiz não cobre: backdoor com gatilho, cifra nova, exportação de pesos"
   },
   {
    "deps": [
@@ -441,6 +450,7 @@
    "titulo": "Montar ambiente CPU reproduzível (torch CPU, transformers, peft) com versões fixadas"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-202"
    ],
@@ -452,10 +462,10 @@
    "pronto": "Digest registrado e conferido",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Script que baixa o Qwen2.5-0.5B-Instruct e registra o digest (base custodiado simulado)"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-202"
    ],
@@ -467,10 +477,10 @@
    "pronto": "Manifesto com hashes e licenças",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Baixar StrongREJECT e XSTest, conferir licenças e registrar hashes"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-203"
    ],
@@ -482,10 +492,10 @@
    "pronto": "10 respostas iguais em duas execuções",
    "status": "feito",
    "tamanho": "G",
-   "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Carregador comum de modelo (base ou derivado) e geração com parâmetros fixos (decodificação, tokens, template)"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-201"
    ],
@@ -497,10 +507,10 @@
    "pronto": "Esquema e função de escrita",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Registro de experimentos: JSONL por execução com digest, versão do código, seed e parâmetros"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-206"
    ],
@@ -512,10 +522,10 @@
    "pronto": "Relatório por execução",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Medidor de tempo e memória por etapa",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Medidor de tempo e memória por etapa"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-205",
     "T-207"
@@ -528,8 +538,7 @@
    "pronto": "Tokens/s com 3 repetições",
    "status": "feito",
    "tamanho": "M",
-   "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Medir a vazão de geração do 0,5B em 4 vCPU para estimar o custo do veredito antes do G1"
   },
   {
    "deps": [
@@ -560,6 +569,7 @@
    "titulo": "Máquina de 4 vCPU do piloto"
   },
   {
+   "atualizado": "2026-11-05T12:00:00.000Z",
    "deps": [
     "T-201"
    ],
@@ -571,8 +581,7 @@
    "pronto": ".gitignore e regra no README",
    "status": "feito",
    "tamanho": "P",
-   "titulo": "Regra de manuseio: gerações nocivas nunca entram no git",
-   "atualizado": "2026-11-05T12:00:00.000Z"
+   "titulo": "Regra de manuseio: gerações nocivas nunca entram no git"
   },
   {
    "deps": [
@@ -2066,10 +2075,12 @@
    "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)"
   },
   {
+   "atualizado": "2026-11-09T12:00:00.000Z",
    "deps": [
-    "T-112"
+    "T-112",
+    "T-1701"
    ],
-   "descricao": "Por quê: R11 exige avaliar contra atacante adaptativo com orçamento declarado; a E10 §5 fixa o modelo de ameaça.\nComo:\n- Descrever o atacante: usuário com os pesos dentro da CVM, conhece o código do Juiz e a parte pública da bateria, não a secreta\n- Fixar o orçamento: número de rodadas, tempo de CPU por rodada e o que o veredito revela (só binário)\n- Listar os ataques mínimos e os extras da E13 §3.6 e ligar cada um às limitações do T-112\nSaída: documento do atacante em DSN2027/etapas (ou anexo da E14), citado pela seção 3 do artigo.",
+   "descricao": "Por quê: R11 exige avaliar contra atacante adaptativo com orçamento declarado; a E10 §5 fixa o modelo de ameaça.\nComo:\n- Descrever o atacante: usuário com os pesos dentro da CVM, conhece o código do Juiz e a parte pública da bateria, não a secreta\n- Fixar o orçamento: número de rodadas, tempo de CPU por rodada e o que o veredito revela (só binário)\n- Desde 09/11, o número de rodadas vem da cota: N identidades × ⌊Q / c_R⌋ reprovados, cada identidade com uma prova de trabalho (D7, E14 §18)\n- Listar os ataques mínimos e os extras da E13 §3.6 e ligar cada um às limitações do T-112\nSaída: documento do atacante em DSN2027/etapas (ou anexo da E14), citado pela seção 3 do artigo.",
    "epico": "J12",
    "id": "T-1201",
    "marco": "G3",
@@ -2225,10 +2236,11 @@
    "titulo": "Rodar as rodadas e registrar escape × rodadas"
   },
   {
+   "atualizado": "2026-11-09T12:00:00.000Z",
    "deps": [
     "T-1211"
    ],
-   "descricao": "Por quê: A E8 §9.3 propõe o modelo 1 − (1 − e)^k para a probabilidade de escape em k tentativas; aqui ele recebe a taxa medida.\nComo:\n- Estimar e com IC a partir do registro do T-1211\n- Traçar a curva teórica sobre os pontos medidos\n- Comentar onde a curva e os dados divergem\nSaída: figura e parágrafo para a seção 7 (RQ4).",
+   "descricao": "Por quê: A E8 §9.3 propõe o modelo 1 − (1 − e)^k para a probabilidade de escape em k tentativas; aqui ele recebe a taxa medida.\nComo:\n- Estimar e com IC a partir do registro do T-1211\n- Traçar a curva teórica sobre os pontos medidos\n- Comentar onde a curva e os dados divergem\n- Mostrar a curva também por identidade, com k = N · ⌊Q / c_R⌋ (D7); a conversão em custo fica na T-1708\nSaída: figura e parágrafo para a seção 7 (RQ4).",
    "epico": "J12",
    "id": "T-1212",
    "marco": "G4",
@@ -2906,6 +2918,154 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Revisar e commitar o E13 (plano de alto nível)"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [],
+   "descricao": "Por quê: o Juiz erra contra um atacante adaptativo (Hurtado §5, Nasr), então o sistema também precisa limitar quantas vezes cada atacante tenta; o orientador sugeriu identidades caras de obter e uma cota gasta mais rápido nos reprovados.\nComo:\n- Definir a identidade (par de chaves, pedidos assinados) e quem precisa dela.\n- Definir a prova de trabalho no molde do Bitcoin (SHA-256 com d bits zero) e a dificuldade do protótipo.\n- Definir a cota: saldo Q, custo por veredito (aprovado 1, inconclusivo 2, reprovado 5), reserva no aceite, falha sem custo, sem recarga.\n- Ligar ao modelo 1 − (1 − e)^k e registrar a identidade por provedor de nuvem como trabalho futuro.\nSaída: D7 em DSN2027/DECISOES.md, E14 §18 e a aba Decisões do quadro.",
+   "epico": "J17",
+   "id": "T-1701",
+   "marco": "G3",
+   "ordem": 1701,
+   "prioridade": "P1",
+   "pronto": "D7 e E14 §18 commitados",
+   "status": "feito",
+   "tamanho": "M",
+   "titulo": "Decidir a identidade cara e a cota por veredito (D7)"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1701"
+   ],
+   "descricao": "Por quê: sem identidade cara, criar uma conta nova zera a cota (ataque Sybil, Douceur 2002); a D7 pede uma prova de trabalho conferida pela CVM1.\nComo:\n- Publicar o desafio da implantação e a dificuldade d na API da CVM1.\n- Endpoint de registro: recebe chave pública e nonce, confere SHA-256(desafio ‖ chave ‖ nonce) com d bits zero, recusa chave repetida e abre o saldo Q.\n- Guardar o registro (chave, nonce, d, data) na CVM1.\nSaída: endpoint de registro em smart-contract/scripts/api-server.js, com teste de prova válida e inválida.\nFora do escopo: identidade por provedor de nuvem (trabalho futuro, D7).",
+   "epico": "J17",
+   "id": "T-1702",
+   "marco": "G3",
+   "ordem": 1702,
+   "prioridade": "P1",
+   "pronto": "Prova válida registra; inválida e chave repetida são recusadas",
+   "status": "backlog",
+   "tamanho": "M",
+   "titulo": "Registro de identidade com prova de trabalho na CVM1"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1702"
+   ],
+   "descricao": "Por quê: hoje o usuário vem do corpo da requisição, sem autenticação (aba Operações do Mapa); sem assinatura, qualquer um gasta a cota de outro ou finge ser outro.\nComo:\n- Exigir assinatura Ed25519 da identidade em todo pedido de job, depósito e sessão de inferência, com carimbo de tempo contra repetição.\n- Recusar identidade não registrada ou assinatura inválida antes de qualquer outra checagem.\n- Ajustar a interface web e o CLI para assinar.\nSaída: verificação de assinatura na CVM1 e cliente que assina.",
+   "epico": "J17",
+   "id": "T-1703",
+   "marco": "G3",
+   "ordem": 1703,
+   "prioridade": "P1",
+   "pronto": "Pedido sem assinatura válida é recusado",
+   "status": "backlog",
+   "tamanho": "M",
+   "titulo": "Pedidos assinados pela identidade"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1702",
+    "T-807"
+   ],
+   "descricao": "Por quê: a cota é o que limita k no modelo 1 − (1 − e)^k; a D7 fixa custos por veredito e a T-107 diz que falha não gasta.\nComo:\n- Livro só de acréscimo por identidade: saldo inicial Q, reserva de c_R no aceite, acerto pelo veredito (aprovado 1, inconclusivo por mérito 2, reprovado 5), devolução integral na falha do job e na reavaliação do operador.\n- Recusar o job quando o saldo não cobre a reserva.\n- Cobrar o depósito do base como um job (provisório) e expor o saldo ao próprio usuário.\nSaída: livro de cotas na CVM1, com os valores lidos de configuração.",
+   "epico": "J17",
+   "id": "T-1704",
+   "marco": "G3",
+   "ordem": 1704,
+   "prioridade": "P1",
+   "pronto": "Saldo bate com o livro em todos os desfechos",
+   "status": "backlog",
+   "tamanho": "M",
+   "titulo": "Livro de cotas na CVM1: reserva no aceite, acerto no veredito"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1702"
+   ],
+   "descricao": "Por quê: a D7 deixa d provisório; o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo.\nComo:\n- Script que gera a chave e procura o nonce, com d como parâmetro.\n- Medir o tempo médio em 4 vCPU para d de 16 a 28 bits, com repetições.\n- Anotar a vantagem esperada de GPU e ASIC a partir de taxas publicadas, marcada como (a verificar).\nSaída: tabela d × tempo em model_gate/results/ e o d do protótipo fixado.",
+   "epico": "J17",
+   "id": "T-1705",
+   "marco": "G3",
+   "ordem": 1705,
+   "prioridade": "P1",
+   "pronto": "Tabela d × tempo e d do protótipo",
+   "status": "backlog",
+   "tamanho": "P",
+   "titulo": "Cliente de mineração e custo da prova de trabalho por dificuldade"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-702",
+    "T-1702"
+   ],
+   "descricao": "Por quê: o auditor precisa contar tentativas e reprovações por identidade pelo recibo, sem saber quem é a pessoa (E14 §10.1, §18.6).\nComo:\n- Acrescentar ao recibo o id da identidade (SHA-256 da chave pública) que pediu o job.\n- Ajustar o esquema da T-702 e a gravação da T-809.\nSaída: campo no recibo e no esquema.",
+   "epico": "J17",
+   "id": "T-1706",
+   "marco": "G3",
+   "ordem": 1706,
+   "prioridade": "P1",
+   "pronto": "Recibo com o id da identidade",
+   "status": "backlog",
+   "tamanho": "P",
+   "titulo": "Id da identidade no recibo"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1703",
+    "T-1704",
+    "T-1706"
+   ],
+   "descricao": "Por quê: a segunda camada só vale se cada regra da D7 for verificável no G3.\nComo:\n- Pedido sem prova ou sem assinatura é recusado.\n- Reprovado gasta 5, aprovado 1, inconclusivo 2; falha do job devolve a reserva.\n- Identidade sem saldo não submete; o recibo traz o id.\nSaída: testes automatizados junto dos do G3 (T-813).",
+   "epico": "J17",
+   "id": "T-1707",
+   "marco": "G3",
+   "ordem": 1707,
+   "prioridade": "P1",
+   "pronto": "Testes passam",
+   "status": "backlog",
+   "tamanho": "M",
+   "titulo": "Testes da identidade e da cota"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1212",
+    "T-1705"
+   ],
+   "descricao": "Por quê: a segunda camada é medida pelo custo esperado de um escape, não por uma RQ nova (E14 §18.5).\nComo:\n- Estender 1 − (1 − e)^k com k = N · ⌊Q / c_R⌋.\n- Calcular E[custo] ≈ (c_R / (e · Q)) · C_id com o e da T-1212 e o C_id da T-1705, e o custo do usuário legítimo com o falso alarme medido.\n- Fixar Q e os pesos 1, 2 e 5 a partir da conta.\nSaída: tabela e parágrafo para a RQ4 e a seção 5.",
+   "epico": "J17",
+   "id": "T-1708",
+   "marco": "G4",
+   "ordem": 1708,
+   "prioridade": "P1",
+   "pronto": "Custo por escape e por aprovação com números medidos",
+   "status": "backlog",
+   "tamanho": "P",
+   "titulo": "Modelo de custo do ataque com identidades e cota"
+  },
+  {
+   "atualizado": "2026-11-09T12:00:00.000Z",
+   "deps": [
+    "T-1708",
+    "T-1504"
+   ],
+   "descricao": "Por quê: a D7 muda o modelo de ameaça (atacante com N identidades) e o desenho; o provedor de nuvem precisa aparecer como trabalho futuro.\nComo:\n- Seção 3: atacante com N identidades e orçamento de cota.\n- Seção 5: identidade, prova de trabalho e cota, em um parágrafo e uma linha de figura.\n- Seção 10: limites (GPU e ASIC, memory-hard) e identidade por provedor de nuvem (AWS, Azure, Oracle) como trabalho futuro.\n- Acrescentar Douceur 2002, Back 2002 e Nakamoto 2008 ao refs.bib, conferidos.\nSaída: trechos nas seções 3, 5 e 10.",
+   "epico": "J17",
+   "id": "T-1709",
+   "marco": "G4",
+   "ordem": 1709,
+   "prioridade": "P1",
+   "pronto": "Trechos revisados nas seções 3, 5 e 10",
+   "status": "backlog",
+   "tamanho": "M",
+   "titulo": "Escrever identidade e cota no artigo"
   }
  ]
 }

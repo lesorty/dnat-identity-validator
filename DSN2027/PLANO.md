@@ -36,8 +36,13 @@ ainda não foi avaliado: falta a máquina de 4 vCPU (T-210) e os sinais. A prime
 (T-208) indica que o veredito **não cabe em 80 min** com a bateria inteira (5,6×); só âncoras +
 XSTest dá 2,1× (~1,1× com lote 4). Ver o [backlog](backlog/README.md) e a E14 §6.2.
 
+**Novo em 09/11:** identidade cara (prova de trabalho) e cota por veredito, sugeridas pelo
+orientador, entram como segunda camada contra o atacante (D7, E14 §18). São 9 tasks no épico J17,
+~15 h, quase todas no marco G3.
+
 **Se apertar, cortar nesta ordem:** bounty vira só desenho → recibo vira log assinado pela CVM1 → contrato do
-derivado não exportável → segunda família em escala menor → extras do adaptativo.
+derivado não exportável → segunda família em escala menor → extras do adaptativo → identidade e cota
+só no desenho e no modelo de custo, sem implementação.
 **Inegociáveis:** F1–F3, verdade de referência independente, falso alarme em fine-tuning benigno,
 teste cego de campo e um atacante adaptativo mínimo.
 

@@ -17,7 +17,8 @@ histórico completo (IDs antigos D-0xx, inclusive o que foi descartado) está na
   como **extensão**: prêmio para quem mostrar uma entrada ou um derivado que explora o modelo.
 - **Modelos abertos têm custo zero (2026-10-28):** o sistema não vende acesso ao modelo; base e
   derivados são abertos, e a plataforma pode cobrar só a computação dos jobs. O que limita as
-  tentativas de quem ataca o portão é uma **cota de jobs por usuário** (T-101, decisão 11). É
+  tentativas de quem ataca o portão é uma **cota por identidade**, e cada identidade é cara de
+  obter (T-101, decisão 11, revista em 09/11 na [D7](#d7--identidade-cara-e-cota-por-veredito-2026-11-09)). É
   uma mudança de apresentação: o `purchaseAccess` do código fica como herança do mercado.
 - **Problema** ([E10](etapas/E10_problema.md) §5): garantir que nenhum derivado comprometido seja
   liberado (o dano nas âncoras não sobe mais que δ em relação ao pai, por categoria, sem perder
@@ -120,6 +121,37 @@ na T-102 do backlog (aba Decisões).*
   do Juiz com a chave só na CVM1, trocado a cada versão e revelado depois.
 - **Execução:** cada job (medição do pai, fine-tuning, Juiz) numa CVM de uso único; o Juiz é o
   segundo job, disparado pela CVM1. Todo veredito gera recibo com hashes no contrato.
-- **Custo zero:** modelos abertos sem preço; a cota de jobs por usuário limita o atacante.
+- **Custo zero:** modelos abertos sem preço; a cota por identidade cara limita o atacante (D7).
 
 *Substitui, nos pontos da E14 §15, a E13 §3.3 e o item "Problema" da D1.*
+
+## D7 · Identidade cara e cota por veredito (2026-11-09)
+- **Origem:** conversa com o orientador, registrada em 09/11 (T-1701). Segunda camada de defesa,
+  ao lado do Juiz: os artigos da base mostram que todo detector de derivados erra contra um
+  atacante adaptativo (Hurtado §5, Nasr), então o sistema também limita **quantas vezes** cada
+  atacante tenta. Especificação na [E14](etapas/E14_especificacao_juiz.md) §18.
+- **Identidade:** todo papel externo (usuário que treina, dono do base, quem abre sessão de
+  inferência) age por uma identidade, um par de chaves. Cada pedido à CVM1 vai assinado por ela. O
+  operador não precisa de identidade: é premissa de confiança (D3).
+- **Identidade cara por prova de trabalho**, como no Bitcoin (Hashcash): o usuário procura um nonce
+  tal que SHA-256(desafio ‖ chave pública ‖ nonce) comece com **d bits zero**, e a CVM1 confere com
+  um único hash. No protótipo, d é baixo de propósito (demonstração em segundos de CPU); num
+  sistema real, mais zeros tornam a identidade cara (cada bit dobra o custo).
+- **Cota por identidade:** cada identidade nasce com um saldo **Q** e gasta por veredito: aprovado
+  custa 1, inconclusivo por mérito custa 2 e **reprovado custa 5**, de modo que quem ataca esgota a
+  identidade muito mais rápido que o usuário legítimo. Falha do job e reavaliação do operador não
+  gastam (T-107). A CVM1 reserva o custo de um reprovado ao aceitar o job e devolve a diferença no
+  veredito; sem saldo para a reserva, o job é recusado. Sem recarga no MVP: identidade esgotada
+  exige uma nova, com nova prova de trabalho. Valores de Q, d e dos pesos são provisórios até a
+  medida (T-1705) e o modelo de custo (T-1708).
+- **No artigo:** o modelo de escape da E14 §13 passa a ter k = N · ⌊Q / c_R⌋ para um atacante com
+  N identidades, e o custo esperado de um escape vira a medida da segunda camada. Não é RQ nova:
+  entra na seção 3 (ameaça), na 5 (desenho) e na RQ4.
+- **Trabalho futuro, sem implementar:** identidade emprestada de um provedor de nuvem (AWS, Azure,
+  Oracle), que já exige cartão de crédito e verificação; dispensa a prova de trabalho e torna a
+  identidade mais robusta.
+- **Limite declarado:** a prova de trabalho põe preço nas tentativas, não as impede; GPU e ASIC
+  calculam SHA-256 muito mais barato que CPU, e uma função *memory-hard* (scrypt, Argon2) fica
+  como variante.
+
+*Revê a decisão 11 da T-101 (cota de jobs por usuário, por janela de tempo).*

@@ -188,10 +188,14 @@
     },
     {
      "q": "O que limita as tentativas de quem ataca o Juiz?",
-     "r": "Uma cota de jobs por usuário, por janela de tempo, controlada pela CVM1, mais o veredito curto e o cache por digest. O artigo usa o modelo 1 − (1 − e)^k, com k limitado pela cota.",
+     "r": "Uma cota por identidade, e cada identidade é cara de obter (prova de trabalho). Reprovado gasta a cota cinco vezes mais rápido que aprovado; o veredito curto e o cache por digest continuam. O artigo usa o modelo 1 − (1 − e)^k, com k = N · ⌊Q / c_R⌋ para N identidades. Revista em 09/11 (T-1701, D7).",
      "estado": "fechada",
-     "porque": "O modelo é aberto e não tem preço, então o custo do job não pode ser o freio; a cota limita as tentativas sem cobrar o usuário legítimo.",
+     "porque": "O modelo é aberto e não tem preço, então o custo do job não pode ser o freio; e uma cota por usuário só freia se criar usuários novos custar caro.",
      "alt": [
+      {
+       "o": "Cota de jobs por usuário, por janela de tempo",
+       "nao": "era a decisão de 28/10; sem identidade cara, criar uma conta nova zera a cota"
+      },
       {
        "o": "Veredito curto e custo do job, sem limite fixo",
        "nao": "era a decisão original; com modelo de custo zero, o custo deixa de frear quem ataca"
@@ -205,7 +209,7 @@
        "nao": "mexe no contrato e pune quem é legítimo"
       }
      ],
-     "fonte": "Fluxo T-101, decisão 11 · revista em 28/10 com o custo zero dos modelos abertos"
+     "fonte": "Fluxo T-101, decisão 11 · 28/10; revista em 09/11 (T-1701)"
     },
     {
      "q": "Em quais vereditos o recibo é gravado?",
@@ -356,7 +360,7 @@
    "falta": [
     "Na preparação da implementação: escrever a seção Fluxo da E14 a partir do Mapa do Juiz, com estas decisões."
    ],
-   "atualizado": "2026-10-28"
+   "atualizado": "2026-11-09"
   },
   {
    "task": "T-102",
@@ -2154,6 +2158,144 @@
     "Medir o comprimento das respostas num derivado abliterado (J9)."
    ],
    "atualizado": "2026-11-05"
+  },
+  {
+   "task": "T-1701",
+   "ordem": 1701,
+   "situacao": "decidida",
+   "pergunta": "Como limitar as tentativas de quem ataca o Juiz, se o Juiz erra?",
+   "contexto": "Na conversa de novembro, o orientador e o autor confirmaram o rumo e acrescentaram uma camada: identidades caras de obter para todos os papéis, com uma cota de treinos que se gasta a cada veredito e muito mais rápido nos reprovados. A decisão 11 da T-101 (cota de jobs por usuário, por janela de tempo) não resistia a quem cria contas novas.",
+   "resposta": "Cada papel externo age por uma identidade: um par de chaves registrado com uma prova de trabalho no molde do Bitcoin (SHA-256 com d bits zero, d baixo no protótipo). Cada identidade nasce com saldo Q = 20 e gasta 1 por aprovado, 2 por inconclusivo de mérito e 5 por reprovado; falha do job não gasta. A CVM1 reserva no aceite e acerta no veredito; sem recarga. O recibo leva o id da identidade, e o artigo usa k = N · ⌊Q / c_R⌋. Identidade por provedor de nuvem (AWS, Azure, Oracle) fica como trabalho futuro.",
+   "itens": [
+    {
+     "q": "Por que uma camada além do Juiz?",
+     "r": "Porque o Juiz erra: cada derivado escapa com alguma probabilidade e, e quem tenta k vezes escapa com 1 − (1 − e)^k. O sistema também limita k: cada identidade tem uma cota, e cada identidade é cara de obter.",
+     "estado": "fechada",
+     "porque": "Os artigos da base mostram que detectores caem contra um atacante adaptativo (Hurtado §5, Nasr); sem limite de tentativas, o escape é questão de tempo.",
+     "alt": [
+      {
+       "o": "Só o Juiz, com a cota de jobs por usuário de 28/10",
+       "nao": "sem identidade cara, criar uma conta nova zera a cota (ataque Sybil, Douceur 2002)"
+      }
+     ],
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "O que é uma identidade?",
+     "r": "Um par de chaves gerado pelo usuário (Ed25519 no protótipo); o id é o SHA-256 da chave pública. Todo pedido à CVM1 vai assinado por ela. A identidade não diz quem é a pessoa: só custa caro e carrega um saldo.",
+     "estado": "fechada",
+     "porque": "Fecha também a lacuna de hoje, em que o usuário vem do corpo da requisição, sem autenticação.",
+     "alt": [
+      {
+       "o": "Conta com e-mail e senha",
+       "nao": "criar em massa é grátis"
+      },
+      {
+       "o": "Documento de identidade (KYC)",
+       "nao": "fora do escopo e da ética de um protótipo acadêmico"
+      },
+      {
+       "o": "CAPTCHA no cadastro",
+       "nao": "barato de resolver em massa e não deixa prova verificável"
+      }
+     ],
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "Quem precisa de identidade?",
+     "r": "Todo papel externo: o usuário que treina, o dono do base e quem abre sessão de inferência. O operador não precisa, porque é premissa de confiança (D3).",
+     "estado": "fechada",
+     "porque": "Qualquer papel que dispara job consome a plataforma e pode atacar.",
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "Como a identidade fica cara?",
+     "r": "Por prova de trabalho, como no Bitcoin (Hashcash): o usuário procura um nonce tal que SHA-256(desafio ‖ chave pública ‖ nonce) comece com d bits zero. A CVM1 confere com um hash. O desafio é fixo por implantação, e a prova amarra a chave.",
+     "estado": "fechada",
+     "porque": "Custa 2^d hashes em média para quem registra e um hash para quem confere; cada bit a mais dobra o custo.",
+     "alt": [
+      {
+       "o": "Função memory-hard (scrypt, Argon2)",
+       "nao": "fica como variante: reduz a vantagem de GPU e ASIC, mas o SHA-256 é o exemplo do Bitcoin e mais simples"
+      },
+      {
+       "o": "Identidade de um provedor de nuvem com cartão",
+       "nao": "mais robusta, mas fica como trabalho futuro, sem implementar agora"
+      }
+     ],
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "Qual a dificuldade?",
+     "r": "No protótipo, baixa de propósito: d = 20 bits (cinco zeros hexadecimais), cerca de um milhão de hashes, segundos em CPU. Num sistema real, d é calibrado para a identidade custar horas de CPU.",
+     "estado": "provisoria",
+     "porque": "A demonstração precisa ser rápida; o artigo apresenta d como parâmetro e o custo por dificuldade.",
+     "fonte": "Provisória até a T-1705"
+    },
+    {
+     "q": "Como a cota é gasta?",
+     "r": "Saldo Q = 20 por identidade. Aprovado gasta 1, inconclusivo por mérito gasta 2 e reprovado gasta 5. Depósito de base gasta 1; sessão de inferência não gasta no MVP.",
+     "estado": "provisoria",
+     "porque": "Quem ataca esgota a identidade muito mais rápido que o usuário legítimo: com esses valores, 4 reprovados por identidade contra 20 aprovados.",
+     "alt": [
+      {
+       "o": "Mesmo custo para todo veredito",
+       "nao": "não pune quem só colhe reprovados"
+      },
+      {
+       "o": "Inconclusivo custa como reprovado",
+       "nao": "o benigno cai em inconclusivo a FPR de 5% da segunda linha e pagaria como atacante"
+      }
+     ],
+     "fonte": "Provisória até a T-1708"
+    },
+    {
+     "q": "Falha do job e reavaliação gastam cota?",
+     "r": "Não. A falha devolve a reserva inteira (T-107), e a reavaliação pedida pelo operador é paga pela plataforma.",
+     "estado": "fechada",
+     "porque": "O erro é da plataforma; o usuário legítimo não paga por ele.",
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "Quando a cota é descontada?",
+     "r": "A CVM1 reserva o custo de um reprovado ao aceitar o job e acerta no veredito, devolvendo a diferença. Sem saldo para a reserva, o job é recusado.",
+     "estado": "fechada",
+     "porque": "O estado só sai em T0 + T_max; sem reserva, uma identidade com pouco saldo lançaria vários jobs em paralelo.",
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "A cota recarrega?",
+     "r": "Não no MVP. A identidade esgotada não submete mais; para continuar, é preciso outra identidade, com nova prova de trabalho.",
+     "estado": "fechada",
+     "porque": "Com recarga, k cresce com o tempo sem custo novo.",
+     "alt": [
+      {
+       "o": "Recarga por janela de tempo (a decisão 11 de 28/10)",
+       "nao": "o atacante paciente ganha tentativas de graça"
+      }
+     ],
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "O que vai no recibo?",
+     "r": "O id da identidade (SHA-256 da chave pública) de quem pediu o job.",
+     "estado": "fechada",
+     "porque": "O auditor conta tentativas e reprovações por identidade sem saber quem é a pessoa.",
+     "fonte": "Orientador; registrada em 09/11"
+    },
+    {
+     "q": "Como entra no artigo?",
+     "r": "No modelo de escape, k = N · ⌊Q / c_R⌋ para um atacante com N identidades, e o custo esperado de um escape fica ≈ (c_R / (e · Q)) · C_id. Entra na seção 3 (ameaça), na 5 (desenho) e junto da RQ4; não é RQ nova.",
+     "estado": "fechada",
+     "porque": "Converte a taxa de escape medida em custo para o atacante, que é o que a segunda camada compra.",
+     "fonte": "Orientador; registrada em 09/11"
+    }
+   ],
+   "falta": [
+    "Medir o custo da prova de trabalho por dificuldade em 4 vCPU (T-1705).",
+    "Fixar Q e os pesos com o modelo de custo e o falso alarme medido (T-1708)."
+   ],
+   "atualizado": "2026-11-09"
   }
  ]
 }

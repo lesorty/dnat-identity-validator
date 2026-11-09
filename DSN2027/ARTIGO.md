@@ -1,6 +1,6 @@
 # Pretensões do artigo
 
-**Alvo:** DSN 2027, Berlim (D1) · **Atualizado:** 2026-10-27 · Cronograma em [PLANO.md](PLANO.md).
+**Alvo:** DSN 2027, Berlim (D1) · **Atualizado:** 2026-11-09 · Cronograma em [PLANO.md](PLANO.md).
 
 ## Tese (rascunho; o problema exato sai da [E10](etapas/E10_problema.md))
 
@@ -14,7 +14,7 @@ a referência que só a plataforma guarda, se a recusa foi preservada.
 
 | # | Contribuição | Papel | Base |
 |---|---|---|---|
-| C1 | **Custódia + portão de liberação** de derivados: prevenção, detecção, contenção e recuperação | Principal (sistema) | D1, D2, [E8](etapas/E8_alinhamento_dsn.md) §9 |
+| C1 | **Custódia + portão de liberação** de derivados: prevenção, detecção, contenção e recuperação; uma **identidade cara** (prova de trabalho) com **cota por veredito** limita as tentativas de quem ataca o portão | Principal (sistema) | D1, D2, D7, [E8](etapas/E8_alinhamento_dsn.md) §9 |
 | C2 | **Avaliação de dependabilidade** do portão: modelo de falhas com quantidade, verdade de referência independente, teste cego com obliterados de campo, atacante adaptativo | Principal (avaliação) | [E9](etapas/E9_testes_validos.md) §3 |
 | C3 | **Controle de exportação** de pesos pela saída legítima | Secundária | [E6](etapas/E6_alt_modelos_abertos.md) §6 |
 | C4 | **Bounty** para entradas ou derivados que explorem o modelo | Extensão ou trabalho futuro | Orientador, 2026-10-27 |
@@ -28,9 +28,13 @@ a referência que só a plataforma guarda, se a recusa foi preservada.
 - Canais laterais e falhas de hardware na CVM (D3).
 - Destilação por consultas e backdoors com gatilho (E6 §9).
 - Modelos grandes em GPU confidencial (opcional).
+- Identidade emprestada de um provedor de nuvem (AWS, Azure, Oracle, que exigem cartão de
+  crédito) no lugar da prova de trabalho (D7).
 
 ## Histórico
 
 - **LADC 2026:** isolamento de aplicações Python (tag `ladc-2026`).
 - **2026-10-17/18:** Juiz de IA contra vazamento em código.
 - **2026-10-27:** proteção de modelos abertos ([E7](etapas/E7_decisao_rumo.md), decidida com o orientador).
+- **2026-11-09:** identidade cara e cota por veredito como segunda camada contra o atacante (D7,
+  sugestão do orientador).

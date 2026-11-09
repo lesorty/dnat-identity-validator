@@ -4,7 +4,9 @@
 decisões das tasks T-101 a T-113, todas fechadas em 28/10; a única marca provisória é a geração
 única do S1 (§6.2), a confirmar no dia 1 do piloto. Os valores numéricos são hipóteses até o
 piloto e vão para o `prereg.yaml` (T-606). **Atualização 06/11:** a primeira medida de custo
-(T-208) indica que a geração única não cabe com a bateria inteira (§6.2).
+(T-208) indica que a geração única não cabe com a bateria inteira (§6.2). **Atualização 09/11:**
+identidade cara (prova de trabalho) e cota por veredito, combinadas com o orientador (T-1701,
+[D7](../DECISOES.md)); especificação na §18, efeitos nas §0–§3, §9, §10, §12–§14, §16 e §17.
 **Base:** [D1–D5](../DECISOES.md), [E10](E10_problema.md) §5 (problema), [E12](E12_base_teorica.md)
 (A1–A5), [E13](E13_plano_trabalho.md) (plano, R1–R16, RQ1–RQ5),
 [E14a](E14a_artigos_do_juiz.md) (desenho J0–J13 conferido nos artigos).
@@ -28,7 +30,9 @@ Juiz compara o derivado com o **pai**, medido sob custódia, e devolve um de tr�
 - **Os pesos nunca saem.** Liberar é virar ativo sob custódia; os formatos liberados são os
   formatos em que a plataforma executa o derivado (precisão cheia, LLM.int8, NF4, FP4).
 - **Custo zero:** base e derivados são modelos abertos e sem preço. A plataforma pode cobrar só a
-  computação. O que limita quem ataca o Juiz é uma **cota de jobs por usuário**.
+  computação. O que limita quem ataca o Juiz é uma **cota por identidade**, e cada identidade é
+  cara de obter: uma prova de trabalho, como no Bitcoin. Reprovado gasta a cota cinco vezes mais
+  rápido que aprovado (§18).
 - **Onde roda:** CVMs reais de nuvem. A CVM1 é o plano de controle, a CVM2 é o builder, e cada job
   (medição do pai, fine-tuning, Juiz) roda numa **CVM de uso único**, sem container e sem microVM.
 - **Quem decide o mérito:** só a bateria comportamental (S1). Os sinais internos (S2, S3) levam no
@@ -44,7 +48,7 @@ Juiz compara o derivado com o **pai**, medido sob custódia, e devolve um de tr�
 |---|---|---|---|
 | **CVM** (VM confidencial) | VM com memória cifrada e protegida contra o hipervisor e o provedor (AMD SEV-SNP ou Intel TDX, conforme a nuvem) | Pesos, derivado e referência só ficam em claro dentro de CVMs | D3, D4, T-102 |
 | **Nuvem** | Azure, AWS ou Oracle | Escolhida pelo custo na preparação da implementação; o desenho não depende dela | T-102, T-1603 |
-| **CVM1** | Plano de controle (`api-server.js`) | Contrato, IPFS, chaves, custódia, cota, cache de vereditos; dispara os jobs | T-101, T-102 |
+| **CVM1** | Plano de controle (`api-server.js`) | Contrato, IPFS, chaves, custódia, identidades, livro de cotas, cache de vereditos; dispara os jobs | T-101, T-102, T-1701 |
 | **CVM2** | Builder numa CVM separada (`builder.py`) | Monta o pacote da app com as dependências (torch, transformers, peft) e devolve com hash | T-102 |
 | **CVM de job** | CVM de uso único, tirada de um *warm pool* de CVMs nunca usadas | Roda um job (medição do pai, fine-tuning ou Juiz) direto na CVM, com o script sem rede, e é destruída no fim | T-102 |
 | **CVM de inferência** | CVM de uso único por sessão de uso | Carrega o derivado aprovado e atende só com texto | T-102 |
@@ -64,6 +68,9 @@ Juiz compara o derivado com o **pai**, medido sob custódia, e devolve um de tr�
 | **Entropia cruzada (CE)** | Perda num corpus benigno fixo, relativa ao pai | Utilidade: separa C (útil) de N (degenerado) | T-106, T-108 |
 | **`prereg.yaml`** | Pré-registro com limiares congelados | Hash no recibo; commitado antes de abrir o teste | T-104, T-106 |
 | **Bonferroni, O'Brien-Fleming** | Correção para várias condições; gasto de α em olhadas fixas | Estatística do veto | T-106 |
+| **Identidade** | Par de chaves (Ed25519 no protótipo); o id é o SHA-256 da chave pública | Todo pedido à CVM1 vai assinado; o id entra no recibo | T-1701 |
+| **Prova de trabalho** | Hashcash com SHA-256, como no Bitcoin: d bits zero no início do hash | Torna cada identidade cara; a CVM1 confere com um hash só | T-1701 |
+| **Livro de cotas** | Saldo por identidade, só de acréscimo, na CVM1 | Reserva o custo de um reprovado no aceite e acerta no veredito | T-1701 |
 | **Firecracker (microVM)** | Descartado | Não roda numa CVM (sem virtualização aninhada); o caminho no código é legado | T-102 |
 
 ---
@@ -73,10 +80,10 @@ Juiz compara o derivado com o **pai**, medido sob custódia, e devolve um de tr�
 ```mermaid
 flowchart LR
   dono([Dono do base]) --> CVM1
-  usuario([Usuário]) --> CVM1
+  usuario([Usuário]) -- pedido assinado pela identidade --> CVM1
   operador([Operador]) --> CVM1
   subgraph nuvem[Nuvem escolhida pelo custo]
-    CVM1[CVM1 · plano de controle<br/>API, chaves, cota, cache]
+    CVM1[CVM1 · plano de controle<br/>API, chaves, identidades e cotas, cache]
     CVM2[CVM2 · builder]
     pool[(warm pool de CVMs nunca usadas)]
     job[CVM de job de uso único<br/>medição do pai · fine-tuning · Juiz]
@@ -112,37 +119,39 @@ flowchart LR
 
 ```mermaid
 flowchart TD
+  ID[Usuário e dono registram uma identidade<br/>chave pública + prova de trabalho, saldo Q] --> DEP
   J0[Operador publica o pacote do Juiz<br/>hash no contrato, chave só na CVM1] --> DEP
   DEP[Dono deposita o base<br/>como dataset, cifrado no IPFS] --> MED
   MED[CVM1 mede o pai num job do Juiz<br/>4 formatos × condições] --> OK{serve de referência?}
   OK -- não --> INAPTO[base inapto]
-  OK -- sim --> FT[Usuário roda o fine-tuning<br/>CVM de uso único, sem rede]
+  OK -- sim --> FT[Usuário roda o fine-tuning<br/>CVM1 reserva a cota · CVM de uso único, sem rede]
   FT -- só métricas --> U([Usuário])
   FT --> RET[Derivado volta à CVM1<br/>retido, cifrado no IPFS]
   RET --> JUIZ[CVM1 dispara o Juiz<br/>segundo job, contra a referência do pai]
   JUIZ --> V{veredito}
-  V -- aprovado --> ATV[ativo · roda só na plataforma]
-  V -- reprovado --> REP[retido como evidência]
-  V -- inconclusivo --> INC[retido · regra da §9]
+  V -- aprovado · gasta 1 --> ATV[ativo · roda só na plataforma]
+  V -- reprovado · gasta 5 --> REP[retido como evidência]
+  V -- inconclusivo · gasta 2, falha 0 --> INC[retido · regra da §9]
   ATV -- operador revoga --> RVG[revogado]
 ```
 
 | Passo | Quem | O que acontece | Task |
 |---|---|---|---|
+| Identidade | Usuário, dono do base | Gera um par de chaves e uma prova de trabalho; a CVM1 confere e abre um saldo Q para a identidade. Todo pedido seguinte vai assinado por ela (§18) | T-1701 |
 | Pacote do Juiz (J0) | Operador | Monta código, bateria, avaliadores e limiares; publica o hash no contrato; entrega a chave da parte secreta só à CVM1 | T-101, T-109 |
 | Depósito | Dono do base | Envia os pesos de um modelo aberto, sem preço, pelo caminho de dataset de hoje; a CVM1 cifra no IPFS e calcula o hash sob custódia | T-101 |
 | Medição do pai (J1) | CVM1, automática | Um job do Juiz mede o pai em todos os formatos e condições; a referência fica cifrada no IPFS, com hash no contrato. Se a medição falha ou o pai recusa poucos itens, o contrato marca o base como **inapto**, e o motivo fica com o operador | T-101 |
-| Fine-tuning | Usuário | Roda numa CVM de uso único, sem rede; recebe só loss, passos e tempo. Derivado de derivado não entra: um nível só | T-101 |
+| Fine-tuning | Usuário | A CVM1 reserva na cota da identidade o custo de um reprovado e recusa o job sem saldo. Roda numa CVM de uso único, sem rede; recebe só loss, passos e tempo. Derivado de derivado não entra: um nível só | T-101, T-1701 |
 | Retenção | CVM1 | O derivado volta cifrado ao IPFS e fica retido até o veredito | T-101 |
 | Juiz | CVM1 dispara | Segundo job automático, numa CVM de uso único nova; ninguém escolhe rodar ou não | T-101 |
-| Desfecho | CVM1 e contrato | O estado sai num instante fixo; o executor registra o derivado e o recibo no contrato | T-101, T-103, T-104 |
+| Desfecho | CVM1 e contrato | O estado sai num instante fixo; o executor registra o derivado e o recibo no contrato; a CVM1 acerta a cota pelo veredito | T-101, T-103, T-104, T-1701 |
 | Revogação | Operador | Revoga qualquer ativo; revogar o base revoga os derivados da raiz. O dono do derivado só retira o seu e nunca reativa | T-101, T-110 |
 
 **Quem vê o quê (T-101, T-103):**
 
 | Quem | Vê |
 |---|---|
-| Usuário | O estado do veredito (aprovado, reprovado, inconclusivo) e as métricas fixas do fine-tuning |
+| Usuário | O estado do veredito (aprovado, reprovado, inconclusivo), as métricas fixas do fine-tuning e o saldo da própria cota |
 | Dono do base | O recibo no contrato |
 | Público | O recibo no contrato; a parte pública da bateria e o código do Juiz; a parte secreta antiga, depois de trocada |
 | Operador e auditoria | O `verdict.json` com os motivos e as respostas cifradas |
@@ -343,12 +352,12 @@ código do Juiz, as regras, os limiares e o resto dos pedidos são públicos.
 - **Nas métricas:** conta como não liberado: é detecção em C e falso alarme em H. O artigo reporta
   a taxa de inconclusivo por classe (H, C, N, F0) e por motivo, com a de H como métrica principal.
 - **Falha do job:** a plataforma roda de novo em CVMs novas, até **três tentativas** no total. Não
-  conta na cota nem é cobrada. Na terceira falha, o veredito é inconclusivo por falha, com alerta
+  conta na cota nem é cobrada: a reserva volta inteira à identidade (§18). Na terceira falha, o veredito é inconclusivo por falha, com alerta
   ao operador.
 - **Exceção:** se uma condição já completa sustentava o veto antes da falha, o resultado é
   **reprovado**, sem rerodar.
 - **O que o operador pode fazer:** manter retido, reprovar ou pedir **uma única reavaliação**, paga
-  pela plataforma. Só as condições e categorias que ficaram na margem são reavaliadas, com o dobro
+  pela plataforma e sem gastar a cota do usuário. Só as condições e categorias que ficaram na margem são reavaliadas, com o dobro
   de âncoras e um sorteio novo. Se continuar inconclusivo, o derivado fica retido de vez.
 - **Cada ação do operador** gera um recibo novo, ligado ao anterior.
 - **Cache:** guarda só vereditos de mérito, pela chave (digest do derivado, hash do Juiz); o
@@ -372,6 +381,7 @@ Todo veredito gera um recibo, inclusive reprovado e inconclusivo.
 | Hash do `prereg.yaml` | Limiares congelados |
 | Hash do dataset | Dataset retido |
 | Hash do `verdict.json` | Medidas e motivos ficam fora do contrato |
+| Id da identidade | SHA-256 da chave pública de quem pediu o job; o auditor conta tentativas e reprovações por identidade (§18) |
 | Estado e data | — |
 
 - **No contrato:** hashes, estado e data. Medidas e motivos ficam no `verdict.json`, conferido pelo
@@ -402,6 +412,8 @@ Todo veredito gera um recibo, inclusive reprovado e inconclusivo.
 | Respostas do derivado | Arquivo à parte | IPFS | Sim | Operador e auditoria | `verdict.json` |
 | Recibo | Registro no contrato | Contrato (no corte: log assinado pela CVM1) | Não | Todos | — |
 | Cache de vereditos | (digest, hash do Juiz) → veredito de mérito | CVM1 | — | CVM1 | — |
+| Registro de identidades | Chave pública, nonce da prova, dificuldade, data | CVM1 | Não | CVM1 e auditoria | Recibo (id) |
+| Livro de cotas | Lançamentos só de acréscimo: reserva, acerto, devolução | CVM1 | Não | CVM1, auditoria; o usuário vê o próprio saldo | — |
 
 O esquema campo a campo do recibo e do `verdict.json` fica para a T-608 e a T-702.
 
@@ -448,6 +460,7 @@ stateDiagram-v2
 | Referência do pai | Sim, medida sob custódia | O usuário nunca a fornece: barra a referência forjada |
 | Provedor de nuvem | Só para disponibilidade | Pode derrubar ou atrasar jobs, não ler pesos; sem atestação real, é premissa declarada |
 | Usuário, script, dados, derivado | Não | O Juiz julga o resultado, não o script |
+| Identidade | Não: é só cara | A prova de trabalho põe preço em cada identidade e a cota limita as tentativas de cada uma; não diz quem é a pessoa (§18) |
 | Dono do base | Não | O pai é medido sob custódia; um pai que recusa pouco fica inapto |
 | Tempo do job | — | O estado sai em T0 + T_max: o tempo não vaza o resultado |
 | Avaliador | Escolhido contra rótulos humanos | O perdedor da disputa audita o vencedor |
@@ -475,7 +488,8 @@ A tabela alinhada à E8 §9.2, base da seção 3 do artigo, fica para a T-1502.
 **Regras de borda:**
 - Derivado que muda o vocabulário ou o tokenizer reprova como fora do contrato (pré-checagem J2).
 - Derivados quase idênticos: cada digest novo é uma tentativa e gasta cota. O artigo mede a taxa
-  de escape por tentativa e usa o modelo 1 − (1 − e)^k, com k limitado pela cota.
+  de escape por tentativa e usa o modelo 1 − (1 − e)^k, com k = N · ⌊Q / c_R⌋ para um atacante com
+  N identidades (§18).
 
 ---
 
@@ -495,6 +509,7 @@ A tabela alinhada à E8 §9.2, base da seção 3 do artigo, fica para a T-1502.
 | T-110 ciclo de vida | — | C1 | — | G3 | 5 |
 | T-111 formatos liberados | A4 | C1, C2 | R8 | RQ1 | 5 |
 | T-112 o que não cobre | A4, A5 | C2 | R7, R11 | RQ4 | 8, 10 |
+| T-1701 identidade e cota | A4 | C1 | R11 | RQ4 (custo esperado de um escape) | 3, 5, 10 |
 
 - Nenhuma decisão fica sem afirmação; nada foi cortado.
 - **RQ3** usa só derivados de campo em safetensors (injeção × campo); a comparação com GGUF saiu.
@@ -540,6 +555,10 @@ A tabela alinhada à E8 §9.2, base da seção 3 do artigo, fica para a T-1502.
 - diagrama de estados como base da T-704 e da T-705;
 - H, C e N como função das medidas (dano por categoria × δ, perda relativa × limiar, degenerescência).
 
+**Da identidade e da cota (§18, J17):**
+- medir o custo da prova de trabalho por dificuldade em 4 vCPU e fixar d do protótipo (T-1705);
+- fixar Q e os pesos 1, 2 e 5 com o modelo de custo e a taxa de falso alarme medida (T-1708).
+
 **Decisões do grupo ainda abertas, fora do J1:**
 - **T-1602:** juiz da verdade de referência e família não vista;
 - **T-1603:** nuvem e GPU confidencial;
@@ -578,7 +597,130 @@ Os pontos em que uma objeção do orientador mudaria mais coisa:
 5. **Quatro formatos, tudo ou nada, em CPU, com a GPU confidencial como conferência** (§8).
 6. **Piloto em CVMs reais, sem microVM e sem container** (§2), com o mínimo de segurança para o
    artigo.
-7. **Custo zero e cota de jobs** como o que limita o atacante (§0, §13).
+7. **Custo zero e cota de jobs** como o que limita o atacante (§0, §13). Revisto em 09/11 com o
+   orientador: a cota passa a ser por **identidade cara** e gasta mais rápido no reprovado (§18).
 
 A D6 foi fechada em 28/10 (T-114) sem esperar a revisão. Estes sete pontos ficam como pauta para o
 orientador; uma objeção que mude algum deles entra como task nova e reabre o trecho da E14.
+
+---
+
+## 18. Identidade e cota (T-1701, D7)
+
+**Data:** 2026-11-09, da conversa com o orientador. **Épico:** J17 no backlog (T-1701 a T-1709).
+
+### 18.1 Por que uma segunda camada
+
+O Juiz é imperfeito, e a base diz por quê: um dono white-box leva os sinais internos ao lado
+benigno (Hurtado §5), e defesas avaliadas contra ataques fixos caem diante de um atacante adaptativo
+(Nasr). Se cada derivado escapa com probabilidade **e**, quem tenta **k** vezes escapa com
+probabilidade 1 − (1 − e)^k, que tende a 1 se k for livre. O sistema não depende só de baixar e:
+também limita k. Duas peças fazem isso:
+
+- **identidade cara:** criar uma identidade custa trabalho computacional, então não sai de graça
+  trocar de identidade quando uma acaba (o ataque Sybil de Douceur 2002);
+- **cota por identidade, gasta por veredito:** cada identidade tem um saldo, e um reprovado gasta
+  muito mais que um aprovado, então quem ataca esgota a identidade depressa e o usuário legítimo
+  quase não sente.
+
+### 18.2 Identidade
+
+- **O que é:** um par de chaves gerado pelo próprio usuário (Ed25519 no protótipo). O **id** da
+  identidade é o SHA-256 da chave pública.
+- **Quem precisa:** todo papel externo que age no sistema: o usuário que treina, o dono do base e
+  quem abre sessão de inferência. O operador não, porque é premissa de confiança (D3).
+- **Pedidos assinados:** todo pedido à CVM1 vai assinado pela chave da identidade, e a CVM1 confere
+  a assinatura antes de qualquer coisa. Isso fecha a lacuna de hoje, em que o usuário vem do corpo
+  da requisição, sem autenticação (aba Operações do Mapa).
+- **O que não diz:** a identidade não revela quem é a pessoa. Ela só custa caro e carrega um
+  saldo.
+
+### 18.3 Prova de trabalho
+
+Como no Bitcoin, no molde do Hashcash (Back 2002):
+
+```
+registro = (chave_pública, nonce)
+válido  ⇔  SHA-256(desafio ‖ chave_pública ‖ nonce) começa com d bits zero
+```
+
+- O **desafio** é um valor fixo publicado pela CVM1 para a implantação. Uma prova feita para outra
+  implantação não vale aqui.
+- O usuário testa nonces até achar um válido: em média **2^d hashes**. A CVM1 confere com **um
+  hash**. Cada bit a mais dobra o custo de quem registra e não muda o de quem confere.
+- A prova amarra a chave pública: ela não pode ser reaproveitada para outra chave.
+- **Dificuldade (provisória até a T-1705):**
+  - **no protótipo**, d baixo de propósito, para a demonstração: por exemplo, d = 20 bits (cinco
+    zeros hexadecimais), cerca de um milhão de hashes, segundos em CPU;
+  - **num sistema real**, d calibrado para a identidade custar horas de CPU. O artigo apresenta d
+    como parâmetro e mostra o custo por dificuldade.
+
+### 18.4 Cota
+
+| Evento | Custo na cota | Observação |
+|---|---|---|
+| Registro | Saldo inicial **Q** | Provisório: Q = 20 |
+| Aceite do fine-tuning | Reserva **c_R** | Sem saldo para a reserva, o job é recusado |
+| Veredito aprovado | **c_A = 1** | Devolve c_R − 1 |
+| Veredito inconclusivo por mérito | **c_I = 2** | Devolve c_R − 2. Fica entre os dois: o benigno cai aqui a FPR de 5% da segunda linha (§6.1) |
+| Veredito reprovado | **c_R = 5** | "Gasta muito mais rápido" |
+| Falha do job (inconclusivo por falha) | 0 | A reserva volta inteira (§9, T-107) |
+| Reavaliação pedida pelo operador | 0 | Paga pela plataforma (§9) |
+| Depósito de um base | c_A = 1 | A medição do pai é um job; provisório |
+| Sessão de inferência | 0 | Pede identidade, mas fica fora da cota no MVP |
+
+- **Sem recarga no MVP:** a identidade esgotada não submete mais; quem quiser continuar faz outra
+  prova de trabalho. A recarga por janela de tempo, que era a decisão de 28/10, foi descartada: com
+  ela, k cresce com o tempo sem custo novo.
+- **Cache:** um digest que já tem veredito no cache gasta a cota pelo veredito do cache, como
+  qualquer outro job; repetir um digest não dá informação nova a quem ataca.
+- **Visibilidade:** o usuário vê o próprio saldo. O saldo muda pelo veredito, que ele já vê, então
+  não abre canal novo.
+- **Valores:** Q, c_A, c_I e c_R são provisórios até o modelo de custo (T-1708).
+
+### 18.5 O que entra no modelo do atacante
+
+Um atacante com **N** identidades faz no máximo k = N · ⌊Q / c_R⌋ tentativas reprovadas. Com os
+valores provisórios, são 4 por identidade. Logo:
+
+- probabilidade de escape: P(escape) = 1 − (1 − e)^(N · ⌊Q / c_R⌋);
+- custo esperado do primeiro escape, com C_id o custo de uma identidade:
+  **E[custo] ≈ (c_R / (e · Q)) · C_id**, mais o custo de computação de 1/e jobs;
+- custo do usuário legítimo por aprovação: cerca de (C_id / Q) · (c_A + f_I · c_I + f_R · c_R), com
+  f_I e f_R as taxas de inconclusivo e de reprovado nos benignos (falso alarme).
+
+A razão entre os dois é a **assimetria** que a camada compra: o atacante paga por tentativa
+fracassada; o legítimo, por aprovação. O artigo calcula as duas com o e e o falso alarme medidos
+(T-1212, T-1708) e as apresenta junto da RQ4; não há RQ nova.
+
+### 18.6 Onde fica e o que muda
+
+- **CVM1:** registro de identidades e livro de cotas, só de acréscimo (§10.2).
+- **Recibo:** ganha o id da identidade (§10.1); o auditor conta tentativas e reprovações por
+  identidade sem ver quem é a pessoa.
+- **Fronteiras (§12):** a identidade não é confiável; só é cara.
+- **Contrato:** sem mudança além do campo no recibo. O registro de identidades no contrato fica
+  como extensão.
+
+### 18.7 Limites e trabalho futuro
+
+- **Põe preço, não impede:** um atacante rico compra mais identidades. A segunda camada só torna
+  o escape caro; a primeira continua sendo o Juiz.
+- **Hardware:** GPU e ASIC calculam SHA-256 ordens de grandeza mais barato que CPU, o que favorece
+  o atacante. Uma função *memory-hard* (scrypt, Argon2) reduz essa vantagem e fica como variante; o
+  SHA-256 fica no protótipo por ser o exemplo do Bitcoin e por simplicidade.
+- **Usuário legítimo também paga:** a dificuldade é escolhida para o custo de entrada ser aceitável.
+- **Identidade compartilhada:** dividir uma identidade divide o mesmo saldo; não multiplica
+  tentativas.
+- **Trabalho futuro, sem implementar agora:** identidade emprestada de um provedor de nuvem (AWS,
+  Azure, Oracle). Abrir uma conta exige cartão de crédito e verificação, então o custo de criar
+  identidades em massa já vem do provedor, sem prova de trabalho, e a identidade fica mais robusta.
+
+### 18.8 Base
+
+- Douceur, *The Sybil Attack*, IPTPS 2002: sem uma autoridade que certifique identidades, um
+  atacante cria quantas quiser.
+- Back, *Hashcash: A Denial of Service Counter-Measure*, 2002; Dwork e Naor, CRYPTO 1992: pagar
+  com computação para limitar abuso.
+- Nakamoto, *Bitcoin*, 2008: dificuldade como número de zeros no início do hash.
+- Os três entram na seção 3 do artigo e no `refs.bib` (T-1709); nenhum é da base do Juiz (D5).
