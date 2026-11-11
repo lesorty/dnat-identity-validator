@@ -31,6 +31,18 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
+## Redução v2 (11/11)
+
+O backlog foi reduzido ao mínimo para um protótipo bruto mas funcional e a submissão: de 381 h
+em 167 tasks em aberto para **213 h em 118** (mais 1 h opcional, T-709). Os nove testes, as
+análises, a execução em CVM real e o campo cego ficam inteiros; o corte mira detalhe de código,
+conveniência e gestão. Cortadas e juntadas foram para a coluna Cortada com o motivo no topo da
+descrição; quem absorve outra task diz o que absorveu, e as dependências foram refeitas sem
+ciclos. Proposta e classificação em `reducao_proposta.json` e `reducao_proposta.py`; página em
+<https://claude.ai/artifact/J9jERdCKczAsvk3YWvJbSr>. Mudanças que reveem decisões (formatos FP e
+NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques)
+ainda vão ao orientador.
+
 ## Objetivos maiores (11/11)
 
 Cada task serve a um de seis objetivos, que ligam o trabalho à meta (submeter ao DSN 2027 em

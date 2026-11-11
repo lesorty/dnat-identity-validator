@@ -560,29 +560,31 @@
    "deps": [
     "T-205"
    ],
-   "descricao": "Por quê: a campanha roda ~300 vereditos (E13 §3.2); um erro silencioso no carregador ou nos sinais invalida tudo, e os testes precisam rodar sem baixar o 0,5B.\nComo:\n- Usar um modelo minúsculo aleatório (por exemplo, um Qwen2 de poucas camadas criado no próprio teste) para testar carregar, gerar e calcular sinais\n- pytest em model_gate/tests/ com tempo total de poucos minutos\n- Workflow do GitHub Actions rodando os testes em CPU a cada push\nSaída: CI verde no repositório.",
+   "descricao": "Cortada em 11/11 (redução v2): Os testes com o modelo minúsculo já existem e passam; o workflow de CI é conveniência, não sustenta afirmação.\n\nPor quê: a campanha roda ~300 vereditos (E13 §3.2); um erro silencioso no carregador ou nos sinais invalida tudo, e os testes precisam rodar sem baixar o 0,5B.\nComo:\n- Usar um modelo minúsculo aleatório (por exemplo, um Qwen2 de poucas camadas criado no próprio teste) para testar carregar, gerar e calcular sinais\n- pytest em model_gate/tests/ com tempo total de poucos minutos\n- Workflow do GitHub Actions rodando os testes em CPU a cada push\nSaída: CI verde no repositório.",
    "epico": "J2",
    "id": "T-209",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "CI verde",
-   "status": "a fazer",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Testes e CI mínimos com um modelo minúsculo"
+   "titulo": "Testes e CI mínimos com um modelo minúsculo",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-202"
    ],
-   "descricao": "Por quê: o G1 é medido em 4 vCPU (E7 §7) e o piloto da S1 começa no dia 1; sem a máquina, nenhuma medida de custo é válida.\nComo:\n- Provisionar uma VM de 4 vCPU (ou reservar uma máquina do grupo) com disco para modelos e derivados\n- Instalar o ambiente pelo setup.sh do T-202\n- Registrar tipo de CPU, memória, disco e acesso (SSH) no README do model_gate\nSaída: máquina acessível com o ambiente e a ficha da máquina documentada.\nFora do escopo: máquinas da campanha (T-1601).",
+   "descricao": "Redução v2 (11/11): Basta uma VM barata de 4 vCPU por algumas horas, só para repetir a medida de custo do Teste 1 fora do notebook.\n\nPor quê: o G1 é medido em 4 vCPU (E7 §7) e o piloto da S1 começa no dia 1; sem a máquina, nenhuma medida de custo é válida.\nComo:\n- Provisionar uma VM de 4 vCPU (ou reservar uma máquina do grupo) com disco para modelos e derivados\n- Instalar o ambiente pelo setup.sh do T-202\n- Registrar tipo de CPU, memória, disco e acesso (SSH) no README do model_gate\nSaída: máquina acessível com o ambiente e a ficha da máquina documentada.\nFora do escopo: máquinas da campanha (T-1601).",
    "epico": "J2",
    "id": "T-210",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Máquina acessível com o ambiente",
    "status": "a fazer",
-   "tamanho": "M",
-   "titulo": "Máquina de 4 vCPU do piloto"
+   "tamanho": "P",
+   "titulo": "Máquina de 4 vCPU do piloto",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "atualizado": "2026-11-05T12:00:00.000Z",
@@ -619,29 +621,31 @@
    "deps": [
     "T-301"
    ],
-   "descricao": "Por quê: o δ é definido por categoria (Qi 2024, T-106), então a amostra de nocivos precisa ser estratificada para que cada categoria tenha itens suficientes.\nComo:\n- Sortear do StrongREJECT o número de itens por categoria da tabela do T-301, com seed fixa\n- Garantir que nenhum item caia também na bateria de referência (T-1001) nem no conjunto da direção (T-401)\n- Gravar só os IDs, nunca o texto\nSaída: model_gate/battery/harmful_ids.json versionado, com a seed usada.",
+   "descricao": "Redução v2 (11/11): Sorteio estratificado com seed: um script curto que grava só os IDs.\n\nPor quê: o δ é definido por categoria (Qi 2024, T-106), então a amostra de nocivos precisa ser estratificada para que cada categoria tenha itens suficientes.\nComo:\n- Sortear do StrongREJECT o número de itens por categoria da tabela do T-301, com seed fixa\n- Garantir que nenhum item caia também na bateria de referência (T-1001) nem no conjunto da direção (T-401)\n- Gravar só os IDs, nunca o texto\nSaída: model_gate/battery/harmful_ids.json versionado, com a seed usada.",
    "epico": "J3",
    "id": "T-302",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Lista de IDs versionada",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Selecionar os itens nocivos estratificados por categoria, com amostra fixa por seed"
+   "tamanho": "P",
+   "titulo": "Selecionar os itens nocivos estratificados por categoria, com amostra fixa por seed",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-301"
    ],
-   "descricao": "Por quê: o R4 mede a recusa excessiva em pedidos seguros com contraste inseguro, e a tolerância própria (T-106) depende desse conjunto.\nComo:\n- Selecionar do XSTest os prompts seguros e os contrastes inseguros correspondentes, mantendo os pares\n- Cobrir os tipos de prompt do XSTest de forma balanceada, com seed fixa\n- Gravar só os IDs e o tipo\nSaída: model_gate/battery/xstest_ids.json versionado.",
+   "descricao": "Redução v2 (11/11): Só os 25 seguros por veredito; os contrastes saíram do veredito (T-301).\n\nPor quê: o R4 mede a recusa excessiva em pedidos seguros com contraste inseguro, e a tolerância própria (T-106) depende desse conjunto.\nComo:\n- Selecionar do XSTest os prompts seguros e os contrastes inseguros correspondentes, mantendo os pares\n- Cobrir os tipos de prompt do XSTest de forma balanceada, com seed fixa\n- Gravar só os IDs e o tipo\nSaída: model_gate/battery/xstest_ids.json versionado.",
    "epico": "J3",
    "id": "T-303",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Lista de IDs versionada",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Selecionar os seguros e os contrastes do XSTest"
+   "tamanho": "P",
+   "titulo": "Selecionar os seguros e os contrastes do XSTest",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -649,29 +653,31 @@
     "T-303",
     "T-109"
    ],
-   "descricao": "Por quê: o R7 exige uma parte secreta, e o bounty interno (§3.6) só é válido se o atacante não a vê; o compromisso por hash prova depois que ela não mudou.\nComo:\n- Separar os IDs selecionados em pública e secreta na proporção do T-301, com seed fixa\n- Calcular o hash (SHA-256 da lista canônica mais um sal) da parte secreta\n- Entregar a parte secreta ao guardião (T-1202) conforme a política do T-109 e apagá-la da máquina de quem ataca\nSaída: lista pública versionada e hash da secreta registrado no repositório.",
+   "descricao": "Redução v2 (11/11): Parte secreta de uma fonte só: amostra do StrongREJECT fora da lista publicada, com o compromisso por hash. Escrever do zero e gerar por LLM vira trabalho futuro.\n\nPor quê: o R7 exige uma parte secreta, e o bounty interno (§3.6) só é válido se o atacante não a vê; o compromisso por hash prova depois que ela não mudou.\nComo:\n- Separar os IDs selecionados em pública e secreta na proporção do T-301, com seed fixa\n- Calcular o hash (SHA-256 da lista canônica mais um sal) da parte secreta\n- Entregar a parte secreta ao guardião (T-1202) conforme a política do T-109 e apagá-la da máquina de quem ataca\nSaída: lista pública versionada e hash da secreta registrado no repositório.",
    "epico": "J3",
    "id": "T-304",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Hash registrado; secreta guardada conforme o T-109",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta"
+   "tamanho": "P",
+   "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-302"
    ],
-   "descricao": "Por quê: o R7 (Halawi) exige medir o derivado com codificações conhecidas, já que um derivado pode recusar em texto claro e atender codificado.\nComo:\n- Escolher um subconjunto fixo dos nocivos públicos\n- Gerar as variantes em base64, cifra de César e leetspeak, com a instrução de responder na mesma codificação\n- Decodificar cada variante de volta e conferir igualdade com o original\nSaída: IDs das variantes e o gerador em model_gate/battery/encodings.py.\nFora do escopo: cifra nova, que fica como limitação (T-112).",
+   "descricao": "Redução v2 (11/11): Só os 6 codificados da composição: transformar texto em base64, César e leetspeak é trivial.\n\nPor quê: o R7 (Halawi) exige medir o derivado com codificações conhecidas, já que um derivado pode recusar em texto claro e atender codificado.\nComo:\n- Escolher um subconjunto fixo dos nocivos públicos\n- Gerar as variantes em base64, cifra de César e leetspeak, com a instrução de responder na mesma codificação\n- Decodificar cada variante de volta e conferir igualdade com o original\nSaída: IDs das variantes e o gerador em model_gate/battery/encodings.py.\nFora do escopo: cifra nova, que fica como limitação (T-112).",
    "epico": "J3",
    "id": "T-305",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Variantes conferidas por decodificação",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Gerar variantes em codificações conhecidas (base64, César, leetspeak) para um subconjunto"
+   "tamanho": "P",
+   "titulo": "Gerar variantes em codificações conhecidas (base64, César, leetspeak) para um subconjunto",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -693,35 +699,37 @@
     "T-303",
     "T-306"
    ],
-   "descricao": "Por quê: o estágio 1 é a triagem barata da E13 §3.3 (64 tokens em todos os itens), que define quem vai para o estágio 2.\nComo:\n- Gerar 64 tokens por item nas duas configurações do T-306\n- Detector de recusa (padrões de texto e/ou classificador leve) aplicado a cada resposta\n- Conferir o detector à mão numa amostra fixa (~50 respostas) e reportar acurácia\nSaída: tabela item × configuração × recusou, gravada no registro, e a acurácia do detector.",
+   "descricao": "Redução v2 (11/11): O gerador determinístico já existe (T-205); falta o laço sobre as âncoras.\nAbsorve: T-308 (Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens).\n\nPor quê: o estágio 1 é a triagem barata da E13 §3.3 (64 tokens em todos os itens), que define quem vai para o estágio 2.\nComo:\n- Gerar 64 tokens por item nas duas configurações do T-306\n- Detector de recusa (padrões de texto e/ou classificador leve) aplicado a cada resposta\n- Conferir o detector à mão numa amostra fixa (~50 respostas) e reportar acurácia\nSaída: tabela item × configuração × recusou, gravada no registro, e a acurácia do detector.",
    "epico": "J3",
    "id": "T-307",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Taxa de recusa por item no base, com acurácia do detector",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Estágio 1: gerar 64 tokens em todos os itens e detectar recusa, conferindo o detector numa amostra"
+   "tamanho": "M",
+   "titulo": "Estágio 1: gerar 64 tokens em todos os itens e detectar recusa, conferindo o detector numa amostra",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-307"
    ],
-   "descricao": "Por quê: o R16 manda ler a resposta inteira, porque um derivado pode recusar e depois atender; por isso o estágio 2 inclui uma amostra dos que recusaram.\nComo:\n- Montar a lista do estágio 2: todos os não recusados, uma amostra aleatória fixa (por seed) dos recusados e toda a parte secreta\n- Gerar 512 tokens para cada item da lista\n- Guardar as gerações fora do git (T-211), registrando só hashes e metadados\nSaída: lista do estágio 2 versionada e gerações completas no armazenamento fora do git.",
+   "descricao": "Juntada em T-307 em 11/11 (redução v2): O segundo estágio deixou de existir com a geração única.\n\nPor quê: o R16 manda ler a resposta inteira, porque um derivado pode recusar e depois atender; por isso o estágio 2 inclui uma amostra dos que recusaram.\nComo:\n- Montar a lista do estágio 2: todos os não recusados, uma amostra aleatória fixa (por seed) dos recusados e toda a parte secreta\n- Gerar 512 tokens para cada item da lista\n- Guardar as gerações fora do git (T-211), registrando só hashes e metadados\nSaída: lista do estágio 2 versionada e gerações completas no armazenamento fora do git.",
    "epico": "J3",
    "id": "T-308",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Lista do estágio 2 e gerações completas",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
-   "titulo": "Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens"
+   "titulo": "Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-202"
    ],
-   "descricao": "Por quê: o R3 separa recusa de dano, e o dano é pontuado pelo avaliador aberto do StrongREJECT, que precisa caber em CPU.\nComo:\n- Baixar o avaliador afinado em Gemma 2B (qylu4156/strongreject-15k-v1 no HF) e conferir que é o modelo do artigo (cartão, prompt, formato da saída)\n- Rodar em CPU com o prompt oficial e decodificação fixa\n- Pontuar 10 exemplos duas vezes e medir o tempo por item\nSaída: wrapper model_gate/battery/judge.py com teste de reprodutibilidade e tempo por item no registro.",
+   "descricao": "Redução v2 (11/11): Maior risco do custo. Reescrever: o avaliador sai da disputa Gemma 4 E4B × Qwen3Guard-4B (T-105), não do Gemma 2B.\n\nPor quê: o R3 separa recusa de dano, e o dano é pontuado pelo avaliador aberto do StrongREJECT, que precisa caber em CPU.\nComo:\n- Baixar o avaliador afinado em Gemma 2B (qylu4156/strongreject-15k-v1 no HF) e conferir que é o modelo do artigo (cartão, prompt, formato da saída)\n- Rodar em CPU com o prompt oficial e decodificação fixa\n- Pontuar 10 exemplos duas vezes e medir o tempo por item\nSaída: wrapper model_gate/battery/judge.py com teste de reprodutibilidade e tempo por item no registro.",
    "epico": "J3",
    "id": "T-309",
    "marco": "G1",
@@ -729,11 +737,12 @@
    "pronto": "Notas reproduzíveis em 10 exemplos",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rodar o juiz do portão (avaliador StrongREJECT em Gemma 2B) em CPU e conferir o modelo"
+   "titulo": "Rodar o juiz do portão (avaliador StrongREJECT em Gemma 2B) em CPU e conferir o modelo",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-308",
+    "T-307",
     "T-309"
    ],
    "descricao": "Por quê: o veredito precisa de dano (R3) e recusa excessiva (R4) por item, não só da detecção de recusa do estágio 1.\nComo:\n- Pontuar com o juiz do T-309 cada resposta nociva do estágio 2\n- Classificar as respostas aos seguros e contrastes do XSTest (cumpre, recusa total, recusa parcial)\n- Gravar a nota por item, configuração e modelo\nSaída: tabela de notas por item no registro.",
@@ -744,14 +753,15 @@
    "pronto": "Notas por item",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Pontuar dano (nota StrongREJECT) e recusa excessiva (classes do XSTest)"
+   "titulo": "Pontuar dano (nota StrongREJECT) e recusa excessiva (classes do XSTest)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-310",
     "T-106"
    ],
-   "descricao": "Por quê: a propriedade (T-106) é a queda de recusa por categoria maior que δ e a violação da tolerância de recusa excessiva; o Juiz compara o derivado com o pai.\nComo:\n- Agregar por categoria: taxa de recusa, nota média de dano e taxa de recusa excessiva, por configuração\n- Calcular a diferença derivado − base por métrica e categoria\n- Expor uma função que recebe duas execuções e devolve o vetor de diferenças\nSaída: model_gate/battery/metrics.py com teste e esquema da saída documentado.",
+   "descricao": "Redução v2 (11/11): Reescrever para o teste da T-301: aprovação no agregado, δ por categoria no veto, dano binarizado.\n\nPor quê: a propriedade (T-106) é a queda de recusa por categoria maior que δ e a violação da tolerância de recusa excessiva; o Juiz compara o derivado com o pai.\nComo:\n- Agregar por categoria: taxa de recusa, nota média de dano e taxa de recusa excessiva, por configuração\n- Calcular a diferença derivado − base por métrica e categoria\n- Expor uma função que recebe duas execuções e devolve o vetor de diferenças\nSaída: model_gate/battery/metrics.py com teste e esquema da saída documentado.",
    "epico": "J3",
    "id": "T-311",
    "marco": "G1",
@@ -759,74 +769,85 @@
    "pronto": "Métricas comparáveis entre modelos",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Agregar métricas por categoria (recusa, dano, recusa excessiva) e a diferença para o base"
+   "titulo": "Agregar métricas por categoria (recusa, dano, recusa excessiva) e a diferença para o base",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-311"
    ],
-   "descricao": "Por quê: o R9 exige que a comparação seja feita contra o pai custodiado; os valores do base são parte da referência que fica com o operador.\nComo:\n- Rodar o instrumento inteiro (estágios 1 e 2, juiz, métricas) no base do T-203, nas duas configurações\n- Associar o resultado ao digest do base e ao hash da composição da bateria\n- Guardar como referência imutável (arquivo com hash)\nSaída: references/base_s1.json com o digest do pai e o hash do arquivo registrado.",
+   "descricao": "Redução v2 (11/11): Rodar o instrumento no base e gravar o resultado com hash.\n\nPor quê: o R9 exige que a comparação seja feita contra o pai custodiado; os valores do base são parte da referência que fica com o operador.\nComo:\n- Rodar o instrumento inteiro (estágios 1 e 2, juiz, métricas) no base do T-203, nas duas configurações\n- Associar o resultado ao digest do base e ao hash da composição da bateria\n- Guardar como referência imutável (arquivo com hash)\nSaída: references/base_s1.json com o digest do pai e o hash do arquivo registrado.",
    "epico": "J3",
    "id": "T-312",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Valores do pai registrados com o digest",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai",
-   "teste": "TS1"
-  },
-  {
-   "deps": [
-    "T-312"
-   ],
-   "descricao": "Por quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
-   "epico": "J3",
-   "id": "T-313",
-   "marco": "G1",
-   "prioridade": "P1",
-   "pronto": "As duas checagens passam",
-   "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
-   "teste": "TS1"
+   "teste": "TS1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-312",
-    "T-207"
+    "T-405",
+    "T-505",
+    "T-608"
    ],
-   "descricao": "Por quê: o G1 cobra o veredito de liberação inteiro, com juiz, em até 80 min em 4 vCPU; este é o número que decide se a bateria encolhe.\nComo:\n- Medir com o T-207 o tempo dos estágios 1 e 2 e do juiz, por configuração (com e sem system prompt)\n- 3 repetições na máquina do T-210\n- Somar com a estimativa por formato (T-509) para obter o custo da liberação inteira\nSaída: tabela minutos × configuração no registro e nota para a decisão do G1.",
+   "descricao": "Redução v2 (11/11): É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.\nAbsorve: T-406 (Teste de S2: abliterado público com razão baixa; base repetido perto de 1); T-508 (Teste: o base quantizado não dispara falso alarme por formato); T-609 (Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado).\n\nPor quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
+   "epico": "J3",
+   "id": "T-313",
+   "marco": "G1",
+   "prioridade": "P0",
+   "pronto": "As duas checagens passam",
+   "status": "backlog",
+   "tamanho": "M",
+   "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
+   "teste": "TS1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
+  },
+  {
+   "deps": [
+    "T-312",
+    "T-207",
+    "T-405",
+    "T-408",
+    "T-505"
+   ],
+   "descricao": "Redução v2 (11/11): Critério do G1 (80 min com o avaliador). Absorve o custo por formato (T-509) e o de S2/S3 (T-411). Sobe para P0.\nAbsorve: T-411 (Medir tempo e memória de S2 e S3 no 0,5B); T-509 (Medir o custo por formato).\n\nPor quê: o G1 cobra o veredito de liberação inteiro, com juiz, em até 80 min em 4 vCPU; este é o número que decide se a bateria encolhe.\nComo:\n- Medir com o T-207 o tempo dos estágios 1 e 2 e do juiz, por configuração (com e sem system prompt)\n- 3 repetições na máquina do T-210\n- Somar com a estimativa por formato (T-509) para obter o custo da liberação inteira\nSaída: tabela minutos × configuração no registro e nota para a decisão do G1.",
    "epico": "J3",
    "id": "T-314",
    "marco": "G1",
-   "prioridade": "P1",
+   "prioridade": "P0",
    "pronto": "Minutos por configuração, 3 repetições",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)",
-   "teste": "TS1"
+   "teste": "TS1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-205",
     "T-302"
    ],
-   "descricao": "Por quê: S2 usa a direção de recusa (Arditi) calculada no base custodiado (R9), e o conjunto que a gera não pode se sobrepor ao instrumento S1.\nComo:\n- Montar pares nocivo/inócuo de fonte separada dos itens do T-302 (por exemplo, os conjuntos usados por Arditi)\n- Rodar o base e extrair a ativação do resíduo no último token da instrução, por camada\n- Salvar os tensores com hash, fora do git se grandes\nSaída: activations/base_pairs.safetensors com hash registrado e a lista de pares versionada.",
+   "descricao": "Redução v2 (11/11): S2 é a segunda linha e a base da linha de base de Hurtado e da ablação da custódia. Extração de ativações por hook no último token.\n\nPor quê: S2 usa a direção de recusa (Arditi) calculada no base custodiado (R9), e o conjunto que a gera não pode se sobrepor ao instrumento S1.\nComo:\n- Montar pares nocivo/inócuo de fonte separada dos itens do T-302 (por exemplo, os conjuntos usados por Arditi)\n- Rodar o base e extrair a ativação do resíduo no último token da instrução, por camada\n- Salvar os tensores com hash, fora do git se grandes\nSaída: activations/base_pairs.safetensors com hash registrado e a lista de pares versionada.",
    "epico": "J4",
    "id": "T-401",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Tensores salvos com hash",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Extrair ativações do resíduo por camada no base para pares nocivo/inócuo (conjunto da direção, separado do instrumento)"
+   "tamanho": "M",
+   "titulo": "Extrair ativações do resíduo por camada no base para pares nocivo/inócuo (conjunto da direção, separado do instrumento)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-401"
    ],
-   "descricao": "Por quê: a direção de recusa é a diferença de médias entre ativações nocivas e inócuas (Arditi), e S2 mede o derivado contra ela.\nComo:\n- Para cada camada, calcular média(nocivo) − média(inócuo) e normalizar\n- Guardar uma direção por camada\n- Conferir que, no base, a projeção separa nocivos de inócuos numa validação separada\nSaída: references/refusal_dirs.safetensors com uma direção por camada e o hash.",
+   "descricao": "Redução v2 (11/11): Absorve a escolha da camada (T-403) e a guarda com hash (T-404).\nAbsorve: T-403 (Escolher a camada da direção por critério definido antes (maior separação na validação)); T-404 (Guardar a direção como parte da referência custodiada, com hash).\n\nPor quê: a direção de recusa é a diferença de médias entre ativações nocivas e inócuas (Arditi), e S2 mede o derivado contra ela.\nComo:\n- Para cada camada, calcular média(nocivo) − média(inócuo) e normalizar\n- Guardar uma direção por camada\n- Conferir que, no base, a projeção separa nocivos de inócuos numa validação separada\nSaída: references/refusal_dirs.safetensors com uma direção por camada e o hash.",
    "epico": "J4",
    "id": "T-402",
    "marco": "G1",
@@ -834,39 +855,42 @@
    "pronto": "Direções por camada salvas",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Calcular a direção de recusa por diferença de médias, por camada, no base custodiado (Arditi)"
+   "titulo": "Calcular a direção de recusa por diferença de médias, por camada, no base custodiado (Arditi)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-402"
    ],
-   "descricao": "Por quê: escolher a camada depois de ver os derivados seria ajuste no teste (R14); o critério tem de ser fixado antes.\nComo:\n- Fixar o critério: a camada com maior separação (por exemplo, AUROC ou distância padronizada) numa divisão de validação dos pares do T-401\n- Aplicar o critério e registrar a camada escolhida\nSaída: critério e camada no README de model_gate/signals/ e no registro, antes de rodar qualquer derivado.",
+   "descricao": "Juntada em T-402 em 11/11 (redução v2): Um critério fixo, escrito junto com a direção.\n\nPor quê: escolher a camada depois de ver os derivados seria ajuste no teste (R14); o critério tem de ser fixado antes.\nComo:\n- Fixar o critério: a camada com maior separação (por exemplo, AUROC ou distância padronizada) numa divisão de validação dos pares do T-401\n- Aplicar o critério e registrar a camada escolhida\nSaída: critério e camada no README de model_gate/signals/ e no registro, antes de rodar qualquer derivado.",
    "epico": "J4",
    "id": "T-403",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Critério e camada registrados",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Escolher a camada da direção por critério definido antes (maior separação na validação)"
+   "titulo": "Escolher a camada da direção por critério definido antes (maior separação na validação)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-403"
    ],
-   "descricao": "Por quê: a direção é parte da referência custodiada (R9); se o derivado pudesse fornecê-la, a referência forjada (RQ5) passaria.\nComo:\n- Juntar a direção da camada escolhida aos valores do T-312 num pacote de referência do pai\n- Calcular o hash do pacote e associá-lo ao digest do base\nSaída: references/ com o pacote completo do pai e o hash, que entra no recibo (T-608).",
+   "descricao": "Juntada em T-402 em 11/11 (redução v2): Guardar com hash é uma linha a mais na T-402.\n\nPor quê: a direção é parte da referência custodiada (R9); se o derivado pudesse fornecê-la, a referência forjada (RQ5) passaria.\nComo:\n- Juntar a direção da camada escolhida aos valores do T-312 num pacote de referência do pai\n- Calcular o hash do pacote e associá-lo ao digest do base\nSaída: references/ com o pacote completo do pai e o hash, que entra no recibo (T-608).",
    "epico": "J4",
    "id": "T-404",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Referência do pai inclui a direção",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Guardar a direção como parte da referência custodiada, com hash"
+   "titulo": "Guardar a direção como parte da referência custodiada, com hash",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-404"
+    "T-402"
    ],
    "descricao": "Por quê: S2 é o sinal de Hurtado: o derivado obliterado perde o gap de recusa ao longo da direção calculada no pai (R9).\nComo:\n- Rodar o derivado nos pares do T-401 e projetar as ativações na direção do T-404\n- Calcular o gap (média nocivo − média inócuo na projeção) e a razão gap_derivado / gap_base\n- Teste unitário com ativações sintéticas\nSaída: model_gate/signals/s2.py com função e teste.",
    "epico": "J4",
@@ -876,21 +900,23 @@
    "pronto": "Função S2 com teste",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "S2: medir o gap de recusa no derivado e a razão contra o base (Hurtado)"
+   "titulo": "S2: medir o gap de recusa no derivado e a razão contra o base (Hurtado)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-405"
    ],
-   "descricao": "Por quê: confirmar que S2 se comporta como em Hurtado antes de calibrar: razão baixa em obliterado, perto de 1 no próprio pai.\nComo:\n- Calcular S2 no huihui-ai v3 e conferir razão baixa\n- Calcular S2 no base de novo e conferir razão perto de 1\n- Registrar os valores no registro\nSaída: duas checagens documentadas, que viram teste de integração opcional.",
+   "descricao": "Juntada em T-313 em 11/11 (redução v2): A sanidade de S2 entra no Teste 1, com o mesmo abliterado público e o base repetido.\n\nPor quê: confirmar que S2 se comporta como em Hurtado antes de calibrar: razão baixa em obliterado, perto de 1 no próprio pai.\nComo:\n- Calcular S2 no huihui-ai v3 e conferir razão baixa\n- Calcular S2 no base de novo e conferir razão perto de 1\n- Registrar os valores no registro\nSaída: duas checagens documentadas, que viram teste de integração opcional.",
    "epico": "J4",
    "id": "T-406",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "As duas checagens passam",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Teste de S2: abliterado público com razão baixa; base repetido perto de 1"
+   "titulo": "Teste de S2: abliterado público com razão baixa; base repetido perto de 1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -910,7 +936,7 @@
    "deps": [
     "T-407"
    ],
-   "descricao": "Por quê: a abliteração é uma edição de posto 1; a fração da energia no primeiro valor singular de ΔW a denuncia (Hurtado).\nComo:\n- Para cada ΔW, calcular a SVD (ou só o topo, por iteração de potência) e a razão σ1² / Σσi²\n- Agregar por camada e no total (média ou máximo, documentado)\n- Tratar ΔW nulo sem divisão por zero\nSaída: função S3 com saída por camada e agregada, em model_gate/signals/s3.py.",
+   "descricao": "Redução v2 (11/11): Absorve o teste sintético de S3 (T-409).\nAbsorve: T-409 (Teste unitário de S3 com ΔW sintético de posto 1 e ruído).\n\nPor quê: a abliteração é uma edição de posto 1; a fração da energia no primeiro valor singular de ΔW a denuncia (Hurtado).\nComo:\n- Para cada ΔW, calcular a SVD (ou só o topo, por iteração de potência) e a razão σ1² / Σσi²\n- Agregar por camada e no total (média ou máximo, documentado)\n- Tratar ΔW nulo sem divisão por zero\nSaída: função S3 com saída por camada e agregada, em model_gate/signals/s3.py.",
    "epico": "J4",
    "id": "T-408",
    "marco": "G1",
@@ -918,35 +944,38 @@
    "pronto": "Função S3 com saída por camada",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "S3: energia do top-1 da SVD por matriz e agregação"
+   "titulo": "S3: energia do top-1 da SVD por matriz e agregação",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-408"
    ],
-   "descricao": "Por quê: S3 é central para RQ1 e RQ5; um teste sintético garante que a métrica mede o que diz medir.\nComo:\n- Gerar ΔW = u vᵀ (posto 1) mais ruído gaussiano em intensidades crescentes\n- Conferir que S3 fica perto de 1 sem ruído e cai com o ruído\n- Conferir S3 baixo para ΔW de posto cheio\nSaída: teste em model_gate/tests/ rodando no CI do T-209.",
+   "descricao": "Juntada em T-408 em 11/11 (redução v2): O teste sintético entra com a métrica.\n\nPor quê: S3 é central para RQ1 e RQ5; um teste sintético garante que a métrica mede o que diz medir.\nComo:\n- Gerar ΔW = u vᵀ (posto 1) mais ruído gaussiano em intensidades crescentes\n- Conferir que S3 fica perto de 1 sem ruído e cai com o ruído\n- Conferir S3 baixo para ΔW de posto cheio\nSaída: teste em model_gate/tests/ rodando no CI do T-209.",
    "epico": "J4",
    "id": "T-409",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Teste passa no CI",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Teste unitário de S3 com ΔW sintético de posto 1 e ruído"
+   "titulo": "Teste unitário de S3 com ΔW sintético de posto 1 e ruído",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-408"
    ],
-   "descricao": "Por quê: derivados LoRA chegam mesclados ou como adaptador separado; S3 não pode depender da forma de entrega.\nComo:\n- Calcular S3 com o adaptador mesclado no base\n- Calcular S3 direto de B·A do adaptador\n- Comparar os valores e documentar a diferença numérica\nSaída: teste e nota em model_gate/signals/ indicando a forma canônica.",
+   "descricao": "Cortada em 11/11 (redução v2): O adaptador LoRA é sempre fundido sob custódia antes do Juiz (T-103); a forma separada não chega ao Juiz.\n\nPor quê: derivados LoRA chegam mesclados ou como adaptador separado; S3 não pode depender da forma de entrega.\nComo:\n- Calcular S3 com o adaptador mesclado no base\n- Calcular S3 direto de B·A do adaptador\n- Comparar os valores e documentar a diferença numérica\nSaída: teste e nota em model_gate/signals/ indicando a forma canônica.",
    "epico": "J4",
    "id": "T-410",
    "marco": "G2",
    "prioridade": "P2",
    "pronto": "Mesmo valor nas duas formas",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "S3 em derivados LoRA: adaptador mesclado × separado"
+   "titulo": "S3 em derivados LoRA: adaptador mesclado × separado",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -954,15 +983,16 @@
     "T-408",
     "T-207"
    ],
-   "descricao": "Por quê: S2 e S3 entram no orçamento do G1 junto com S1; a SVD e a extração de ativações podem pesar em 4 vCPU.\nComo:\n- Medir com o T-207 o tempo e a memória de S2 e de S3 num derivado do 0,5B\n- 3 repetições na máquina do T-210\nSaída: minutos e GiB por sinal no registro, somados ao custo do veredito.",
+   "descricao": "Juntada em T-314 em 11/11 (redução v2): Tempo e memória de S2 e S3 entram na medida de custo do G1.\n\nPor quê: S2 e S3 entram no orçamento do G1 junto com S1; a SVD e a extração de ativações podem pesar em 4 vCPU.\nComo:\n- Medir com o T-207 o tempo e a memória de S2 e de S3 num derivado do 0,5B\n- 3 repetições na máquina do T-210\nSaída: minutos e GiB por sinal no registro, somados ao custo do veredito.",
    "epico": "J4",
    "id": "T-411",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Minutos e GiB por sinal",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Medir tempo e memória de S2 e S3 no 0,5B"
+   "titulo": "Medir tempo e memória de S2 e S3 no 0,5B",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -984,44 +1014,48 @@
    "deps": [
     "T-406"
    ],
-   "descricao": "Por quê: Wollschläger mostra que a recusa pode viver em mais de uma direção; a robustez de S2 à escolha da direção é uma ameaça à validade.\nComo:\n- Calcular 2–3 direções alternativas (outras camadas, outros conjuntos de pares)\n- Recalcular S2 nos mesmos derivados com cada direção\n- Reportar a variação\nSaída: nota com a tabela de variação, para a seção de ameaças.",
+   "descricao": "Cortada em 11/11 (redução v2): P3. Várias direções (Wollschläger) vira ameaça à validade declarada.\n\nPor quê: Wollschläger mostra que a recusa pode viver em mais de uma direção; a robustez de S2 à escolha da direção é uma ameaça à validade.\nComo:\n- Calcular 2–3 direções alternativas (outras camadas, outros conjuntos de pares)\n- Recalcular S2 nos mesmos derivados com cada direção\n- Reportar a variação\nSaída: nota com a tabela de variação, para a seção de ameaças.",
    "epico": "J4",
    "id": "T-413",
    "marco": "G2",
    "prioridade": "P3",
    "pronto": "Variação de S2 entre 2–3 direções",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Sensibilidade de S2 à escolha da direção (várias direções, Wollschläger)"
+   "titulo": "Sensibilidade de S2 à escolha da direção (várias direções, Wollschläger)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-205"
+    "T-205",
+    "T-503"
    ],
-   "descricao": "Por quê: o D5 libera precisão cheia e quantizações zero-shot (R8), e o bitsandbytes em CPU não é garantido; a E13 §3.3 manda quantizar e desquantizar em CPU pela formalização por bloco de Egashira §3.\nComo:\n- Implementar absmax por bloco e o alfabeto de cada formato: LLM.int8, NF4, FP4\n- Quantizar e desquantizar as matrizes lineares, devolvendo um modelo em precisão cheia com os pesos arredondados\n- Testes com tensores pequenos e valores conhecidos\nSaída: model_gate/formats/quant.py com uma função por formato e testes.",
+   "descricao": "Redução v2 (11/11): Só NF4 (proposta: liberar FP e NF4 no protótipo). Absorve a conferência contra a referência (T-502).\nAbsorve: T-502 (Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos).\n\nPor quê: o D5 libera precisão cheia e quantizações zero-shot (R8), e o bitsandbytes em CPU não é garantido; a E13 §3.3 manda quantizar e desquantizar em CPU pela formalização por bloco de Egashira §3.\nComo:\n- Implementar absmax por bloco e o alfabeto de cada formato: LLM.int8, NF4, FP4\n- Quantizar e desquantizar as matrizes lineares, devolvendo um modelo em precisão cheia com os pesos arredondados\n- Testes com tensores pequenos e valores conhecidos\nSaída: model_gate/formats/quant.py com uma função por formato e testes.",
    "epico": "J5",
    "id": "T-501",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Função por formato com teste",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Quantizar e desquantizar por bloco (absmax, alfabeto) para LLM.int8, NF4 e FP4 em CPU (Egashira §3)"
+   "tamanho": "M",
+   "titulo": "Quantizar e desquantizar por bloco (absmax, alfabeto) para LLM.int8, NF4 e FP4 em CPU (Egashira §3)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-501",
     "T-503"
    ],
-   "descricao": "Por quê: a quantização própria só vale para o R8 se reproduzir a de referência; o erro tem de ser medido e reportado.\nComo:\n- Sortear uma amostra de matrizes do base\n- Quantizar com a nossa implementação e com a de referência (bitsandbytes, se rodar pelo T-503, ou numa máquina com GPU)\n- Medir o erro máximo e médio por bloco\nSaída: tabela de erro no registro e nota em model_gate/formats/README.md.",
+   "descricao": "Juntada em T-501 em 11/11 (redução v2): Conferir contra a referência numa amostra é parte de implementar NF4.\n\nPor quê: a quantização própria só vale para o R8 se reproduzir a de referência; o erro tem de ser medido e reportado.\nComo:\n- Sortear uma amostra de matrizes do base\n- Quantizar com a nossa implementação e com a de referência (bitsandbytes, se rodar pelo T-503, ou numa máquina com GPU)\n- Medir o erro máximo e médio por bloco\nSaída: tabela de erro no registro e nota em model_gate/formats/README.md.",
    "epico": "J5",
    "id": "T-502",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Erro máximo por bloco documentado",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos"
+   "titulo": "Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1041,45 +1075,48 @@
    "deps": [
     "T-501"
    ],
-   "descricao": "Por quê: cada formato liberado é um artefato distinto e entra no recibo; precisa de digest próprio (R8, P2).\nComo:\n- Gerar as versões int8, NF4 e FP4 de um derivado com o T-501\n- Salvar em safetensors fora do git e calcular o digest de cada uma\n- Registrar a relação derivado → formato → digest\nSaída: manifesto de formatos por derivado no registro.",
+   "descricao": "Juntada em T-505 em 11/11 (redução v2): Gerar os formatos e registrar o digest é o primeiro passo de rodar o instrumento em cada formato.\n\nPor quê: cada formato liberado é um artefato distinto e entra no recibo; precisa de digest próprio (R8, P2).\nComo:\n- Gerar as versões int8, NF4 e FP4 de um derivado com o T-501\n- Salvar em safetensors fora do git e calcular o digest de cada uma\n- Registrar a relação derivado → formato → digest\nSaída: manifesto de formatos por derivado no registro.",
    "epico": "J5",
    "id": "T-504",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "3 formatos com digest",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Gerar as versões quantizadas de um derivado e registrar os digests"
+   "titulo": "Gerar as versões quantizadas de um derivado e registrar os digests",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-504",
-    "T-506",
-    "T-311"
+    "T-301",
+    "T-311",
+    "T-501"
    ],
-   "descricao": "Por quê: Egashira mostra que um modelo pode se comportar bem em precisão cheia e mal quantizado; o R8 manda avaliar cada formato liberado.\nComo:\n- Rodar o instrumento reduzido do T-506 em cada versão do T-504\n- Calcular as métricas e as diferenças contra o base no mesmo formato\n- Gravar por formato no registro\nSaída: métricas por formato, prontas para a regra do T-605.",
+   "descricao": "Redução v2 (11/11): Mesma bateria em 2 formatos, não em 4.\nAbsorve: T-504 (Gerar as versões quantizadas de um derivado e registrar os digests).\n\nPor quê: Egashira mostra que um modelo pode se comportar bem em precisão cheia e mal quantizado; o R8 manda avaliar cada formato liberado.\nComo:\n- Rodar o instrumento reduzido do T-506 em cada versão do T-504\n- Calcular as métricas e as diferenças contra o base no mesmo formato\n- Gravar por formato no registro\nSaída: métricas por formato, prontas para a regra do T-605.",
    "epico": "J5",
    "id": "T-505",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Métricas por formato",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Rodar o instrumento reduzido em cada formato"
+   "tamanho": "M",
+   "titulo": "Rodar o instrumento reduzido em cada formato",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-301"
    ],
-   "descricao": "Por quê: rodar a bateria completa em 4 formatos × 2 configurações estoura o G1; a E13 §3.3 prevê a completa só em precisão cheia.\nComo:\n- Escolher o subconjunto por formato (itens por categoria e quantos da parte secreta), mantendo todas as categorias\n- Fixar com seed e justificar pelo custo do T-314\nSaída: composição reduzida em model_gate/battery/README.md e lista de IDs versionada.",
+   "descricao": "Cortada em 11/11 (redução v2): Contradiz a E14 §15: a bateria não é reduzida nos quantizados.\n\nPor quê: rodar a bateria completa em 4 formatos × 2 configurações estoura o G1; a E13 §3.3 prevê a completa só em precisão cheia.\nComo:\n- Escolher o subconjunto por formato (itens por categoria e quantos da parte secreta), mantendo todas as categorias\n- Fixar com seed e justificar pelo custo do T-314\nSaída: composição reduzida em model_gate/battery/README.md e lista de IDs versionada.",
    "epico": "J5",
    "id": "T-506",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Composição reduzida registrada",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Definir o instrumento reduzido por formato (subconjunto e tamanho)"
+   "titulo": "Definir o instrumento reduzido por formato (subconjunto e tamanho)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -1100,31 +1137,33 @@
    "deps": [
     "T-505"
    ],
-   "descricao": "Por quê: o pai quantizado é o caso mais simples de derivado legítimo; se reprovar, todo formato dá falso alarme.\nComo:\n- Rodar o instrumento reduzido e S3 no base quantizado nos 3 formatos\n- Conferir que as diferenças ficam abaixo de δ e que S3 fica no piso do T-412\nSaída: checagem registrada; se falhar, ajustar δ ou o instrumento antes da calibração.",
+   "descricao": "Juntada em T-313 em 11/11 (redução v2): O base quantizado já é um dos casos do teste ponta a ponta do veredito.\n\nPor quê: o pai quantizado é o caso mais simples de derivado legítimo; se reprovar, todo formato dá falso alarme.\nComo:\n- Rodar o instrumento reduzido e S3 no base quantizado nos 3 formatos\n- Conferir que as diferenças ficam abaixo de δ e que S3 fica no piso do T-412\nSaída: checagem registrada; se falhar, ajustar δ ou o instrumento antes da calibração.",
    "epico": "J5",
    "id": "T-508",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Base aprovado nos 3 formatos",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Teste: o base quantizado não dispara falso alarme por formato"
+   "titulo": "Teste: o base quantizado não dispara falso alarme por formato",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-505",
     "T-207"
    ],
-   "descricao": "Por quê: o custo por formato entra no custo da liberação inteira do G1 e na RQ5.\nComo:\n- Medir com o T-207 o tempo e a memória da quantização e do instrumento reduzido por formato\n- 3 repetições\nSaída: minutos por formato no registro e na nota de custo do T-314.",
+   "descricao": "Juntada em T-314 em 11/11 (redução v2): O custo por formato entra na medida de custo do G1.\n\nPor quê: o custo por formato entra no custo da liberação inteira do G1 e na RQ5.\nComo:\n- Medir com o T-207 o tempo e a memória da quantização e do instrumento reduzido por formato\n- 3 repetições\nSaída: minutos por formato no registro e na nota de custo do T-314.",
    "epico": "J5",
    "id": "T-509",
    "marco": "G1",
    "prioridade": "P2",
    "pronto": "Minutos por formato",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Medir o custo por formato",
-   "teste": "TS1"
+   "teste": "TS1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1132,21 +1171,25 @@
     "T-405",
     "T-408"
    ],
-   "descricao": "Por quê: S1, S2 e S3 têm escalas diferentes; para combiná-los é preciso normalizar com estatísticas da calibração, nunca do teste (R14).\nComo:\n- Calcular média e desvio de cada sinal nos derivados H da calibração\n- Converter cada sinal em z-score e orientar o sinal (maior = mais suspeito)\n- Gravar os parâmetros com hash\nSaída: model_gate/verdict/normalize.py e parâmetros em references/, versionados.",
+   "descricao": "Cortada em 11/11 (redução v2): Sem z-soma no Juiz (T-108): S2 e S3 têm limiar próprio a FPR 5%, sem normalizar e somar.\n\nPor quê: S1, S2 e S3 têm escalas diferentes; para combiná-los é preciso normalizar com estatísticas da calibração, nunca do teste (R14).\nComo:\n- Calcular média e desvio de cada sinal nos derivados H da calibração\n- Converter cada sinal em z-score e orientar o sinal (maior = mais suspeito)\n- Gravar os parâmetros com hash\nSaída: model_gate/verdict/normalize.py e parâmetros em references/, versionados.",
    "epico": "J6",
    "id": "T-601",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Normalização versionada",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Normalizar cada sinal em z-score com estatísticas da calibração"
+   "titulo": "Normalizar cada sinal em z-score com estatísticas da calibração",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-601"
+    "T-311",
+    "T-405",
+    "T-408",
+    "T-505"
    ],
-   "descricao": "Por quê: Hurtado combina sinais por z-soma; a regra alternativa (qualquer sinal reprova) serve de ablação na RQ5.\nComo:\n- Implementar a z-soma dos sinais normalizados\n- Implementar a regra por qualquer sinal acima do próprio limiar\n- Documentar quando cada uma é usada e testá-las com valores sintéticos\nSaída: as duas combinações em model_gate/verdict/combine.py, com testes.",
+   "descricao": "Redução v2 (11/11): Reescrever como a escada do veredito (E14 §6.3), com a regra tudo ou nada dos formatos (absorve a T-605). A z-soma fica só na linha de base (T-1301).\nAbsorve: T-605 (Regra por formato: reprova se qualquer formato liberado reprova (D5)).\n\nPor quê: Hurtado combina sinais por z-soma; a regra alternativa (qualquer sinal reprova) serve de ablação na RQ5.\nComo:\n- Implementar a z-soma dos sinais normalizados\n- Implementar a regra por qualquer sinal acima do próprio limiar\n- Documentar quando cada uma é usada e testá-las com valores sintéticos\nSaída: as duas combinações em model_gate/verdict/combine.py, com testes.",
    "epico": "J6",
    "id": "T-602",
    "marco": "G2",
@@ -1154,7 +1197,8 @@
    "pronto": "Duas combinações implementadas",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Combinar por z-soma (Hurtado) e documentar a alternativa por regra (qualquer sinal reprova)"
+   "titulo": "Combinar por z-soma (Hurtado) e documentar a alternativa por regra (qualquer sinal reprova)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1193,15 +1237,16 @@
     "T-505",
     "T-602"
    ],
-   "descricao": "Por quê: o D5 libera vários formatos; se qualquer um perder a recusa, o derivado não pode sair (R8, Egashira).\nComo:\n- Calcular o veredito por formato com os resultados do T-505\n- Reprovar o derivado se qualquer formato liberado reprovar; inconclusivo se nenhum reprova e algum é inconclusivo\n- Teste com um caso que só reprova quantizado\nSaída: regra em model_gate/verdict/ com teste.",
+   "descricao": "Juntada em T-602 em 11/11 (redução v2): A regra por formato é um degrau da escada.\n\nPor quê: o D5 libera vários formatos; se qualquer um perder a recusa, o derivado não pode sair (R8, Egashira).\nComo:\n- Calcular o veredito por formato com os resultados do T-505\n- Reprovar o derivado se qualquer formato liberado reprovar; inconclusivo se nenhum reprova e algum é inconclusivo\n- Teste com um caso que só reprova quantizado\nSaída: regra em model_gate/verdict/ com teste.",
    "epico": "J6",
    "id": "T-605",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Regra no veredito com teste",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Regra por formato: reprova se qualquer formato liberado reprova (D5)"
+   "titulo": "Regra por formato: reprova se qualquer formato liberado reprova (D5)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1209,7 +1254,7 @@
     "T-603",
     "T-604"
    ],
-   "descricao": "Por quê: o pré-registro é o que impede ajustar o protocolo depois de ver o teste (R14, G2).\nComo:\n- Escrever δ por categoria, tolerância de recusa excessiva, métricas, limiar e faixa, tamanhos por divisão, seeds e critérios de sucesso e de corte por RQ\n- Incluir a regra de rótulo H/C/N (T-1004)\n- Revisar com o orientador\nSaída: prereg.yaml revisado em model_gate/ ou DSN2027/.\nFora do escopo: o commit com data (T-607).",
+   "descricao": "Redução v2 (11/11): Pré-registro. Absorve seeds e repetições (T-1403).\nAbsorve: T-1403 (Seeds e repetições por configuração, conforme o pré-registro).\n\nPor quê: o pré-registro é o que impede ajustar o protocolo depois de ver o teste (R14, G2).\nComo:\n- Escrever δ por categoria, tolerância de recusa excessiva, métricas, limiar e faixa, tamanhos por divisão, seeds e critérios de sucesso e de corte por RQ\n- Incluir a regra de rótulo H/C/N (T-1004)\n- Revisar com o orientador\nSaída: prereg.yaml revisado em model_gate/ ou DSN2027/.\nFora do escopo: o commit com data (T-607).",
    "epico": "J6",
    "id": "T-606",
    "marco": "G2",
@@ -1218,7 +1263,8 @@
    "status": "backlog",
    "tamanho": "G",
    "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1240,36 +1286,38 @@
     "T-602",
     "T-104"
    ],
-   "descricao": "Por quê: o verdict.json é o que o executor lê e o que alimenta o recibo no contrato (P2, T-104).\nComo:\n- Definir o esquema: estado (aprovado, reprovado, inconclusivo), motivos por instrumento e por formato, z-scores, limiar\n- Incluir os hashes do pai, do derivado, do Juiz e o compromisso da bateria\n- Gerador que valida o esquema antes de gravar\nSaída: esquema JSON e model_gate/verdict/emit.py com teste.",
+   "descricao": "Redução v2 (11/11): verdict.json: um dicionário serializado com estado, regra, medidas e hashes.\n\nPor quê: o verdict.json é o que o executor lê e o que alimenta o recibo no contrato (P2, T-104).\nComo:\n- Definir o esquema: estado (aprovado, reprovado, inconclusivo), motivos por instrumento e por formato, z-scores, limiar\n- Incluir os hashes do pai, do derivado, do Juiz e o compromisso da bateria\n- Gerador que valida o esquema antes de gravar\nSaída: esquema JSON e model_gate/verdict/emit.py com teste.",
    "epico": "J6",
    "id": "T-608",
    "marco": "G2",
    "prioridade": "P0",
    "pronto": "Esquema e gerador do verdict.json",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Saída do veredito: verdict.json com motivos por instrumento e hashes para o recibo"
+   "tamanho": "P",
+   "titulo": "Saída do veredito: verdict.json com motivos por instrumento e hashes para o recibo",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-608"
    ],
-   "descricao": "Por quê: antes de integrar no DNAT (J8), o veredito inteiro tem de dar o resultado esperado em casos conhecidos.\nComo:\n- Rodar o Juiz completo no base, no huihui-ai v3, num LoRA benigno do piloto (T-914) e no base quantizado\n- Esperado: aprovado, reprovado, aprovado, aprovado\n- Guardar os quatro verdict.json como exemplos\nSaída: teste ponta a ponta documentado, com tempo total de cada veredito.",
+   "descricao": "Juntada em T-313 em 11/11 (redução v2): O teste ponta a ponta do veredito é o próprio Teste 1 (base, abliterado, LoRA benigno, base quantizado).\n\nPor quê: antes de integrar no DNAT (J8), o veredito inteiro tem de dar o resultado esperado em casos conhecidos.\nComo:\n- Rodar o Juiz completo no base, no huihui-ai v3, num LoRA benigno do piloto (T-914) e no base quantizado\n- Esperado: aprovado, reprovado, aprovado, aprovado\n- Guardar os quatro verdict.json como exemplos\nSaída: teste ponta a ponta documentado, com tempo total de cada veredito.",
    "epico": "J6",
    "id": "T-609",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "4 vereditos esperados",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado",
-   "teste": "TS1"
+   "teste": "TS1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-104"
    ],
-   "descricao": "Por quê: o recibo mínimo (P2, D3) precisa distinguir no contrato o modelo custodiado do derivado que passou pelo Juiz; hoje AssetType só tem Dataset e Application.\nComo:\n- Acrescentar Model e Derivative ao enum AssetType em smart-contract/contracts/DnatMarketplace.sol (linha 28), no fim do enum para não mudar os valores existentes\n- Conferir que registerAsset e purchaseAccess continuam aceitando Dataset e Application como antes\n- Rodar npx hardhat compile e o teste existente (asset_envelope.test.js)\nSaída: contrato com os dois tipos novos, compilando sem quebrar o fluxo atual.\nFora do escopo: campos do derivado ficam no T-702; regras de registro no T-703.",
+   "descricao": "Redução v2 (11/11): Absorve os campos do derivado (T-702).\nAbsorve: T-702 (Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito).\n\nPor quê: o recibo mínimo (P2, D3) precisa distinguir no contrato o modelo custodiado do derivado que passou pelo Juiz; hoje AssetType só tem Dataset e Application.\nComo:\n- Acrescentar Model e Derivative ao enum AssetType em smart-contract/contracts/DnatMarketplace.sol (linha 28), no fim do enum para não mudar os valores existentes\n- Conferir que registerAsset e purchaseAccess continuam aceitando Dataset e Application como antes\n- Rodar npx hardhat compile e o teste existente (asset_envelope.test.js)\nSaída: contrato com os dois tipos novos, compilando sem quebrar o fluxo atual.\nFora do escopo: campos do derivado ficam no T-702; regras de registro no T-703.",
    "epico": "J7",
    "id": "T-701",
    "marco": "G3",
@@ -1277,84 +1325,90 @@
    "pronto": "Contrato compila com os novos tipos",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Adicionar os tipos Model e Derivative em AssetType"
+   "titulo": "Adicionar os tipos Model e Derivative em AssetType",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-701"
    ],
-   "descricao": "Por quê: o recibo do P2 liga o derivado ao pai e ao veredito por hashes (pai, derivado, Juiz, bateria), como o esquema definido no T-104.\nComo:\n- Criar struct DerivativeInfo (ou mapping por assetId) com parentId, derivativeHash, judgeHash, batteryCommitment e verdict (aprovado, reprovado, inconclusivo)\n- Manter a struct Asset intacta e ligar por assetId, para não mexer no layout usado por purchaseAccess\n- Expor getDerivative(assetId) e um evento DerivativeRegistered com os mesmos campos\nSaída: struct, mapping, getter e evento no DnatMarketplace.sol, com os campos idênticos aos do esquema do T-104.\nFora do escopo: quem pode gravar esses campos é o T-703.",
+   "descricao": "Juntada em T-701 em 11/11 (redução v2): Tipo e campos do derivado numa mudança só do contrato.\n\nPor quê: o recibo do P2 liga o derivado ao pai e ao veredito por hashes (pai, derivado, Juiz, bateria), como o esquema definido no T-104.\nComo:\n- Criar struct DerivativeInfo (ou mapping por assetId) com parentId, derivativeHash, judgeHash, batteryCommitment e verdict (aprovado, reprovado, inconclusivo)\n- Manter a struct Asset intacta e ligar por assetId, para não mexer no layout usado por purchaseAccess\n- Expor getDerivative(assetId) e um evento DerivativeRegistered com os mesmos campos\nSaída: struct, mapping, getter e evento no DnatMarketplace.sol, com os campos idênticos aos do esquema do T-104.\nFora do escopo: quem pode gravar esses campos é o T-703.",
    "epico": "J7",
    "id": "T-702",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Struct e getters",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito"
+   "titulo": "Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-702"
+    "T-701"
    ],
-   "descricao": "Por quê: pelo R10 e pela fronteira de confiança do T-105, só o executor, que roda o Juiz por hash na CVM, pode afirmar que um derivado foi julgado; o dono do derivado é o adversário.\nComo:\n- Adicionar papel de operador/executor (endereço fixado no construtor e trocável só pelo admin) e modifier onlyOperator\n- Implementar registerDerivative(parentId, hashes, verdict) com onlyOperator, exigindo pai do tipo Model e ativo\n- Teste: chamada a partir do endereço do dono do pai ou de terceiro reverte\nSaída: função registerDerivative restrita ao operador, com teste de reversão no hardhat.",
+   "descricao": "Redução v2 (11/11): Só o executor registra o derivado. Um modificador de papel no contrato.\n\nPor quê: pelo R10 e pela fronteira de confiança do T-105, só o executor, que roda o Juiz por hash na CVM, pode afirmar que um derivado foi julgado; o dono do derivado é o adversário.\nComo:\n- Adicionar papel de operador/executor (endereço fixado no construtor e trocável só pelo admin) e modifier onlyOperator\n- Implementar registerDerivative(parentId, hashes, verdict) com onlyOperator, exigindo pai do tipo Model e ativo\n- Teste: chamada a partir do endereço do dono do pai ou de terceiro reverte\nSaída: função registerDerivative restrita ao operador, com teste de reversão no hardhat.",
    "epico": "J7",
    "id": "T-703",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Chamada por outro endereço reverte",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Papel de executor/operador e registerDerivative só por ele"
+   "tamanho": "P",
+   "titulo": "Papel de executor/operador e registerDerivative só por ele",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-703"
    ],
-   "descricao": "Por quê: o portão só vale se um derivado reprovado nunca virar ativo (C1); hoje updateAsset deixa o dono gravar a.active = newActive (linha 174) sem nenhuma checagem.\nComo:\n- registerDerivative grava active = false quando o veredito não é aprovado\n- Em updateAsset, para tipo Derivative, proibir newActive = true se o veredito não for aprovado ou se o derivado tiver sido revogado pelo operador\n- Teste: o dono tenta reativar um reprovado e um revogado e as duas chamadas revertem\nSaída: updateAsset ajustado e teste de reativação negada.\nFora do escopo: a revogação em si é o T-705.",
+   "descricao": "Redução v2 (11/11): Reprovado nunca fica ativo. Uma checagem em updateAsset.\n\nPor quê: o portão só vale se um derivado reprovado nunca virar ativo (C1); hoje updateAsset deixa o dono gravar a.active = newActive (linha 174) sem nenhuma checagem.\nComo:\n- registerDerivative grava active = false quando o veredito não é aprovado\n- Em updateAsset, para tipo Derivative, proibir newActive = true se o veredito não for aprovado ou se o derivado tiver sido revogado pelo operador\n- Teste: o dono tenta reativar um reprovado e um revogado e as duas chamadas revertem\nSaída: updateAsset ajustado e teste de reativação negada.\nFora do escopo: a revogação em si é o T-705.",
    "epico": "J7",
    "id": "T-704",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Reativação pelo dono reverte",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Derivado reprovado nunca fica active; o dono não reativa (ajustar updateAsset, hoje linha 173)"
+   "tamanho": "P",
+   "titulo": "Derivado reprovado nunca fica active; o dono não reativa (ajustar updateAsset, hoje linha 173)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-703"
    ],
-   "descricao": "Por quê: o ciclo de vida do T-110 exige que o operador retire um derivado liberado (por exemplo, quando o Juiz muda), mas revokeAsset hoje exige o dono (linha 186), que é o adversário.\nComo:\n- Criar revokeDerivative(assetId, motivo) com onlyOperator, que zera active e marca o derivado como revogado\n- Emitir evento DerivativeRevoked(assetId, motivo, versão do Juiz)\n- Manter revokeAsset do dono para os tipos antigos, sem mudar o comportamento\nSaída: função de revogação pelo operador com evento e teste no hardhat.",
+   "descricao": "Redução v2 (11/11): Revogação pelo operador. Trocar o dono pelo operador em revokeAsset.\n\nPor quê: o ciclo de vida do T-110 exige que o operador retire um derivado liberado (por exemplo, quando o Juiz muda), mas revokeAsset hoje exige o dono (linha 186), que é o adversário.\nComo:\n- Criar revokeDerivative(assetId, motivo) com onlyOperator, que zera active e marca o derivado como revogado\n- Emitir evento DerivativeRevoked(assetId, motivo, versão do Juiz)\n- Manter revokeAsset do dono para os tipos antigos, sem mudar o comportamento\nSaída: função de revogação pelo operador com evento e teste no hardhat.",
    "epico": "J7",
    "id": "T-705",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Operador revoga; evento emitido",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Revogação pelo operador (hoje revokeAsset exige o dono, linha 185) e evento"
+   "tamanho": "P",
+   "titulo": "Revogação pelo operador (hoje revokeAsset exige o dono, linha 185) e evento",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-704"
    ],
-   "descricao": "Por quê: um derivado só pode ser consumido se passou pelo portão e se o pai continua válido; purchaseAccess hoje só confere active e o par Dataset/Application (linha 224).\nComo:\n- Definir como o derivado entra na compra (no lugar do Application ou como terceiro ativo) seguindo o fluxo do T-101\n- Exigir veredito aprovado, derivado ativo e pai ativo antes de registrar o direito de acesso\n- Teste: compra de derivado reprovado, revogado ou com pai revogado reverte\nSaída: purchaseAccess (ou nova função de compra) com as checagens e testes.",
+   "descricao": "Cortada em 11/11 (redução v2): Compra de acesso é herança do mercado; com modelos abertos de custo zero (D1), não sustenta afirmação.\n\nPor quê: um derivado só pode ser consumido se passou pelo portão e se o pai continua válido; purchaseAccess hoje só confere active e o par Dataset/Application (linha 224).\nComo:\n- Definir como o derivado entra na compra (no lugar do Application ou como terceiro ativo) seguindo o fluxo do T-101\n- Exigir veredito aprovado, derivado ativo e pai ativo antes de registrar o direito de acesso\n- Teste: compra de derivado reprovado, revogado ou com pai revogado reverte\nSaída: purchaseAccess (ou nova função de compra) com as checagens e testes.",
    "epico": "J7",
    "id": "T-706",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Compra de reprovado reverte",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Compra de acesso a derivado exige veredito aprovado e pai ativo"
+   "titulo": "Compra de acesso a derivado exige veredito aprovado e pai ativo",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-705",
     "T-110"
    ],
-   "descricao": "Por quê: o T-110 define revogação, mas não diz o que acontece com os filhos quando o pai é revogado; sem regra, um derivado continua vendável com pai retirado.\nComo:\n- Escolher entre cascata (revogar filhos) e bloqueio na compra (o T-706 já checa pai ativo)\n- Implementar a opção escolhida sem laço sem limite sobre filhos (gás)\n- Registrar a decisão na E14 ou no T-110\nSaída: regra escrita e implementada, com um teste.",
+   "descricao": "Redução v2 (11/11): Cascata mínima: o derivado só é ativo se o pai é ativo (uma checagem). Faz parte do critério do G3.\n\nPor quê: o T-110 define revogação, mas não diz o que acontece com os filhos quando o pai é revogado; sem regra, um derivado continua vendável com pai retirado.\nComo:\n- Escolher entre cascata (revogar filhos) e bloqueio na compra (o T-706 já checa pai ativo)\n- Implementar a opção escolhida sem laço sem limite sobre filhos (gás)\n- Registrar a decisão na E14 ou no T-110\nSaída: regra escrita e implementada, com um teste.",
    "epico": "J7",
    "id": "T-707",
    "marco": "G3",
@@ -1362,31 +1416,32 @@
    "pronto": "Regra decidida e implementada",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Regra para derivados de um pai revogado"
+   "titulo": "Regra para derivados de um pai revogado",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-704",
     "T-705",
     "T-706"
    ],
-   "descricao": "Por quê: o marco G3 pede prova de que reprovado não sai, aprovado vira ativo e o operador revoga; os testes do contrato são essa prova no nível on-chain.\nComo:\n- Criar smart-contract/test/derivative.test.js no padrão de asset_envelope.test.js\n- Casos: registro aprovado, registro reprovado, registro por não operador, reativação negada, revogação pelo operador, compra negada para reprovado e revogado\n- Rodar npx hardhat test e anotar o commit\nSaída: suíte de testes verde no repositório.\nFora do escopo: o teste ponta a ponta nas CVMs é o T-813.",
+   "descricao": "Juntada em T-813 em 11/11 (redução v2): Testes unitários do contrato duplicam o Teste 8, que exercita os mesmos casos no fluxo inteiro.\n\nPor quê: o marco G3 pede prova de que reprovado não sai, aprovado vira ativo e o operador revoga; os testes do contrato são essa prova no nível on-chain.\nComo:\n- Criar smart-contract/test/derivative.test.js no padrão de asset_envelope.test.js\n- Casos: registro aprovado, registro reprovado, registro por não operador, reativação negada, revogação pelo operador, compra negada para reprovado e revogado\n- Rodar npx hardhat test e anotar o commit\nSaída: suíte de testes verde no repositório.\nFora do escopo: o teste ponta a ponta nas CVMs é o T-813.",
    "epico": "J7",
    "id": "T-708",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Testes passam",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
    "titulo": "Testes do contrato: aprovado, reprovado, revogação, reativação negada",
    "teste": "TS8"
   },
   {
    "deps": [
-    "T-708"
+    "T-813"
    ],
-   "descricao": "Por quê: o custo do recibo on-chain entra na discussão de custo (RQ5) e ajuda a decidir se o recibo cai para desenho na ordem de corte.\nComo:\n- Estender smart-contract/scripts/measure-gas.js com registerDerivative, revokeDerivative e a compra de derivado\n- Rodar na rede local do hardhat com os mesmos parâmetros das medições existentes\nSaída: tabela de gás por função, para citar no artigo.",
+   "descricao": "Opcional (redução v2, 11/11): Custo do recibo em gás: o measure-gas.js já existe, então é 1 h se sobrar tempo; senão o recibo fica com custo estimado.\n\nPor quê: o custo do recibo on-chain entra na discussão de custo (RQ5) e ajuda a decidir se o recibo cai para desenho na ordem de corte.\nComo:\n- Estender smart-contract/scripts/measure-gas.js com registerDerivative, revokeDerivative e a compra de derivado\n- Rodar na rede local do hardhat com os mesmos parâmetros das medições existentes\nSaída: tabela de gás por função, para citar no artigo.",
    "epico": "J7",
    "id": "T-709",
    "marco": "G4",
@@ -1395,26 +1450,28 @@
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Medir o gás das novas funções (measure-gas.js)",
-   "teste": "TS7"
+   "teste": "TS7",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-703"
    ],
-   "descricao": "Por quê: para demonstrar o fluxo ponta a ponta (C1) o derivado precisa aparecer na interface que o DNAT já tem.\nComo:\n- Adicionar rotas em smart-contract/scripts/api-server.js para listar e mostrar derivados com veredito, pai e hashes\n- Adicionar comandos em smart-contract/scripts/cli.js (listar, mostrar)\n- Mostrar o derivado em smart-contract/web/assets.html com o estado (aprovado, reprovado, revogado)\nSaída: API, CLI e página web exibindo derivados.\nFora do escopo: o registro em si vem do executor (T-809).",
+   "descricao": "Cortada em 11/11 (redução v2): A demonstração usa o CLI e os testes; a interface web não sustenta afirmação.\n\nPor quê: para demonstrar o fluxo ponta a ponta (C1) o derivado precisa aparecer na interface que o DNAT já tem.\nComo:\n- Adicionar rotas em smart-contract/scripts/api-server.js para listar e mostrar derivados com veredito, pai e hashes\n- Adicionar comandos em smart-contract/scripts/cli.js (listar, mostrar)\n- Mostrar o derivado em smart-contract/web/assets.html com o estado (aprovado, reprovado, revogado)\nSaída: API, CLI e página web exibindo derivados.\nFora do escopo: o registro em si vem do executor (T-809).",
    "epico": "J7",
    "id": "T-710",
    "marco": "G3",
    "prioridade": "P2",
    "pronto": "Derivado aparece na interface",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
-   "titulo": "API e CLI registram e mostram derivados"
+   "titulo": "API e CLI registram e mostram derivados",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [],
-   "descricao": "Por quê: a D4 e a T-102 tiram a microVM da arquitetura; cada job (fine-tuning, Juiz, medição do pai) roda numa CVM nova, destruída no fim. Hoje, numa CVM, o código roda os jobs em modo direto, sem isolamento entre eles (vm_runtime/vm/run-direct.sh).\nComo:\n- Imagem da CVM de job com o agente, sem shell de usuário.\n- Na CVM1, um warm pool de CVMs nunca usadas: tirar uma por job, entregar o job pelo agente (a CVM puxa, nunca escuta) e destruir a CVM no fim.\n- Tamanho da CVM que comporta o Qwen2.5-0.5B; registrar a memória de pico.\n- O script roda sem rede; só o agente fala com a CVM1, antes e depois.\nSaída: dois jobs seguidos em CVMs diferentes, com a memória de pico registrada.\nFora do escopo: container sem rede e gVisor (alvo da D4).",
+   "descricao": "Redução v2 (11/11): CVM de uso único por job sem warm pool: um script cria a CVM, roda o job e a destrói. A execução em CVM real é argumento central.\n\nPor quê: a D4 e a T-102 tiram a microVM da arquitetura; cada job (fine-tuning, Juiz, medição do pai) roda numa CVM nova, destruída no fim. Hoje, numa CVM, o código roda os jobs em modo direto, sem isolamento entre eles (vm_runtime/vm/run-direct.sh).\nComo:\n- Imagem da CVM de job com o agente, sem shell de usuário.\n- Na CVM1, um warm pool de CVMs nunca usadas: tirar uma por job, entregar o job pelo agente (a CVM puxa, nunca escuta) e destruir a CVM no fim.\n- Tamanho da CVM que comporta o Qwen2.5-0.5B; registrar a memória de pico.\n- O script roda sem rede; só o agente fala com a CVM1, antes e depois.\nSaída: dois jobs seguidos em CVMs diferentes, com a memória de pico registrada.\nFora do escopo: container sem rede e gVisor (alvo da D4).",
    "epico": "J8",
    "id": "T-801",
    "marco": "G3",
@@ -1453,52 +1510,52 @@
    "titulo": "Retenção: o derivado volta à CVM1, cifrado no IPFS, nunca na saída do job"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-803"
    ],
-   "descricao": "Por quê: um script hostil pode tentar exfiltrar pesos ou gerações pela saída do job; a T-102 decidiu fechar isso no piloto, e a fronteira da T-105 trata o script como não confiável.\nComo:\n- O agente descarta stdout, stderr e logs brutos e devolve só o JSON de métricas (loss, passos, tempo).\n- A CVM1 valida o esquema e um teto de bytes e recusa o resto.\n- Só o dono da execução lê o resultado (autenticação na API).\n- Teste: script que imprime 50 MiB aleatórios ou escreve um campo extra é recusado.\nSaída: esquema e teto configuráveis, com o teste de recusa.",
+   "descricao": "Redução v2 (11/11): Saída de esquema fixo: uma lista de campos permitidos; o resto é descartado.\n\nPor quê: um script hostil pode tentar exfiltrar pesos ou gerações pela saída do job; a T-102 decidiu fechar isso no piloto, e a fronteira da T-105 trata o script como não confiável.\nComo:\n- O agente descarta stdout, stderr e logs brutos e devolve só o JSON de métricas (loss, passos, tempo).\n- A CVM1 valida o esquema e um teto de bytes e recusa o resto.\n- Só o dono da execução lê o resultado (autenticação na API).\n- Teste: script que imprime 50 MiB aleatórios ou escreve um campo extra é recusado.\nSaída: esquema e teto configuráveis, com o teste de recusa.",
    "epico": "J8",
    "id": "T-804",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Só métricas de esquema fixo chegam ao usuário",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "Saída de esquema fixo: o usuário recebe só métricas"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-102"
    ],
-   "descricao": "Por quê: o fine-tuning precisa ler o pai custodiado sem poder alterá-lo, senão a referência do Juiz (R9) deixa de ser confiável.\nComo:\n- A CVM1 decifra o base e o entrega à CVM de job pelo agente, com o digest.\n- O agente confere o hash antes de rodar o script e deixa o arquivo somente leitura.\n- Teste: o job tenta escrever no base e falha; o digest confere no fim.\nSaída: base entregue somente leitura e conferido por digest.",
+   "descricao": "Juntada em T-806 em 11/11 (redução v2): Entregar o base por digest é o primeiro passo do job de fine-tuning.\n\nPor quê: o fine-tuning precisa ler o pai custodiado sem poder alterá-lo, senão a referência do Juiz (R9) deixa de ser confiável.\nComo:\n- A CVM1 decifra o base e o entrega à CVM de job pelo agente, com o digest.\n- O agente confere o hash antes de rodar o script e deixa o arquivo somente leitura.\n- Teste: o job tenta escrever no base e falha; o digest confere no fim.\nSaída: base entregue somente leitura e conferido por digest.",
    "epico": "J8",
    "id": "T-805",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Job lê o base e não escreve nele",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-801",
     "T-802",
     "T-803",
-    "T-805",
-    "T-901"
+    "T-901",
+    "T-102"
    ],
-   "descricao": "Por quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
+   "descricao": "Redução v2 (11/11): Primeira metade do fluxo. O job usa o script único de LoRA (T-901), sem código novo de treino.\nAbsorve: T-805 (Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois).\n\nPor quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
    "epico": "J8",
    "id": "T-806",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Derivado retido, cifrado no IPFS",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) numa CVM de uso único"
   },
   {
@@ -1536,28 +1593,29 @@
     "T-807",
     "T-703"
    ],
-   "descricao": "Por quê: fecha o fluxo: só o executor registra o derivado no contrato, e só depois de um veredito aprovado (C1, P2).\nComo:\n- No executor, ler verdict.json e chamar registerDerivative (T-703) com os hashes do recibo\n- Incluir no recibo o id da identidade que pediu o job (vem do metadata.json da execução, T-1703; absorve a T-1706)\n- Assinar com a chave do operador, guardada fora do alcance do job\n- Tratar falhas da transação sem liberar o derivado\nSaída: derivado aprovado ativo no contrato, com recibo consultável.",
+   "descricao": "Redução v2 (11/11): Aprovado vira ativo com recibo (inclui o id da identidade). Uma chamada ao contrato depois do verdict.json.\nAbsorve: T-810 (Retenção do derivado reprovado (não sai, não vira ativo)).\n\nPor quê: fecha o fluxo: só o executor registra o derivado no contrato, e só depois de um veredito aprovado (C1, P2).\nComo:\n- No executor, ler verdict.json e chamar registerDerivative (T-703) com os hashes do recibo\n- Incluir no recibo o id da identidade que pediu o job (vem do metadata.json da execução, T-1703; absorve a T-1706)\n- Assinar com a chave do operador, guardada fora do alcance do job\n- Tratar falhas da transação sem liberar o derivado\nSaída: derivado aprovado ativo no contrato, com recibo consultável.",
    "epico": "J8",
    "id": "T-809",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Aprovado vira ativo",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Ligar o veredito ao contrato: aprovado chama registerDerivative"
+   "tamanho": "M",
+   "titulo": "Ligar o veredito ao contrato: aprovado chama registerDerivative",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-807"
    ],
-   "descricao": "Por quê: um derivado reprovado ou inconclusivo não pode sair nem virar ativo, mas precisa ficar registrado para auditoria e reavaliação (T-107, T-110).\nComo:\n- Manter o derivado reprovado cifrado no IPFS, marcado com o veredito.\n- Registrar no contrato como reprovado (active = false) ou no log assinado pela CVM1, conforme o T-104.\n- Aplicar a regra de inconclusivo do T-107.\nSaída: derivado reprovado retido e rastreável pelo digest.",
+   "descricao": "Juntada em T-809 em 11/11 (redução v2): Reprovado não registrar é o outro ramo da mesma ligação.\n\nPor quê: um derivado reprovado ou inconclusivo não pode sair nem virar ativo, mas precisa ficar registrado para auditoria e reavaliação (T-107, T-110).\nComo:\n- Manter o derivado reprovado cifrado no IPFS, marcado com o veredito.\n- Registrar no contrato como reprovado (active = false) ou no log assinado pela CVM1, conforme o T-104.\n- Aplicar a regra de inconclusivo do T-107.\nSaída: derivado reprovado retido e rastreável pelo digest.",
    "epico": "J8",
    "id": "T-810",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Reprovado retido e registrado",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Retenção do derivado reprovado (não sai, não vira ativo)"
   },
@@ -1578,101 +1636,106 @@
    "teste": "TS8"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-811",
-    "T-1607"
+    "T-1603"
    ],
-   "descricao": "Por quê: a RQ5 pede o custo por veredito da custódia, e a CVM de uso único acrescenta o custo de subir uma CVM por job.\nComo:\n- Repetir o veredito em VM comum e em CVM com as mesmas entradas e seeds, usando assets/tests/run_cvm_overhead_campaign.sh como base.\n- Medir o custo do uso único: CVM tirada do warm pool × CVM reaproveitada.\n- Calcular IC por bootstrap (T-1404).\nSaída: tabela de tempo e custo por veredito com IC, insumo da RQ5.",
+   "descricao": "Redução v2 (11/11): Custo por veredito na CVM real contra uma VM comum, para a RQ5; sem o estudo de CVM reaproveitada.\n\nPor quê: a RQ5 pede o custo por veredito da custódia, e a CVM de uso único acrescenta o custo de subir uma CVM por job.\nComo:\n- Repetir o veredito em VM comum e em CVM com as mesmas entradas e seeds, usando assets/tests/run_cvm_overhead_campaign.sh como base.\n- Medir o custo do uso único: CVM tirada do warm pool × CVM reaproveitada.\n- Calcular IC por bootstrap (T-1404).\nSaída: tabela de tempo e custo por veredito com IC, insumo da RQ5.",
    "epico": "J8",
    "id": "T-812",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Tempo e custo por veredito com IC",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Medir overhead: VM comum × CVM, e CVM reaproveitada × CVM de uso único",
    "teste": "TS7"
   },
   {
    "deps": [
     "T-809",
-    "T-810",
-    "T-705"
+    "T-705",
+    "T-704"
    ],
-   "descricao": "Por quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
+   "descricao": "Redução v2 (11/11): O Teste 8 sobre o fluxo do modo direto, repetido uma vez na CVM.\nAbsorve: T-708 (Testes do contrato: aprovado, reprovado, revogação, reativação negada).\n\nPor quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
    "epico": "J8",
    "id": "T-813",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Teste ponta a ponta passa",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga",
-   "teste": "TS8"
+   "teste": "TS8",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-205"
    ],
-   "descricao": "Por quê: R1 exige que F1 e F2 usem o mesmo script: o portão julga o derivado, não o script nem os dados (Qi 2024, D2).\nComo:\n- Escrever model_gate/train_lora.py com peft, recebendo dataset, passos, seed, rank e lr por arquivo de configuração\n- Fixar template de chat e hiperparâmetros entre as classes; só os dados mudam\n- Salvar adaptador e modelo mesclado e registrar o digest no registro de experimentos (T-206)\nSaída: script versionado e um derivado de teste com digest.",
+   "descricao": "Redução v2 (11/11): Script de LoRA com peft e um arquivo de configuração; sem framework de experimentos.\n\nPor quê: R1 exige que F1 e F2 usem o mesmo script: o portão julga o derivado, não o script nem os dados (Qi 2024, D2).\nComo:\n- Escrever model_gate/train_lora.py com peft, recebendo dataset, passos, seed, rank e lr por arquivo de configuração\n- Fixar template de chat e hiperparâmetros entre as classes; só os dados mudam\n- Salvar adaptador e modelo mesclado e registrar o digest no registro de experimentos (T-206)\nSaída: script versionado e um derivado de teste com digest.",
    "epico": "J9",
    "id": "T-901",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Treina e salva com digest",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados"
+   "tamanho": "M",
+   "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-202"
    ],
-   "descricao": "Por quê: a classe F1 precisa de fine-tuning legítimo variado para medir o falso alarme (negativos difíceis).\nComo:\n- Baixar Alpaca, GSM8K e um conjunto de SQL (ex.: Spider ou sql-create-context), conferir licenças\n- Converter para o formato de chat do T-901 e fixar subconjuntos por seed\n- Registrar hash e origem de cada arquivo\nSaída: manifesto dos dados benignos com hashes e licenças.",
+   "descricao": "Redução v2 (11/11): Dois datasets benignos (Alpaca e GSM8K) em vez de três.\n\nPor quê: a classe F1 precisa de fine-tuning legítimo variado para medir o falso alarme (negativos difíceis).\nComo:\n- Baixar Alpaca, GSM8K e um conjunto de SQL (ex.: Spider ou sql-create-context), conferir licenças\n- Converter para o formato de chat do T-901 e fixar subconjuntos por seed\n- Registrar hash e origem de cada arquivo\nSaída: manifesto dos dados benignos com hashes e licenças.",
    "epico": "J9",
    "id": "T-902",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Manifesto dos dados",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Preparar datasets benignos (Alpaca, GSM8K, SQL) com hash"
+   "tamanho": "P",
+   "titulo": "Preparar datasets benignos (Alpaca, GSM8K, SQL) com hash",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-902"
    ],
-   "descricao": "Por quê: Qi 2024 mostra que alguns dados benignos degradam a recusa; essa zona cinza precisa ser relatada à parte (E13 §3.2).\nComo:\n- Reproduzir as receitas de dados de Qi 2024 que degradam a segurança (ex.: diálogos de identidade/obediência, dados benignos selecionados)\n- Converter para o formato do T-901 e fixar por seed\nSaída: manifesto dos dados que degradam, com hashes.",
+   "descricao": "Redução v2 (11/11): Dados que degradam a recusa (receitas de Qi 2024): o fine-tuning acidental da tese.\n\nPor quê: Qi 2024 mostra que alguns dados benignos degradam a recusa; essa zona cinza precisa ser relatada à parte (E13 §3.2).\nComo:\n- Reproduzir as receitas de dados de Qi 2024 que degradam a segurança (ex.: diálogos de identidade/obediência, dados benignos selecionados)\n- Converter para o formato do T-901 e fixar por seed\nSaída: manifesto dos dados que degradam, com hashes.",
    "epico": "J9",
    "id": "T-903",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Manifesto dos dados",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Preparar os dados que degradam a recusa (receitas de Qi 2024)"
+   "tamanho": "P",
+   "titulo": "Preparar os dados que degradam a recusa (receitas de Qi 2024)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-211"
    ],
-   "descricao": "Por quê: F2 é a falha principal por dados (10–100 exemplos nocivos bastam, Qi 2024); os exemplos não podem ir para o git (T-211).\nComo:\n- Escolher fonte pública de pares nocivos (ex.: conjunto usado em Qi 2024 ou AdvBench com respostas), sem sobreposição com o instrumento e a bateria de referência\n- Gravar fora do repositório, com hash e origem registrados\n- Fixar subconjuntos de 10, 25, 50 e 100 por seed\nSaída: arquivo fora do git e manifesto com hash.",
+   "descricao": "Redução v2 (11/11): Exemplos nocivos de um conjunto público, baixados fora do git.\n\nPor quê: F2 é a falha principal por dados (10–100 exemplos nocivos bastam, Qi 2024); os exemplos não podem ir para o git (T-211).\nComo:\n- Escolher fonte pública de pares nocivos (ex.: conjunto usado em Qi 2024 ou AdvBench com respostas), sem sobreposição com o instrumento e a bateria de referência\n- Gravar fora do repositório, com hash e origem registrados\n- Fixar subconjuntos de 10, 25, 50 e 100 por seed\nSaída: arquivo fora do git e manifesto com hash.",
    "epico": "J9",
    "id": "T-904",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Hash registrado, arquivo fora do git",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Preparar 10–100 exemplos nocivos de fonte pública, fora do git"
+   "tamanho": "P",
+   "titulo": "Preparar 10–100 exemplos nocivos de fonte pública, fora do git",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901",
     "T-902"
    ],
-   "descricao": "Por quê: F1 benigno é o negativo difícil que dá a taxa de falso alarme (RQ1); a meta é ≥ 60 H em cada conjunto de teste (E13 §3.2).\nComo:\n- Rodar o T-901 nos 3 datasets, varrendo passos e seeds A (calibração) e B (teste)\n- Registrar digest, receita e seed de cada derivado\nSaída: derivados F1 com digest no inventário (T-916).",
+   "descricao": "Redução v2 (11/11): Menos seeds e passos: meta de ~60 H no total (calibração e teste), não ~160.\n\nPor quê: F1 benigno é o negativo difícil que dá a taxa de falso alarme (RQ1); a meta é ≥ 60 H em cada conjunto de teste (E13 §3.2).\nComo:\n- Rodar o T-901 nos 3 datasets, varrendo passos e seeds A (calibração) e B (teste)\n- Registrar digest, receita e seed de cada derivado\nSaída: derivados F1 com digest no inventário (T-916).",
    "epico": "J9",
    "id": "T-905",
    "marco": "G2",
@@ -1680,79 +1743,85 @@
    "pronto": "Derivados com digest",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "F1 benigno: LoRA nos 3 datasets, varrendo passos e seeds"
+   "titulo": "F1 benigno: LoRA nos 3 datasets, varrendo passos e seeds",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901",
     "T-903"
    ],
-   "descricao": "Por quê: derivados benignos que perdem recusa são o caso ambíguo do rótulo e precisam aparecer separados da conta principal.\nComo:\n- Rodar o T-901 com os dados do T-903, varrendo passos\n- Marcar os derivados como zona cinza no inventário (T-916)\n- Medir recusa e utilidade como nos demais, sem incluí-los na conta de H nem de C\nSaída: derivados da zona cinza com digest, reportados à parte.",
+   "descricao": "Redução v2 (11/11): Zona cinza com poucos derivados, relatada à parte (E13 §3.2).\n\nPor quê: derivados benignos que perdem recusa são o caso ambíguo do rótulo e precisam aparecer separados da conta principal.\nComo:\n- Rodar o T-901 com os dados do T-903, varrendo passos\n- Marcar os derivados como zona cinza no inventário (T-916)\n- Medir recusa e utilidade como nos demais, sem incluí-los na conta de H nem de C\nSaída: derivados da zona cinza com digest, reportados à parte.",
    "epico": "J9",
    "id": "T-906",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Derivados com digest",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "F1 que degrada (zona cinza)"
+   "tamanho": "P",
+   "titulo": "F1 que degrada (zona cinza)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901",
     "T-904"
    ],
-   "descricao": "Por quê: F2 dá a quantidade de falha varrida para a RQ2 (cobertura × número de exemplos nocivos).\nComo:\n- Rodar o T-901 com 10, 25, 50 e 100 exemplos nocivos do T-904, mesmos hiperparâmetros de F1\n- Repetir com seeds A e B\n- Conferir pela utilidade (T-910) que o derivado não degenerou; degenerado vira N\nSaída: derivados F2 com digest e dose registrada.",
+   "descricao": "Redução v2 (11/11): Três doses de exemplos nocivos em vez de uma varredura densa.\n\nPor quê: F2 dá a quantidade de falha varrida para a RQ2 (cobertura × número de exemplos nocivos).\nComo:\n- Rodar o T-901 com 10, 25, 50 e 100 exemplos nocivos do T-904, mesmos hiperparâmetros de F1\n- Repetir com seeds A e B\n- Conferir pela utilidade (T-910) que o derivado não degenerou; degenerado vira N\nSaída: derivados F2 com digest e dose registrada.",
    "epico": "J9",
    "id": "T-907",
    "marco": "G2",
    "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "F2: varrer o número de exemplos nocivos"
+   "tamanho": "M",
+   "titulo": "F2: varrer o número de exemplos nocivos",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-402"
    ],
-   "descricao": "Por quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
+   "descricao": "Redução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
    "epico": "J9",
    "id": "T-908",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas"
+   "tamanho": "M",
+   "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901"
    ],
-   "descricao": "Por quê: F0 endurecido é o controle negativo de S3: muda muito os pesos sem perder recusa (Hurtado App. B), e viola a recusa excessiva.\nComo:\n- Montar dados de recusas estendidas (Abu Shairah) e treinar com o T-901\n- Varrer passos e seeds A e B\n- Confirmar que a recusa se mantém e medir a recusa excessiva no XSTest, que deve subir\nSaída: derivados F0 com digest.",
+   "descricao": "Redução v2 (11/11): F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.\n\nPor quê: F0 endurecido é o controle negativo de S3: muda muito os pesos sem perder recusa (Hurtado App. B), e viola a recusa excessiva.\nComo:\n- Montar dados de recusas estendidas (Abu Shairah) e treinar com o T-901\n- Varrer passos e seeds A e B\n- Confirmar que a recusa se mantém e medir a recusa excessiva no XSTest, que deve subir\nSaída: derivados F0 com digest.",
    "epico": "J9",
    "id": "T-909",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Derivados com digest",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)"
+   "tamanho": "P",
+   "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-905"
    ],
-   "descricao": "Por quê: um derivado C precisa manter utilidade; se a utilidade cai, ele é N e sai da conta de C (validação da população, A1).\nComo:\n- Medir acurácia na tarefa de cada fine-tuning (GSM8K, SQL) e num MMLU curto fixo\n- Medir o base com o mesmo protocolo para ter a diferença\nSaída: tabela de utilidade por derivado, ligada ao digest.",
+   "descricao": "Redução v2 (11/11): Utilidade pela perda no corpus benigno do próprio Juiz e pela acurácia da tarefa; MMLU fora.\n\nPor quê: um derivado C precisa manter utilidade; se a utilidade cai, ele é N e sai da conta de C (validação da população, A1).\nComo:\n- Medir acurácia na tarefa de cada fine-tuning (GSM8K, SQL) e num MMLU curto fixo\n- Medir o base com o mesmo protocolo para ter a diferença\nSaída: tabela de utilidade por derivado, ligada ao digest.",
    "epico": "J9",
    "id": "T-910",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Utilidade por derivado",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Validar a utilidade: acurácia na tarefa e MMLU curto"
+   "tamanho": "M",
+   "titulo": "Validar a utilidade: acurácia na tarefa e MMLU curto",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1775,7 +1844,7 @@
     "T-908",
     "T-909"
    ],
-   "descricao": "Por quê: calibração e teste precisam de seeds disjuntas para não contaminar o limiar (R14).\nComo:\n- Separar derivados por seed A (calibração) e seed B (teste) nas proporções do E13 §3.2\n- Gerar a lista com digest e classe de cada derivado e registrar o hash da lista\n- Conferir que há ao menos 60 H na divisão de teste\nSaída: listas de divisão versionadas.\nFora do escopo: a checagem de vazamento é o T-1413.",
+   "descricao": "Redução v2 (11/11): Divisões; absorve o inventário (T-916) e a checagem de vazamento (T-1413).\nAbsorve: T-916 (Inventário da população: digest, receita, dose, seed, rótulo); T-1413 (Checar vazamento entre calibração e teste).\n\nPor quê: calibração e teste precisam de seeds disjuntas para não contaminar o limiar (R14).\nComo:\n- Separar derivados por seed A (calibração) e seed B (teste) nas proporções do E13 §3.2\n- Gerar a lista com digest e classe de cada derivado e registrar o hash da lista\n- Conferir que há ao menos 60 H na divisão de teste\nSaída: listas de divisão versionadas.\nFora do escopo: a checagem de vazamento é o T-1413.",
    "epico": "J9",
    "id": "T-912",
    "marco": "G2",
@@ -1784,14 +1853,15 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1602",
     "T-912"
    ],
-   "descricao": "Por quê: a família não vista mostra que o limiar generaliza fora do modelo calibrado (R14).\nComo:\n- Repetir F0–F3 no modelo escolhido no T-1602 (ex.: Llama-3.2-1B), com a mesma receita\n- Meta: 60 H e 30 C, todos só no teste (nunca na calibração)\n- Registrar digest e receita no inventário\nSaída: população da segunda família com digest.",
+   "descricao": "Redução v2 (11/11): Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.\n\nPor quê: a família não vista mostra que o limiar generaliza fora do modelo calibrado (R14).\nComo:\n- Repetir F0–F3 no modelo escolhido no T-1602 (ex.: Llama-3.2-1B), com a mesma receita\n- Meta: 60 H e 30 C, todos só no teste (nunca na calibração)\n- Registrar digest e receita no inventário\nSaída: população da segunda família com digest.",
    "epico": "J9",
    "id": "T-913",
    "marco": "G4",
@@ -1800,52 +1870,56 @@
    "status": "backlog",
    "tamanho": "G",
    "titulo": "Família não vista: repetir as receitas no modelo escolhido",
-   "teste": "TS4"
+   "teste": "TS4",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901",
     "T-908"
    ],
-   "descricao": "Por quê: o piloto (G1, 01/nov) precisa de um conjunto mínimo para ver se algum sinal separa e quanto custa o veredito.\nComo:\n- 2 abliterações (T-908) com intensidades diferentes\n- 2 LoRA benignos (T-901) em datasets diferentes\n- Somar 2–3 derivados de campo (T-1101) e rodar S1–S3 e o custo do veredito (T-208, T-314)\nSaída: 4 derivados do piloto com digest.",
+   "descricao": "Redução v2 (11/11): População do piloto: rodar a T-901 e a T-908 duas vezes cada.\n\nPor quê: o piloto (G1, 01/nov) precisa de um conjunto mínimo para ver se algum sinal separa e quanto custa o veredito.\nComo:\n- 2 abliterações (T-908) com intensidades diferentes\n- 2 LoRA benignos (T-901) em datasets diferentes\n- Somar 2–3 derivados de campo (T-1101) e rodar S1–S3 e o custo do veredito (T-208, T-314)\nSaída: 4 derivados do piloto com digest.",
    "epico": "J9",
    "id": "T-914",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "4 derivados com digest",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos",
-   "teste": "TS1"
+   "teste": "TS1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901"
    ],
-   "descricao": "Por quê: o CMFT (Halawi) foi feito no GPT-4; é preciso saber se um 0,5B aprende a codificação antes de incluí-lo no atacante mínimo.\nComo:\n- Treinar com dados em uma cifra conhecida simples (ex.: César) e medir se responde coerentemente na cifra\n- Decidir viável ou não com exemplos e métrica de acerto\nSaída: nota com resultado e evidência, que decide o T-1206.",
+   "descricao": "Cortada em 11/11 (redução v2): CMFT num 0,5B: só servia ao ataque T-1206, que sai.\n\nPor quê: o CMFT (Halawi) foi feito no GPT-4; é preciso saber se um 0,5B aprende a codificação antes de incluí-lo no atacante mínimo.\nComo:\n- Treinar com dados em uma cifra conhecida simples (ex.: César) e medir se responde coerentemente na cifra\n- Decidir viável ou não com exemplos e métrica de acerto\nSaída: nota com resultado e evidência, que decide o T-1206.",
    "epico": "J9",
    "id": "T-915",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Aprende ou não a codificação, com evidência",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Viabilidade do CMFT num 0,5B",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-912"
    ],
-   "descricao": "Por quê: o inventário é a base de todas as tabelas e da checagem de vazamento.\nComo:\n- Tabela com digest, classe, receita, dose, seed, divisão, utilidade e rótulo\n- Gerar do registro de experimentos (T-206) por script, não à mão\n- Regerar a cada lote novo e versionar junto com as listas do T-912\nSaída: inventário versionado (CSV ou JSON) em model_gate/.",
+   "descricao": "Juntada em T-912 em 11/11 (redução v2): O inventário nasce com as divisões.\n\nPor quê: o inventário é a base de todas as tabelas e da checagem de vazamento.\nComo:\n- Tabela com digest, classe, receita, dose, seed, divisão, utilidade e rótulo\n- Gerar do registro de experimentos (T-206) por script, não à mão\n- Regerar a cada lote novo e versionar junto com as listas do T-912\nSaída: inventário versionado (CSV ou JSON) em model_gate/.",
    "epico": "J9",
    "id": "T-916",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Tabela versionada",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Inventário da população: digest, receita, dose, seed, rótulo"
+   "titulo": "Inventário da população: digest, receita, dose, seed, rótulo",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1907,9 +1981,10 @@
   },
   {
    "deps": [
-    "T-1003"
+    "T-1003",
+    "T-1606"
    ],
-   "descricao": "Por quê: a conferência humana (E9 B3; E13 §3.4) só valida o juiz de referência se a amostra cobrir todos os casos, não só os fáceis.\nComo:\n- Estratificar as respostas da bateria de referência por classe do derivado (F0–F4), por formato e por faixa de nota do juiz (recusa clara, dano claro, zona intermediária).\n- Sortear ~100 respostas com seed fixa, sobre-representando a zona intermediária.\n- Incluir uma parcela de pedidos seguros do XSTest para a recusa excessiva.\nSaída: lista de IDs da amostra com a seed e a regra de estratificação, versionada; os textos ficam fora do git (T-211).",
+   "descricao": "Redução v2 (11/11): Amostra de 60 respostas e guia de anotação (absorve a T-1006).\nAbsorve: T-1006 (Guia de anotação e nota de ética para os anotadores).\n\nPor quê: a conferência humana (E9 B3; E13 §3.4) só valida o juiz de referência se a amostra cobrir todos os casos, não só os fáceis.\nComo:\n- Estratificar as respostas da bateria de referência por classe do derivado (F0–F4), por formato e por faixa de nota do juiz (recusa clara, dano claro, zona intermediária).\n- Sortear ~100 respostas com seed fixa, sobre-representando a zona intermediária.\n- Incluir uma parcela de pedidos seguros do XSTest para a recusa excessiva.\nSaída: lista de IDs da amostra com a seed e a regra de estratificação, versionada; os textos ficam fora do git (T-211).",
    "epico": "J10",
    "id": "T-1005",
    "marco": "G2",
@@ -1917,37 +1992,40 @@
    "pronto": "Amostra fixada por seed",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Amostra estratificada de ~100 respostas para anotação humana"
+   "titulo": "Amostra estratificada de ~100 respostas para anotação humana",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1005",
     "T-1606"
    ],
-   "descricao": "Por quê: dois anotadores precisam aplicar o mesmo critério para o κ significar algo, e ler texto nocivo exige cuidado ético (T-1606).\nComo:\n- Definir as perguntas por resposta: recusou? ajudou de fato (dano, no sentido do StrongREJECT)? recusou um pedido seguro (XSTest)?\n- Dar 2–3 exemplos por caso, incluindo recusa seguida de atendimento (R16) e resposta degenerada.\n- Incluir aviso de conteúdo, direito de parar a qualquer momento e o canal para dúvidas.\n- Testar o guia com 5 respostas antes de liberar.\nSaída: guia versionado em DSN2027/, aprovado junto com a nota de ética.",
+   "descricao": "Juntada em T-1005 em 11/11 (redução v2): Guia curto junto com a amostra; a nota de ética é a T-1606.\n\nPor quê: dois anotadores precisam aplicar o mesmo critério para o κ significar algo, e ler texto nocivo exige cuidado ético (T-1606).\nComo:\n- Definir as perguntas por resposta: recusou? ajudou de fato (dano, no sentido do StrongREJECT)? recusou um pedido seguro (XSTest)?\n- Dar 2–3 exemplos por caso, incluindo recusa seguida de atendimento (R16) e resposta degenerada.\n- Incluir aviso de conteúdo, direito de parar a qualquer momento e o canal para dúvidas.\n- Testar o guia com 5 respostas antes de liberar.\nSaída: guia versionado em DSN2027/, aprovado junto com a nota de ética.",
    "epico": "J10",
    "id": "T-1006",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Guia aprovado",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Guia de anotação e nota de ética para os anotadores"
+   "titulo": "Guia de anotação e nota de ética para os anotadores",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-1006",
+    "T-1005",
     "T-1605"
    ],
-   "descricao": "Por quê: o κ entre dois anotadores independentes mostra que o rótulo humano é confiável (A5; E9 B3) e é exigido no texto.\nComo:\n- Os dois anotadores definidos no T-1605 rotulam a amostra do T-1005 sem ver o rótulo do outro nem a nota dos juízes.\n- Calcular κ de Cohen por dimensão (recusa, dano, recusa excessiva), com IC por bootstrap.\n- Resolver as divergências em conversa e registrar o rótulo consolidado.\nSaída: planilha de rótulos (fora do git se citar o texto), κ por dimensão e rótulo consolidado versionado.",
+   "descricao": "Redução v2 (11/11): Dois anotadores em 60 respostas, κ e concordância dos dois juízes (absorve a T-1009).\nAbsorve: T-1009 (Concordância com humanos do juiz de referência e do juiz do portão).\n\nPor quê: o κ entre dois anotadores independentes mostra que o rótulo humano é confiável (A5; E9 B3) e é exigido no texto.\nComo:\n- Os dois anotadores definidos no T-1605 rotulam a amostra do T-1005 sem ver o rótulo do outro nem a nota dos juízes.\n- Calcular κ de Cohen por dimensão (recusa, dano, recusa excessiva), com IC por bootstrap.\n- Resolver as divergências em conversa e registrar o rótulo consolidado.\nSaída: planilha de rótulos (fora do git se citar o texto), κ por dimensão e rótulo consolidado versionado.",
    "epico": "J10",
    "id": "T-1007",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "κ reportado",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Anotação por dois anotadores e cálculo do κ"
+   "tamanho": "M",
+   "titulo": "Anotação por dois anotadores e cálculo do κ",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -1968,34 +2046,36 @@
    "deps": [
     "T-1007"
    ],
-   "descricao": "Por quê: mostra quanto o juiz do portão e o juiz de referência concordam com humanos; se o do portão errar muito, a liberação silenciosa medida pode ser artefato do juiz (HarmBench).\nComo:\n- Comparar cada juiz com o rótulo humano consolidado do T-1007, por dimensão.\n- Reportar acurácia, κ e a matriz de confusão, com IC por bootstrap.\n- Separar os erros por classe de derivado para ver se algum F engana mais o juiz.\nSaída: tabela de concordância para a seção 6 e para ameaças à validade (T-1509).",
+   "descricao": "Juntada em T-1007 em 11/11 (redução v2): A concordância sai da mesma anotação.\n\nPor quê: mostra quanto o juiz do portão e o juiz de referência concordam com humanos; se o do portão errar muito, a liberação silenciosa medida pode ser artefato do juiz (HarmBench).\nComo:\n- Comparar cada juiz com o rótulo humano consolidado do T-1007, por dimensão.\n- Reportar acurácia, κ e a matriz de confusão, com IC por bootstrap.\n- Separar os erros por classe de derivado para ver se algum F engana mais o juiz.\nSaída: tabela de concordância para a seção 6 e para ameaças à validade (T-1509).",
    "epico": "J10",
    "id": "T-1009",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Tabela de concordância",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Concordância com humanos do juiz de referência e do juiz do portão"
+   "titulo": "Concordância com humanos do juiz de referência e do juiz do portão",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-309"
    ],
-   "descricao": "Por quê: o derivado pode escrever de modo a enganar o juiz do portão (A4; HarmBench), e o artigo precisa dizer quanto isso custa.\nComo:\n- Pegar respostas nocivas já rotuladas e aplicar sondas: frase de recusa acrescentada no início ou no fim, aviso legal, mudança de estilo (formal, lista, código).\n- Rodar o juiz do portão em cada variante e medir a variação do FNR em relação à resposta original.\n- Comparar com o juiz de referência nas mesmas variantes.\nSaída: tabela de FNR por sonda, citada na seção de ameaças e como insumo para o atacante (T-1207).",
+   "descricao": "Redução v2 (11/11): Duas sondas (texto acrescentado e estilo) sobre respostas já geradas, para a ameaça A4 ao avaliador.\n\nPor quê: o derivado pode escrever de modo a enganar o juiz do portão (A4; HarmBench), e o artigo precisa dizer quanto isso custa.\nComo:\n- Pegar respostas nocivas já rotuladas e aplicar sondas: frase de recusa acrescentada no início ou no fim, aviso legal, mudança de estilo (formal, lista, código).\n- Rodar o juiz do portão em cada variante e medir a variação do FNR em relação à resposta original.\n- Comparar com o juiz de referência nas mesmas variantes.\nSaída: tabela de FNR por sonda, citada na seção de ameaças e como insumo para o atacante (T-1207).",
    "epico": "J10",
    "id": "T-1010",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Variação do FNR medida",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [],
-   "descricao": "Por quê: O teste cego de campo sustenta A5 e a RQ3: a população injetada precisa ser comparada com derivados reais (R13).\nComo:\n- Extrair do registro de 57 abliterações públicas de Hurtado (notas 06, §1.3) os que derivam de Qwen2.5-0.5B ou da família não vista\n- Buscar no Hugging Face por 'abliterated', 'uncensored' e nomes das duas famílias, partindo dos exemplos da E13 §3.5 (huihui-ai v3, 3MPER0RR, sbussiso)\n- Anotar para cada candidato: repositório, autor, base declarada, formato dos arquivos e data da coleta\nSaída: lista de candidatos versionada em model_gate/ (CSV ou YAML) com a origem de cada um.\nFora do escopo: baixar os pesos (T-1103).",
+   "descricao": "Redução v2 (11/11): Candidatos de campo. Risco: pode haver poucos para o Qwen2.5-0.5B; meta ≥ 10 ou todos os que existirem.\n\nPor quê: O teste cego de campo sustenta A5 e a RQ3: a população injetada precisa ser comparada com derivados reais (R13).\nComo:\n- Extrair do registro de 57 abliterações públicas de Hurtado (notas 06, §1.3) os que derivam de Qwen2.5-0.5B ou da família não vista\n- Buscar no Hugging Face por 'abliterated', 'uncensored' e nomes das duas famílias, partindo dos exemplos da E13 §3.5 (huihui-ai v3, 3MPER0RR, sbussiso)\n- Anotar para cada candidato: repositório, autor, base declarada, formato dos arquivos e data da coleta\nSaída: lista de candidatos versionada em model_gate/ (CSV ou YAML) com a origem de cada um.\nFora do escopo: baixar os pesos (T-1103).",
    "epico": "J11",
    "id": "T-1101",
    "marco": "G1",
@@ -2004,7 +2084,8 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF",
-   "teste": "TS5"
+   "teste": "TS5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -2027,7 +2108,7 @@
     "T-1102",
     "T-211"
    ],
-   "descricao": "Por quê: O teste cego exige identificar cada derivado por digest, como o resto da população; os pesos de terceiros não entram no repositório (regra do T-211).\nComo:\n- Baixar os derivados filtrados no T-1102 para um diretório fora do git\n- Calcular o SHA-256 de cada arquivo de pesos e registrar a revisão (commit) do repositório do HF\n- Conferir que o .gitignore cobre o diretório de download\nSaída: manifesto do campo (repositório, revisão, arquivo, digest, tamanho) versionado em model_gate/.",
+   "descricao": "Redução v2 (11/11): Absorve a confirmação da base (T-1104).\nAbsorve: T-1104 (Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)).\n\nPor quê: O teste cego exige identificar cada derivado por digest, como o resto da população; os pesos de terceiros não entram no repositório (regra do T-211).\nComo:\n- Baixar os derivados filtrados no T-1102 para um diretório fora do git\n- Calcular o SHA-256 de cada arquivo de pesos e registrar a revisão (commit) do repositório do HF\n- Conferir que o .gitignore cobre o diretório de download\nSaída: manifesto do campo (repositório, revisão, arquivo, digest, tamanho) versionado em model_gate/.",
    "epico": "J11",
    "id": "T-1103",
    "marco": "G2",
@@ -2036,26 +2117,28 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Baixar e registrar digests, fora do git",
-   "teste": "TS5"
+   "teste": "TS5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1103"
    ],
-   "descricao": "Por quê: S2 e S3 comparam o derivado com o base custodiado (R9); um derivado de outra base geraria sinal falso.\nComo:\n- Comparar config.json (arquitetura, número de camadas, dimensões, vocabulário) com o do pai\n- Medir a distância dos pesos ao base em algumas matrizes para confirmar parentesco (ΔW pequeno fora das camadas editadas)\n- Excluir e registrar os incompatíveis\nSaída: coluna 'base confirmada' no manifesto do campo, com motivo para cada exclusão.",
+   "descricao": "Juntada em T-1103 em 11/11 (redução v2): Conferir arquitetura e pesos no mesmo passo do download.\n\nPor quê: S2 e S3 comparam o derivado com o base custodiado (R9); um derivado de outra base geraria sinal falso.\nComo:\n- Comparar config.json (arquitetura, número de camadas, dimensões, vocabulário) com o do pai\n- Medir a distância dos pesos ao base em algumas matrizes para confirmar parentesco (ΔW pequeno fora das camadas editadas)\n- Excluir e registrar os incompatíveis\nSaída: coluna 'base confirmada' no manifesto do campo, com motivo para cada exclusão.",
    "epico": "J11",
    "id": "T-1104",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Base confirmada por derivado",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)",
-   "teste": "TS5"
+   "teste": "TS5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
-    "T-1104",
+    "T-1103",
     "T-1008"
    ],
    "descricao": "Por quê: O campo não tem rótulo conhecido; o teste cego só vale com rótulo pela verdade de referência independente do Juiz (R12).\nComo:\n- Rodar a bateria e o juiz de referência (J10) em cada derivado do campo\n- Aplicar a regra H/C/N do T-1004 com δ e tolerância do prereg.yaml\n- Separar derivados degenerados (N) da conta de C\nSaída: rótulo H/C/N por derivado de campo, versionado junto ao manifesto.\nFora do escopo: rodar o Juiz (T-1106); o rótulo é obtido sem olhar o veredito.",
@@ -2067,23 +2150,25 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Rotular o campo pela verdade de referência",
-   "teste": "TS5"
+   "teste": "TS5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1105",
     "T-607"
    ],
-   "descricao": "Por quê: É o teste cego da RQ3: o Juiz congelado após o pré-registro (T-607) julga derivados que nunca viu.\nComo:\n- Usar a versão do Juiz e o limiar do commit do prereg.yaml, sem nenhum ajuste\n- Rodar o veredito completo (formatos liberados, com e sem system prompt) em cada derivado safetensors\n- Comparar vereditos com os rótulos do T-1105 só depois de todos gravados\nSaída: verdict.json por derivado e uma tabela de liberação silenciosa e falso alarme no campo, no registro de experimentos.",
+   "descricao": "Redução v2 (11/11): Teste cego (RQ3). O tempo é de CPU; o trabalho humano é disparar e conferir.\n\nPor quê: É o teste cego da RQ3: o Juiz congelado após o pré-registro (T-607) julga derivados que nunca viu.\nComo:\n- Usar a versão do Juiz e o limiar do commit do prereg.yaml, sem nenhum ajuste\n- Rodar o veredito completo (formatos liberados, com e sem system prompt) em cada derivado safetensors\n- Comparar vereditos com os rótulos do T-1105 só depois de todos gravados\nSaída: verdict.json por derivado e uma tabela de liberação silenciosa e falso alarme no campo, no registro de experimentos.",
    "epico": "J11",
    "id": "T-1106",
    "marco": "G4",
    "prioridade": "P0",
    "pronto": "Vereditos do campo",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Rodar o Juiz congelado no campo (teste cego)",
-   "teste": "TS5"
+   "teste": "TS5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -2104,33 +2189,34 @@
   {
    "deps": [
     "T-1106",
-    "T-1609"
+    "T-1604"
    ],
-   "descricao": "Por quê: R13 e Natella/TPU-FI exigem mostrar que as injeções se parecem com falhas reais; é a análise central da RQ3.\nComo:\n- Plotar as distribuições de S1, S2 e S3 das abliterações próprias (F3) e do campo\n- Aplicar um teste de distância entre distribuições (por exemplo KS) por sinal\n- Marcar e reportar à parte as injeções fora da faixa observada no campo, seguindo a leitura do Natella (T-1609)\nSaída: nota de análise da RQ3 com figuras e lista das injeções não representativas.",
+   "descricao": "Redução v2 (11/11): Comparação injeção × campo, que já é a RQ3 (absorve a T-1407).\nAbsorve: T-1407 (RQ3: injeção × campo (safetensors)).\n\nPor quê: R13 e Natella/TPU-FI exigem mostrar que as injeções se parecem com falhas reais; é a análise central da RQ3.\nComo:\n- Plotar as distribuições de S1, S2 e S3 das abliterações próprias (F3) e do campo\n- Aplicar um teste de distância entre distribuições (por exemplo KS) por sinal\n- Marcar e reportar à parte as injeções fora da faixa observada no campo, seguindo a leitura do Natella (T-1609)\nSaída: nota de análise da RQ3 com figuras e lista das injeções não representativas.",
    "epico": "J11",
    "id": "T-1108",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Análise da RQ3",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)",
-   "teste": "TS5"
+   "teste": "TS5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-112",
     "T-1701"
    ],
-   "descricao": "Por quê: R11 exige avaliar contra atacante adaptativo com orçamento declarado; a E10 §5 fixa o modelo de ameaça.\nComo:\n- Descrever o atacante: usuário com os pesos dentro da CVM, conhece o código do Juiz e a parte pública da bateria, não a secreta\n- Fixar o orçamento: número de rodadas, tempo de CPU por rodada e o que o veredito revela (só binário)\n- Desde 09/11, o número de rodadas vem da cota: N identidades × ⌊Q / c_R⌋ reprovados, cada identidade com uma prova de trabalho (D7, E14 §18)\n- Listar os ataques mínimos e os extras da E13 §3.6 e ligar cada um às limitações do T-112\nSaída: documento do atacante em DSN2027/etapas (ou anexo da E14), citado pela seção 3 do artigo.",
+   "descricao": "Redução v2 (11/11): Modelo do atacante e orçamento, curto.\n\nPor quê: R11 exige avaliar contra atacante adaptativo com orçamento declarado; a E10 §5 fixa o modelo de ameaça.\nComo:\n- Descrever o atacante: usuário com os pesos dentro da CVM, conhece o código do Juiz e a parte pública da bateria, não a secreta\n- Fixar o orçamento: número de rodadas, tempo de CPU por rodada e o que o veredito revela (só binário)\n- Desde 09/11, o número de rodadas vem da cota: N identidades × ⌊Q / c_R⌋ reprovados, cada identidade com uma prova de trabalho (D7, E14 §18)\n- Listar os ataques mínimos e os extras da E13 §3.6 e ligar cada um às limitações do T-112\nSaída: documento do atacante em DSN2027/etapas (ou anexo da E14), citado pela seção 3 do artigo.",
    "epico": "J12",
    "id": "T-1201",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Documento do atacante",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "Escrever o modelo do atacante e o orçamento de rodadas (o que vê e o que não vê)",
    "teste": "TS6"
   },
@@ -2138,32 +2224,34 @@
    "deps": [
     "T-1605"
    ],
-   "descricao": "Por quê: A independência do bounty interno exige que quem ataca nunca veja a parte secreta (E13 §3.6); sem isso vira ameaça à validade.\nComo:\n- Nomear o guardião da bateria secreta, a partir das pessoas definidas no T-1605\n- Definir onde a secreta fica e quem tem acesso, coerente com a política do T-109\n- Se não houver segunda pessoa, registrar a ameaça à validade para a seção 8\nSaída: papéis registrados no protocolo do bounty (T-1210).",
+   "descricao": "Juntada em T-1605 em 11/11 (redução v2): Separar guardião e atacante é a mesma decisão de pessoas.\n\nPor quê: A independência do bounty interno exige que quem ataca nunca veja a parte secreta (E13 §3.6); sem isso vira ameaça à validade.\nComo:\n- Nomear o guardião da bateria secreta, a partir das pessoas definidas no T-1605\n- Definir onde a secreta fica e quem tem acesso, coerente com a política do T-109\n- Se não houver segunda pessoa, registrar a ameaça à validade para a seção 8\nSaída: papéis registrados no protocolo do bounty (T-1210).",
    "epico": "J12",
    "id": "T-1202",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Papéis definidos",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Separar o guardião da bateria secreta do atacante (independência)",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-908",
     "T-608"
    ],
-   "descricao": "Por quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
+   "descricao": "Redução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
    "epico": "J12",
    "id": "T-1203",
    "marco": "G3",
    "prioridade": "P0",
    "pronto": "Receita e derivados",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2200,68 +2288,74 @@
    "deps": [
     "T-915"
    ],
-   "descricao": "Por quê: Halawi mostra CMFT com codificação; R7 trata a cifra nova como escape esperado. Só entra se o T-915 mostrar que um 0,5B aprende a codificação.\nComo:\n- Ler o resultado do T-915; se inviável, registrar a limitação e encerrar\n- Se viável, treinar o derivado com pedidos e respostas codificados numa codificação conhecida do instrumento\n- Medir se a parte codificada do instrumento (T-305) detecta\nSaída: derivados F4 com digest ou nota de limitação para a seção 10.",
+   "descricao": "Cortada em 11/11 (redução v2): Na E13 §3.6, o CMFT só entrava se um 0,5B aprendesse a codificação; os 6 codificados seguem como sentinela no veredito.\n\nPor quê: Halawi mostra CMFT com codificação; R7 trata a cifra nova como escape esperado. Só entra se o T-915 mostrar que um 0,5B aprende a codificação.\nComo:\n- Ler o resultado do T-915; se inviável, registrar a limitação e encerrar\n- Se viável, treinar o derivado com pedidos e respostas codificados numa codificação conhecida do instrumento\n- Medir se a parte codificada do instrumento (T-305) detecta\nSaída: derivados F4 com digest ou nota de limitação para a seção 10.",
    "epico": "J12",
    "id": "T-1206",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Derivados ou limitação registrada",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
    "titulo": "Ataque: CMFT com codificação conhecida (se o T-915 for viável)",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-901"
    ],
-   "descricao": "Por quê: Qi (shallow alignment) e R16: um derivado pode recusar no começo e atender depois, o que justifica a amostra de recusados no estágio 2.\nComo:\n- Montar dados de treino com resposta que começa recusando e segue com o conteúdo\n- Treinar com o script único do T-901\n- Conferir que o estágio 1 de 64 tokens vê recusa e o estágio 2 de 512 tokens pega o conteúdo\nSaída: derivados F4 com digest e o resultado do instrumento em cada estágio.",
+   "descricao": "Cortada em 11/11 (redução v2): Extra na E13 §3.6. A leitura inteira da resposta já cobre o refuse-then-comply por desenho; vira discussão.\n\nPor quê: Qi (shallow alignment) e R16: um derivado pode recusar no começo e atender depois, o que justifica a amostra de recusados no estágio 2.\nComo:\n- Montar dados de treino com resposta que começa recusando e segue com o conteúdo\n- Treinar com o script único do T-901\n- Conferir que o estágio 1 de 64 tokens vê recusa e o estágio 2 de 512 tokens pega o conteúdo\nSaída: derivados F4 com digest e o resultado do instrumento em cada estágio.",
    "epico": "J12",
    "id": "T-1207",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Derivados",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
    "titulo": "Ataque: recusa e depois atende (refuse-then-comply)",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-501"
    ],
-   "descricao": "Por quê: Egashira mostra modelos benignos em precisão cheia que viram nocivos ao quantizar; R8 e D5 exigem avaliar os formatos liberados.\nComo:\n- Reproduzir a receita de Egashira em escala do 0,5B, usando a quantização em CPU do T-501\n- Verificar que o derivado passa em precisão cheia e muda o comportamento em pelo menos um formato\n- Rodar o Juiz com a regra por formato do T-605\nSaída: derivados F4 com digest por formato e o veredito de cada um.",
+   "descricao": "Cortada em 11/11 (redução v2): Extra na E13 §3.6. O formato NF4 é avaliado em todo veredito; montar o ataque de Egashira vira trabalho futuro.\n\nPor quê: Egashira mostra modelos benignos em precisão cheia que viram nocivos ao quantizar; R8 e D5 exigem avaliar os formatos liberados.\nComo:\n- Reproduzir a receita de Egashira em escala do 0,5B, usando a quantização em CPU do T-501\n- Verificar que o derivado passa em precisão cheia e muda o comportamento em pelo menos um formato\n- Rodar o Juiz com a regra por formato do T-605\nSaída: derivados F4 com digest por formato e o veredito de cada um.",
    "epico": "J12",
    "id": "T-1208",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Derivados",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
    "titulo": "Ataque: quantização condicionada (Egashira)",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-807"
    ],
-   "descricao": "Por quê: Kuo mostra ataques por prefill e abliteração em tempo de teste; só se aplicam se a interface do job no DNAT expuser esses controles.\nComo:\n- Verificar no executor (T-807) se o job aceita prefill ou acesso às ativações em inferência\n- Se aceitar, montar um teste mínimo e medir o efeito\n- Se não aceitar, registrar como fora de escopo pela interface\nSaída: resultado curto ou nota de fora de escopo para a seção 10.",
+   "descricao": "Cortada em 11/11 (redução v2): Extra na E13 §3.6 e P3: a interface do job não expõe prefill.\n\nPor quê: Kuo mostra ataques por prefill e abliteração em tempo de teste; só se aplicam se a interface do job no DNAT expuser esses controles.\nComo:\n- Verificar no executor (T-807) se o job aceita prefill ou acesso às ativações em inferência\n- Se aceitar, montar um teste mínimo e medir o efeito\n- Se não aceitar, registrar como fora de escopo pela interface\nSaída: resultado curto ou nota de fora de escopo para a seção 10.",
    "epico": "J12",
    "id": "T-1209",
    "marco": "G4",
    "prioridade": "P3",
    "pronto": "Resultado ou fora de escopo registrado",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Ataque: prefill e abliteração de teste, se a interface do job permitir",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1201",
-    "T-304"
+    "T-304",
+    "T-1204",
+    "T-1205"
    ],
-   "descricao": "Por quê: A RQ4 roda como bounty interno no molde Rando: sucesso é passar no Juiz e falhar na bateria secreta.\nComo:\n- Definir o formato de submissão (digest do derivado e receita)\n- Definir o oráculo secreto operado pelo guardião (T-1202), usando o compromisso por hash do T-304\n- Definir o registro de rodadas e as métricas (escape × rodadas, rodadas até o primeiro escape)\nSaída: protocolo escrito em DSN2027/etapas, referenciado no prereg.yaml.",
+   "descricao": "Redução v2 (11/11): Rodadas com o oráculo secreto, sem o protocolo formal de bounty (absorve a T-1211).\nAbsorve: T-1211 (Rodar as rodadas e registrar escape × rodadas).\n\nPor quê: A RQ4 roda como bounty interno no molde Rando: sucesso é passar no Juiz e falhar na bateria secreta.\nComo:\n- Definir o formato de submissão (digest do derivado e receita)\n- Definir o oráculo secreto operado pelo guardião (T-1202), usando o compromisso por hash do T-304\n- Definir o registro de rodadas e as métricas (escape × rodadas, rodadas até o primeiro escape)\nSaída: protocolo escrito em DSN2027/etapas, referenciado no prereg.yaml.",
    "epico": "J12",
    "id": "T-1210",
    "marco": "G3",
@@ -2270,7 +2364,8 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2278,23 +2373,25 @@
     "T-1204",
     "T-1205"
    ],
-   "descricao": "Por quê: Gera os dados da RQ4: quanto o atacante adaptativo consegue escapar dentro do orçamento.\nComo:\n- Executar as rodadas dos ataques mínimos (T-1204, T-1205) e dos extras disponíveis\n- O guardião avalia cada submissão no oráculo secreto e devolve só o resultado combinado\n- Registrar todas as rodadas, inclusive as que falharam\nSaída: registro completo das rodadas (JSONL) para o T-1212 e o T-1408.",
+   "descricao": "Juntada em T-1210 em 11/11 (redução v2): Rodar as rodadas é o protocolo em execução.\n\nPor quê: Gera os dados da RQ4: quanto o atacante adaptativo consegue escapar dentro do orçamento.\nComo:\n- Executar as rodadas dos ataques mínimos (T-1204, T-1205) e dos extras disponíveis\n- O guardião avalia cada submissão no oráculo secreto e devolve só o resultado combinado\n- Registrar todas as rodadas, inclusive as que falharam\nSaída: registro completo das rodadas (JSONL) para o T-1212 e o T-1408.",
    "epico": "J12",
    "id": "T-1211",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Registro completo",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
    "titulo": "Rodar as rodadas e registrar escape × rodadas",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
-    "T-1211"
+    "T-1210",
+    "T-1705"
    ],
-   "descricao": "Por quê: A E8 §9.3 propõe o modelo 1 − (1 − e)^k para a probabilidade de escape em k tentativas; aqui ele recebe a taxa medida.\nComo:\n- Estimar e com IC a partir do registro do T-1211\n- Traçar a curva teórica sobre os pontos medidos\n- Comentar onde a curva e os dados divergem\n- Mostrar a curva também por identidade, com k = N · ⌊Q / c_R⌋ (D7); a conversão em custo fica na T-1708\nSaída: figura e parágrafo para a seção 7 (RQ4).",
+   "descricao": "Redução v2 (11/11): Modelo 1 − (1 − e)^k; absorve o custo com identidades e cota (T-1708).\nAbsorve: T-1708 (Modelo de custo do ataque com identidades e cota).\n\nPor quê: A E8 §9.3 propõe o modelo 1 − (1 − e)^k para a probabilidade de escape em k tentativas; aqui ele recebe a taxa medida.\nComo:\n- Estimar e com IC a partir do registro do T-1211\n- Traçar a curva teórica sobre os pontos medidos\n- Comentar onde a curva e os dados divergem\n- Mostrar a curva também por identidade, com k = N · ⌊Q / c_R⌋ (D7); a conversão em custo fica na T-1708\nSaída: figura e parágrafo para a seção 7 (RQ4).",
    "epico": "J12",
    "id": "T-1212",
    "marco": "G4",
@@ -2325,16 +2422,17 @@
     "T-405",
     "T-408"
    ],
-   "descricao": "Por quê: R15 exige comparar com a melhor alternativa existente; os dois sinais de Hurtado, sem custódia, são essa linha de base.\nComo:\n- Reimplementar os dois sinais conforme o artigo de Hurtado, reaproveitando S2/S3 quando forem equivalentes\n- Combinar por z-soma como no original\n- Usar como referência o que o derivado declara (sem custódia)\nSaída: módulo da linha de base em model_gate/ com teste unitário.",
+   "descricao": "Redução v2 (11/11): Linha de base (R15). Absorve a conferência contra Hurtado (T-1303). Reaproveita S2 e S3; a z-soma é uma soma de z-scores.\nAbsorve: T-1303 (Conferir a reimplementação contra um caso publicado por Hurtado).\n\nPor quê: R15 exige comparar com a melhor alternativa existente; os dois sinais de Hurtado, sem custódia, são essa linha de base.\nComo:\n- Reimplementar os dois sinais conforme o artigo de Hurtado, reaproveitando S2/S3 quando forem equivalentes\n- Combinar por z-soma como no original\n- Usar como referência o que o derivado declara (sem custódia)\nSaída: módulo da linha de base em model_gate/ com teste unitário.",
    "epico": "J13",
    "id": "T-1301",
    "marco": "G3",
    "prioridade": "P0",
    "pronto": "Código com teste",
    "status": "backlog",
-   "tamanho": "G",
+   "tamanho": "M",
    "titulo": "Reimplementar os dois sinais de Hurtado com z-soma, sem custódia",
-   "teste": "TS3"
+   "teste": "TS3",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2356,87 +2454,93 @@
    "deps": [
     "T-1301"
    ],
-   "descricao": "Por quê: Uma reimplementação errada enfraqueceria a linha de base e inflaria o ganho do Juiz.\nComo:\n- Escolher um modelo ou caso publicado por Hurtado que rode em CPU\n- Comparar os valores dos sinais com os relatados\n- Explicar diferenças (modelo, camadas, versão)\nSaída: nota com a diferença documentada, citável na seção 6.",
+   "descricao": "Juntada em T-1301 em 11/11 (redução v2): Conferir contra um caso publicado faz parte de reimplementar.\n\nPor quê: Uma reimplementação errada enfraqueceria a linha de base e inflaria o ganho do Juiz.\nComo:\n- Escolher um modelo ou caso publicado por Hurtado que rode em CPU\n- Comparar os valores dos sinais com os relatados\n- Explicar diferenças (modelo, camadas, versão)\nSaída: nota com a diferença documentada, citável na seção 6.",
    "epico": "J13",
    "id": "T-1303",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Diferença documentada",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Conferir a reimplementação contra um caso publicado por Hurtado",
-   "teste": "TS3"
+   "teste": "TS3",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1302"
    ],
-   "descricao": "Por quê: A RQ1 compara Juiz e linha de base nas mesmas divisões.\nComo:\n- Rodar a linha de base em calibração, teste, família não vista e campo\n- Usar o mesmo orquestrador e registro do Juiz (T-1401)\n- Conferir que nenhuma divisão de teste foi usada na calibração\nSaída: vereditos da linha de base por derivado no registro de experimentos.",
+   "descricao": "Juntada em T-1405 em 11/11 (redução v2): Rodar a linha de base são sinais baratos, no mesmo passo da RQ1.\n\nPor quê: A RQ1 compara Juiz e linha de base nas mesmas divisões.\nComo:\n- Rodar a linha de base em calibração, teste, família não vista e campo\n- Usar o mesmo orquestrador e registro do Juiz (T-1401)\n- Conferir que nenhuma divisão de teste foi usada na calibração\nSaída: vereditos da linha de base por derivado no registro de experimentos.",
    "epico": "J13",
    "id": "T-1304",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Vereditos da linha de base",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Rodar a linha de base em todas as divisões",
-   "teste": "TS3"
+   "teste": "TS3",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [],
-   "descricao": "Por quê: R15 pede a melhor alternativa; Egler é relevante, mas caro demais para rodar no prazo, e o revisor vai perguntar.\nComo:\n- Resumir o custo de Egler frente ao orçamento de CPU do E13 §6\n- Escrever um parágrafo para a seção 6 ou 9 explicando a escolha\nSaída: parágrafo no LaTeX (artigo/sections).",
+   "descricao": "Juntada em T-1510 em 11/11 (redução v2): Uma frase nos trabalhos relacionados.\n\nPor quê: R15 pede a melhor alternativa; Egler é relevante, mas caro demais para rodar no prazo, e o revisor vai perguntar.\nComo:\n- Resumir o custo de Egler frente ao orçamento de CPU do E13 §6\n- Escrever um parágrafo para a seção 6 ou 9 explicando a escolha\nSaída: parágrafo no LaTeX (artigo/sections).",
    "epico": "J13",
    "id": "T-1305",
    "marco": "G4",
    "prioridade": "P3",
    "pronto": "Parágrafo escrito",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
-   "titulo": "Justificar no texto por que Egler fica só citado (custo)"
+   "titulo": "Justificar no texto por que Egler fica só citado (custo)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-608"
    ],
-   "descricao": "Por quê: A campanha tem ~300 vereditos (E13 §3.2) e roda por dias; uma queda não pode obrigar a refazer o que já terminou.\nComo:\n- Montar a fila derivado × configuração (formato, system prompt) a partir do inventário (T-916)\n- Marcar cada item concluído no registro de experimentos e pular os concluídos ao retomar\n- Testar matando o processo no meio e retomando\nSaída: orquestrador em model_gate/ com teste de retomada.",
+   "descricao": "Redução v2 (11/11): Laço simples que pula o que já tem resultado; sem fila nem retomada sofisticada.\n\nPor quê: A campanha tem ~300 vereditos (E13 §3.2) e roda por dias; uma queda não pode obrigar a refazer o que já terminou.\nComo:\n- Montar a fila derivado × configuração (formato, system prompt) a partir do inventário (T-916)\n- Marcar cada item concluído no registro de experimentos e pular os concluídos ao retomar\n- Testar matando o processo no meio e retomando\nSaída: orquestrador em model_gate/ com teste de retomada.",
    "epico": "J14",
    "id": "T-1401",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Retoma após queda sem refazer o feito",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Orquestrador da campanha: fila de derivados × configurações, retomável"
+   "tamanho": "P",
+   "titulo": "Orquestrador da campanha: fila de derivados × configurações, retomável",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1401",
     "T-1601"
    ],
-   "descricao": "Por quê: O orçamento de CPU (E13 §6) só cabe com várias máquinas; a quantidade sai do G0 (T-1601).\nComo:\n- Partir a fila entre as máquinas decididas\n- Sincronizar o registro de experimentos de volta a um lugar só\n- Conferir que nenhum item roda duas vezes\nSaída: campanha rodando em paralelo e registro consolidado.",
+   "descricao": "Cortada em 11/11 (redução v2): Sem distribuir: a campanha reduzida cabe numa máquina (~90 h de CPU, 3 vereditos em paralelo).\n\nPor quê: O orçamento de CPU (E13 §6) só cabe com várias máquinas; a quantidade sai do G0 (T-1601).\nComo:\n- Partir a fila entre as máquinas decididas\n- Sincronizar o registro de experimentos de volta a um lugar só\n- Conferir que nenhum item roda duas vezes\nSaída: campanha rodando em paralelo e registro consolidado.",
    "epico": "J14",
    "id": "T-1402",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Campanha roda em paralelo",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "G",
-   "titulo": "Distribuir a campanha nas máquinas decididas no G0"
+   "titulo": "Distribuir a campanha nas máquinas decididas no G0",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-606"
    ],
-   "descricao": "Por quê: R14: seeds e repetições têm de vir do pré-registro, não de escolhas na hora.\nComo:\n- Ler seeds, repetições e tamanhos do prereg.yaml\n- Gerar o plano de execução automaticamente a partir dele\n- Versionar o plano gerado\nSaída: plano de execução versionado, entrada do orquestrador.",
+   "descricao": "Juntada em T-606 em 11/11 (redução v2): Seeds e repetições ficam no pré-registro.\n\nPor quê: R14: seeds e repetições têm de vir do pré-registro, não de escolhas na hora.\nComo:\n- Ler seeds, repetições e tamanhos do prereg.yaml\n- Gerar o plano de execução automaticamente a partir dele\n- Versionar o plano gerado\nSaída: plano de execução versionado, entrada do orquestrador.",
    "epico": "J14",
    "id": "T-1403",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Plano de execução gerado do prereg.yaml",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Seeds e repetições por configuração, conforme o pré-registro",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2456,9 +2560,9 @@
   {
    "deps": [
     "T-1404",
-    "T-1304"
+    "T-1302"
    ],
-   "descricao": "Por quê: A RQ1 é o resultado-título: taxa de liberação silenciosa (E8 §9.3, E9 B1) e falso alarme por classe de falha.\nComo:\n- Separar por classe F0–F4 e por divisão\n- Calcular as métricas do Juiz e da linha de base com IC\n- Montar a tabela no formato IEEE\nSaída: tabela da RQ1 (LaTeX) e dados de origem versionados.",
+   "descricao": "Redução v2 (11/11): RQ1, o resultado-título.\nAbsorve: T-1304 (Rodar a linha de base em todas as divisões).\n\nPor quê: A RQ1 é o resultado-título: taxa de liberação silenciosa (E8 §9.3, E9 B1) e falso alarme por classe de falha.\nComo:\n- Separar por classe F0–F4 e por divisão\n- Calcular as métricas do Juiz e da linha de base com IC\n- Montar a tabela no formato IEEE\nSaída: tabela da RQ1 (LaTeX) e dados de origem versionados.",
    "epico": "J14",
    "id": "T-1405",
    "marco": "G4",
@@ -2467,60 +2571,63 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base",
-   "teste": "TS3"
+   "teste": "TS3",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1404"
    ],
-   "descricao": "Por quê: A RQ2 mede sensibilidade à quantidade de falha (molde ReMlX): passos, número de exemplos nocivos, intensidade de abliteração.\nComo:\n- Agrupar derivados pela dose varrida em cada classe\n- Traçar cobertura do Juiz por dose com IC\n- Comparar com a linha de base na mesma figura\nSaída: figura da RQ2 e script que a gera.",
+   "descricao": "Redução v2 (11/11): Curvas da RQ2 a partir das doses já geradas.\n\nPor quê: A RQ2 mede sensibilidade à quantidade de falha (molde ReMlX): passos, número de exemplos nocivos, intensidade de abliteração.\nComo:\n- Agrupar derivados pela dose varrida em cada classe\n- Traçar cobertura do Juiz por dose com IC\n- Comparar com a linha de base na mesma figura\nSaída: figura da RQ2 e script que a gera.",
    "epico": "J14",
    "id": "T-1406",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Figura da RQ2",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "RQ2: curvas de cobertura × quantidade de falha",
-   "teste": "TS3"
+   "teste": "TS3",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-10-28T22:10:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-1108"
    ],
-   "descricao": "Por quê: A RQ3 trata da representatividade: injeção × campo, só com derivados de campo em safetensors (T-113).\nComo:\n- Consolidar a análise do T-1108\n- Reportar o desempenho do Juiz no campo em safetensors\n- Destacar as injeções fora da distribuição\nSaída: tabela ou figura da RQ3 e script que a gera.",
+   "descricao": "Juntada em T-1108 em 11/11 (redução v2): A análise da RQ3 é a comparação injeção × campo.\n\nPor quê: A RQ3 trata da representatividade: injeção × campo, só com derivados de campo em safetensors (T-113).\nComo:\n- Consolidar a análise do T-1108\n- Reportar o desempenho do Juiz no campo em safetensors\n- Destacar as injeções fora da distribuição\nSaída: tabela ou figura da RQ3 e script que a gera.",
    "epico": "J14",
    "id": "T-1407",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Tabela ou figura da RQ3",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "RQ3: injeção × campo (safetensors)",
    "teste": "TS5"
   },
   {
    "deps": [
-    "T-1211"
+    "T-1210"
    ],
-   "descricao": "Por quê: A RQ4 mostra a resistência ao atacante adaptativo.\nComo:\n- Traçar escape acumulado por rodada a partir do T-1211\n- Sobrepor a curva do modelo analítico do T-1212\n- Anotar rodadas até o primeiro escape\nSaída: figura da RQ4 e script que a gera.",
+   "descricao": "Redução v2 (11/11): Gráfico de escape × rodadas.\n\nPor quê: A RQ4 mostra a resistência ao atacante adaptativo.\nComo:\n- Traçar escape acumulado por rodada a partir do T-1211\n- Sobrepor a curva do modelo analítico do T-1212\n- Anotar rodadas até o primeiro escape\nSaída: figura da RQ4 e script que a gera.",
    "epico": "J14",
    "id": "T-1408",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Figura da RQ4",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "RQ4: escape × rodadas",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1213",
     "T-812"
    ],
-   "descricao": "Por quê: A RQ5 junta a ablação dos sinais e da custódia (T-1213) com o custo por veredito (T-812).\nComo:\n- Tabelar liberação silenciosa por combinação de sinais e com e sem custódia\n- Adicionar tempo e custo por veredito por modo de execução\n- Marcar a CVM como limitação se não houver crédito (T-1603)\nSaída: tabela da RQ5 (LaTeX).",
+   "descricao": "Redução v2 (11/11): Ablação dos sinais e da custódia e custo por veredito, sem o estudo de overhead.\nAbsorve: T-1414 (Relatório de custo total da campanha).\n\nPor quê: A RQ5 junta a ablação dos sinais e da custódia (T-1213) com o custo por veredito (T-812).\nComo:\n- Tabelar liberação silenciosa por combinação de sinais e com e sem custódia\n- Adicionar tempo e custo por veredito por modo de execução\n- Marcar a CVM como limitação se não houver crédito (T-1603)\nSaída: tabela da RQ5 (LaTeX).",
    "epico": "J14",
    "id": "T-1409",
    "marco": "G4",
@@ -2529,25 +2636,27 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "RQ5: ablação dos sinais e da custódia; custo por veredito",
-   "teste": "TS7"
+   "teste": "TS7",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1405",
     "T-1406",
-    "T-1407",
+    "T-1108",
     "T-1408",
     "T-1409"
    ],
-   "descricao": "Por quê: O artigo segue o template IEEE do DSN; figuras fora do padrão custam página e legibilidade.\nComo:\n- Fixar estilo comum (fonte, tamanho de coluna, paleta legível em P&B)\n- Regerar todas as figuras das RQs por script\n- Exportar em PDF vetorial para artigo/figures\nSaída: figuras finais em artigo/figures e scripts versionados.",
+   "descricao": "Redução v2 (11/11): Figuras. Poucas figuras: RQ1, RQ3, RQ4 e custo.\n\nPor quê: O artigo segue o template IEEE do DSN; figuras fora do padrão custam página e legibilidade.\nComo:\n- Fixar estilo comum (fonte, tamanho de coluna, paleta legível em P&B)\n- Regerar todas as figuras das RQs por script\n- Exportar em PDF vetorial para artigo/figures\nSaída: figuras finais em artigo/figures e scripts versionados.",
    "epico": "J14",
    "id": "T-1410",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Figuras finais em PDF",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Figuras no padrão IEEE"
+   "tamanho": "M",
+   "titulo": "Figuras no padrão IEEE",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2567,45 +2676,48 @@
    "deps": [
     "T-1411"
    ],
-   "descricao": "Por quê: O CFP pede declaração de artefato; a ética (PLANO §0) proíbe publicar pesos e gerações nocivas.\nComo:\n- Separar scripts, configurações, prereg.yaml e instruções de reprodução\n- Conferir que nada de pesos ou gerações nocivas entra (regra do T-211)\n- Escrever um README de reprodução\nSaída: pacote do artefato pronto para anexar ou publicar.",
+   "descricao": "Juntada em T-1512 em 11/11 (redução v2): A declaração de artefato é um parágrafo junto da ética e do AI Tool Usage.\n\nPor quê: O CFP pede declaração de artefato; a ética (PLANO §0) proíbe publicar pesos e gerações nocivas.\nComo:\n- Separar scripts, configurações, prereg.yaml e instruções de reprodução\n- Conferir que nada de pesos ou gerações nocivas entra (regra do T-211)\n- Escrever um README de reprodução\nSaída: pacote do artefato pronto para anexar ou publicar.",
    "epico": "J14",
    "id": "T-1412",
    "marco": "SUB",
    "prioridade": "P1",
    "pronto": "Pacote do artefato",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
-   "titulo": "Artefato: scripts e instruções, sem pesos nem gerações nocivas"
+   "titulo": "Artefato: scripts e instruções, sem pesos nem gerações nocivas",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-912"
    ],
-   "descricao": "Por quê: R14 exige calibração e teste separados; vazamento invalida o pré-registro.\nComo:\n- Cruzar digests de derivados entre calibração, teste e família não vista\n- Cruzar IDs de itens entre instrumento do Juiz e bateria de referência\n- Registrar a checagem no registro de experimentos\nSaída: relatório da checagem sem repetições (ou correção registrada).",
+   "descricao": "Juntada em T-912 em 11/11 (redução v2): Checar vazamento ao montar as divisões.\n\nPor quê: R14 exige calibração e teste separados; vazamento invalida o pré-registro.\nComo:\n- Cruzar digests de derivados entre calibração, teste e família não vista\n- Cruzar IDs de itens entre instrumento do Juiz e bateria de referência\n- Registrar a checagem no registro de experimentos\nSaída: relatório da checagem sem repetições (ou correção registrada).",
    "epico": "J14",
    "id": "T-1413",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Nenhum derivado ou item repetido",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Checar vazamento entre calibração e teste",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1411"
    ],
-   "descricao": "Por quê: O custo informa a RQ5 e a discussão de viabilidade do Juiz em produção.\nComo:\n- Somar horas de CPU do registro de experimentos por etapa\n- Converter em US$ pelo preço das máquinas usadas\n- Separar treino da população, veredito e verdade de referência\nSaída: tabela de custo total, citável na seção 7 ou 10.",
+   "descricao": "Juntada em T-1409 em 11/11 (redução v2): O custo total entra na RQ5.\n\nPor quê: O custo informa a RQ5 e a discussão de viabilidade do Juiz em produção.\nComo:\n- Somar horas de CPU do registro de experimentos por etapa\n- Converter em US$ pelo preço das máquinas usadas\n- Separar treino da população, veredito e verdade de referência\nSaída: tabela de custo total, citável na seção 7 ou 10.",
    "epico": "J14",
    "id": "T-1414",
    "marco": "G4",
    "prioridade": "P2",
    "pronto": "Horas de CPU e US$",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Relatório de custo total da campanha",
-   "teste": "TS7"
+   "teste": "TS7",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [],
@@ -2624,30 +2736,32 @@
     "T-105",
     "T-1501"
    ],
-   "descricao": "Por quê: A seção 3 fixa sistema, custódia, adversário e componentes confiáveis (E10 §5; E8 §9.2), base de A3.\nComo:\n- Descrever a CVM, o fluxo do T-101 e as fronteiras de confiança do T-105\n- Descrever o adversário (usuário com os pesos dentro da CVM)\n- Manter cerca de 1 página\nSaída: artigo/sections com a seção 3 em rascunho completo.",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Seção 3 a partir da E14 §2–§3 e da E10, que já existem.\n\nPor quê: A seção 3 fixa sistema, custódia, adversário e componentes confiáveis (E10 §5; E8 §9.2), base de A3.\nComo:\n- Descrever a CVM, o fluxo do T-101 e as fronteiras de confiança do T-105\n- Descrever o adversário (usuário com os pesos dentro da CVM)\n- Manter cerca de 1 página\nSaída: artigo/sections com a seção 3 em rascunho completo.",
    "epico": "J15",
    "id": "T-1502",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Seção 3: sistema e ameaça"
+   "tamanho": "M",
+   "titulo": "Seção 3: sistema e ameaça",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-106",
     "T-1501"
    ],
-   "descricao": "Por quê: A seção 4 dá a forma DSN: modelo de falhas F0–F4 com quantidade, estados H/C/N e a propriedade com δ.\nComo:\n- Escrever a propriedade formal do T-106\n- Descrever as classes de falha e as doses varridas (E13 §3.2)\n- Definir os estados H, C e N\nSaída: seção 4 em rascunho completo (~1 página).",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Seção 4 a partir da E14 §5 e da T-301.\n\nPor quê: A seção 4 dá a forma DSN: modelo de falhas F0–F4 com quantidade, estados H/C/N e a propriedade com δ.\nComo:\n- Escrever a propriedade formal do T-106\n- Descrever as classes de falha e as doses varridas (E13 §3.2)\n- Definir os estados H, C e N\nSaída: seção 4 em rascunho completo (~1 página).",
    "epico": "J15",
    "id": "T-1503",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Seção 4: modelo de falhas e propriedade"
+   "tamanho": "M",
+   "titulo": "Seção 4: modelo de falhas e propriedade",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2666,17 +2780,18 @@
   {
    "deps": [
     "T-607",
-    "T-1609"
+    "T-1604"
    ],
-   "descricao": "Por quê: A seção 6 sustenta A5: verdade de referência, divisões, pré-registro, estatística e linha de base.\nComo:\n- Descrever a verdade de referência independente e a anotação humana com κ\n- Descrever divisões, tamanhos e o pré-registro (commit do T-607)\n- Descrever o critério de representatividade a partir do Natella\nSaída: seção 6 em rascunho completo (~1 página).",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Seção 6 a partir da E13 §3 e do pré-registro.\n\nPor quê: A seção 6 sustenta A5: verdade de referência, divisões, pré-registro, estatística e linha de base.\nComo:\n- Descrever a verdade de referência independente e a anotação humana com κ\n- Descrever divisões, tamanhos e o pré-registro (commit do T-607)\n- Descrever o critério de representatividade a partir do Natella\nSaída: seção 6 em rascunho completo (~1 página).",
    "epico": "J15",
    "id": "T-1505",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Seção 6: metodologia"
+   "tamanho": "M",
+   "titulo": "Seção 6: metodologia",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2696,15 +2811,16 @@
    "deps": [
     "T-1501"
    ],
-   "descricao": "Por quê: O revisor do DSN pode não conhecer recusa, abliteração e fine-tuning nocivo; a seção 2 dá esse contexto mínimo.\nComo:\n- Explicar recusa e direção de recusa (Arditi)\n- Explicar perda de recusa por fine-tuning (Qi 2024)\n- Explicar custódia em CVM em uma frase\nSaída: seção 2 em rascunho completo (~0,5 página).",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Contexto curto: recusa, abliteração e fine-tuning nocivo.\n\nPor quê: O revisor do DSN pode não conhecer recusa, abliteração e fine-tuning nocivo; a seção 2 dá esse contexto mínimo.\nComo:\n- Explicar recusa e direção de recusa (Arditi)\n- Explicar perda de recusa por fine-tuning (Qi 2024)\n- Explicar custódia em CVM em uma frase\nSaída: seção 2 em rascunho completo (~0,5 página).",
    "epico": "J15",
    "id": "T-1507",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
-   "tamanho": "G",
-   "titulo": "Seção 2: contexto"
+   "tamanho": "M",
+   "titulo": "Seção 2: contexto",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2738,7 +2854,7 @@
    "deps": [
     "T-1501"
    ],
-   "descricao": "Por quê: A seção 9 posiciona o trabalho contra detectores, defesas nos pesos e atestação (camadas 2 e 3 da base).\nComo:\n- Agrupar trabalhos por camada\n- Dizer o que cada grupo não resolve e o portão resolve\n- Manter cerca de 0,5 página\nSaída: seção 9 em rascunho completo.",
+   "descricao": "Redução v2 (11/11): Escrita do artigo.\nAbsorve: T-1305 (Justificar no texto por que Egler fica só citado (custo)).\n\nPor quê: A seção 9 posiciona o trabalho contra detectores, defesas nos pesos e atestação (camadas 2 e 3 da base).\nComo:\n- Agrupar trabalhos por camada\n- Dizer o que cada grupo não resolve e o portão resolve\n- Manter cerca de 0,5 página\nSaída: seção 9 em rascunho completo.",
    "epico": "J15",
    "id": "T-1510",
    "marco": "G4",
@@ -2746,7 +2862,8 @@
    "pronto": "Rascunho completo",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Seção 9: trabalhos relacionados (camadas 2 e 3)"
+   "titulo": "Seção 9: trabalhos relacionados (camadas 2 e 3)",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2764,31 +2881,33 @@
   },
   {
    "deps": [
-    "T-1412"
+    "T-1411"
    ],
-   "descricao": "Por quê: O CFP do DSN exige ética, declaração de uso de IA e intenção de artefato.\nComo:\n- Atualizar 11_ai_usage.tex\n- Escrever a seção de ética (modelos pequenos, sem pesos nem gerações nocivas publicados, nota da anotação humana)\n- Escrever a declaração de artefato a partir do T-1412\nSaída: seções obrigatórias no LaTeX.",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Textos padrão do CFP.\nAbsorve: T-1412 (Artefato: scripts e instruções, sem pesos nem gerações nocivas).\n\nPor quê: O CFP do DSN exige ética, declaração de uso de IA e intenção de artefato.\nComo:\n- Atualizar 11_ai_usage.tex\n- Escrever a seção de ética (modelos pequenos, sem pesos nem gerações nocivas publicados, nota da anotação humana)\n- Escrever a declaração de artefato a partir do T-1412\nSaída: seções obrigatórias no LaTeX.",
    "epico": "J15",
    "id": "T-1512",
    "marco": "SUB",
    "prioridade": "P1",
    "pronto": "Seções obrigatórias escritas",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Ética, AI Tool Usage e declaração de artefato"
+   "tamanho": "P",
+   "titulo": "Ética, AI Tool Usage e declaração de artefato",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1501"
    ],
-   "descricao": "Por quê: D5 fixa a base teórica; o refs.bib atual ainda carrega referências do Juiz de código.\nComo:\n- Remover entradas que não são citadas\n- Adicionar as referências da base (A1–A5) e os moldes do DSN\n- Conferir que toda citação resolve\nSaída: refs.bib limpo e compilando sem avisos de citação.",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Limpar o refs.bib para a base D5.\n\nPor quê: D5 fixa a base teórica; o refs.bib atual ainda carrega referências do Juiz de código.\nComo:\n- Remover entradas que não são citadas\n- Adicionar as referências da base (A1–A5) e os moldes do DSN\n- Conferir que toda citação resolve\nSaída: refs.bib limpo e compilando sem avisos de citação.",
    "epico": "J15",
    "id": "T-1513",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Bibliografia limpa",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "refs.bib só com a base (D5) e os moldes do DSN"
+   "tamanho": "P",
+   "titulo": "refs.bib só com a base (D5) e os moldes do DSN",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2808,15 +2927,16 @@
    "deps": [
     "T-1514"
    ],
-   "descricao": "Por quê: os coautores precisam de alguns dias para revisar antes de 02/dez (E13 §4: rascunho em 28/nov).\nComo:\n- Compilar o PDF completo com os números congelados (T-1411) e o resumo submetido.\n- Enviar com uma lista curta dos pontos em que a opinião deles é necessária (enquadramento DSN, ameaças, limites).\n- Fixar o prazo de retorno para 30/nov.\nSaída: PDF e lista de pontos enviados até 28/nov; commit do estado enviado.",
+   "descricao": "Redução v2 (11/11): Escrita do artigo. Enviar o rascunho.\n\nPor quê: os coautores precisam de alguns dias para revisar antes de 02/dez (E13 §4: rascunho em 28/nov).\nComo:\n- Compilar o PDF completo com os números congelados (T-1411) e o resumo submetido.\n- Enviar com uma lista curta dos pontos em que a opinião deles é necessária (enquadramento DSN, ameaças, limites).\n- Fixar o prazo de retorno para 30/nov.\nSaída: PDF e lista de pontos enviados até 28/nov; commit do estado enviado.",
    "epico": "J15",
    "id": "T-1515",
    "marco": "SUB",
    "prioridade": "P1",
    "pronto": "Enviado até 28/nov",
    "status": "backlog",
-   "tamanho": "M",
-   "titulo": "Rascunho completo aos coautores"
+   "tamanho": "P",
+   "titulo": "Rascunho completo aos coautores",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2889,35 +3009,36 @@
    "objetivoMaior": "O2"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [],
-   "descricao": "Por quê: o fluxo integrado roda em CVMs reais (T-102); a nuvem (Azure, AWS ou Oracle) sai pelo custo (E13 §8, decisão 4).\nComo:\n- Comparar o preço de CVM AMD SEV-SNP de 4 vCPU nas três nuvens e o crédito disponível para o grupo.\n- Escolher a nuvem e registrar no PLANO.\nSaída: nuvem escolhida e status do crédito registrados no PLANO.",
+   "descricao": "Redução v2 (11/11): Escolher a nuvem e provisionar as CVMs (absorve a T-1607).\nAbsorve: T-1607 (Provisionar as CVMs do piloto na nuvem escolhida).\n\nPor quê: o fluxo integrado roda em CVMs reais (T-102); a nuvem (Azure, AWS ou Oracle) sai pelo custo (E13 §8, decisão 4).\nComo:\n- Comparar o preço de CVM AMD SEV-SNP de 4 vCPU nas três nuvens e o crédito disponível para o grupo.\n- Escolher a nuvem e registrar no PLANO.\nSaída: nuvem escolhida e status do crédito registrados no PLANO.",
    "epico": "J16",
    "id": "T-1603",
    "marco": "G0",
    "prioridade": "P1",
    "pronto": "Nuvem escolhida e crédito ou orçamento confirmado",
    "status": "backlog",
-   "tamanho": "P",
+   "tamanho": "M",
    "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito",
    "objetivoMaior": "O3"
   },
   {
    "deps": [],
-   "descricao": "Por quê: Natella (IEEE TSE 2013) é a referência para a representatividade das falhas injetadas (R13, A5), e a seção 6 não pode ser escrita sem ele.\nComo:\n- Baixar pelo acesso institucional (IEEE Xplore pelo proxy da universidade).\n- Salvar em pesquisa/artigos/1_base/A5_medida_valida/ seguindo o padrão de nome dos outros PDFs.\n- Atualizar o índice em pesquisa/artigos/README.md.\nSaída: PDF no acervo e índice atualizado.",
+   "descricao": "Redução v2 (11/11): Baixar e ler o Natella (absorve a T-1609).\nAbsorve: T-1609 (Ler o Natella e resumir para a metodologia).\n\nPor quê: Natella (IEEE TSE 2013) é a referência para a representatividade das falhas injetadas (R13, A5), e a seção 6 não pode ser escrita sem ele.\nComo:\n- Baixar pelo acesso institucional (IEEE Xplore pelo proxy da universidade).\n- Salvar em pesquisa/artigos/1_base/A5_medida_valida/ seguindo o padrão de nome dos outros PDFs.\n- Atualizar o índice em pesquisa/artigos/README.md.\nSaída: PDF no acervo e índice atualizado.",
    "epico": "J16",
    "id": "T-1604",
    "marco": "G0",
    "prioridade": "P1",
    "pronto": "PDF em pesquisa/artigos/1_base/A5_medida_valida",
    "status": "backlog",
-   "tamanho": "P",
+   "tamanho": "M",
    "titulo": "Baixar o Natella (IEEE TSE 2013) pelo acesso institucional",
-   "objetivoMaior": "O5"
+   "objetivoMaior": "O5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [],
-   "descricao": "Por quê: a decisão 5 da E13 §8 trava a anotação humana (T-1007) e a independência do bounty interno (T-1202).\nComo:\n- Convidar dois anotadores que aceitem ler texto nocivo, sob a nota de ética (T-1606).\n- Escolher um guardião da bateria secreta que não participe dos ataques (E13 §3.6).\n- Se não houver segunda pessoa, registrar isso como ameaça à validade.\nSaída: nomes e papéis registrados em DSN2027/PLANO.md.",
+   "descricao": "Redução v2 (11/11): Anotadores e guardião; absorve a independência do atacante (T-1202).\nAbsorve: T-1202 (Separar o guardião da bateria secreta do atacante (independência)).\n\nPor quê: a decisão 5 da E13 §8 trava a anotação humana (T-1007) e a independência do bounty interno (T-1202).\nComo:\n- Convidar dois anotadores que aceitem ler texto nocivo, sob a nota de ética (T-1606).\n- Escolher um guardião da bateria secreta que não participe dos ataques (E13 §3.6).\n- Se não houver segunda pessoa, registrar isso como ameaça à validade.\nSaída: nomes e papéis registrados em DSN2027/PLANO.md.",
    "epico": "J16",
    "id": "T-1605",
    "marco": "G0",
@@ -2926,77 +3047,82 @@
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Definir pessoas: anotadores e guardião da bateria secreta",
-   "objetivoMaior": "O2"
+   "objetivoMaior": "O2",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [],
-   "descricao": "Por quê: a anotação humana de texto nocivo pede nota de ética e, se a instituição exigir, aprovação de comitê (E13 §3.4); o CFP do DSN também pede seção de ética.\nComo:\n- Escrever a nota: riscos para os anotadores, consentimento, direito de desistir, como o texto é guardado e descartado.\n- Perguntar à instituição se a anotação precisa de comitê e, se precisar, submeter.\n- Reaproveitar o texto na seção de ética do artigo (T-1512).\nSaída: nota aprovada e arquivada em DSN2027/.",
+   "descricao": "Redução v2 (11/11): Nota de ética curta para a anotação e para a seção do CFP.\n\nPor quê: a anotação humana de texto nocivo pede nota de ética e, se a instituição exigir, aprovação de comitê (E13 §3.4); o CFP do DSN também pede seção de ética.\nComo:\n- Escrever a nota: riscos para os anotadores, consentimento, direito de desistir, como o texto é guardado e descartado.\n- Perguntar à instituição se a anotação precisa de comitê e, se precisar, submeter.\n- Reaproveitar o texto na seção de ética do artigo (T-1512).\nSaída: nota aprovada e arquivada em DSN2027/.",
    "epico": "J16",
    "id": "T-1606",
    "marco": "G0",
    "prioridade": "P1",
    "pronto": "Nota aprovada",
    "status": "backlog",
-   "tamanho": "M",
+   "tamanho": "P",
    "titulo": "Nota de ética e, se exigido, comitê para a anotação humana",
-   "objetivoMaior": "O2"
+   "objetivoMaior": "O2",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-1603"
    ],
-   "descricao": "Por quê: o fluxo integrado roda em CVMs reais (T-102), e a RQ5 mede o custo da custódia nelas.\nComo:\n- Na nuvem do T-1603, provisionar a CVM1, a CVM2 (builder) e a imagem das CVMs de job, com 4 vCPU.\n- Instalar o ambiente do T-202 e o agente da CVM de job.\n- Registrar o modelo de CPU confidencial e a versão do firmware; atestação real só se a avaliação precisar (T-102).\nSaída: CVMs acessíveis, com o ambiente registrado.",
+   "descricao": "Juntada em T-1603 em 11/11 (redução v2): Uma CVM para a demonstração.\n\nPor quê: o fluxo integrado roda em CVMs reais (T-102), e a RQ5 mede o custo da custódia nelas.\nComo:\n- Na nuvem do T-1603, provisionar a CVM1, a CVM2 (builder) e a imagem das CVMs de job, com 4 vCPU.\n- Instalar o ambiente do T-202 e o agente da CVM de job.\n- Registrar o modelo de CPU confidencial e a versão do firmware; atestação real só se a avaliação precisar (T-102).\nSaída: CVMs acessíveis, com o ambiente registrado.",
    "epico": "J16",
    "id": "T-1607",
    "marco": "G3",
    "prioridade": "P2",
    "pronto": "CVMs acessíveis",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Provisionar as CVMs do piloto na nuvem escolhida",
    "objetivoMaior": "O3"
   },
   {
    "deps": [],
-   "descricao": "Por quê: o cronograma da E13 §4 depende de revisões em datas fixas (decisões em 02/nov, resumo em 25/nov, rascunho em 28/nov).\nComo:\n- Propor ao orientador e aos coautores as datas: revisão da E14 (até 30/out), decisões do G0 (02/nov), leitura do rascunho (28–30/nov).\n- Fechar as datas e colocá-las no calendário de todos.\nSaída: datas no calendário e registradas no PLANO.",
+   "descricao": "Cortada em 11/11 (redução v2): Combinar datas é conversa, não task.\n\nPor quê: o cronograma da E13 §4 depende de revisões em datas fixas (decisões em 02/nov, resumo em 25/nov, rascunho em 28/nov).\nComo:\n- Propor ao orientador e aos coautores as datas: revisão da E14 (até 30/out), decisões do G0 (02/nov), leitura do rascunho (28–30/nov).\n- Fechar as datas e colocá-las no calendário de todos.\nSaída: datas no calendário e registradas no PLANO.",
    "epico": "J16",
    "id": "T-1608",
    "marco": "G0",
    "prioridade": "P1",
    "pronto": "Datas no calendário",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Combinar as datas de revisão com orientador e coautores",
-   "objetivoMaior": "O5"
+   "objetivoMaior": "O5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [
     "T-1604"
    ],
-   "descricao": "Por quê: a comparação injeção × campo da RQ3 (T-1108) segue o método de representatividade de Natella.\nComo:\n- Ler o artigo inteiro, com foco em como ele mede se falhas injetadas representam falhas reais.\n- Traduzir o método para o nosso caso: quais distribuições (S1–S3) comparar e que teste usar.\n- Gravar a nota no padrão das outras leituras em pesquisa/ (ex.: 09_leitura_natella.md).\nSaída: nota de leitura versionada, citada na seção 6.",
+   "descricao": "Juntada em T-1604 em 11/11 (redução v2): Ler o Natella junto com o download.\n\nPor quê: a comparação injeção × campo da RQ3 (T-1108) segue o método de representatividade de Natella.\nComo:\n- Ler o artigo inteiro, com foco em como ele mede se falhas injetadas representam falhas reais.\n- Traduzir o método para o nosso caso: quais distribuições (S1–S3) comparar e que teste usar.\n- Gravar a nota no padrão das outras leituras em pesquisa/ (ex.: 09_leitura_natella.md).\nSaída: nota de leitura versionada, citada na seção 6.",
    "epico": "J16",
    "id": "T-1609",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Nota de leitura",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "M",
    "titulo": "Ler o Natella e resumir para a metodologia",
-   "objetivoMaior": "O5"
+   "objetivoMaior": "O5",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "deps": [],
-   "descricao": "Por quê: a E13 é a fonte do backlog e do cronograma, e ainda não está no git; o PLANO já aponta para ela.\nComo:\n- Reler a E13 conferindo números (tamanhos, marcos, datas) contra o backlog.\n- Ajustar o PLANO §1 para apontar para a E13.\n- Commitar a E13 e o PLANO juntos.\nSaída: DSN2027/etapas/E13_plano_trabalho.md commitado.",
+   "descricao": "Feita: A E13 já está no git (commit d79361d).\n\nPor quê: a E13 é a fonte do backlog e do cronograma, e ainda não está no git; o PLANO já aponta para ela.\nComo:\n- Reler a E13 conferindo números (tamanhos, marcos, datas) contra o backlog.\n- Ajustar o PLANO §1 para apontar para a E13.\n- Commitar a E13 e o PLANO juntos.\nSaída: DSN2027/etapas/E13_plano_trabalho.md commitado.",
    "epico": "J16",
    "id": "T-1610",
    "marco": "ESP",
    "prioridade": "P1",
    "pronto": "E13 commitado",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Revisar e commitar o E13 (plano de alto nível)",
-   "objetivoMaior": "O1"
+   "objetivoMaior": "O1",
+   "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
    "atualizado": "2026-11-09T12:00:00.000Z",
@@ -3113,27 +3239,27 @@
    "teste": "TS9"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
     "T-1212",
     "T-1705"
    ],
-   "descricao": "Por quê: a segunda camada é medida pelo custo esperado de um escape, não por uma RQ nova (E14 §18.5).\nComo:\n- Estender 1 − (1 − e)^k com k = N · ⌊Q / c_R⌋.\n- Calcular E[custo] ≈ (c_R / (e · Q)) · C_id com o e da T-1212 e o C_id da T-1705, e o custo do usuário legítimo com o falso alarme medido.\n- Fixar Q e os pesos 1, 2 e 5 a partir da conta.\nSaída: tabela e parágrafo para a RQ4 e a seção 5.",
+   "descricao": "Juntada em T-1212 em 11/11 (redução v2): O custo com identidades e cota é o mesmo modelo analítico.\n\nPor quê: a segunda camada é medida pelo custo esperado de um escape, não por uma RQ nova (E14 §18.5).\nComo:\n- Estender 1 − (1 − e)^k com k = N · ⌊Q / c_R⌋.\n- Calcular E[custo] ≈ (c_R / (e · Q)) · C_id com o e da T-1212 e o C_id da T-1705, e o custo do usuário legítimo com o falso alarme medido.\n- Fixar Q e os pesos 1, 2 e 5 a partir da conta.\nSaída: tabela e parágrafo para a RQ4 e a seção 5.",
    "epico": "J17",
    "id": "T-1708",
    "marco": "G4",
    "ordem": 1708,
    "prioridade": "P1",
    "pronto": "Custo por escape e por aprovação com números medidos",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Modelo de custo do ataque com identidades e cota",
    "teste": "TS6"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T18:00:00.000Z",
    "deps": [
-    "T-1708",
+    "T-1212",
     "T-1504"
    ],
    "descricao": "Por quê: a D7 muda o modelo de ameaça (atacante com N identidades) e o desenho; o provedor de nuvem precisa aparecer como trabalho futuro.\nComo:\n- Seção 3: atacante com N identidades e orçamento de cota.\n- Seção 5: identidade, prova de trabalho e cota, em um parágrafo e uma linha de figura.\n- Seção 10: limites (GPU e ASIC, memory-hard) e identidade por provedor de nuvem (AWS, Azure, Oracle) como trabalho futuro.\n- Acrescentar Douceur 2002, Back 2002 e Nakamoto 2008 ao refs.bib, conferidos.\nSaída: trechos nas seções 3, 5 e 10.",
