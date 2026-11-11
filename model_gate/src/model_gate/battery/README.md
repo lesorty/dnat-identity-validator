@@ -187,3 +187,33 @@ Tasks do backlog cuja descrição ficou para trás:
   quantizados (T-106, T-111).
 - **T-309:** ainda fala no avaliador em Gemma 2B; a T-105 trocou para a disputa Gemma 4 E4B ×
   Qwen3Guard-4B.
+
+## 6. Sorteio das âncoras públicas (T-302)
+
+Código em `sample.py` e `pool.py`; acervo em [`harmful_ids.json`](harmful_ids.json), gerado por
+`experiments/build_harmful_pool.py`.
+
+- **Acervo público:** os 313 itens do StrongREJECT no commit fixado (T-204), um por linha do CSV.
+  O arquivo guarda só o ID (linha, 0-based), a categoria, a origem e o SHA-256 do texto
+  normalizado (NFKC, minúsculas, espaços colapsados). Nenhum texto entra no git.
+- **Semente:** HMAC-SHA256 da chave secreta sobre a versão do Juiz, o digest do derivado, a
+  condição e a rodada (E14 §7.2). O mesmo derivado recebe sempre o mesmo sorteio; a
+  reavaliação usa a rodada 1 (T-107).
+- **Cota:** 32 âncoras por condição, divididas igualmente entre as 6 categorias (6, 6, 5, 5, 5,
+  5; a sobra vai às primeiras em ordem alfabética). A ordem das perguntas também sai da semente.
+- **Falta de âncoras:** uma categoria com menos âncoras que a sua cota entra inteira, e a falta é
+  sorteada entre as âncoras que sobraram nas outras. Com menos de 32 âncoras no total, a condição
+  não é julgada (`InsufficientAnchors`, E14 §5). Com as âncoras medidas do Qwen2.5-0.5B (§2), as
+  duas condições sorteiam as 32, com a cota cheia em todas as categorias (teste
+  `test_sorteio_com_as_ancoras_medidas_do_base`).
+- **Sobreposição:** `pool.overlap` compara o acervo com outro conjunto pelos hashes. A bateria de
+  referência (T-1001) e o conjunto da direção do S2 (T-401) têm de dar sobreposição vazia. Atenção
+  da T-401: 25 itens do acervo vêm do AdvBench, de onde Arditi tira os pares nocivos da direção.
+
+**Ponto em aberto para a T-304 (parte secreta).** O acervo público é o StrongREJECT inteiro, então
+a parte secreta não pode ser "uma amostra do StrongREJECT fora da lista publicada", como a redução
+v2 escreveu na T-304: não sobra item fora da lista, e um pedido tirado de um benchmark público não
+é segredo para quem treina com o benchmark inteiro. As saídas: (a) o guardião escreve os ~54
+pedidos secretos (9 por categoria, uma ou duas horas), que é a fonte que mais vale contra quem
+decora a prova; (b) gerar por um LLM e filtrar à mão; (c) tirar uma fatia do StrongREJECT do
+acervo público, aceitando que ela é pública. Decisão com o orientador.

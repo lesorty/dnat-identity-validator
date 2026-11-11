@@ -1,0 +1,1898 @@
+{
+ "dataset": "strongreject",
+ "commit": "f7cad6c17e624e21d8df2278e918ae1dddb4cb56",
+ "file": "strongreject_dataset/strongreject_dataset.csv",
+ "dataset_digest": "31357e7e409ba9de62037e2fb46b3cd558a92e6917c65afb079e00ca1db25d3a",
+ "id": "linha do CSV (0-based)",
+ "hash": "SHA-256 do texto normalizado (NFKC, minúsculas, espaços colapsados)",
+ "count": 313,
+ "by_category": {
+  "Disinformation and deception": 50,
+  "Hate, harassment and discrimination": 50,
+  "Illegal goods and services": 50,
+  "Non-violent crimes": 59,
+  "Sexual content": 50,
+  "Violence": 54
+ },
+ "duplicated_hashes": [],
+ "items": [
+  {
+   "id": 0,
+   "category": "Disinformation and deception",
+   "source": "DAN",
+   "sha256": "357992f6677e668e6c407656af00036b9a314bcda8f3329ea9c13aa418910e32"
+  },
+  {
+   "id": 1,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "eb21e48f696a0d7711207a21f8bdc25b478860696e1ae65f55e9d0460ddb5714"
+  },
+  {
+   "id": 2,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "37b18eaad6714f475d5e2ded4a528f6f0e237bc9869a40b0c7eb01d71731af08"
+  },
+  {
+   "id": 3,
+   "category": "Disinformation and deception",
+   "source": "DAN",
+   "sha256": "fbb6ce287bebbaa03dcbf3c261ab89c4ea6b11fa58e3ffa534bef11273c381b7"
+  },
+  {
+   "id": 4,
+   "category": "Disinformation and deception",
+   "source": "Jailbreaking via Prompt Engineering",
+   "sha256": "0abb05ca03f877931e795af59f1deacb5bf51beca0b3bb4f50a51ecb360b8ca2"
+  },
+  {
+   "id": 5,
+   "category": "Disinformation and deception",
+   "source": "DAN",
+   "sha256": "b6300f7d7a92bc034a927768dcfc6ae3f3a59d31a9865e8515b5f3def2a5ea0f"
+  },
+  {
+   "id": 6,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "065c70a758d5f72a24a2b3fdf5c1480d9f7bdcb2ff375913d6e078e91687bfc0"
+  },
+  {
+   "id": 7,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "4fc5d2fa46941b36962ce33cc0cb4712ec1c61294b24ddde6495c329f8260b91"
+  },
+  {
+   "id": 8,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "6cc1e391253c8b51d428cae7b6369d913b3632f208ba9ab2ecf43ecc8580ca60"
+  },
+  {
+   "id": 9,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "f9e1b28d66cb3e548e2eebb52a1539c44f029f765985156a18f52da03e0e525a"
+  },
+  {
+   "id": 10,
+   "category": "Disinformation and deception",
+   "source": "DAN",
+   "sha256": "dbba750bdc5a9dbf3c0dd028fe5200ef91250f3f951dcd1df8d7985923e4b53c"
+  },
+  {
+   "id": 11,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "9c30d98139baa8dd41b4c3e16aeb7bae299ce2c0e7bedfa5cfd09157668a2650"
+  },
+  {
+   "id": 12,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "86b067ef4d35a94903ebac6fb967b1ed17138b78cb574ab912fdc1e14ff25ffb"
+  },
+  {
+   "id": 13,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "66893915f9de110de477e0427b165864e02df1609769c49280be0ef19b8caee9"
+  },
+  {
+   "id": 14,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "b7313dfbd61641b450790aad2e74a0263fab93a91974881678da5ed92fc32878"
+  },
+  {
+   "id": 15,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "ef599a62206168fb97d8ad22b23b0be00942682f80cd5692f798f8f565533b0b"
+  },
+  {
+   "id": 16,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "0245d1d93cd44c7c3096fa1325e792d6111db45a3952bb2e4e9764df5cf0c96f"
+  },
+  {
+   "id": 17,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "4ed04cc0bb724408a3acfb48115c8a3fe1c5a8aa4b238730f716035dfdcd398f"
+  },
+  {
+   "id": 18,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "2a26363d98ab43519549d6e5d8c1504614f44537ff1650e1d8ddd2bb5bb200a5"
+  },
+  {
+   "id": 19,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "1749ca30d6fd34c33e3518c29ba9db8d4eb66570c65e1e221f6a5457aa02ee6f"
+  },
+  {
+   "id": 20,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "ea97946c2df91129edf1099fa250ef9fcc65bd69df41b5938f393db73bc236fd"
+  },
+  {
+   "id": 21,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "42c0bf842d97aa72d7fa7a5b0444b74e546b7951669971112adba65dcdb6a42a"
+  },
+  {
+   "id": 22,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "4e37d061268f7ec0cc8881effe6a5a948c51c7f3e2ab45d71e9666b4f468edec"
+  },
+  {
+   "id": 23,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "39fdef3d5c3638f11c1e67a881280ff7ed54434da6b2db775ddc58861652c6cc"
+  },
+  {
+   "id": 24,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "1990cc6fc828bfd519afe0a175381c20630f3ed665c44ab3e34a7dc8c47d2599"
+  },
+  {
+   "id": 25,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "48dca031653631c17637b3c113130122a5eb3d490478f20a28db4de72e19ce59"
+  },
+  {
+   "id": 26,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "c7574189e3d0042361b0016cc60347fbf83befc9ddcde61afba1f751032ac91d"
+  },
+  {
+   "id": 27,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "cf18d0b9024fea065ac5c1e279fb7fd0b01145646ef0f3fcd6431167ace6793c"
+  },
+  {
+   "id": 28,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "f3098f8acab50b6a43073f0bf7ef18bf417d86b1e38ae3129dc6ae4cdfd77235"
+  },
+  {
+   "id": 29,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "8804551e170162d99c70143d8eb14ea37e2bb389944350dd7d5004039a47a887"
+  },
+  {
+   "id": 30,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "1bbfb29f50c0e9f54a94ba9fd7b738415d47d9ffa6184dc2557fcaeb5fc806b1"
+  },
+  {
+   "id": 31,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "a3af86f1169c43091ad3f2caec620c438efea4deb87629bdf1c9934469859fd0"
+  },
+  {
+   "id": 32,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "503184eab842604426113ec818a451f63fcaf3baa03dbf846fcfcfbc98da576b"
+  },
+  {
+   "id": 33,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "32298da4565a715b964ad5105835e864246278731f6dc51845f607841ee3dbfe"
+  },
+  {
+   "id": 34,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "2c78f8e0d7caea9f4975a66b16009b9392e84def7a651f5bc3317d82ab123284"
+  },
+  {
+   "id": 35,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "d2a5e7163f3abc0da93fac6b1ac6727085bb43ae975cf4f129f6be0407a58fbc"
+  },
+  {
+   "id": 36,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "9f9f6d7934feed4134ffd927d6920daee1656de4044a761444d50b079ecaf645"
+  },
+  {
+   "id": 37,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "7b7506729b2a8358a973a895bb74b47f2cae5fe885282b839ee28ae135a40101"
+  },
+  {
+   "id": 38,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "ce72cb4621c0844f7efaa69260f75ac990767f5650bcfb229e015a763cc60048"
+  },
+  {
+   "id": 39,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "622132b792e5ba7a12d6a0d6bdbe62e781876bece479a43d0afd92163841f821"
+  },
+  {
+   "id": 40,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "a68bc145724355ae789a4ae2f3f9c8e722cd3b1217767d422cfe8b069556e812"
+  },
+  {
+   "id": 41,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "db7c70fef79fd6293e21c2f5a6fad0e302eb1d0cbf9d89c833cc1be97fd39ed9"
+  },
+  {
+   "id": 42,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "6c167793d3649dd80e586835857f915642acda7e3904ec086744e992df318cb5"
+  },
+  {
+   "id": 43,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "9aee645f39f47a380a113400eeca88d4ae12c746cd10655f10e94138dcd8c663"
+  },
+  {
+   "id": 44,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "a6672e6074dd55c2849973a717098b03bd8db56dc66bef45bd6fd46b197cffa1"
+  },
+  {
+   "id": 45,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "88fcf8a14a2607d39a9671b3637b3da032e93e0373890dd3204a4280ff0b335d"
+  },
+  {
+   "id": 46,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "8f750c62f5a123a2d2d649a1b2f98b88f6ecf03f3816ba97df29d6dd9dd89bd8"
+  },
+  {
+   "id": 47,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "828e01d7662fc516da074b2a44f7bbffc19220e7298f74b41de2b1f8f75cb308"
+  },
+  {
+   "id": 48,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "af4c0abb0f823c331f38877d92e8c1db3bb42b57813a744b2eea90de39593649"
+  },
+  {
+   "id": 49,
+   "category": "Disinformation and deception",
+   "source": "custom",
+   "sha256": "ab4427a3f1acd1b23a9c9f0a50218ffa0a7c72ba40dc719636b675b51182d6a8"
+  },
+  {
+   "id": 50,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "ee7034704fe381bf6e1446cc51438a3fb6ef0dd018fd5a333b477785b6122fde"
+  },
+  {
+   "id": 51,
+   "category": "Hate, harassment and discrimination",
+   "source": "DAN",
+   "sha256": "88ef11237e02baf39d83201d3d87f2edd778690a1c94ec2a3e054e3195a8459e"
+  },
+  {
+   "id": 52,
+   "category": "Hate, harassment and discrimination",
+   "source": "DAN",
+   "sha256": "ddf8f13b454eb7531988caf81ed56f6485cde41c3d60f0e18196ae96c09dd83e"
+  },
+  {
+   "id": 53,
+   "category": "Hate, harassment and discrimination",
+   "source": "DAN",
+   "sha256": "e2d9b14873a1e5f1243cdfa2a7764c1ddccb7556490b5957a4035cf2bf2a9090"
+  },
+  {
+   "id": 54,
+   "category": "Hate, harassment and discrimination",
+   "source": "DAN",
+   "sha256": "54be0334756440b3d904882daa6f2627398110c9135e21b95cfb3e6db9b63920"
+  },
+  {
+   "id": 55,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "d708c02ffa17364b1c3b8f50ca320b57e8c8ea2418fcecc60a4843c930fae8f5"
+  },
+  {
+   "id": 56,
+   "category": "Hate, harassment and discrimination",
+   "source": "AdvBench",
+   "sha256": "e2f14d8a4e02019aac95062f7f78f191bd2624be3b605a2bee1a2de2d8f10551"
+  },
+  {
+   "id": 57,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "0e8c9e62c7cbea86ba0ab882d90d7db0220ca9ba69e24c698f30899658becdcc"
+  },
+  {
+   "id": 58,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "df408b340014ecacebe29672f0be030e4259b8e8e14437a66f3fb905c931ad31"
+  },
+  {
+   "id": 59,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "c8b1e1a81ac676ff7435b3ab1c7baa8e86ac41ec8d489d123aa16c6d011deed0"
+  },
+  {
+   "id": 60,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "398126dc562d2170ac963298d3a9050c5c12aef019f103c7a51434bef41aa2b0"
+  },
+  {
+   "id": 61,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "15414913a51128dbfb1b53a4a684ff464edf66a1622ba27c56a914464ee6a525"
+  },
+  {
+   "id": 62,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "6a4ce25ee5c54ecca90589add528541d3582053192ad5d87f5547b0cdd541278"
+  },
+  {
+   "id": 63,
+   "category": "Hate, harassment and discrimination",
+   "source": "Jailbreaking via Prompt Engineering",
+   "sha256": "5bf6c464f6906c9d92945db38fc8877cd62a5f20db7596cc3485954273444604"
+  },
+  {
+   "id": 64,
+   "category": "Hate, harassment and discrimination",
+   "source": "MaliciousInstruct",
+   "sha256": "99315b07f1d08d5c9867397affcbd5e2d970286f7c4af23d940aa2cda1db6613"
+  },
+  {
+   "id": 65,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "449c5f635feff3d8ce1ec418c7deed066fc1af67d4b88f21f16745842a815165"
+  },
+  {
+   "id": 66,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "0d92140edacc7fca28f53f13ec28fbb21675e377a48f2adc3be3063e92a9ba47"
+  },
+  {
+   "id": 67,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "f12b45767295621bf97d1681c1d2aca9f551b483d6cc3e59b4061c9a9e34517b"
+  },
+  {
+   "id": 68,
+   "category": "Hate, harassment and discrimination",
+   "source": "MaliciousInstruct",
+   "sha256": "affaf5ab372eb335fada84720d193fdbb4e708c43245e47464779579daefc056"
+  },
+  {
+   "id": 69,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "1112dc6e55338ff9321205d24bc0fd889f203e3efeabdfa5e4ccd2d82c533b50"
+  },
+  {
+   "id": 70,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "92339393a435f1c961ab6eca5a5edb6b93a4cf56cc80680fd018b76ec1d01f9a"
+  },
+  {
+   "id": 71,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "9dd4b2e03e69b7a4274077768ff59cd02bc096493b7d9d4d250c3aad980fb25a"
+  },
+  {
+   "id": 72,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "1c02060aeaf7f91ca8443b7613c9be12745bd73b0b39cef29c27cad42e959dda"
+  },
+  {
+   "id": 73,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "334d03296de27aa6f84b5d653c160773210e7828961054ba8243fe5c2bfb3313"
+  },
+  {
+   "id": 74,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "714df19325479d5c09c22e1c1545e4554e915c0547dcf79d2faafb9cc3047c6b"
+  },
+  {
+   "id": 75,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "5e862c7b62b22cb3725776f75f590b143c4abfd489ba410ee80577fa5326d021"
+  },
+  {
+   "id": 76,
+   "category": "Hate, harassment and discrimination",
+   "source": "MaliciousInstruct",
+   "sha256": "d0760d00da71df6ff912dcda95f25f26f72d1216b0ec89417a271c0f0e579edb"
+  },
+  {
+   "id": 77,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "cf8737d24f8ba8df0587b166b036c050f8006d839627d4a6868c6baa52b31f5f"
+  },
+  {
+   "id": 78,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "45d0434f84c95b6fe512f56238509841f6a7884e2f2ade2dca6ba8806fe54194"
+  },
+  {
+   "id": 79,
+   "category": "Hate, harassment and discrimination",
+   "source": "DAN",
+   "sha256": "ed02de754418eb780ad25c393980dd577aa293680aa2fd6e760ff5edf6eadc08"
+  },
+  {
+   "id": 80,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "c9f60895323495d26dfeeaa843828fd4c4e97e5788687a19d6e2aaa473f71f41"
+  },
+  {
+   "id": 81,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "e2bc9b47362b2b1e3600a21c60433dc64b2ced7f808157ef4ee16636c4375e89"
+  },
+  {
+   "id": 82,
+   "category": "Hate, harassment and discrimination",
+   "source": "Jailbreaking via Prompt Engineering",
+   "sha256": "1d2cec1e081de55119bdfdb37f70b57a8d47ad36a29c990bb4c7c41577804bc7"
+  },
+  {
+   "id": 83,
+   "category": "Hate, harassment and discrimination",
+   "source": "DAN",
+   "sha256": "f71613f730e48ca22ac2ec36a0fbbe7469cc7620ffe912c6df9bb5a4ed48878a"
+  },
+  {
+   "id": 84,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "4242c33d4adbd3cd9e7fa217eff584eaa46932615cad94bd09c21ede71405593"
+  },
+  {
+   "id": 85,
+   "category": "Hate, harassment and discrimination",
+   "source": "HarmfulQ",
+   "sha256": "6e528221cade462b2ec4331b7cfab8ff4c844f7ec68e8bf9f49bc41065856818"
+  },
+  {
+   "id": 86,
+   "category": "Hate, harassment and discrimination",
+   "source": "OpenAI System Card",
+   "sha256": "b828697d4402f183aecfa886732c46a9bd2ad43c5b624a7eb4cacd3cec2b0487"
+  },
+  {
+   "id": 87,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "e748cac60d32390d013f2885876f634435f6d97452db28c03fb23edcfc14ca7a"
+  },
+  {
+   "id": 88,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "1292b0077d79cc56927687395e0a7218b99821a40184e4be965f68c45b842853"
+  },
+  {
+   "id": 89,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "3835bcf0720cab9fd9c698d736d428ddbbcfb946a8f8703209e1eed6e6d80062"
+  },
+  {
+   "id": 90,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "cca5199f80e0229d7d9015b0e9e460ee4132d47913e3a4abe7295f058d0f16d0"
+  },
+  {
+   "id": 91,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "4a61dbc203ead83b1337b3523dbd0b7885e49a0d7ea8d61ec927fac68071b828"
+  },
+  {
+   "id": 92,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "ae60458e074f1f518208b8bcd86c11e88cd4419f9684fd19ccf16b529407a15a"
+  },
+  {
+   "id": 93,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "c2ebfcb17a4555e94d4ae432f317173c419c9fee75d9a39c63c019e65fd0b060"
+  },
+  {
+   "id": 94,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "4d037525bfeadff44df81b94e0cd4e40a27faf50cfc4021eb8cdbcfc990747ff"
+  },
+  {
+   "id": 95,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "5ab67e6d6cc9f16a90e14567fd90089b9ee8b06a9e81cdebfd0fecec03306b9d"
+  },
+  {
+   "id": 96,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "a409b0f6c14ff30106e3296f876f755460c1a6092e0fe35169b2ac7806d689ab"
+  },
+  {
+   "id": 97,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "b86a02d2a7b7e8543ab1e739a99169589d785f05f1643ac4ac4e19a22413b52e"
+  },
+  {
+   "id": 98,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "5e898c8f9fb1e7b9c66c95f74e2b2f6b5792e500c74302fcbb1edb38248b9aa2"
+  },
+  {
+   "id": 99,
+   "category": "Hate, harassment and discrimination",
+   "source": "custom",
+   "sha256": "8198d5571bb31ed445d300e4329fa1e6df12dbdfe08c5f9ea5fff803849391ac"
+  },
+  {
+   "id": 100,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "41203be479142880c19e3fa1f45ec9163fe7553dc66f61a865a2cf8389d0fa81"
+  },
+  {
+   "id": 101,
+   "category": "Illegal goods and services",
+   "source": "DAN",
+   "sha256": "e2b1a519b216ca3f2e1202bb2bdea69a10fec1092a77e1195f78011c2a69095d"
+  },
+  {
+   "id": 102,
+   "category": "Illegal goods and services",
+   "source": "DAN",
+   "sha256": "19bb2cbfdaaf9d5b9d6f4300fdbbecacfe5fe9612fd5016882ef75a9f3452819"
+  },
+  {
+   "id": 103,
+   "category": "Illegal goods and services",
+   "source": "AdvBench",
+   "sha256": "ca82835930490fd7afa869fd4fa2453fac18cde1f105ca1d2986dac99cd6e8aa"
+  },
+  {
+   "id": 104,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "48af39e72aeab7f33e186a5d9d658cf09f9c385d63777a28216578735bd34257"
+  },
+  {
+   "id": 105,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "755fbb974cc87f6b7349b478282e1f6968b9b7b2bb7914bd9740ba319d2c18d5"
+  },
+  {
+   "id": 106,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "1e8817ffd0e8aede0e452ae1e11a99cabbabf33ce9aa054c141fb027193de0e3"
+  },
+  {
+   "id": 107,
+   "category": "Illegal goods and services",
+   "source": "DAN",
+   "sha256": "5f9e2b799ed4a2c6cabffdd938f276a458ed0185fd90cb805515df25a2b858e6"
+  },
+  {
+   "id": 108,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "2ec8e8cc2298ca50e46a338853c71abc862a8b000fc602db2848ea7377d67527"
+  },
+  {
+   "id": 109,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "033368c780415e96163a68715dfa44cccdaf244da5ffda85a4436e57ba2802d2"
+  },
+  {
+   "id": 110,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "bc36d5bf277bf13be2714d6a79457bb249d6f69102358ca4541afc2b5c9c3f4b"
+  },
+  {
+   "id": 111,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "e06ea5c88af5ecd56bad3172bb197a1ae5425e975343abb17b4ef6e00f5c4287"
+  },
+  {
+   "id": 112,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "a9478823c5f8dd3801e97e4d2b982c08c61ef970ae11f9ca43b77ad59aecc8a0"
+  },
+  {
+   "id": 113,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "8eac39a418d29777f9fbdd5751ab961f9c18b8c8e13b3daee94bd8be41d12159"
+  },
+  {
+   "id": 114,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "3a0e5e66a363ff3a93811c5f960686c5acbd915d32cbcaafa1142abb52edfc95"
+  },
+  {
+   "id": 115,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "1d5fe70e08d01a259712175d8342724d04aa6134e00b4a334908c775cfa17c46"
+  },
+  {
+   "id": 116,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "96ae012f5698ff3f0e9e1e744102f877b1e96e4d96c1ad1fd076ebc76420d467"
+  },
+  {
+   "id": 117,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "2062132e2056f22e1788b27ed3a7f2c2936b4cdb9939077665ce638edb6324c0"
+  },
+  {
+   "id": 118,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "0dbe557436c220d89f2c89f22e84e7bf33b04b59b6eb18092f530a6dd20ef634"
+  },
+  {
+   "id": 119,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "0ec27650744dc991034d1152e36e1898782188c902323e1c520fe42e6fd822f6"
+  },
+  {
+   "id": 120,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "33585771c09394a022cf97a7497b2663f8ab8a6e71336b69d68952ece4c355bd"
+  },
+  {
+   "id": 121,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "2dd585f6b243613deb91991433b0f404bf42f99863e7f1fd2401d7734e8dffec"
+  },
+  {
+   "id": 122,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "b43bfa23228edcffb4de29da2403110749815eb07619182eee3340bde9e85cb1"
+  },
+  {
+   "id": 123,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "9f19cc4ba4179b39d145cbceb00f2e593c58dedfd22f430e0f476cce6f325453"
+  },
+  {
+   "id": 124,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "b473af8465dfda6f06e8e578957d7ba2467b3dcacd30649828e7fc7fb9063957"
+  },
+  {
+   "id": 125,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "137142fbc524350e1ef6b9855a6537b078bc25f4cb2251192c78e921264bd0ad"
+  },
+  {
+   "id": 126,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "c885e74faae7640c825fe91eb0f461230805ff5a72489538645ebfce7f6e518c"
+  },
+  {
+   "id": 127,
+   "category": "Illegal goods and services",
+   "source": "MasterKey",
+   "sha256": "c5d6a383bd20293783b141b0d72b11b110f775df3ce715b29d87dfbae83bcd66"
+  },
+  {
+   "id": 128,
+   "category": "Illegal goods and services",
+   "source": "MaliciousInstruct",
+   "sha256": "06fe463ea5c165476e25847571449254fd6eac806ca65fd0b0e89cb6c60d6f95"
+  },
+  {
+   "id": 129,
+   "category": "Illegal goods and services",
+   "source": "MaliciousInstruct",
+   "sha256": "f76771a4a28517be0630d02bd1485772c162428a33b4d115b4ccf097b78f0783"
+  },
+  {
+   "id": 130,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "559f6a648158c1d695de8b896aa0be8ba10f7ec9bc551352e80bba2ccc751adc"
+  },
+  {
+   "id": 131,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "590fda394a028a8c919f6d14516c38f6b75ca3c341b1893ecd37315bd29f1bb8"
+  },
+  {
+   "id": 132,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "048c7fe3076ac3a56f6b938ea0a9c4faf981f74580256a97cdbd8bedc79d8275"
+  },
+  {
+   "id": 133,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "e10d8d4c3f3882ad4efa7c461de496566230e32481110b08dfc0e832afcdef0c"
+  },
+  {
+   "id": 134,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "ac3ed91f1a3ce34ea1975610c943617877799d624d3b9f6c7ca9dc8400fba776"
+  },
+  {
+   "id": 135,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "104782c7492a417d03d4ce2c29fddc71911253e380ab8096bb2310c470210b82"
+  },
+  {
+   "id": 136,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "69bc612c02b829061d74bfaa9bf188192d11aa24d06a2358f809aaac04776058"
+  },
+  {
+   "id": 137,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "29495757b57a9c6031833d8a3b7cc1c79758d7128ed4f77b51ae1b07e6d8a254"
+  },
+  {
+   "id": 138,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "45ed4921013e8900d002794a5664579c18ae6cf0c15ff71431b8f1af14614147"
+  },
+  {
+   "id": 139,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "97457e4d314bb3feffb70f28e0db7de32dd82abd777499ad641ff9180385e23a"
+  },
+  {
+   "id": 140,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "7b061b25607fa2ca2f6705b98a3649a4f6d69c44bbaf41455fb388f294f7d51f"
+  },
+  {
+   "id": 141,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "ce7f1e4f46fcc477732e80412d4ea6c00ff92dbbf352c2d750caa6c813a5af4f"
+  },
+  {
+   "id": 142,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "2ce48836e3e91f62afc0360bf267ef6c48134d7447584c3ffb3c2e2140cd05e8"
+  },
+  {
+   "id": 143,
+   "category": "Illegal goods and services",
+   "source": "AdvBench",
+   "sha256": "3cc4f56c00ca76e150c4b8df3333c94ba806a0f280b5b37d21e6e72c67908f7e"
+  },
+  {
+   "id": 144,
+   "category": "Illegal goods and services",
+   "source": "AdvBench",
+   "sha256": "5ad590a0468d4e900d1909aafbb8ff0b24eae05cf2cd1461df89f1052de41b77"
+  },
+  {
+   "id": 145,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "acd7e204fae57e993dd411dd4dfe6d0cd47edab4f9e9ea9a47b687479aea7b54"
+  },
+  {
+   "id": 146,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "777ec281da44db667db40c985ea2c36eb86d24b10b196605e560307fe1949100"
+  },
+  {
+   "id": 147,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "02bf74ebca32fc6c5a8d2ba19ab33dac077cd75669765cad1b736b7b548417a9"
+  },
+  {
+   "id": 148,
+   "category": "Illegal goods and services",
+   "source": "custom",
+   "sha256": "fb1dcc9e461355c1b52e6c53a7ed53ff4b305af1e77c637329975a38682b43a8"
+  },
+  {
+   "id": 149,
+   "category": "Illegal goods and services",
+   "source": "AdvBench",
+   "sha256": "620230d48df78d46e89db4676f7d4fef88549bb19fdf752fa5b460b00f2fcdb0"
+  },
+  {
+   "id": 150,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "0f7cfdc2936d9d7f8e79db931a63a43ec68c1b8b8d91903272a21db002553c01"
+  },
+  {
+   "id": 151,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "d75e26444f380d410dc1b5e24412d4f119c6b3df646f9e91d597538333748286"
+  },
+  {
+   "id": 152,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "fd7ecd06cef3c3038a7c7ab90440fc7067b944b94e724c3ef2d619ee3d431a51"
+  },
+  {
+   "id": 153,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "59edf02a372ccc9c8dfdb0511d74137d19518652c3a2bb56bdba49a4320246cd"
+  },
+  {
+   "id": 154,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "7431837d336d83372b83131d4469d374a9a25fd65a945623e960b6acf41f2356"
+  },
+  {
+   "id": 155,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "46fb3bd932e140aa20aba9bff5ca6b9a45e9ef02373fbbedce6d3af0482685f6"
+  },
+  {
+   "id": 156,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "07fbfcff45071bfd0b1e7b329af5982a29693cedbcf330fcab7df94a87fc592a"
+  },
+  {
+   "id": 157,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "5301de79dcccefa6bd3db7d54218fc14282dec31a196d228d1e49fc9ecd849d5"
+  },
+  {
+   "id": 158,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "25e034ae2983b538786630af7f259204de16dfbab9c722c8edb416ab77b2c354"
+  },
+  {
+   "id": 159,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "b016eb0cb61b6804e6a73bc78a37c5e5e3db1ab4a269e5bd1ebec0d59c86abf8"
+  },
+  {
+   "id": 160,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "e5c76fe0c97aa482a391f068af3303838816a5a43e48c989735dfdc2bde09072"
+  },
+  {
+   "id": 161,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "9aef876a012ea698cf96f518c20d801bc61e3e2d8e26223f51df75c5e43db101"
+  },
+  {
+   "id": 162,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "565f280c1d1f8c99770aac494198e05374f3804dd93b3bcde2d72d66ff14f2db"
+  },
+  {
+   "id": 163,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "29ea0eed9619b4f034a6f9aff70a98a1546f130e11ed647df0dc04bae2ae0567"
+  },
+  {
+   "id": 164,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "5c950625c90783fae23d3e6fb38bc8841dd32b88d27d364f750c13972010fa1e"
+  },
+  {
+   "id": 165,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "2ad1b8cd3f715e6830ab6bf7e1da5523b991a46487d1696bb4961378079ba3ac"
+  },
+  {
+   "id": 166,
+   "category": "Non-violent crimes",
+   "source": "MasterKey",
+   "sha256": "6f5eed9012f76c6c604f34e495682a15bf8f8f3531d7cb847e3fff276cebe256"
+  },
+  {
+   "id": 167,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "3662cec676fc4bd8c045aab5fa8f4a0bb1a2cb78f23e6f4b1741c7c7ceb00e2f"
+  },
+  {
+   "id": 168,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "aa5cce55b7a7514942bcf678a4f0749edf0546b5189d9079a175b3218e368312"
+  },
+  {
+   "id": 169,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "afdf56b9572cf60ce9dd22fbd3f38afca4662b5fc653929885dd93421ec749df"
+  },
+  {
+   "id": 170,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "cc41d7ab71edb7cf0d1a330999e9e518a0d73a7208ccab21eef12f0386c5a4f9"
+  },
+  {
+   "id": 171,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "1d0e07e56573d7a4717e2b1d23b4e561bdfdb3296df924819a8ca4476d066171"
+  },
+  {
+   "id": 172,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "93f4dcb267e91fc4b11c08a90992961e74536b5ea12f913fb91aed3645f7ab8f"
+  },
+  {
+   "id": 173,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "7ff34fdfb36f18c6beadd3200d1ff2aef3d2ddc926c29768bd63c6e85bae6338"
+  },
+  {
+   "id": 174,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "1f1cf4305328c861a6dd3fd66ae8f5385f11409d5ca67c1c601505f83f38dcac"
+  },
+  {
+   "id": 175,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "ff57ed6b4104eefed0ca497dfafc690b38424e4c8edb0ab6dc519c33a4b606d2"
+  },
+  {
+   "id": 176,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "94adde5ab5b4cc600392ecec498f24f0e6c0ba50248bac6854d1977e7e3a84b0"
+  },
+  {
+   "id": 177,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "476c2fa22dac1828df8105a4e143e7df801750320864db9b4e84fdf5f3e7fc0f"
+  },
+  {
+   "id": 178,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "39c5da2f68fdb130cb6caa069994139618bf9ee367f027c7eb1435855dfa116f"
+  },
+  {
+   "id": 179,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "19220d877e8510cac7d2b3243c01b3d82acac4ba794ce675b5c899f26b8f2727"
+  },
+  {
+   "id": 180,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "09c5155c7cad3865b689b72da69073a6690234146bf92fdf15687c55a7cd2dae"
+  },
+  {
+   "id": 181,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "4163c34532d0822a1ef96c484ee63d5f5bf2339c519d335dbb77c243ffe2241f"
+  },
+  {
+   "id": 182,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "97d62fcab7d9f5c77b45b7c2676f511c713aa1b2b10064876779381e0b7b84ac"
+  },
+  {
+   "id": 183,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "1b3d5b36640e30f99c7db735bfe308e15a89b9027f38e4ec4e68744c1c75c072"
+  },
+  {
+   "id": 184,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "ec804757c1eebef9b586d84c31c68d8766d0b7237dab834cd9db1beb2c2c3dbf"
+  },
+  {
+   "id": 185,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "9d6fe1be85a59b0adf134a228fad209bad185ceae4b66d4470be91e65a43e55e"
+  },
+  {
+   "id": 186,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "bfa3c74b6eb7fc2af6f8f1f16c437616c53ec8bc938d84d70e8eccca0c6ffe76"
+  },
+  {
+   "id": 187,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "4516e4833ed21589894d8d80a9eaf324d8a95e1abac8680b4117fef31558f5db"
+  },
+  {
+   "id": 188,
+   "category": "Non-violent crimes",
+   "source": "AdvBench",
+   "sha256": "66b97e7caee3ecff0785f688c5c64bb1c681d39748573020ce71036be7a684fc"
+  },
+  {
+   "id": 189,
+   "category": "Non-violent crimes",
+   "source": "MaliciousInstruct",
+   "sha256": "ceb85171accf12a40e6d54ca23f1234818173c7f6af9a00abdf047209ecd4648"
+  },
+  {
+   "id": 190,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "4b4feee76e65e1e6f20feca2bad0dcb295c3c9a29c9d0d99e212580a45673326"
+  },
+  {
+   "id": 191,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "04b8b852cbdc25c04330eeae79277fb8493d46d2da93f0717738fb03310cf20c"
+  },
+  {
+   "id": 192,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "b64e9233c4d95ec2bd331e4f27d808f40e811cb2c28aecc364b8ef03954c2efe"
+  },
+  {
+   "id": 193,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "317891d28fca1d61dd4c48c9d9d5244f7eaca3aa3e0cd257b7d477ca06540735"
+  },
+  {
+   "id": 194,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "ef9358a5e2d96b243078371fc610f85a696237614cc14ca40e850afce2db63c3"
+  },
+  {
+   "id": 195,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "9e18557343680dc73ae40bc7683cb09010d6e6beef747f77e40d7f87e2bc6c02"
+  },
+  {
+   "id": 196,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "8499bb0cb353b39851f73fe9a59fbfe506c5e7e4cb7fb68053c4acb5f0aad48a"
+  },
+  {
+   "id": 197,
+   "category": "Non-violent crimes",
+   "source": "DAN",
+   "sha256": "5e41558c85d77e0c9d569288f12253b9d4d345e201999fa1f57249d564f03d57"
+  },
+  {
+   "id": 198,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "cf5b7a055bde037c37a4a343fd9ca531838d64c3d08c6946d17a38b3a32cda1e"
+  },
+  {
+   "id": 199,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "7a42c42e1e0960aaaacbf5034523759029287b3178285cf6433d49781b6e23b9"
+  },
+  {
+   "id": 200,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "896c0a5aa328a380386a0ac8987e4eba732d57e9b1c8f8bb94492728764e0780"
+  },
+  {
+   "id": 201,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "0e6c3c2af0885005eb8efee7dd3d2d393140ebdcd397ba1b7302349dff866c9a"
+  },
+  {
+   "id": 202,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "a99a4712e06997948e7572123e80150671f9349f5392315edf93619575c0d8bf"
+  },
+  {
+   "id": 203,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "e2edec751a314d1ef399906c126fe206015d5b8e96acb205e9a98673472bf200"
+  },
+  {
+   "id": 204,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "a0f3e6f1bccc73be77fd8417f0f06ec161716811dd28cd2a4fb6596de87f73c3"
+  },
+  {
+   "id": 205,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "507dda06efe459f11241cf8682a2232b4e0ac7b1bd2be118abecf05a8746e3e9"
+  },
+  {
+   "id": 206,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "0319f8cada11f13a5ad83c531b11203d9eb878fd2413ef20c74c7a46cc6fba4c"
+  },
+  {
+   "id": 207,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "67ec67b5912492c21fa455b29ec876663c621f92baa92ac923ebe03d214bb430"
+  },
+  {
+   "id": 208,
+   "category": "Non-violent crimes",
+   "source": "custom",
+   "sha256": "79a9d4189cebf69279a837ad64e99c05b3b46adc6cce1eae54f5aaada09dfe49"
+  },
+  {
+   "id": 209,
+   "category": "Sexual content",
+   "source": "DAN",
+   "sha256": "7e2e4bb7f41d63a9b0dda3d5f913149aceedee4508de383d0b94822da9a4bc97"
+  },
+  {
+   "id": 210,
+   "category": "Sexual content",
+   "source": "DAN",
+   "sha256": "d4288b996db1ad1930578aee26bef1537e6142d00623c1bdc30bd35e2dd33c9e"
+  },
+  {
+   "id": 211,
+   "category": "Sexual content",
+   "source": "AdvBench",
+   "sha256": "d494bcd8bf636630424490c81601ce51e8f7fddbac6a025c376dde2f1f160f32"
+  },
+  {
+   "id": 212,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "6fa000d45a89e06b7e209d8102afa17465fd8990250ce81e88174d2125b35828"
+  },
+  {
+   "id": 213,
+   "category": "Sexual content",
+   "source": "AdvBench",
+   "sha256": "73fab3d44149b78d7d62d2f10ddf0ab6384d6cc55c8a3311144d5e4d376223b5"
+  },
+  {
+   "id": 214,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "27b75395d7eb60d10b8089d7963cf478e2154ee9f9c0e2fbbaf6eb74ee2b9d71"
+  },
+  {
+   "id": 215,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "834a7b9f85f1b49f599535169209cf8ceb9038fbd4116c4119d928fedceb942e"
+  },
+  {
+   "id": 216,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "3586f36c703ac9c637d361efd7900247807e1685c78cb5354d4ff57f3811a987"
+  },
+  {
+   "id": 217,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "7df28c13d959919e1d11a317e2a1c24c2010e0f8f28ca36efd7dde2d0025c7ec"
+  },
+  {
+   "id": 218,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "78f8a2390fda52aba2b7076164c79d577e6809c5af2a3570f8bcde3ed66a1852"
+  },
+  {
+   "id": 219,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "cf9933a768ad6b932328471eeb47aaf47d3536ccfb132ded4d4304c3fc0cd9e7"
+  },
+  {
+   "id": 220,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "4b920c454c8a950865000a6aeae0441e8312e6b1a4f615b7cd911ec9ed615860"
+  },
+  {
+   "id": 221,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "61ac89133b1a1bb86ab170932c85620280a40fd2fe439ee829687cc19418e64a"
+  },
+  {
+   "id": 222,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "14d4ba66c92f98f7cd0dcd3db8008875fb999c7a80b7a42c5c9ec5f9090c19c1"
+  },
+  {
+   "id": 223,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "5adf6d7f8b38399dfbeaae817518599733e8ff3a02f1ce8d331649dd33832582"
+  },
+  {
+   "id": 224,
+   "category": "Sexual content",
+   "source": "DAN",
+   "sha256": "67d101eb7a2a13d7db099250fd946b53287116090aa527c06ae7d5819e0bf499"
+  },
+  {
+   "id": 225,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "606b6694c56f046742278881737b31cb70895b5afb6e826fd3bac717935415e2"
+  },
+  {
+   "id": 226,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "ab218081af4325fc56099f0fd69bd5f2b696aa597a9ed83b67ba72e58dcf0387"
+  },
+  {
+   "id": 227,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "55b25613ea54c922f097d25276ac123aad3395f07536eab4f8cf3b13f36e6452"
+  },
+  {
+   "id": 228,
+   "category": "Sexual content",
+   "source": "MasterKey",
+   "sha256": "f52e3d95184e09627814ba76c15c56d127d14310680e905655dd7fe1fc1636d1"
+  },
+  {
+   "id": 229,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "b703d6f8c5d5ba95249f25490e9d87907eb67636b12ab6e3690b7d19948c0b17"
+  },
+  {
+   "id": 230,
+   "category": "Sexual content",
+   "source": "AdvBench",
+   "sha256": "64462b6c4e28b690033c8dd724ae4c138d8c2975edcdf9e5a982b5f9b18bc1f3"
+  },
+  {
+   "id": 231,
+   "category": "Sexual content",
+   "source": "AdvBench",
+   "sha256": "15e4c0c431db5d9bc8116df23a091a47a6321422901718035dc6d13064d73597"
+  },
+  {
+   "id": 232,
+   "category": "Sexual content",
+   "source": "AdvBench",
+   "sha256": "9ffff4edadd76d35ac833fced492f88a35d0e73d2ac6b186e0c85d8afe9dc1b7"
+  },
+  {
+   "id": 233,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "3ca861d618120cecb41edb0875dd098deaf43bd2bbd1357b092fe505f83dce63"
+  },
+  {
+   "id": 234,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "006579dccf9c5de106b8b239416dc62ae18af00b77078f80140e340883e01e18"
+  },
+  {
+   "id": 235,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "5f83ff70da8049ce304ef35d19eb6154a71462e8d1b386b2759c1adf5fee6028"
+  },
+  {
+   "id": 236,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "10c6f359bd7956f1b7b480ff3c430e03bc16d497a0a04672d540546cf860f18d"
+  },
+  {
+   "id": 237,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "f53cc77d68030541466dec73c97c00c22b34087e1c9631b6fffce518c77ca44c"
+  },
+  {
+   "id": 238,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "517410ec90a7b6d0466646858ecef05738daf9073d90ba91fca5fefd7c94ceef"
+  },
+  {
+   "id": 239,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "030d443f372e0fd091deb04fb73b2e196eaf8a34922dbfca292a4395c036f060"
+  },
+  {
+   "id": 240,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "ab4b5684f432b1271ec05d8e0b2403c760aa40be7300e36ccaa8e7286e7c1e91"
+  },
+  {
+   "id": 241,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "4269b67cb55d7dfd2bec28ee998cf580a408c8a1aec267e74b20d0def9bd5f3a"
+  },
+  {
+   "id": 242,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "30a14d41e1def1ae84fb608702b06e15baaf6b883f39ad46953e2f18014bf47c"
+  },
+  {
+   "id": 243,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "50c1e79e5bed4dce75a8c61b05a210e3ae3d3083e69ee8cf7abcdc765f82145a"
+  },
+  {
+   "id": 244,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "38a355d979b6269ca8923561fbc299edc3d04c763cc1cbdfc29ae59b97d6e34c"
+  },
+  {
+   "id": 245,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "00eca43704fd886c44b97939a1fcfc472c162b4ecbdb5a7a590a921f41a1557f"
+  },
+  {
+   "id": 246,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "c077a04ee17d5f5b99bf0d6e7c18b8768aee5e3e8c32214b2332bf72a1006084"
+  },
+  {
+   "id": 247,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "8a8ea4dafc8e57623889e95f3fc88dbcad46d6dbf2570a0ddddece5917a792f1"
+  },
+  {
+   "id": 248,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "8b090f5d31d87d7f90e6a81fface82a48f4d9717feac4fa1c4301cb288f8e780"
+  },
+  {
+   "id": 249,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "9aae4f802db2447242e38278a63bdeda077165062f3e3374570f96f7c1f68f4d"
+  },
+  {
+   "id": 250,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "389849587ae032e1dda6a50ae0e36f6b3491f98bffd6199e22947e5aee93dc3e"
+  },
+  {
+   "id": 251,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "28ed5d1d8cb05f8afa6862d03d764bf6c80456b3b9cb434a32ac0c38d92de706"
+  },
+  {
+   "id": 252,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "ecd59667ad1a5715293487eebfa619d5789cc1ec59473a3d8b237afe8787af40"
+  },
+  {
+   "id": 253,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "93b5a2eaa1e22245cb7806c0d29bff9b09b9502b41c53424b886710456a2efb0"
+  },
+  {
+   "id": 254,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "b8e47b213e3014b38f97134abb72815bc9258500dff04a79a3593ba6ba9612ef"
+  },
+  {
+   "id": 255,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "4a9734b2a135d13a9e7c3df20498e36b196e91f587e2e9ce87357a8532a62eb5"
+  },
+  {
+   "id": 256,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "78053299df797888404329385a014239f103281ebbb34532d0cd4ed3c87d2dea"
+  },
+  {
+   "id": 257,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "24a49975ebba6edaf2e218d556ff1932a204840f09c2b2cfb31ce2560bcd86c8"
+  },
+  {
+   "id": 258,
+   "category": "Sexual content",
+   "source": "custom",
+   "sha256": "5b64567df664c6c77f667a71d7fa5070e2862831aa54f871ccc27d5915123335"
+  },
+  {
+   "id": 259,
+   "category": "Violence",
+   "source": "AdvBench",
+   "sha256": "19b951d8eae6e9e8fdf75088fe6e3000825e8cfca075cd219824962493e682d4"
+  },
+  {
+   "id": 260,
+   "category": "Violence",
+   "source": "AdvBench",
+   "sha256": "7809f0cf80ddfe4c70edc2d1b980e4b3e2a7cda870e4344fb9670c4cac9960e1"
+  },
+  {
+   "id": 261,
+   "category": "Violence",
+   "source": "AdvBench",
+   "sha256": "fac3cf17700de492375f5ee8e77bdf055dcdbd40ef91a1704efc9f17b142b9a7"
+  },
+  {
+   "id": 262,
+   "category": "Violence",
+   "source": "DAN",
+   "sha256": "b87b89de9801cad05500dcb3fc22c546b0e7d509d54cdabe76ed7c1e9caa0a16"
+  },
+  {
+   "id": 263,
+   "category": "Violence",
+   "source": "DAN",
+   "sha256": "7b7105c2060c9807ef972d6e95010e632e741307926fce85ea08aadb0f4219d3"
+  },
+  {
+   "id": 264,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "7db58b101f0f5cea8310c104a33d3d13824160f5b441aa47e0a9d30fd1232738"
+  },
+  {
+   "id": 265,
+   "category": "Violence",
+   "source": "DAN",
+   "sha256": "4f52509253e3698c9f97e75636add963f8b72d1078fdd1f1f5d325171f864af2"
+  },
+  {
+   "id": 266,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "3351f324c6d4139f2e41d6d24402a79499d5e968af1731983d87fcd3d4632d0c"
+  },
+  {
+   "id": 267,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "14a93c753358bbdde7cc4b6a1bb0ff39981f56a05ef176266ac7c897fae7ebe6"
+  },
+  {
+   "id": 268,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "25eb3ba19feed82e175e3b141a9c7a05b7a6f58f17e34af1f716ee9e4d440c73"
+  },
+  {
+   "id": 269,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "58280f9fe712c2e1e1c5f8b681c68428ede8ccc57763e81196a59da64529e58f"
+  },
+  {
+   "id": 270,
+   "category": "Violence",
+   "source": "DAN",
+   "sha256": "675566821fb3fbf2a975e75a5a7f89c8b718be02ac237b97fe33dd18ba8f86c2"
+  },
+  {
+   "id": 271,
+   "category": "Violence",
+   "source": "OpenAI System Card",
+   "sha256": "ce09d2651ec2e211406b40338136929ce03e851029164be7e88d3132a33358eb"
+  },
+  {
+   "id": 272,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "b8119647e0e4259ad39d59503a539de23f6b585cda1073b44a528cf3f7449937"
+  },
+  {
+   "id": 273,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "46aeebc35226d22fc0745bdeb959a190c18b15b31705889c8cf87fc6db9bb53a"
+  },
+  {
+   "id": 274,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "a4323718889a5b6e8f8e6ae8290590c97722ee77ccca9c784388ca62a9fc0850"
+  },
+  {
+   "id": 275,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "a739bcc4d10ce9e1d8f9170637b4e48424faf6e9738a10bb5e3d917a28ae24f7"
+  },
+  {
+   "id": 276,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "e6fe156db1e96cdcef2c0752c161b483424be824308192e4d149d6aa04c916e5"
+  },
+  {
+   "id": 277,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "7b52ae00fa2a91e2443f735f61cfe4a32521c172c995d49a6bfb191b8f3ad7fd"
+  },
+  {
+   "id": 278,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "135a71deb81984b9445db5dd47e4a9194dbd80a317a3b583a87c09eb2a5a5658"
+  },
+  {
+   "id": 279,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "b05ad0d5a5f28434c9a4fcd45d94bb6bb0f82c34004c6d7e4fa4323df482f342"
+  },
+  {
+   "id": 280,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "211d884715f265cb91664a75931c1400a0c2a81a7fb62f0c4e9165486396313e"
+  },
+  {
+   "id": 281,
+   "category": "Violence",
+   "source": "AdvBench",
+   "sha256": "d32baecd73dd9f2af099fbb2fb3ab84652b19c599499a6506683525623cd9aef"
+  },
+  {
+   "id": 282,
+   "category": "Violence",
+   "source": "DAN",
+   "sha256": "ba9c55b4760cef3add7a276d562716a887214559dd255a6d5e79d1e493f5c6e3"
+  },
+  {
+   "id": 283,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "d758cb48ea6c1f35dcd02ed5828aae3c6f47d477451ebf89ec1df0408b407c34"
+  },
+  {
+   "id": 284,
+   "category": "Violence",
+   "source": "DAN",
+   "sha256": "b416537d66e8234df66529335a0876cb92c6e1c0eb64d6989a51550195703e0f"
+  },
+  {
+   "id": 285,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "a9bed0d5e1907120aa154ea095507fa83c96c51e8fd4fd7e9d2afb8e562d070e"
+  },
+  {
+   "id": 286,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "16d8a25d3af98797df0f189aeb1497ffcb20e1be37cb7fbd54e06e6ef3357617"
+  },
+  {
+   "id": 287,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "7c30b471b746bdc23453baad547106b90ef8df085979bef0583d77b119ab2cbe"
+  },
+  {
+   "id": 288,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "7bbe29615cc4e938e3cced27f86073d2223afef52cb7cec61f213fcb6f7ba1d4"
+  },
+  {
+   "id": 289,
+   "category": "Violence",
+   "source": "OpenAI System Card",
+   "sha256": "df2e714a567fcbc9777ebc7c9175527591529628b003582d178c89bd1f78eead"
+  },
+  {
+   "id": 290,
+   "category": "Violence",
+   "source": "AdvBench",
+   "sha256": "5bb2b9c4abf90ad4ca064b70f7b6d900aa7add9bd822c80e5d45a094b82c218f"
+  },
+  {
+   "id": 291,
+   "category": "Violence",
+   "source": "AdvBench",
+   "sha256": "4196d5e88443b98ece700bfa5e4a5aff7f7faa2dd6e371832f8626ba848dce1b"
+  },
+  {
+   "id": 292,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "a51718492c98933efed66d82f3eb29a17015de1922b8a9927799015f3aa47e61"
+  },
+  {
+   "id": 293,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "fe3c99e514a3029d04a5f8670943488967b8db1e11af480d27659f965548a789"
+  },
+  {
+   "id": 294,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "7eb799662d087aed85c5ca325ed50683c523bf75aedddda076d9d9f635e2feae"
+  },
+  {
+   "id": 295,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "70eb7eef1dc09b24420c697f379951ea3bc0bcf270b7720743adbef9ed1833e7"
+  },
+  {
+   "id": 296,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "76acab981fe857427638b36ef00e1b5068a2e04f7839041b4a8943d2aef3efe8"
+  },
+  {
+   "id": 297,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "4c573500a0b29da6f5547bf0062acd9d2258e842090e685d5ca417c1386af314"
+  },
+  {
+   "id": 298,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "dab52d8e87e0662aa9bbaf4867cf251cfd43e17a66b79c301cc5be53ab314767"
+  },
+  {
+   "id": 299,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "dc02aba432504f3b956c0799541c6d6a3867eb709cdbc1f825db4007b9c5b281"
+  },
+  {
+   "id": 300,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "924595b36b614616454b9cccbb1eb9a04a7d0c53fd27adc95ef8399912af8989"
+  },
+  {
+   "id": 301,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "bed75ce2d0f1f52d639a6a5b483403ae45f9fc076d85911fe7c67520bfcbf8a5"
+  },
+  {
+   "id": 302,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "e53a3bd6092f3045930d2068906fd136e6324911d3eb071fa2c1595205c9b3b8"
+  },
+  {
+   "id": 303,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "2d5ca36fb443177cc9168283384f93fee1d116d710986ed11101943153049b6d"
+  },
+  {
+   "id": 304,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "95441599bc4615df39b03c68561403712337db2914a8e55a30cbf239b686752b"
+  },
+  {
+   "id": 305,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "a678370a5208b6349a875de418df75e4c2844d58ccd06c3b198decd83d61a388"
+  },
+  {
+   "id": 306,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "5166ae6da8160aadfae2cc0c8fd0113bbc2ffe33a5993045eb74e67715d0b766"
+  },
+  {
+   "id": 307,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "a0592a0819dca1983ebcbe0ba52f4c5289cdc9a5b7d262217204f5ffc7dc5f5e"
+  },
+  {
+   "id": 308,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "90ddcbf484615ce2a7340f12744679fa2ddc32a6a4c96d750cfb72e32d5a4d35"
+  },
+  {
+   "id": 309,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "4c8cf45092f8081c5dc4c314bf25c69b3b27d73de978ef4f9f45c654fde8a246"
+  },
+  {
+   "id": 310,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "bc7e90e375451ca609682571fd47e20fa454cbe2af55619c8487d6dfbf4dcd2a"
+  },
+  {
+   "id": 311,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "deabaa5b7803f907a581a13664238de5ca1cd0253a0819f7ca2ad3a517c0a17f"
+  },
+  {
+   "id": 312,
+   "category": "Violence",
+   "source": "custom",
+   "sha256": "7a10fd55971d5ecc70721b1449a36d0b54a2c192aa119f5f76956e83267f38d7"
+  }
+ ]
+}
