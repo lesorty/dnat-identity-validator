@@ -167,7 +167,7 @@
    "marco": "G3",
    "objetivo": "Limitar as tentativas de quem ataca o Juiz: identidade cara (prova de trabalho) e cota por identidade gasta por veredito.",
    "titulo": "Identidade e cota",
-   "objetivoMaior": "O3"
+   "objetivoMaior": "O6"
   }
  ],
  "marcos": [
@@ -773,7 +773,8 @@
    "pronto": "Valores do pai registrados com o digest",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai"
+   "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai",
+   "teste": "TS1"
   },
   {
    "deps": [
@@ -787,7 +788,8 @@
    "pronto": "As duas checagens passam",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda"
+   "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
+   "teste": "TS1"
   },
   {
    "deps": [
@@ -802,7 +804,8 @@
    "pronto": "Minutos por configuração, 3 repetições",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)"
+   "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)",
+   "teste": "TS1"
   },
   {
    "deps": [
@@ -1120,7 +1123,8 @@
    "pronto": "Minutos por formato",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Medir o custo por formato"
+   "titulo": "Medir o custo por formato",
+   "teste": "TS1"
   },
   {
    "deps": [
@@ -1165,7 +1169,8 @@
    "pronto": "Limiar registrado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Fixar θ da segunda linha a FPR de 5% na calibração"
+   "titulo": "Fixar θ da segunda linha a FPR de 5% na calibração",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -1180,7 +1185,8 @@
    "pronto": "Faixa registrada e ligada à regra do T-107",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Definir a faixa de inconclusivo em torno do limiar"
+   "titulo": "Definir a faixa de inconclusivo em torno do limiar",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -1211,7 +1217,8 @@
    "pronto": "Arquivo revisado",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ"
+   "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -1225,7 +1232,8 @@
    "pronto": "Commit anterior ao primeiro teste",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Commitar o prereg.yaml antes de abrir qualquer conjunto de teste"
+   "titulo": "Commitar o prereg.yaml antes de abrir qualquer conjunto de teste",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -1254,7 +1262,8 @@
    "pronto": "4 vereditos esperados",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado"
+   "titulo": "Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado",
+   "teste": "TS1"
   },
   {
    "deps": [
@@ -1370,7 +1379,8 @@
    "pronto": "Testes passam",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Testes do contrato: aprovado, reprovado, revogação, reativação negada"
+   "titulo": "Testes do contrato: aprovado, reprovado, revogação, reativação negada",
+   "teste": "TS8"
   },
   {
    "deps": [
@@ -1384,7 +1394,8 @@
    "pronto": "Tabela de gás",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Medir o gás das novas funções (measure-gas.js)"
+   "titulo": "Medir o gás das novas funções (measure-gas.js)",
+   "teste": "TS7"
   },
   {
    "deps": [
@@ -1563,7 +1574,8 @@
    "pronto": "Fluxo completo numa máquina comum",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rodar o fluxo inteiro numa máquina comum, no modo direto, antes das CVMs"
+   "titulo": "Rodar o fluxo inteiro numa máquina comum, no modo direto, antes das CVMs",
+   "teste": "TS8"
   },
   {
    "atualizado": "2026-10-28T20:00:00.000Z",
@@ -1579,7 +1591,8 @@
    "pronto": "Tempo e custo por veredito com IC",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Medir overhead: VM comum × CVM, e CVM reaproveitada × CVM de uso único"
+   "titulo": "Medir overhead: VM comum × CVM, e CVM reaproveitada × CVM de uso único",
+   "teste": "TS7"
   },
   {
    "deps": [
@@ -1595,7 +1608,8 @@
    "pronto": "Teste ponta a ponta passa",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga"
+   "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga",
+   "teste": "TS8"
   },
   {
    "deps": [
@@ -1769,7 +1783,8 @@
    "pronto": "Lista versionada",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)"
+   "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -1784,7 +1799,8 @@
    "pronto": "População da segunda família",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Família não vista: repetir as receitas no modelo escolhido"
+   "titulo": "Família não vista: repetir as receitas no modelo escolhido",
+   "teste": "TS4"
   },
   {
    "deps": [
@@ -1799,7 +1815,8 @@
    "pronto": "4 derivados com digest",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos"
+   "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos",
+   "teste": "TS1"
   },
   {
    "deps": [
@@ -1813,7 +1830,8 @@
    "pronto": "Aprende ou não a codificação, com evidência",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Viabilidade do CMFT num 0,5B"
+   "titulo": "Viabilidade do CMFT num 0,5B",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -1972,7 +1990,8 @@
    "pronto": "Variação do FNR medida",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta"
+   "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta",
+   "teste": "TS6"
   },
   {
    "deps": [],
@@ -1984,7 +2003,8 @@
    "pronto": "Lista com origem de cada um",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF"
+   "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF",
+   "teste": "TS5"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -1999,7 +2019,8 @@
    "pronto": "≥ 20 em safetensors identificados",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Filtrar por formato (só safetensors) e pela base declarada"
+   "titulo": "Filtrar por formato (só safetensors) e pela base declarada",
+   "teste": "TS5"
   },
   {
    "deps": [
@@ -2014,7 +2035,8 @@
    "pronto": "Manifesto do campo",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Baixar e registrar digests, fora do git"
+   "titulo": "Baixar e registrar digests, fora do git",
+   "teste": "TS5"
   },
   {
    "deps": [
@@ -2028,7 +2050,8 @@
    "pronto": "Base confirmada por derivado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)"
+   "titulo": "Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)",
+   "teste": "TS5"
   },
   {
    "deps": [
@@ -2043,7 +2066,8 @@
    "pronto": "Rótulo por derivado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rotular o campo pela verdade de referência"
+   "titulo": "Rotular o campo pela verdade de referência",
+   "teste": "TS5"
   },
   {
    "deps": [
@@ -2058,7 +2082,8 @@
    "pronto": "Vereditos do campo",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Rodar o Juiz congelado no campo (teste cego)"
+   "titulo": "Rodar o Juiz congelado no campo (teste cego)",
+   "teste": "TS5"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -2089,7 +2114,8 @@
    "pronto": "Análise da RQ3",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)"
+   "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)",
+   "teste": "TS5"
   },
   {
    "atualizado": "2026-11-09T12:00:00.000Z",
@@ -2105,7 +2131,8 @@
    "pronto": "Documento do atacante",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Escrever o modelo do atacante e o orçamento de rodadas (o que vê e o que não vê)"
+   "titulo": "Escrever o modelo do atacante e o orçamento de rodadas (o que vê e o que não vê)",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2119,7 +2146,8 @@
    "pronto": "Papéis definidos",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Separar o guardião da bateria secreta do atacante (independência)"
+   "titulo": "Separar o guardião da bateria secreta do atacante (independência)",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2134,7 +2162,8 @@
    "pronto": "Receita e derivados",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3"
+   "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2148,7 +2177,8 @@
    "pronto": "Receita e derivados",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Ataque: treino contra o limiar usando o veredito binário"
+   "titulo": "Ataque: treino contra o limiar usando o veredito binário",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2163,7 +2193,8 @@
    "pronto": "Referência forjada que passa sem custódia",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Ataque: referência forjada (sem custódia)"
+   "titulo": "Ataque: referência forjada (sem custódia)",
+   "teste": "TS7"
   },
   {
    "deps": [
@@ -2177,7 +2208,8 @@
    "pronto": "Derivados ou limitação registrada",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Ataque: CMFT com codificação conhecida (se o T-915 for viável)"
+   "titulo": "Ataque: CMFT com codificação conhecida (se o T-915 for viável)",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2191,7 +2223,8 @@
    "pronto": "Derivados",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Ataque: recusa e depois atende (refuse-then-comply)"
+   "titulo": "Ataque: recusa e depois atende (refuse-then-comply)",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2205,7 +2238,8 @@
    "pronto": "Derivados",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Ataque: quantização condicionada (Egashira)"
+   "titulo": "Ataque: quantização condicionada (Egashira)",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2219,7 +2253,8 @@
    "pronto": "Resultado ou fora de escopo registrado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Ataque: prefill e abliteração de teste, se a interface do job permitir"
+   "titulo": "Ataque: prefill e abliteração de teste, se a interface do job permitir",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2234,7 +2269,8 @@
    "pronto": "Protocolo escrito",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas"
+   "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2250,7 +2286,8 @@
    "pronto": "Registro completo",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Rodar as rodadas e registrar escape × rodadas"
+   "titulo": "Rodar as rodadas e registrar escape × rodadas",
+   "teste": "TS6"
   },
   {
    "atualizado": "2026-11-09T12:00:00.000Z",
@@ -2265,7 +2302,8 @@
    "pronto": "Curva com os dados reais",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Modelo analítico 1 − (1 − e)^k com os números medidos"
+   "titulo": "Modelo analítico 1 − (1 − e)^k com os números medidos",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2279,7 +2317,8 @@
    "pronto": "Resultado com IC",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Ablação com e sem custódia (RQ5)"
+   "titulo": "Ablação com e sem custódia (RQ5)",
+   "teste": "TS7"
   },
   {
    "deps": [
@@ -2294,7 +2333,8 @@
    "pronto": "Código com teste",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Reimplementar os dois sinais de Hurtado com z-soma, sem custódia"
+   "titulo": "Reimplementar os dois sinais de Hurtado com z-soma, sem custódia",
+   "teste": "TS3"
   },
   {
    "deps": [
@@ -2309,7 +2349,8 @@
    "pronto": "Limiar registrado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Calibrar a linha de base com o mesmo protocolo"
+   "titulo": "Calibrar a linha de base com o mesmo protocolo",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -2323,7 +2364,8 @@
    "pronto": "Diferença documentada",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Conferir a reimplementação contra um caso publicado por Hurtado"
+   "titulo": "Conferir a reimplementação contra um caso publicado por Hurtado",
+   "teste": "TS3"
   },
   {
    "deps": [
@@ -2337,7 +2379,8 @@
    "pronto": "Vereditos da linha de base",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rodar a linha de base em todas as divisões"
+   "titulo": "Rodar a linha de base em todas as divisões",
+   "teste": "TS3"
   },
   {
    "deps": [],
@@ -2392,7 +2435,8 @@
    "pronto": "Plano de execução gerado do prereg.yaml",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Seeds e repetições por configuração, conforme o pré-registro"
+   "titulo": "Seeds e repetições por configuração, conforme o pré-registro",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -2406,7 +2450,8 @@
    "pronto": "Funções com teste",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Bootstrap e IC para TPR, FPR, AUROC e liberação silenciosa"
+   "titulo": "Bootstrap e IC para TPR, FPR, AUROC e liberação silenciosa",
+   "teste": "TS3"
   },
   {
    "deps": [
@@ -2421,7 +2466,8 @@
    "pronto": "Tabela da RQ1",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base"
+   "titulo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base",
+   "teste": "TS3"
   },
   {
    "deps": [
@@ -2435,7 +2481,8 @@
    "pronto": "Figura da RQ2",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "RQ2: curvas de cobertura × quantidade de falha"
+   "titulo": "RQ2: curvas de cobertura × quantidade de falha",
+   "teste": "TS3"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -2450,7 +2497,8 @@
    "pronto": "Tabela ou figura da RQ3",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "RQ3: injeção × campo (safetensors)"
+   "titulo": "RQ3: injeção × campo (safetensors)",
+   "teste": "TS5"
   },
   {
    "deps": [
@@ -2464,7 +2512,8 @@
    "pronto": "Figura da RQ4",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "RQ4: escape × rodadas"
+   "titulo": "RQ4: escape × rodadas",
+   "teste": "TS6"
   },
   {
    "deps": [
@@ -2479,7 +2528,8 @@
    "pronto": "Tabela da RQ5",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "RQ5: ablação dos sinais e da custódia; custo por veredito"
+   "titulo": "RQ5: ablação dos sinais e da custódia; custo por veredito",
+   "teste": "TS7"
   },
   {
    "deps": [
@@ -2539,7 +2589,8 @@
    "pronto": "Nenhum derivado ou item repetido",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Checar vazamento entre calibração e teste"
+   "titulo": "Checar vazamento entre calibração e teste",
+   "teste": "TS2"
   },
   {
    "deps": [
@@ -2553,7 +2604,8 @@
    "pronto": "Horas de CPU e US$",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Relatório de custo total da campanha"
+   "titulo": "Relatório de custo total da campanha",
+   "teste": "TS7"
   },
   {
    "deps": [],
@@ -3058,7 +3110,8 @@
    "pronto": "Testes passam",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Testes da identidade e da cota"
+   "titulo": "Testes da identidade e da cota",
+   "teste": "TS9"
   },
   {
    "atualizado": "2026-11-09T12:00:00.000Z",
@@ -3075,7 +3128,8 @@
    "pronto": "Custo por escape e por aprovação com números medidos",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Modelo de custo do ataque com identidades e cota"
+   "titulo": "Modelo de custo do ataque com identidades e cota",
+   "teste": "TS6"
   },
   {
    "atualizado": "2026-11-09T12:00:00.000Z",
@@ -3147,6 +3201,123 @@
    "pronto": "Resumo em 25/11 e submissão em 02/12, com o rascunho aos coautores antes.",
    "defende": "a tese inteira",
    "marco": "SUB"
+  },
+  {
+   "id": "O6",
+   "ordem": 6,
+   "nome": "Identidades no sistema",
+   "curto": "identidade",
+   "pronto": "Toda ação externa vem de uma identidade registrada com prova de trabalho e assinada; cada veredito gasta a cota da identidade, e o id dela vai no recibo.",
+   "defende": "A4; limita quantas vezes quem ataca tenta",
+   "marco": "G3"
+  },
+  {
+   "id": "TS1",
+   "tipo": "teste",
+   "numero": 1,
+   "ordem": 11,
+   "nome": "Sanidade e custo do Juiz",
+   "pai": "O1",
+   "marco": "G1",
+   "amostra": "o base duas vezes, 1 abliterado público, e o piloto (2 abliterações, 2 LoRA benignos)",
+   "pronto": "Repetir o base não muda as medidas, o abliterado público muda, e o veredito inteiro, com o avaliador, cabe em 80 min em 4 vCPU.",
+   "rq": "G1"
+  },
+  {
+   "id": "TS2",
+   "tipo": "teste",
+   "numero": 2,
+   "ordem": 12,
+   "nome": "Calibração e pré-registro",
+   "pai": "O2",
+   "marco": "G2",
+   "amostra": "70 derivados de calibração (40 H, 30 C), seeds A",
+   "pronto": "δ, θ da segunda linha e a faixa de inconclusivo fixados só com a calibração, e o prereg.yaml commitado antes de abrir o teste.",
+   "rq": "R14"
+  },
+  {
+   "id": "TS3",
+   "tipo": "teste",
+   "numero": 3,
+   "ordem": 13,
+   "nome": "Detecção por classe de falha",
+   "pai": "O4",
+   "marco": "G4",
+   "amostra": "~105 derivados de teste (60 H, 45 C), seeds B",
+   "pronto": "Liberação silenciosa e falso alarme por classe (TPR a FPR 5%, com IC), contra a linha de base de Hurtado, e curvas por quantidade de falha.",
+   "rq": "RQ1, RQ2"
+  },
+  {
+   "id": "TS4",
+   "tipo": "teste",
+   "numero": 4,
+   "ordem": 14,
+   "nome": "Família não vista",
+   "pai": "O4",
+   "marco": "G4",
+   "amostra": "90 derivados (60 H, 30 C) de outra família",
+   "pronto": "Os limiares calibrados no Qwen2.5-0.5B, sem recalibrar, mantêm o desempenho em outra família de modelo.",
+   "rq": "RQ1, generalização"
+  },
+  {
+   "id": "TS5",
+   "tipo": "teste",
+   "numero": 5,
+   "ordem": 15,
+   "nome": "Campo cego",
+   "pai": "O4",
+   "marco": "G4",
+   "amostra": "≥ 20 derivados públicos em safetensors",
+   "pronto": "O Juiz congelado julga derivados reais que nunca viu, rotulados pela verdade de referência, e as distribuições de S1–S3 são comparadas com as injeções.",
+   "rq": "RQ3"
+  },
+  {
+   "id": "TS6",
+   "tipo": "teste",
+   "numero": 6,
+   "ordem": 16,
+   "nome": "Atacante adaptativo",
+   "pai": "O4",
+   "marco": "G4",
+   "amostra": "~15 derivados F4, em rodadas de bounty interno",
+   "pronto": "Taxa de escape por rodada contra quem conhece o Juiz e a parte pública da bateria, e o custo esperado de um escape com a cota por identidade.",
+   "rq": "RQ4"
+  },
+  {
+   "id": "TS7",
+   "tipo": "teste",
+   "numero": 7,
+   "ordem": 17,
+   "nome": "Ablação e custo",
+   "pai": "O4",
+   "marco": "G4",
+   "amostra": "a população de teste, sem custódia e sem cada sinal",
+   "pronto": "A referência forjada passa sem custódia e é barrada com ela; o efeito de tirar cada sinal; o custo por veredito na CVM e o do recibo.",
+   "rq": "RQ5"
+  },
+  {
+   "id": "TS8",
+   "tipo": "teste",
+   "numero": 8,
+   "ordem": 18,
+   "nome": "Ponta a ponta no DNAT",
+   "pai": "O3",
+   "marco": "G3",
+   "amostra": "1 derivado reprovado, 1 aprovado, 1 revogação em cascata",
+   "pronto": "O reprovado não sai, o aprovado vira ativo com recibo que um auditor confere pelos hashes, e o operador revoga um aprovado e um base.",
+   "rq": "C1, G3"
+  },
+  {
+   "id": "TS9",
+   "tipo": "teste",
+   "numero": 9,
+   "ordem": 19,
+   "nome": "Identidade e cota",
+   "pai": "O6",
+   "marco": "G3",
+   "amostra": "registro válido e inválido, pedido sem assinatura, cota esgotada",
+   "pronto": "Prova de trabalho válida registra e inválida é recusada; pedido sem assinatura é recusado; reprovados esgotam a cota e o job seguinte é negado.",
+   "rq": "A4"
   }
  ]
 }

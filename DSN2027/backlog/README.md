@@ -33,7 +33,7 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
 
 ## Objetivos maiores (11/11)
 
-Cada task serve a um de cinco objetivos, que ligam o trabalho à meta (submeter ao DSN 2027 em
+Cada task serve a um de seis objetivos, que ligam o trabalho à meta (submeter ao DSN 2027 em
 02/12) e às afirmações do artigo. O objetivo vem do épico; as tasks da J16 (gestão) têm o seu
 próprio. O quadro mostra o objetivo em cada cartão e filtra por ele.
 
@@ -41,9 +41,25 @@ próprio. O quadro mostra o objetivo em cada cartão e filtra por ele.
 |---|---|---|---|
 | **O1** Um Juiz que mede e cabe | O S1 separa um abliterado do base, e o veredito inteiro cabe em 80 min em 4 vCPU (G1) | A5 | J1–J5 |
 | **O2** Um Juiz calibrado e congelado | População com rótulos independentes; δ e limiares fixados; `prereg.yaml` commitado (G2) | A1, A5 | J6, J9, J10 |
-| **O3** O Juiz dentro do DNAT | Reprovado não sai; aprovado vira ativo com recibo; revogação em cascata (G3) | C1, A3 | J7, J8, J17 |
+| **O3** O Juiz dentro do DNAT | Reprovado não sai; aprovado vira ativo com recibo; revogação em cascata (G3) | C1, A3 | J7, J8 |
 | **O4** Respostas às RQ1–RQ5 | Campanha com IC, campo cego, atacante adaptativo, linha de base e ablação (G4) | C2, A3–A5 | J11–J14 |
 | **O5** Artigo submetido | Resumo em 25/11 e submissão em 02/12 | a tese | J15 |
+| **O6** Identidades no sistema | Toda ação externa vem de uma identidade com prova de trabalho e assinada; cada veredito gasta a cota, e o id vai no recibo (G3) | A4 | J17 |
+
+O J17 saiu do O3 para o O6. As tasks que executam ou analisam um teste levam também o número
+dele (campo `teste`). Os testes, na ordem em que rodam:
+
+| # | Teste | Objetivo | Responde | Amostra |
+|---|---|---|---|---|
+| 1 | Sanidade e custo do Juiz | O1 | G1 | o base duas vezes, 1 abliterado público e o piloto |
+| 2 | Calibração e pré-registro | O2 | R14 | 70 derivados (40 H, 30 C), seeds A |
+| 3 | Detecção por classe de falha | O4 | RQ1, RQ2 | ~105 derivados (60 H, 45 C), seeds B |
+| 4 | Família não vista | O4 | RQ1 | 90 derivados de outra família |
+| 5 | Campo cego | O4 | RQ3 | ≥ 20 derivados públicos em safetensors |
+| 6 | Atacante adaptativo | O4 | RQ4 | ~15 derivados F4 em rodadas |
+| 7 | Ablação e custo | O4 | RQ5 | a população de teste |
+| 8 | Ponta a ponta no DNAT | O3 | C1, G3 | 1 reprovado, 1 aprovado, 1 revogação |
+| 9 | Identidade e cota | O6 | A4 | registro válido e inválido, cota esgotada |
 
 ## Andamento (09/11)
 
