@@ -109,7 +109,80 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
 .scrim { position: fixed; inset: 0; background: #000; opacity: .35; z-index: 19; }
 [hidden] { display: none !important; }
 
+/* abas Quadro / Decisões */
+.views { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.views button { border: 0; background: none; padding: 8px 14px 9px; cursor: pointer; font-family: var(--f-display); font-weight: 600; font-size: .95rem; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.views button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.views button .n { font-family: var(--f-mono); font-size: .72rem; margin-left: 6px; color: var(--muted); }
+
+/* registro de decisões: uma pergunta por task; abre para mostrar cada decisão */
+.dec { display: grid; gap: 14px; max-width: 980px; }
+.dec-intro { color: var(--muted); max-width: 70ch; margin: 0; }
+.dec-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .78rem; color: var(--muted); align-items: center; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 5px; vertical-align: 0; }
+.q { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.q > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 6px 14px; align-items: center; }
+.q > summary::-webkit-details-marker { display: none; }
+.q > summary:hover { background: var(--soft); }
+.q[open] > summary { border-bottom: 1px solid var(--line); }
+.q .tid { font-family: var(--f-mono); font-weight: 700; font-size: .78rem; background: var(--ink); color: var(--on-ink); border-radius: 5px; padding: 2px 7px; align-self: start; margin-top: 3px; }
+.q .qt { font-family: var(--f-display); font-weight: 600; font-size: 1.08rem; line-height: 1.3; text-wrap: balance; min-width: 0; }
+.q .qs { font-size: .8rem; color: var(--muted); margin-top: 3px; }
+.q .qr { display: grid; justify-items: end; gap: 6px; }
+.pill { font-size: .72rem; font-weight: 700; border-radius: 999px; padding: 2px 9px; background: var(--c); color: var(--tc, var(--on-solid)); white-space: nowrap; }
+.bar { display: flex; width: 120px; height: 7px; border-radius: 4px; overflow: hidden; background: var(--soft); }
+.bar i { display: block; height: 100%; }
+.q-body { padding: 16px; display: grid; gap: 16px; }
+.q-body h3 { font-family: var(--f-display); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+.q-body p { margin: 0; max-width: 72ch; }
+.answer { border-left: 4px solid var(--done); background: var(--soft); border-radius: 0 8px 8px 0; padding: 10px 14px; }
+.answer.partial { border-left-color: var(--p1); }
+.answer.none { border-left-color: var(--cut); }
+.items { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.item { display: grid; grid-template-columns: 4px 1fr; background: var(--panel); }
+.item + .item { border-top: 1px solid var(--line); }
+.item > .s { background: var(--c); }
+.item > .c { padding: 10px 14px; display: grid; gap: 4px; min-width: 0; }
+.item .iq { font-weight: 700; font-size: .9rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; justify-content: space-between; }
+.item .iq .tag { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--c); }
+.item .ir { font-size: .9rem; }
+.item .ir.vazio { color: var(--muted); font-style: italic; }
+.item .why, .item .alt, .item .src { font-size: .82rem; color: var(--muted); }
+.item .why b, .item .alt b { color: var(--fg); font-weight: 600; }
+.item .alt ul { margin: 2px 0 0; padding-left: 18px; }
+.item .src { font-family: var(--f-mono); font-size: .72rem; }
+.todo { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.q-foot { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* objetivos: o que cada épico e cada task ajudam a atingir */
+.goal { display: grid; gap: 4px; }
+.goal p { margin: 0; max-width: 90ch; font-size: .9rem; }
+.goal b { font-family: var(--f-display); }
+.objs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.obj { text-align: left; cursor: pointer; background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--ink); border-radius: 9px; padding: 10px 12px; display: grid; gap: 5px; align-content: start; min-width: 0; }
+.obj:hover { border-color: var(--ink); }
+.obj[aria-pressed="true"] { border-color: var(--accent); border-top-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 var(--glow) -4px var(--accent); }
+.obj .oh { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.obj .oid { font-family: var(--f-mono); font-size: .72rem; font-weight: 700; background: var(--ink); color: var(--on-ink); border-radius: 4px; padding: 1px 6px; }
+.obj[aria-pressed="true"] .oid { background: var(--accent); color: var(--on-solid); }
+.obj .on { font-family: var(--f-display); font-weight: 700; font-size: .95rem; line-height: 1.2; }
+.obj .op { font-size: .78rem; color: var(--muted); line-height: 1.35; }
+.obj .od { font-size: .74rem; color: var(--fg); }
+.obj .od span { color: var(--muted); }
+.obj .obar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--soft); }
+.obj .obar i { display: block; height: 100%; }
+.obj .on2 { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.b-obj { font-family: var(--f-mono); font-size: .68rem; font-weight: 700; padding: 0 6px; border-radius: 4px; border: 1px solid var(--accent); color: var(--fg); line-height: 1.5; white-space: nowrap; }
+.b-obj.none { border-color: var(--line); color: var(--muted); }
+.d-obj { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 8px 10px; font-size: .82rem; display: grid; gap: 2px; }
+.d-obj b { font-family: var(--f-display); }
+.d-obj span { color: var(--muted); }
+@media (max-width: 1100px) { .objs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .objs { grid-template-columns: minmax(0, 1fr); } }
+
 @media (max-width: 700px) {
+  .q > summary { grid-template-columns: auto 1fr; }
+  .q .qr { grid-column: 1 / -1; justify-items: start; grid-auto-flow: column; align-items: center; }
   .board { grid-template-columns: repeat(5, 84vw); }
   .toolbar input[type="search"] { width: 100%; }
   .drawer .row2 { grid-template-columns: 1fr; }
@@ -131,10 +204,19 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
     </div>
   </header>
 
+  <nav class="views" role="tablist" aria-label="Visões">
+    <button type="button" role="tab" id="tabQuadro" data-v="quadro" aria-selected="true">Quadro</button>
+    <button type="button" role="tab" id="tabDecisoes" data-v="decisoes" aria-selected="false">Decisões<span class="n" id="decCount"></span></button>
+  </nav>
+
+  <div id="vQuadro" style="display:contents">
+  <section class="goal" id="goal" aria-label="Meta"></section>
+  <section class="objs" id="objs" aria-label="Objetivos"></section>
   <section class="rail" aria-label="Marcos"><ol id="rail"></ol></section>
 
   <section class="toolbar" aria-label="Filtros">
     <input type="search" id="q" placeholder="Buscar por ID ou texto" aria-label="Buscar">
+    <select id="fObj" aria-label="Objetivo"></select>
     <select id="fFase" aria-label="Fase"></select>
     <select id="fEpico" aria-label="Épico"></select>
     <select id="fMarco" aria-label="Marco"></select>
@@ -153,6 +235,17 @@ select, input[type="text"], input[type="search"], textarea { background: var(--p
   <section class="epics" id="epics" aria-label="Épicos"></section>
 
   <div class="board-scroll"><section class="board" id="board" aria-label="Quadro"></section></div>
+  </div>
+
+  <section class="dec" id="vDecisoes" hidden aria-label="Decisões por task">
+    <p class="dec-intro">Cada task do backlog que pede uma decisão vira uma pergunta. Abra a pergunta para ver o que estava em jogo, o que foi decidido, as alternativas descartadas e o que ainda falta.</p>
+    <div class="dec-legend">
+      <span><span class="dot" style="--c:var(--done)"></span>fechada</span>
+      <span><span class="dot" style="--c:var(--p1)"></span>provisória: segue a recomendação até revisão</span>
+      <span><span class="dot" style="--c:var(--cut)"></span>em aberto</span>
+    </div>
+    <div id="decList" class="dec"><p class="msg">Carregando as decisões…</p></div>
+  </section>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -178,9 +271,9 @@ const SIZES = [
   { k: "G", n: "G · cerca de 4 h", h: 4, c: "var(--sG)" }
 ];
 const PHASES = { 1: "Conceber o Juiz", 2: "Construir o Juiz", 3: "O Juiz dentro do DNAT", 4: "Avaliar o Juiz", 5: "Transversais" };
-const S = { epicos: [], tasks: [], marcos: [] };
+const S = { epicos: [], tasks: [], marcos: [], decisoes: [], objetivos: [] };
 let db = null, readOnly = false, dragId = null, deferRender = false, editing = null;
-const F = { q: "", fase: "", epico: "", marco: "", prio: "", tam: "", sort: "manual", livres: false };
+const F = { q: "", obj: "", fase: "", epico: "", marco: "", prio: "", tam: "", sort: "manual", livres: false };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const num = id => parseInt(String(id).replace(/\D/g, ""), 10) || 0;
@@ -198,9 +291,14 @@ const pending = t => (t.deps || []).filter(d => { const x = byId(d); return x &&
 const sortedMarcos = () => [...S.marcos].sort((a, b) => (a.data || "").localeCompare(b.data || ""));
 const sortedEpicos = () => [...S.epicos].sort((a, b) => num(a.id) - num(b.id));
 const sumH = ts => ts.reduce((a, t) => a + hours(t), 0);
+/* objetivo maior: o da task, se ela tiver um próprio; senão, o do épico */
+const objList = () => S.objetivos.filter(o => o.tipo !== "meta").sort((a, b) => (a.ordem ?? num(a.id)) - (b.ordem ?? num(b.id)));
+const objIdOf = t => t.objetivoMaior || epicOf(t)?.objetivoMaior || "";
+const objOf = t => S.objetivos.find(o => o.id === objIdOf(t));
 
 function visible(t) {
   const e = epicOf(t);
+  if (F.obj && objIdOf(t) !== F.obj) return false;
   if (F.epico && t.epico !== F.epico) return false;
   if (F.fase && String(e?.fase) !== F.fase) return false;
   if (F.marco && t.marco !== F.marco) return false;
@@ -231,8 +329,28 @@ function renderRail() {
   }).join("");
 }
 
+function renderObjs() {
+  const meta = S.objetivos.find(o => o.tipo === "meta");
+  $("goal").innerHTML = meta ? `<div class="label">O que queremos</div><p><b>${esc(meta.nome)}</b> ${esc(meta.texto || "")}</p>` : "";
+  $("objs").innerHTML = objList().map(o => {
+    const ts = S.tasks.filter(t => objIdOf(t) === o.id && st(t) !== "cortada");
+    const all = sumH(ts), dn = sumH(ts.filter(t => st(t) === "feito")), dg = sumH(ts.filter(t => st(t) === "em andamento"));
+    const p0 = sumH(ts.filter(t => prio(t) === "P0" && st(t) !== "feito"));
+    const m = S.marcos.find(x => x.id === o.marco);
+    const w = n => all ? n / all * 100 : 0;
+    return `<button type="button" class="obj" data-o="${esc(o.id)}" aria-pressed="${F.obj === o.id}">
+      <span class="oh"><span class="oid">${esc(o.id)}</span><span class="on">${esc(o.nome)}</span></span>
+      <span class="op"><b>Pronto quando:</b> ${esc(o.pronto || "")}</span>
+      <span class="od"><span>Defende</span> ${esc(o.defende || "")}${m ? ` <span>· marco</span> ${esc(m.id)} ${m.data ? esc(m.data.slice(8, 10) + "/" + m.data.slice(5, 7)) : ""}` : ""}</span>
+      <span class="obar"><i style="width:${w(dn)}%;background:var(--done)"></i><i style="width:${w(dg)}%;background:var(--doing)"></i></span>
+      <span class="on2">${dn} de ${all} h feitas · P0 em aberto ${p0} h · ${ts.length} tasks</span>
+    </button>`;
+  }).join("");
+}
+
 function renderFilters() {
   const keep = (id, html) => { const el = $(id); const v = el.value; el.innerHTML = html; el.value = v; };
+  keep("fObj", `<option value="">Todos os objetivos</option>` + objList().map(o => `<option value="${esc(o.id)}">${esc(o.id)} · ${esc(o.nome)}</option>`).join(""));
   keep("fFase", `<option value="">Todas as fases</option>` + Object.entries(PHASES).map(([k, v]) => `<option value="${k}">Fase ${k} · ${v}</option>`).join(""));
   keep("fEpico", `<option value="">Todos os épicos</option>` + sortedEpicos().map(e => `<option value="${esc(e.id)}">${esc(e.id)} · ${esc(e.titulo)}</option>`).join(""));
   keep("fMarco", `<option value="">Todos os marcos</option>` + sortedMarcos().map(m => `<option value="${esc(m.id)}">${esc(m.id)} · ${esc(m.nome)}</option>`).join(""));
@@ -241,7 +359,7 @@ function renderFilters() {
 }
 
 function renderEpics() {
-  $("epics").innerHTML = sortedEpicos().filter(e => !F.fase || String(e.fase) === F.fase).map(e => {
+  $("epics").innerHTML = sortedEpicos().filter(e => !F.fase || String(e.fase) === F.fase).filter(e => !F.obj || e.objetivoMaior === F.obj || S.tasks.some(t => t.epico === e.id && objIdOf(t) === F.obj)).map(e => {
     const ts = S.tasks.filter(t => t.epico === e.id && st(t) !== "cortada");
     const done = ts.filter(t => st(t) === "feito").length, doing = ts.filter(t => st(t) === "em andamento").length;
     const w = n => ts.length ? n / ts.length * 100 : 0;
@@ -250,9 +368,9 @@ function renderEpics() {
 }
 
 function cardHTML(t) {
-  const p = pending(t); const s = st(t); const pr = prioOf(prio(t)); const sz = sizeOf(tam(t));
+  const p = pending(t); const s = st(t); const pr = prioOf(prio(t)); const sz = sizeOf(tam(t)); const ob = objOf(t);
   return `<article class="card" draggable="${!readOnly}" data-id="${esc(t.id)}" data-ordem="${ord(t)}" tabindex="0" style="--pc:${pr.c}" aria-label="${esc(t.id)} ${esc(t.titulo)}">
-    <div class="top"><span class="tid">${esc(t.id)}</span><span class="b-sol" style="--c:${pr.c};--tc:${pr.tc || "var(--on-solid)"}" title="${pr.n}">${pr.k}</span><span class="b-sol" style="--c:${sz.c};--tc:${sz.tc || "var(--on-solid)"}" title="${sz.n}">${sz.k} ${sz.h}h</span><span class="b-sol b-ep">${esc(t.epico)}</span>${t.marco ? `<span class="b-sol b-mk">${esc(t.marco)}</span>` : ""}</div>
+    <div class="top"><span class="tid">${esc(t.id)}</span><span class="b-sol" style="--c:${pr.c};--tc:${pr.tc || "var(--on-solid)"}" title="${pr.n}">${pr.k}</span><span class="b-sol" style="--c:${sz.c};--tc:${sz.tc || "var(--on-solid)"}" title="${sz.n}">${sz.k} ${sz.h}h</span><span class="b-sol b-ep">${esc(t.epico)}</span>${t.marco ? `<span class="b-sol b-mk">${esc(t.marco)}</span>` : ""}${ob ? `<span class="b-obj" title="${esc(ob.id + " · " + ob.nome + (ob.pronto ? ". Pronto quando: " + ob.pronto : ""))}">${esc(ob.id)} · ${esc(ob.curto || ob.nome)}</span>` : (S.objetivos.length ? `<span class="b-obj none">sem objetivo</span>` : "")}</div>
     <div class="t">${esc(t.titulo)}</div>
     ${p.length && (s === "backlog" || s === "priorizado") ? `<div class="b"><span class="blocked">bloqueada por ${p.map(esc).join(", ")}</span></div>` : ""}
   </article>`;
@@ -267,12 +385,68 @@ function renderBoard() {
   }).join("");
 }
 
-function renderAll() { renderSummary(); renderRail(); renderFilters(); renderEpics(); renderBoard(); }
+const EST = {
+  fechada: { n: "fechada", c: "var(--done)" },
+  provisoria: { n: "provisória", c: "var(--p1)" },
+  aberta: { n: "em aberto", c: "var(--cut)" }
+};
+const SIT = {
+  decidida: { n: "Decidida", c: "var(--done)", tc: "var(--on-light)", a: "" },
+  parcial: { n: "Em parte", c: "var(--p1)", tc: "var(--on-light)", a: "partial" },
+  aberta: { n: "Em aberto", c: "var(--cut)", a: "none" }
+};
+const openDec = new Set();
+
+function renderDecisoes() {
+  const ds = [...S.decisoes].sort((a, b) => (a.ordem ?? num(a.task)) - (b.ordem ?? num(b.task)));
+  $("decCount").textContent = ds.length ? String(ds.length) : "";
+  if (!ds.length) { $("decList").innerHTML = `<p class="msg">${db || readOnly ? "Nenhuma decisão registrada ainda. Elas aparecem aqui conforme as tasks são decididas." : "Abra no claude.ai para ver as decisões."}</p>`; return; }
+  $("decList").innerHTML = ds.map(d => {
+    const its = d.itens || [];
+    const cnt = k => its.filter(i => (i.estado || "fechada") === k).length;
+    const f = cnt("fechada"), p = cnt("provisoria"), a = cnt("aberta"), n = its.length || 1;
+    const sit = SIT[d.situacao] || SIT.parcial;
+    const t = byId(d.task);
+    const alt = i => (i.alt || []).length ? `<div class="alt"><b>Alternativas descartadas:</b><ul>${i.alt.map(x => `<li>${esc(x.o)}${x.nao ? ` · ${esc(x.nao)}` : ""}</li>`).join("")}</ul></div>` : "";
+    const item = i => { const e = EST[i.estado || "fechada"]; return `<div class="item" style="--c:${e.c}"><div class="s"></div><div class="c">
+      <div class="iq"><span>${esc(i.q)}</span><span class="tag">${e.n}</span></div>
+      <div class="ir${i.r ? "" : " vazio"}">${esc(i.r || (i.rec ? "Sem decisão. Recomendação: " + i.rec : "Sem decisão ainda."))}</div>
+      ${i.porque ? `<div class="why"><b>Por quê:</b> ${esc(i.porque)}</div>` : ""}${alt(i)}
+      ${i.fonte ? `<div class="src">${esc(i.fonte)}</div>` : ""}</div></div>`; };
+    return `<details class="q" data-task="${esc(d.task)}" ${openDec.has(d.task) ? "open" : ""}>
+      <summary><span class="tid">${esc(d.task)}</span>
+        <div style="min-width:0"><div class="qt">${esc(d.pergunta)}</div><div class="qs">${t ? esc(t.titulo) : ""}</div></div>
+        <div class="qr"><span class="pill" style="--c:${sit.c};--tc:${sit.tc || "var(--on-solid)"}">${sit.n}</span>
+          <span class="bar" title="${f} fechadas, ${p} provisórias, ${a} em aberto"><i style="width:${f / n * 100}%;background:var(--done)"></i><i style="width:${p / n * 100}%;background:var(--p1)"></i><i style="width:${a / n * 100}%;background:var(--cut)"></i></span>
+          <span class="msg" style="font-size:.74rem">${f} fechadas · ${p} provisórias · ${a} em aberto</span></div>
+      </summary>
+      <div class="q-body">
+        ${d.contexto ? `<div><h3>O que estava em jogo</h3><p>${esc(d.contexto)}</p></div>` : ""}
+        <div><h3>O que foi decidido</h3><div class="answer ${sit.a}"><p>${esc(d.resposta || "Nada decidido ainda.")}</p></div></div>
+        ${its.length ? `<div><h3>Decisão por decisão</h3><div class="items">${its.map(item).join("")}</div></div>` : ""}
+        ${(d.falta || []).length ? `<div><h3>Ainda falta para fechar a task</h3><ul class="todo">${d.falta.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+        <div class="q-foot">${t ? `<button class="btn" type="button" data-open-task="${esc(d.task)}">Abrir ${esc(d.task)} no quadro</button>` : ""}${d.atualizado ? `<span class="msg">Atualizado em ${esc(String(d.atualizado).slice(8, 10) + "/" + String(d.atualizado).slice(5, 7))}</span>` : ""}</div>
+      </div></details>`;
+  }).join("");
+}
+
+function setView(v) {
+  const dec = v === "decisoes";
+  $("vQuadro").hidden = dec; $("vDecisoes").hidden = !dec;
+  $("tabQuadro").setAttribute("aria-selected", String(!dec)); $("tabDecisoes").setAttribute("aria-selected", String(dec));
+}
+document.querySelector(".views").addEventListener("click", e => { const b = e.target.closest("button[data-v]"); if (b) setView(b.dataset.v); });
+$("decList").addEventListener("toggle", e => { const d = e.target.closest?.("details.q"); if (!d) return; d.open ? openDec.add(d.dataset.task) : openDec.delete(d.dataset.task); }, true);
+$("decList").addEventListener("click", e => { const b = e.target.closest("[data-open-task]"); if (b) openDrawer(b.dataset.openTask); });
+function showDecisao(id) { closeDrawer(); openDec.add(id); setView("decisoes"); renderDecisoes(); document.querySelector(`details.q[data-task="${id}"]`)?.scrollIntoView({ block: "start" }); }
+
+function renderAll() { renderSummary(); renderObjs(); renderRail(); renderFilters(); renderEpics(); renderBoard(); renderDecisoes(); }
 
 /* filtros */
 $("q").addEventListener("input", e => { F.q = e.target.value.trim(); renderBoard(); });
-for (const [id, key] of [["fFase", "fase"], ["fEpico", "epico"], ["fMarco", "marco"], ["fPrio", "prio"], ["fTam", "tam"], ["fSort", "sort"]])
-  $(id).addEventListener("change", e => { F[key] = e.target.value; if (key === "fase" || key === "epico") renderEpics(); renderBoard(); });
+for (const [id, key] of [["fObj", "obj"], ["fFase", "fase"], ["fEpico", "epico"], ["fMarco", "marco"], ["fPrio", "prio"], ["fTam", "tam"], ["fSort", "sort"]])
+  $(id).addEventListener("change", e => { F[key] = e.target.value; if (key === "fase" || key === "epico" || key === "obj") { renderObjs(); renderEpics(); } renderBoard(); });
+$("objs").addEventListener("click", e => { const b = e.target.closest(".obj"); if (!b) return; F.obj = F.obj === b.dataset.o ? "" : b.dataset.o; $("fObj").value = F.obj; if (F.epico && !S.tasks.some(t => t.epico === F.epico && (!F.obj || objIdOf(t) === F.obj))) { F.epico = ""; $("fEpico").value = ""; } renderObjs(); renderEpics(); renderBoard(); });
 $("fLivres").addEventListener("change", e => { F.livres = e.target.checked; renderBoard(); });
 $("epics").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return; F.epico = F.epico === b.dataset.e ? "" : b.dataset.e; $("fEpico").value = F.epico; renderEpics(); renderBoard(); });
 
@@ -343,14 +517,17 @@ function openDrawer(id) {
       <label>Coluna<select id="dStatus" ${dis}>${opt(COLS.map(c => ({ v: c.k, n: c.n })), st(t))}</select></label>
       <label>Marco<select id="dMarco" ${dis}><option value="">sem marco</option>${opt(sortedMarcos().map(m => ({ v: m.id, n: m.id + " · " + m.nome })), t.marco || "")}</select></label>
     </div>
+    ${id && objOf(t) ? `<div class="d-obj"><span>Objetivo maior${t.objetivoMaior ? " (próprio da task)" : " (do épico " + esc(t.epico) + ")"}</span><b>${esc(objOf(t).id)} · ${esc(objOf(t).nome)}</b>${objOf(t).pronto ? `<span>Pronto quando: ${esc(objOf(t).pronto)}</span>` : ""}</div>` : ""}
     <label>Épico<select id="dEpico" ${id || readOnly ? "disabled" : ""}>${opt(sortedEpicos().map(e => ({ v: e.id, n: e.id + " · " + e.titulo })), t.epico)}</select></label>
     <label>Depende de<input type="text" id="dDeps" value="${esc((t.deps || []).join(", "))}" placeholder="T-101, T-103" ${dis}></label>
     ${id && pending(t).length ? `<div><span class="blocked">Ainda falta concluir: ${pending(t).map(esc).join(", ")}</span></div>` : ""}
+    ${id && S.decisoes.some(d => d.task === id) ? `<div><button class="btn" type="button" id="dDec">Ver as decisões desta task</button></div>` : ""}
     <div class="msg" id="dMsg"></div>
     <div class="actions"><button class="btn" type="button" id="dCancel">Fechar</button>${readOnly ? "" : `<button class="btn primary" type="button" id="dSave">${id ? "Salvar" : "Criar"}</button>`}</div>`;
   $("drawer").hidden = false; $("scrim").hidden = false;
   $("dCancel").addEventListener("click", closeDrawer);
   $("dSave")?.addEventListener("click", submitDrawer);
+  $("dDec")?.addEventListener("click", () => showDecisao(id));
   /* a descrição cresce com o texto até 72% da altura da tela; daí em diante rola */
   const desc = $("dDesc");
   const fit = () => { desc.style.height = "auto"; desc.style.height = Math.min(desc.scrollHeight + 2, Math.round(innerHeight * .72)) + "px"; };
@@ -390,6 +567,7 @@ let temaSalvo = null;
 try { temaSalvo = localStorage.getItem("backlog-tema"); } catch (e) {}
 applyTheme(temaSalvo ?? "dark");
 
+try { if (location.hash === "#decisoes") setView("decisoes"); } catch (e) {}
 renderAll();
 (async () => {
   try { db = await window.claude?.use?.("db"); } catch (e) { db = null; }
@@ -406,6 +584,8 @@ renderAll();
     S[name] = snap.docs.map(d => ({ id: d.id, ...(d.data() || {}) }));
     renderAll();
   }, err => { $("status").textContent = "Sem acesso ao backlog (" + esc(err.code) + ")."; });
-  watch("epicos"); watch("marcos"); watch("tasks");
+  watch("epicos"); watch("marcos"); watch("tasks"); watch("decisoes"); watch("objetivos");
 })();
 </script>
+
+

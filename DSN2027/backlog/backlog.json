@@ -7,7 +7,8 @@
    "fase": 1,
    "marco": "ESP",
    "objetivo": "Definir o que o Juiz é, como entra no DNAT, o que decide e o que sustenta no artigo.",
-   "titulo": "Especificação do Juiz"
+   "titulo": "Especificação do Juiz",
+   "objetivoMaior": "O1"
   },
   {
    "id": "J2",
@@ -16,7 +17,8 @@
    "fase": 2,
    "marco": "G1",
    "objetivo": "Bancada de experimentos para construir o Juiz em CPU.",
-   "titulo": "Fundação"
+   "titulo": "Fundação",
+   "objetivoMaior": "O1"
   },
   {
    "id": "J3",
@@ -25,7 +27,8 @@
    "fase": 2,
    "marco": "G1",
    "objetivo": "Perguntas que o Juiz faz ao derivado para medir recusa, dano e recusa excessiva.",
-   "titulo": "Instrumento comportamental"
+   "titulo": "Instrumento comportamental",
+   "objetivoMaior": "O1"
   },
   {
    "id": "J4",
@@ -34,7 +37,8 @@
    "fase": 2,
    "marco": "G1",
    "objetivo": "Sinais nos pesos e ativações contra o base custodiado.",
-   "titulo": "Sinais internos S2/S3"
+   "titulo": "Sinais internos S2/S3",
+   "objetivoMaior": "O1"
   },
   {
    "id": "J5",
@@ -43,7 +47,8 @@
    "fase": 2,
    "marco": "G1",
    "objetivo": "Avaliar o que sai: precisão cheia e quantizações zero-shot (D5).",
-   "titulo": "Formatos"
+   "titulo": "Formatos",
+   "objetivoMaior": "O1"
   },
   {
    "id": "J6",
@@ -52,7 +57,8 @@
    "fase": 2,
    "marco": "G2",
    "objetivo": "Juntar os instrumentos numa decisão de três estados.",
-   "titulo": "Veredito"
+   "titulo": "Veredito",
+   "objetivoMaior": "O2"
   },
   {
    "id": "J7",
@@ -61,7 +67,8 @@
    "fase": 3,
    "marco": "G3",
    "objetivo": "Recibo do veredito e revogação pelo operador.",
-   "titulo": "Contrato"
+   "titulo": "Contrato",
+   "objetivoMaior": "O3"
   },
   {
    "id": "J8",
@@ -70,7 +77,8 @@
    "fase": 3,
    "marco": "G3",
    "objetivo": "O Juiz rodando no DNAT com o derivado retido.",
-   "titulo": "Executor e custódia"
+   "titulo": "Executor e custódia",
+   "objetivoMaior": "O3"
   },
   {
    "id": "J9",
@@ -79,7 +87,8 @@
    "fase": 4,
    "marco": "G2",
    "objetivo": "Derivados F0–F3 com quantidade de falha.",
-   "titulo": "População de derivados"
+   "titulo": "População de derivados",
+   "objetivoMaior": "O2"
   },
   {
    "id": "J10",
@@ -88,7 +97,8 @@
    "fase": 4,
    "marco": "G2",
    "objetivo": "Rótulo independente do Juiz.",
-   "titulo": "Verdade de referência"
+   "titulo": "Verdade de referência",
+   "objetivoMaior": "O2"
   },
   {
    "id": "J11",
@@ -97,7 +107,8 @@
    "fase": 4,
    "marco": "G4",
    "objetivo": "Teste cego com derivados públicos (RQ3).",
-   "titulo": "Campo"
+   "titulo": "Campo",
+   "objetivoMaior": "O4"
   },
   {
    "id": "J12",
@@ -106,7 +117,8 @@
    "fase": 4,
    "marco": "G4",
    "objetivo": "RQ4 e RQ5: atacante que conhece o Juiz.",
-   "titulo": "Adaptativo e bounty"
+   "titulo": "Adaptativo e bounty",
+   "objetivoMaior": "O4"
   },
   {
    "id": "J13",
@@ -115,7 +127,8 @@
    "fase": 4,
    "marco": "G4",
    "objetivo": "Comparação justa com a melhor alternativa.",
-   "titulo": "Linha de base"
+   "titulo": "Linha de base",
+   "objetivoMaior": "O4"
   },
   {
    "id": "J14",
@@ -124,7 +137,8 @@
    "fase": 4,
    "marco": "G4",
    "objetivo": "Números com intervalo de confiança.",
-   "titulo": "Campanha e análise"
+   "titulo": "Campanha e análise",
+   "objetivoMaior": "O4"
   },
   {
    "id": "J15",
@@ -133,7 +147,8 @@
    "fase": 5,
    "marco": "SUB",
    "objetivo": "O artigo do DSN 2027.",
-   "titulo": "Escrita"
+   "titulo": "Escrita",
+   "objetivoMaior": "O5"
   },
   {
    "id": "J16",
@@ -151,7 +166,8 @@
    "fase": 3,
    "marco": "G3",
    "objetivo": "Limitar as tentativas de quem ataca o Juiz: identidade cara (prova de trabalho) e cota por identidade gasta por veredito.",
-   "titulo": "Identidade e cota"
+   "titulo": "Identidade e cota",
+   "objetivoMaior": "O3"
   }
  ],
  "marcos": [
@@ -2804,7 +2820,8 @@
    "pronto": "Decisão registrada",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Decidir as máquinas da campanha (quantas e onde)"
+   "titulo": "Decidir as máquinas da campanha (quantas e onde)",
+   "objetivoMaior": "O4"
   },
   {
    "deps": [],
@@ -2816,7 +2833,8 @@
    "pronto": "Decisão registrada",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Decidir o juiz da verdade de referência e a família não vista"
+   "titulo": "Decidir o juiz da verdade de referência e a família não vista",
+   "objetivoMaior": "O2"
   },
   {
    "atualizado": "2026-10-28T20:00:00.000Z",
@@ -2829,7 +2847,8 @@
    "pronto": "Nuvem escolhida e crédito ou orçamento confirmado",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito"
+   "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito",
+   "objetivoMaior": "O3"
   },
   {
    "deps": [],
@@ -2841,7 +2860,8 @@
    "pronto": "PDF em pesquisa/artigos/1_base/A5_medida_valida",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Baixar o Natella (IEEE TSE 2013) pelo acesso institucional"
+   "titulo": "Baixar o Natella (IEEE TSE 2013) pelo acesso institucional",
+   "objetivoMaior": "O5"
   },
   {
    "deps": [],
@@ -2853,7 +2873,8 @@
    "pronto": "Nomes e papéis registrados",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Definir pessoas: anotadores e guardião da bateria secreta"
+   "titulo": "Definir pessoas: anotadores e guardião da bateria secreta",
+   "objetivoMaior": "O2"
   },
   {
    "deps": [],
@@ -2865,7 +2886,8 @@
    "pronto": "Nota aprovada",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Nota de ética e, se exigido, comitê para a anotação humana"
+   "titulo": "Nota de ética e, se exigido, comitê para a anotação humana",
+   "objetivoMaior": "O2"
   },
   {
    "atualizado": "2026-10-28T20:00:00.000Z",
@@ -2880,7 +2902,8 @@
    "pronto": "CVMs acessíveis",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Provisionar as CVMs do piloto na nuvem escolhida"
+   "titulo": "Provisionar as CVMs do piloto na nuvem escolhida",
+   "objetivoMaior": "O3"
   },
   {
    "deps": [],
@@ -2892,7 +2915,8 @@
    "pronto": "Datas no calendário",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Combinar as datas de revisão com orientador e coautores"
+   "titulo": "Combinar as datas de revisão com orientador e coautores",
+   "objetivoMaior": "O5"
   },
   {
    "deps": [
@@ -2906,7 +2930,8 @@
    "pronto": "Nota de leitura",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Ler o Natella e resumir para a metodologia"
+   "titulo": "Ler o Natella e resumir para a metodologia",
+   "objetivoMaior": "O5"
   },
   {
    "deps": [],
@@ -2918,7 +2943,8 @@
    "pronto": "E13 commitado",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Revisar e commitar o E13 (plano de alto nível)"
+   "titulo": "Revisar e commitar o E13 (plano de alto nível)",
+   "objetivoMaior": "O1"
   },
   {
    "atualizado": "2026-11-09T12:00:00.000Z",
@@ -3067,6 +3093,60 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Escrever identidade e cota no artigo"
+  }
+ ],
+ "objetivos": [
+  {
+   "id": "meta",
+   "tipo": "meta",
+   "ordem": 0,
+   "nome": "Submeter ao DSN 2027 em 02/12.",
+   "texto": "O artigo sustenta a tese: com o modelo aberto, a recusa não sobrevive à derivação, então o derivado só sai depois que um portão sob custódia, o Juiz, o compara com o pai. Contribuições: C1, custódia mais portão no DNAT; C2, a avaliação de dependabilidade do portão."
+  },
+  {
+   "id": "O1",
+   "ordem": 1,
+   "nome": "Um Juiz que mede e cabe",
+   "curto": "mede e cabe",
+   "pronto": "O S1 separa um abliterado do base, e o veredito inteiro, com o avaliador, cabe em 80 min em 4 vCPU.",
+   "defende": "A5; base de todo o resto",
+   "marco": "G1"
+  },
+  {
+   "id": "O2",
+   "ordem": 2,
+   "nome": "Um Juiz calibrado e congelado",
+   "curto": "calibrado",
+   "pronto": "População F0–F3 com rótulos independentes; δ e limiares fixados; prereg.yaml commitado antes de abrir o teste.",
+   "defende": "A1, A5",
+   "marco": "G2"
+  },
+  {
+   "id": "O3",
+   "ordem": 3,
+   "nome": "O Juiz dentro do DNAT",
+   "curto": "no DNAT",
+   "pronto": "Um reprovado não sai, um aprovado vira ativo com recibo que um auditor confere, e a revogação funciona em cascata.",
+   "defende": "C1, A3",
+   "marco": "G3"
+  },
+  {
+   "id": "O4",
+   "ordem": 4,
+   "nome": "Respostas às RQ1–RQ5",
+   "curto": "RQ1–RQ5",
+   "pronto": "Campanha com intervalos de confiança, teste cego de campo, atacante adaptativo, linha de base e ablação.",
+   "defende": "C2, A3, A4, A5",
+   "marco": "G4"
+  },
+  {
+   "id": "O5",
+   "ordem": 5,
+   "nome": "Artigo submetido",
+   "curto": "artigo",
+   "pronto": "Resumo em 25/11 e submissão em 02/12, com o rascunho aos coautores antes.",
+   "defende": "a tese inteira",
+   "marco": "SUB"
   }
  ]
 }

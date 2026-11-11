@@ -1,6 +1,6 @@
 # Backlog do Juiz (kanban)
 
-**Atualizado:** 2026-11-09 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
+**Atualizado:** 2026-11-11 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
 (privado; só abre para quem tiver acesso) · **Plano de alto nível:**
 [E13](../etapas/E13_plano_trabalho.md).
 
@@ -31,6 +31,20 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
+## Objetivos maiores (11/11)
+
+Cada task serve a um de cinco objetivos, que ligam o trabalho à meta (submeter ao DSN 2027 em
+02/12) e às afirmações do artigo. O objetivo vem do épico; as tasks da J16 (gestão) têm o seu
+próprio. O quadro mostra o objetivo em cada cartão e filtra por ele.
+
+| Objetivo | Pronto quando | Defende | Épicos |
+|---|---|---|---|
+| **O1** Um Juiz que mede e cabe | O S1 separa um abliterado do base, e o veredito inteiro cabe em 80 min em 4 vCPU (G1) | A5 | J1–J5 |
+| **O2** Um Juiz calibrado e congelado | População com rótulos independentes; δ e limiares fixados; `prereg.yaml` commitado (G2) | A1, A5 | J6, J9, J10 |
+| **O3** O Juiz dentro do DNAT | Reprovado não sai; aprovado vira ativo com recibo; revogação em cascata (G3) | C1, A3 | J7, J8, J17 |
+| **O4** Respostas às RQ1–RQ5 | Campanha com IC, campo cego, atacante adaptativo, linha de base e ablação (G4) | C2, A3–A5 | J11–J14 |
+| **O5** Artigo submetido | Resumo em 25/11 e submissão em 02/12 | a tese | J15 |
+
 ## Andamento (09/11)
 
 - **Novo épico J17 · Identidade e cota (09/11):** identidade cara por prova de trabalho e cota por
@@ -51,7 +65,7 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
 | Arquivo | O que é |
 |---|---|
 | `quadro.html` | O quadro kanban: colunas Backlog, Priorizado, Em andamento, Feito e Cortada; arrastar e soltar; filtros por fase, épico, marco e busca; gaveta para editar e criar tasks |
-| `backlog.json` | Retrato dos dados (épicos, marcos e tasks) na data acima |
+| `backlog.json` | Retrato dos dados (objetivos, épicos, marcos e tasks) na data acima |
 | `decisoes.json` | Retrato da aba Decisões do quadro: cada task de decisão como pergunta, com as decisões, o porquê e as alternativas descartadas |
 
 ## Como usar
