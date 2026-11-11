@@ -636,16 +636,16 @@
    "deps": [
     "T-301"
    ],
-   "descricao": "Redução v2 (11/11): Só os 25 seguros por veredito; os contrastes saíram do veredito (T-301).\n\nPor quê: o R4 mede a recusa excessiva em pedidos seguros com contraste inseguro, e a tolerância própria (T-106) depende desse conjunto.\nComo:\n- Selecionar do XSTest os prompts seguros e os contrastes inseguros correspondentes, mantendo os pares\n- Cobrir os tipos de prompt do XSTest de forma balanceada, com seed fixa\n- Gravar só os IDs e o tipo\nSaída: model_gate/battery/xstest_ids.json versionado.",
+   "descricao": "Feita em 11/11 (commit 9195807): xstest_ids.json divide os 250 seguros em 15 por tipo para o S1 (150) e 10 por tipo para a referência (100, T-1001); os 200 contrastes ficam fora do veredito. sample.draw_safe sorteia 25 por condição, estratificados pelos 10 tipos. README da bateria, §8.\n\nRedução v2 (11/11): Só os 25 seguros por veredito; os contrastes saíram do veredito (T-301).\n\nPor quê: o R4 mede a recusa excessiva em pedidos seguros com contraste inseguro, e a tolerância própria (T-106) depende desse conjunto.\nComo:\n- Selecionar do XSTest os prompts seguros e os contrastes inseguros correspondentes, mantendo os pares\n- Cobrir os tipos de prompt do XSTest de forma balanceada, com seed fixa\n- Gravar só os IDs e o tipo\nSaída: model_gate/battery/xstest_ids.json versionado.",
    "epico": "J3",
    "id": "T-303",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Lista de IDs versionada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Selecionar os seguros e os contrastes do XSTest",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-11T21:00:00.000Z"
   },
   {
    "deps": [
@@ -683,15 +683,16 @@
    "deps": [
     "T-205"
    ],
-   "descricao": "Por quê: o R5 manda fixar o template, e o R6 exige medir com e sem system prompt (no Llama-2, 22,6% × 79,9% em Arditi).\nComo:\n- Usar o chat template do tokenizer do Qwen2.5 na revisão do T-203\n- Definir as duas configurações: sem system prompt e com o system prompt padrão do modelo\n- Gravar o texto exato e os parâmetros de geração de cada uma\nSaída: model_gate/battery/configs.yaml versionado, lido pelo gerador do T-205.",
+   "descricao": "Feita em 11/11 (commit 9195807): model_gate/src/model_gate/battery/configs.yaml com as condições vazio e padrão, o texto exato que o modelo vê em cada uma (conferido por teste contra o template do Qwen na revisão fixada) e os parâmetros de geração; configs.gen_config devolve o GenConfig da T-205. README da bateria, §7.\n\nPor quê: o R5 manda fixar o template, e o R6 exige medir com e sem system prompt (no Llama-2, 22,6% × 79,9% em Arditi).\nComo:\n- Usar o chat template do tokenizer do Qwen2.5 na revisão do T-203\n- Definir as duas configurações: sem system prompt e com o system prompt padrão do modelo\n- Gravar o texto exato e os parâmetros de geração de cada uma\nSaída: model_gate/battery/configs.yaml versionado, lido pelo gerador do T-205.",
    "epico": "J3",
    "id": "T-306",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Configurações versionadas",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
-   "titulo": "Fixar o template de chat e as duas configurações (com e sem system prompt)"
+   "titulo": "Fixar o template de chat e as duas configurações (com e sem system prompt)",
+   "atualizado": "2026-11-11T21:00:00.000Z"
   },
   {
    "deps": [
@@ -1925,7 +1926,7 @@
    "deps": [
     "T-302"
    ],
-   "descricao": "Por quê: R12: o rótulo deve vir de procedimento diferente do Juiz, com itens que o Juiz nunca viu.\nComo:\n- Selecionar itens nocivos e seguros fora dos IDs do T-302 e T-303 (ex.: HarmBench + parte não usada do XSTest)\n- Fixar por seed e registrar origem e licença de cada fonte\n- Teste automático que falha se houver ID em comum com o instrumento\nSaída: lista de IDs disjunta, com checagem automática de interseção vazia.",
+   "descricao": "Insumo pronto (T-303, 11/11): no xstest_ids.json, os seguros com uso \"referencia\" (100, 10 por tipo) e os 200 contrastes são da referência; os 150 \"s1\" são do Juiz e não podem entrar. Para os nocivos, conferir sobreposição com o acervo do S1 por model_gate.battery.pool.overlap.\n\nPor quê: R12: o rótulo deve vir de procedimento diferente do Juiz, com itens que o Juiz nunca viu.\nComo:\n- Selecionar itens nocivos e seguros fora dos IDs do T-302 e T-303 (ex.: HarmBench + parte não usada do XSTest)\n- Fixar por seed e registrar origem e licença de cada fonte\n- Teste automático que falha se houver ID em comum com o instrumento\nSaída: lista de IDs disjunta, com checagem automática de interseção vazia.",
    "epico": "J10",
    "id": "T-1001",
    "marco": "G2",
@@ -1933,7 +1934,8 @@
    "pronto": "Lista de IDs disjunta da do Juiz",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Bateria de referência com itens diferentes dos do instrumento do Juiz"
+   "titulo": "Bateria de referência com itens diferentes dos do instrumento do Juiz",
+   "atualizado": "2026-11-11T21:00:00.000Z"
   },
   {
    "deps": [
