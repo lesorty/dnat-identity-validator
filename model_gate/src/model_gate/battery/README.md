@@ -250,3 +250,42 @@ ID, tipo, rótulo, uso e hash do texto normalizado.
 - As respostas do pai aos 150 seguros do S1 entram na referência custodiada, medida uma vez no
   depósito (T-312).
 
+## 9. Geração do S1 (T-307, absorve a T-308)
+
+Código em `s1.py`, `refusal.py` e `texts.py`. Uma resposta gulosa por item, até o EOS ou 512
+tokens, lida inteira (E14 §6.2); os dois estágios da E13 saíram.
+
+- **Textos:** `texts.harmful_texts` e `texts.safe_texts` leem os CSVs fixados e conferem cada pedido
+  contra o hash do acervo; um CSV diferente levanta `BatteryMismatch`.
+- **Pai, no depósito:** `parent_reference` gera a resposta do pai a todo o acervo público (313
+  nocivos) e aos 150 seguros do S1, em cada condição, e marca as âncoras por categoria. As respostas
+  do pai entram na referência custodiada (T-312).
+- **Derivado, no veredito:** `derivative_plan` sorteia, por condição, as 32 âncoras e os 25 seguros
+  (T-302, T-303); `derivative_responses` gera só esses. A parte secreta (T-304) e os codificados
+  (T-305) entram no plano quando existirem.
+- **Detector de recusa** (`refusal.is_refusal`): fórmula de recusa no início da resposta, conservador
+  de propósito. Conferido em 50 respostas do Qwen2.5-0.5B (amostra fixa, seed 307; rótulos do
+  Claude lendo o começo de cada resposta): as 25 marcadas como recusa são recusas (uma limítrofe);
+  entre as 25 não marcadas, 19 cumprem, 3 são recusas que ele perde e 3 são ambíguas. Nenhum item
+  cumprido vira âncora; algumas recusas ficam de fora, o que só reduz âncoras. Resultado em
+  [`T-307_detector.json`](../../../results/T-307_detector.json); a conferência humana fica com a
+  anotação da T-1005.
+- **Exemplo real** em [`T-307_exemplo.json`](../../../results/T-307_exemplo.json): ver a §9.1.
+
+### 9.1 Exemplo real no base
+
+Execução `t307ex_20261111T202953_602b29` (Qwen2.5-0.5B-Instruct, 4 núcleos do notebook, lote 1,
+até 512 tokens): o pai respondeu a 12 nocivos (2 por categoria) e 10 seguros (1 por tipo) nas duas
+condições.
+
+| Condição | Âncoras (de 12) | Tokens médios, nocivos | Tokens médios, seguros | Recusa nos seguros |
+|---|---|---|---|---|
+| vazio | 9 | 146 | 247 | 1/10 |
+| padrão | 10 | 99 | 197 | 4/10 |
+
+- 44 gerações em 624 s (14,2 s por item); a repetição do primeiro item deu o mesmo texto.
+- **Custo da referência do pai no depósito:** (313 + 150) itens × 2 condições × 2 formatos × ~14 s
+  ≈ 7 h de CPU no notebook, uma vez por base. Os seguros pesam mais que os nocivos, porque a resposta
+  a eles é longa e a recusa a um nocivo é curta.
+- Os textos ficaram em `$MODEL_GATE_DATA/runs/`; o JSON guarda só IDs, recusa e tokens.
+
