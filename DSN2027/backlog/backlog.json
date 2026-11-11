@@ -1536,7 +1536,7 @@
     "T-807",
     "T-703"
    ],
-   "descricao": "Por quê: fecha o fluxo: só o executor registra o derivado no contrato, e só depois de um veredito aprovado (C1, P2).\nComo:\n- No executor, ler verdict.json e chamar registerDerivative (T-703) com os hashes do recibo\n- Assinar com a chave do operador, guardada fora do alcance do job\n- Tratar falhas da transação sem liberar o derivado\nSaída: derivado aprovado ativo no contrato, com recibo consultável.",
+   "descricao": "Por quê: fecha o fluxo: só o executor registra o derivado no contrato, e só depois de um veredito aprovado (C1, P2).\nComo:\n- No executor, ler verdict.json e chamar registerDerivative (T-703) com os hashes do recibo\n- Incluir no recibo o id da identidade que pediu o job (vem do metadata.json da execução, T-1703; absorve a T-1706)\n- Assinar com a chave do operador, guardada fora do alcance do job\n- Tratar falhas da transação sem liberar o derivado\nSaída: derivado aprovado ativo no contrato, com recibo consultável.",
    "epico": "J8",
    "id": "T-809",
    "marco": "G3",
@@ -3013,104 +3013,103 @@
    "titulo": "Decidir a identidade cara e a cota por veredito (D7)"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T12:00:00.000Z",
    "deps": [
     "T-1701"
    ],
-   "descricao": "Por quê: sem identidade cara, criar uma conta nova zera a cota (ataque Sybil, Douceur 2002); a D7 pede uma prova de trabalho conferida pela CVM1.\nComo:\n- Publicar o desafio da implantação e a dificuldade d na API da CVM1.\n- Endpoint de registro: recebe chave pública e nonce, confere SHA-256(desafio ‖ chave ‖ nonce) com d bits zero, recusa chave repetida e abre o saldo Q.\n- Guardar o registro (chave, nonce, d, data) na CVM1.\nSaída: endpoint de registro em smart-contract/scripts/api-server.js, com teste de prova válida e inválida.\nFora do escopo: identidade por provedor de nuvem (trabalho futuro, D7).",
+   "descricao": "Por quê: sem identidade cara, criar uma conta nova zera a cota (ataque Sybil, Douceur 2002); a D7 pede uma prova de trabalho conferida pela CVM1 (E14 §18.2–§18.3).\nComo:\n- Criar smart-contract/scripts/identity.js: id = SHA-256 da chave pública Ed25519; prova válida se SHA-256(desafio ‖ chave ‖ nonce) começa com d bits zero; só o módulo crypto do Node, sem dependência nova.\n- Guardar as identidades em identities.json na pasta de estado da CVM1, ao lado de executions/ (chave, nonce, d, data, saldo Q = 20).\n- Rotas no api-server.js: GET /api/identity/challenge devolve desafio e d (d = 20 no protótipo); POST /api/identity/register recebe chave e nonce, confere a prova com um hash e recusa chave repetida.\nSaída: identity.js e as duas rotas.\nFora do escopo: contrato e banco de dados; identidade por provedor de nuvem (trabalho futuro, D7).",
    "epico": "J17",
    "id": "T-1702",
    "marco": "G3",
    "ordem": 1702,
-   "prioridade": "P1",
-   "pronto": "Prova válida registra; inválida e chave repetida são recusadas",
+   "prioridade": "P0",
+   "pronto": "Prova válida registra com saldo Q; inválida e chave repetida são recusadas",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Registro de identidade com prova de trabalho na CVM1"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T12:00:00.000Z",
    "deps": [
     "T-1702"
    ],
-   "descricao": "Por quê: hoje o usuário vem do corpo da requisição, sem autenticação (aba Operações do Mapa); sem assinatura, qualquer um gasta a cota de outro ou finge ser outro.\nComo:\n- Exigir assinatura Ed25519 da identidade em todo pedido de job, depósito e sessão de inferência, com carimbo de tempo contra repetição.\n- Recusar identidade não registrada ou assinatura inválida antes de qualquer outra checagem.\n- Ajustar a interface web e o CLI para assinar.\nSaída: verificação de assinatura na CVM1 e cliente que assina.",
+   "descricao": "Por quê: hoje quem pede um job vem do campo user do corpo, sem autenticação; sem assinatura, qualquer um gasta a cota de outro (E14 §18.2).\nComo:\n- Middleware no api-server.js que lê X-Identity, X-Timestamp e X-Signature e confere a assinatura Ed25519 sobre método, caminho, carimbo e SHA-256 do corpo.\n- Recusar carimbo fora de ±5 min (contra repetição) e identidade desconhecida.\n- Aplicar só em register-dataset, register-application e run-from-cids; leitura e ações do operador ficam como estão (D3).\n- Gravar o id da identidade no metadata.json de cada execução.\nSaída: middleware aplicado às três rotas e o id em cada execução.\nFora do escopo: leitura da execução só pelo dono (T-804); sessões de inferência.",
    "epico": "J17",
    "id": "T-1703",
    "marco": "G3",
    "ordem": 1703,
-   "prioridade": "P1",
-   "pronto": "Pedido sem assinatura válida é recusado",
+   "prioridade": "P0",
+   "pronto": "Pedido sem assinatura, com assinatura errada ou carimbo velho recebe 401",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Pedidos assinados pela identidade"
+   "titulo": "Pedidos assinados pela identidade nas rotas que criam trabalho"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T12:00:00.000Z",
    "deps": [
-    "T-1702",
-    "T-807"
+    "T-1703"
    ],
-   "descricao": "Por quê: a cota é o que limita k no modelo 1 − (1 − e)^k; a D7 fixa custos por veredito e a T-107 diz que falha não gasta.\nComo:\n- Livro só de acréscimo por identidade: saldo inicial Q, reserva de c_R no aceite, acerto pelo veredito (aprovado 1, inconclusivo por mérito 2, reprovado 5), devolução integral na falha do job e na reavaliação do operador.\n- Recusar o job quando o saldo não cobre a reserva.\n- Cobrar o depósito do base como um job (provisório) e expor o saldo ao próprio usuário.\nSaída: livro de cotas na CVM1, com os valores lidos de configuração.",
+   "descricao": "Por quê: a cota é o que limita k no modelo 1 − (1 − e)^k; a D7 fixa os custos por veredito, e a T-107 diz que falha não gasta (E14 §18.4).\nComo:\n- No identity.js: reserve(id, execução) tira c_R = 5 do saldo e recusa o job sem saldo; settle(execução, estado) cobra 1 (aprovado), 2 (inconclusivo) ou 5 (reprovado) e devolve a diferença; falha devolve tudo. O acerto conta uma vez por execução.\n- Chamar reserve em run-from-cids; deixar settle pronto para o Juiz como segundo job (T-807) chamar.\n- Contar aprovados, inconclusivos e reprovados por identidade; GET /api/identity/:id mostra saldo e contagens (o que o auditor e o modelo de ataque precisam).\nSaída: livro de cotas no identity.js e a rota de consulta.\nFora do escopo: recarga de cota (sem recarga no MVP, D7).",
    "epico": "J17",
    "id": "T-1704",
    "marco": "G3",
    "ordem": 1704,
-   "prioridade": "P1",
-   "pronto": "Saldo bate com o livro em todos os desfechos",
+   "prioridade": "P0",
+   "pronto": "4 reprovados esgotam Q = 20 e o 5º job é recusado; falha devolve a reserva",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Livro de cotas na CVM1: reserva no aceite, acerto no veredito"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T12:00:00.000Z",
    "deps": [
-    "T-1702"
+    "T-1703"
    ],
-   "descricao": "Por quê: a D7 deixa d provisório; o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo.\nComo:\n- Script que gera a chave e procura o nonce, com d como parâmetro.\n- Medir o tempo médio em 4 vCPU para d de 16 a 28 bits, com repetições.\n- Anotar a vantagem esperada de GPU e ASIC a partir de taxas publicadas, marcada como (a verificar).\nSaída: tabela d × tempo em model_gate/results/ e o d do protótipo fixado.",
+   "descricao": "Por quê: sem cliente, ninguém registra nem assina; e o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo (T-1708).\nComo:\n- cli.js identity new: gera a chave Ed25519, minera o nonce para o desafio da CVM1, registra e guarda a chave num arquivo local.\n- O CLI passa a assinar os pedidos às três rotas da T-1703.\n- cli.js identity bench: mede o tempo da prova para d de 12 a 24 bits, 5 repetições, e grava a tabela.\nSaída: comandos no cli.js e a tabela de custo por d em results/.",
    "epico": "J17",
    "id": "T-1705",
    "marco": "G3",
    "ordem": 1705,
-   "prioridade": "P1",
-   "pronto": "Tabela d × tempo e d do protótipo",
+   "prioridade": "P0",
+   "pronto": "Um usuário novo registra e roda um job pelo CLI; tabela de custo por d gravada",
    "status": "backlog",
-   "tamanho": "P",
-   "titulo": "Cliente de mineração e custo da prova de trabalho por dificuldade"
+   "tamanho": "M",
+   "titulo": "Cliente de identidade no CLI e custo da prova por dificuldade"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T12:00:00.000Z",
    "deps": [
     "T-702",
     "T-1702"
    ],
-   "descricao": "Por quê: o auditor precisa contar tentativas e reprovações por identidade pelo recibo, sem saber quem é a pessoa (E14 §10.1, §18.6).\nComo:\n- Acrescentar ao recibo o id da identidade (SHA-256 da chave pública) que pediu o job.\n- Ajustar o esquema da T-702 e a gravação da T-809.\nSaída: campo no recibo e no esquema.",
+   "descricao": "Cortada em 11/11 e absorvida: o id da identidade vai para o registro da execução (T-1703) e para a contagem por identidade (T-1704); pôr o id no recibo on-chain virou um passo da T-809. Assim a identidade não depende das mudanças no contrato (T-702).\n\nDescrição original: acrescentar ao recibo o id da identidade (SHA-256 da chave pública) que pediu o job, ajustando o esquema da T-702 e a gravação da T-809.",
    "epico": "J17",
    "id": "T-1706",
    "marco": "G3",
    "ordem": 1706,
    "prioridade": "P1",
    "pronto": "Recibo com o id da identidade",
-   "status": "backlog",
+   "status": "cortada",
    "tamanho": "P",
    "titulo": "Id da identidade no recibo"
   },
   {
-   "atualizado": "2026-11-09T12:00:00.000Z",
+   "atualizado": "2026-11-11T12:00:00.000Z",
    "deps": [
     "T-1703",
     "T-1704",
-    "T-1706"
+    "T-1705"
    ],
-   "descricao": "Por quê: a segunda camada só vale se cada regra da D7 for verificável no G3.\nComo:\n- Pedido sem prova ou sem assinatura é recusado.\n- Reprovado gasta 5, aprovado 1, inconclusivo 2; falha do job devolve a reserva.\n- Identidade sem saldo não submete; o recibo traz o id.\nSaída: testes automatizados junto dos do G3 (T-813).",
+   "descricao": "Por quê: a segunda camada só vale se cada regra da D7 for verificável; é o Teste 9.\nComo:\n- test/identity.test.js, no estilo do asset_envelope.test.js: prova válida, inválida e chave repetida; assinatura certa, errada e carimbo velho; reserva, acerto e esgotamento da cota; falha devolve a reserva.\n- Os testes montam um Express só com as rotas de identidade, sem blockchain nem executor.\n- Roteiro de demonstração: registra uma identidade, simula 4 reprovados e mostra o 5º job recusado.\nSaída: testes no package.json (npm run test:identity) e o roteiro.",
    "epico": "J17",
    "id": "T-1707",
    "marco": "G3",
    "ordem": 1707,
-   "prioridade": "P1",
-   "pronto": "Testes passam",
+   "prioridade": "P0",
+   "pronto": "Testes passam sem blockchain nem executor; a demonstração recusa o 5º job",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Testes da identidade e da cota",
+   "titulo": "Testes da identidade e da cota, e demonstração",
    "teste": "TS9"
   },
   {
