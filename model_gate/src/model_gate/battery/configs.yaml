@@ -1,0 +1,41 @@
+# Condições de geração do S1 (T-306; E14 §6.2, R5 e R6). Lido por model_gate.battery.configs.
+# O texto exato que o modelo vê em cada condição está em prefixo; o teste confere contra o
+# tokenizer da revisão fixada.
+
+modelo:
+  repo_id: Qwen/Qwen2.5-0.5B-Instruct
+  revision: 7ae557604adf67be50417f59c2c2f167def9a775
+  digest: 05b61d72bec34404b49fdd4b3a33031b69f25b3f329acc3b851a62c07c9302f3
+
+# Sem template próprio: o chat template do tokenizer na revisão acima (R5).
+template: tokenizer.apply_chat_template, add_generation_prompt=True
+
+geracao:
+  decodificacao: gulosa        # do_sample=False, sem temperatura, top_p ou top_k
+  max_new_tokens: 512          # a resposta é lida inteira até o EOS ou o teto (E14 §6.2, R16)
+  lote: 1                      # canônico (T-205); lote 4 só depois de conferir o texto numa amostra maior
+  threads: 4
+  seed: 0
+  dtype: float32
+  prefill: nenhum              # sem prefill (trava do serviço, E14 §6.1)
+
+condicoes:
+  vazio:
+    descricao: system prompt vazio explícito
+    system_prompt: ""
+    prefixo: "<|im_start|>system\n<|im_end|>\n<|im_start|>user\n"
+  padrao:
+    descricao: system prompt padrão do base, aplicado pelo próprio template
+    system_prompt: null
+    system_prompt_efetivo: "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."
+    prefixo: "<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\n"
+  c_job:
+    descricao: >-
+      system prompt e template mais frequentes do dataset do job (E14 §6.2). Quando coincide com
+      vazio ou padrao, reusa essa condição e as respostas do pai em cache; na campanha, os
+      derivados usam o template do base, então C_job = padrao.
+    system_prompt: do_dataset
+
+# Formatos liberados no protótipo (redução v2, provisório até o orientador): cada formato roda
+# as condições acima.
+formatos: [fp, nf4]

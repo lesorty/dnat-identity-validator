@@ -13,6 +13,7 @@ import hmac
 import random
 
 PUBLIC_ANCHORS = 32  # por condição (T-301): 48 âncoras = 32 públicas + 16 secretas
+XSTEST_SAFE = 25  # seguros do XSTest por condição (T-301, T-303)
 
 
 class InsufficientAnchors(Exception):
@@ -32,17 +33,17 @@ def quota(n: int, categories: list[str]) -> dict[str, int]:
     return {c: base + (1 if i < extra else 0) for i, c in enumerate(cats)}
 
 
-def draw_anchors(anchors_by_category: dict[str, list[int]], seed: int, n: int = PUBLIC_ANCHORS) -> list[int]:
-    """Sorteia n âncoras estratificadas; devolve os IDs na ordem em que o Juiz os pergunta.
+def draw_stratified(groups: dict[str, list[int]], seed: int, n: int) -> list[int]:
+    """Sorteia n IDs estratificados pelos grupos; devolve na ordem em que o Juiz os pergunta.
 
-    Cada categoria recebe a sua cota. Se uma categoria tem menos âncoras que a cota, entram todas
-    as dela, e a falta é sorteada entre as âncoras que sobraram nas outras categorias. Com menos
-    de n âncoras no total, levanta InsufficientAnchors.
+    Cada grupo recebe a sua cota (quota). Se um grupo tem menos itens que a cota, entram todos
+    os dele, e a falta é sorteada entre os itens que sobraram nos outros. Com menos de n itens no
+    total, levanta InsufficientAnchors.
     """
-    pools = {c: sorted(set(ids)) for c, ids in anchors_by_category.items()}
+    pools = {c: sorted(set(ids)) for c, ids in groups.items()}
     total = sum(len(v) for v in pools.values())
     if total < n:
-        raise InsufficientAnchors(f"{total} âncoras, o sorteio pede {n}")
+        raise InsufficientAnchors(f"{total} itens, o sorteio pede {n}")
     rng = random.Random(seed)
     q = quota(n, list(pools))
     chosen: list[int] = []
@@ -60,3 +61,13 @@ def draw_anchors(anchors_by_category: dict[str, list[int]], seed: int, n: int = 
         chosen += leftovers[:missing]
     rng.shuffle(chosen)
     return chosen
+
+
+def draw_anchors(anchors_by_category: dict[str, list[int]], seed: int, n: int = PUBLIC_ANCHORS) -> list[int]:
+    """As âncoras públicas da condição, estratificadas pelas categorias do StrongREJECT (T-302)."""
+    return draw_stratified(anchors_by_category, seed, n)
+
+
+def draw_safe(safe_by_type: dict[str, list[int]], seed: int, n: int = XSTEST_SAFE) -> list[int]:
+    """Os seguros do XSTest da condição, estratificados pelos 10 tipos (T-303)."""
+    return draw_stratified(safe_by_type, seed, n)

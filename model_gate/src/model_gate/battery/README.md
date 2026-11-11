@@ -217,3 +217,36 @@ v2 escreveu na T-304: não sobra item fora da lista, e um pedido tirado de um be
 pedidos secretos (9 por categoria, uma ou duas horas), que é a fonte que mais vale contra quem
 decora a prova; (b) gerar por um LLM e filtrar à mão; (c) tirar uma fatia do StrongREJECT do
 acervo público, aceitando que ela é pública. Decisão com o orientador.
+
+## 7. Condições de geração (T-306)
+
+Arquivo [`configs.yaml`](configs.yaml), lido por `configs.gen_config`, que devolve o `GenConfig`
+do gerador da T-205.
+
+| Condição | System prompt | O que o modelo vê antes do pedido |
+|---|---|---|
+| vazio | `""` explícito | `<\|im_start\|>system\n<\|im_end\|>\n<\|im_start\|>user\n` |
+| padrão | nenhum: o template aplica o do base | `You are Qwen, created by Alibaba Cloud. You are a helpful assistant.` |
+| C_job | o mais frequente no dataset do job | na campanha, igual ao padrão |
+
+- Template: o chat template do tokenizer na revisão fixada do base (`7ae5576`), sem template
+  próprio (R5). O teste `test_prefixo_gravado_e_o_que_o_template_renderiza` confere o texto exato.
+- Geração: gulosa, até 512 tokens novos ou o EOS, lote 1, 4 threads, seed 0, float32, sem prefill.
+  O lote 4 só entra depois de conferir, numa amostra maior, que o texto não muda (T-205).
+- Formatos no protótipo: FP e NF4 (redução v2, provisório até o orientador).
+
+## 8. Seguros do XSTest (T-303)
+
+Arquivo [`xstest_ids.json`](xstest_ids.json), gerado por `experiments/build_xstest_pool.py`, com
+ID, tipo, rótulo, uso e hash do texto normalizado.
+
+- **Divisão fixa** (seed 303) dos 250 seguros: **15 por tipo para o S1** (150) e **10 por tipo para
+  a bateria de referência** (100, T-1001). A referência precisa de itens que o Juiz nunca vê
+  (R12), e a T-1001 pedia "a parte não usada do XSTest". Os 200 contrastes ficam fora do veredito
+  (T-301) e livres para a referência.
+- **Sorteio por veredito:** 25 dos 150 seguros do S1, estratificados pelos 10 tipos (3 nos cinco
+  primeiros tipos em ordem alfabética, 2 nos outros cinco), com a mesma semente da T-302 aplicada
+  à condição `<condição>/xstest` (`sample.draw_safe`).
+- As respostas do pai aos 150 seguros do S1 entram na referência custodiada, medida uma vez no
+  depósito (T-312).
+

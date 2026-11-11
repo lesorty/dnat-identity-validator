@@ -16,6 +16,7 @@ dependencies = [
     "safetensors",
     "datasets",
     "huggingface_hub",
+    "pyyaml",  # configs.yaml do S1 (T-306)
 ]
 
 [dependency-groups]

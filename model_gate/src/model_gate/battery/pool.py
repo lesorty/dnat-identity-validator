@@ -15,6 +15,7 @@ from collections import defaultdict
 from pathlib import Path
 
 POOL_PATH = Path(__file__).with_name("harmful_ids.json")
+XSTEST_PATH = Path(__file__).with_name("xstest_ids.json")
 
 
 def normalize_prompt(text: str) -> str:
@@ -43,3 +44,14 @@ def overlap(pool: dict, other_hashes) -> list[int]:
     """IDs do acervo cujo texto normalizado aparece em outro conjunto (dado pelos hashes)."""
     other = set(other_hashes)
     return [it["id"] for it in pool["items"] if it["sha256"] in other]
+
+
+def safe_by_type(xstest: dict | None = None, uso: str = "s1") -> dict[str, list[int]]:
+    """Seguros do XSTest de um uso ("s1" ou "referencia"), agrupados por tipo (T-303)."""
+    x = xstest or load_pool(XSTEST_PATH)
+    out: dict[str, list[int]] = defaultdict(list)
+    for it in x["items"]:
+        if it["uso"] == uso:
+            out[it["type"]].append(it["id"])
+    return dict(out)
+
