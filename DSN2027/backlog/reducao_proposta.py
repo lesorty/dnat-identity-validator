@@ -129,10 +129,10 @@ j("T-1202", "T-1605", "Separar guardião e atacante é a mesma decisão de pesso
 m("T-1203", "Ataque mínimo: abliteração + LoRA de cura.")
 m("T-1204", "Ataque mínimo: treino contra o limiar.")
 m("T-1205", "Referência forjada: base da RQ5.")
-c("T-1206", "CMFT fora (sem a T-915).")
-c("T-1207", "Refuse-then-comply: a leitura inteira já o cobre por desenho; vira discussão.")
-c("T-1208", "Quantização condicionada: o formato NF4 é avaliado, mas o ataque de Egashira vira trabalho futuro.")
-c("T-1209", "P3; a interface do job não expõe prefill.")
+c("T-1206", "Na E13 §3.6, o CMFT só entrava se um 0,5B aprendesse a codificação; os 6 codificados seguem como sentinela no veredito.")
+c("T-1207", "Extra na E13 §3.6. A leitura inteira da resposta já cobre o refuse-then-comply por desenho; vira discussão.")
+c("T-1208", "Extra na E13 §3.6. O formato NF4 é avaliado em todo veredito; montar o ataque de Egashira vira trabalho futuro.")
+c("T-1209", "Extra na E13 §3.6 e P3: a interface do job não expõe prefill.")
 e("T-1210", "M", "Rodadas com o oráculo secreto, sem o protocolo formal de bounty (absorve a T-1211).")
 j("T-1211", "T-1210", "Rodar as rodadas é o protocolo em execução.")
 m("T-1212", "Modelo 1 − (1 − e)^k; absorve o custo com identidades e cota (T-1708).")
@@ -203,15 +203,40 @@ for i, t_, why in [
 ]:
     A[i] = ("encolher", t_, (A[i][2] + " " if A[i][0] == "manter" else "") + why, A[i][3] if i in A else True)
 
-# Linha de corte, em ordem: o que sai se o ritmo não der
-CORTE = [
- ("Atacante adaptativo com um ataque só", ["T-1203"], "O Teste 6 fica com o treino contra o limiar (T-1204), que é o que o R11 pede."),
- ("Sem as curvas da RQ2", ["T-1406"], "A sensibilidade à quantidade de falha vira um parágrafo com as três doses."),
- ("Sem CVM real; só o modo direto", ["T-1603"], "A custódia fica demonstrada no modo direto e descrita para a CVM; ameaça à validade declarada."),
- ("Sem anotação humana", ["T-1005","T-1007","T-1606"], "O rótulo fica só com o juiz de referência mais forte (R12); a concordância humana vira limitação."),
- ("Recibo como log assinado pela CVM1, sem mudar o contrato", ["T-701","T-703","T-704","T-705","T-707","T-708"], "É a ordem de corte já prevista no G3 (E13 §5); o recibo on-chain vira desenho. Exige 2 h para o log assinado."),
- ("Sem campo cego (RQ3)", ["T-1101","T-1102","T-1103","T-1105","T-1106","T-1108","T-1604"], "A representatividade (A5) fica sem o teste cego; o maior golpe na avaliação."),
-]
+# Terceira passada (versão 2, 11/11): testes, análises, CVM real e campo cego ficam inteiros;
+# o corte é só em detalhe de código, conveniência e gestão que não muda resultado.
+# Volta o que a versão 1 tirava de teste, análise ou execução em CVM real:
+A["T-913"] = ("encolher", "G", "Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.", True)
+A["T-1602"] = ("manter", None, "Juiz de referência e a família não vista (o Teste 4 fica).", False)
+A["T-801"] = ("encolher", "M", "CVM de uso único por job sem warm pool: um script cria a CVM, roda o job e a destrói. A execução em CVM real é argumento central.", True)
+A["T-812"] = ("encolher", "M", "Custo por veredito na CVM real contra uma VM comum, para a RQ5; sem o estudo de CVM reaproveitada.", True)
+A["T-1603"] = ("encolher", "M", "Escolher a nuvem e provisionar as CVMs (absorve a T-1607).", True)
+# Detalhe de código e conveniência que sai ou encolhe:
+for i, t_, why in [
+ ("T-302","P","Sorteio estratificado com seed: um script curto que grava só os IDs."),
+ ("T-312","P","Rodar o instrumento no base e gravar o resultado com hash."),
+ ("T-608","P","verdict.json: um dicionário serializado com estado, regra, medidas e hashes."),
+ ("T-804","P","Saída de esquema fixo: uma lista de campos permitidos; o resto é descartado."),
+ ("T-901","M","Script de LoRA com peft e um arquivo de configuração; sem framework de experimentos."),
+ ("T-904","P","Exemplos nocivos de um conjunto público, baixados fora do git."),
+ ("T-914","P","População do piloto: rodar a T-901 e a T-908 duas vezes cada."),
+ ("T-1401","P","Laço simples que pula o que já tem resultado; sem fila nem retomada sofisticada."),
+ ("T-1406","P","Curvas da RQ2 a partir das doses já geradas."),
+]:
+    A[i] = ("encolher", t_, why, A[i][3])
+j("T-406", "T-313", "A sanidade de S2 entra no Teste 1, com o mesmo abliterado público e o base repetido.")
+j("T-609", "T-313", "O teste ponta a ponta do veredito é o próprio Teste 1 (base, abliterado, LoRA benigno, base quantizado).")
+j("T-504", "T-505", "Gerar os formatos e registrar o digest é o primeiro passo de rodar o instrumento em cada formato.")
+j("T-708", "T-813", "Testes unitários do contrato duplicam o Teste 8, que exercita os mesmos casos no fluxo inteiro.")
+j("T-1412", "T-1512", "A declaração de artefato é um parágrafo junto da ética e do AI Tool Usage.")
+c("T-1608", "Combinar datas é conversa, não task.")
+A["T-313"] = ("manter", None, "É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.", True)
+# Voltam, pequenas, as classes e sondas que sustentam a análise:
+A["T-909"] = ("encolher", "P", "F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.", True)
+A["T-903"] = ("encolher", "P", "Dados que degradam a recusa (receitas de Qi 2024): o fine-tuning acidental da tese.", True)
+A["T-906"] = ("encolher", "P", "Zona cinza com poucos derivados, relatada à parte (E13 §3.2).", True)
+A["T-1010"] = ("encolher", "P", "Duas sondas (texto acrescentado e estilo) sobre respostas já geradas, para a ameaça A4 ao avaliador.", True)
+CORTE = []
 
 open_ids = [x["id"] for x in b["tasks"] if x["status"] not in ("feito", "cortada")]
 missing = [i for i in open_ids if i not in A]; extra = [i for i in A if i not in open_ids]

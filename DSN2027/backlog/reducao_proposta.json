@@ -1,67 +1,5 @@
 {
- "linha_corte": [
-  {
-   "nome": "Atacante adaptativo com um ataque só",
-   "tasks": [
-    "T-1203"
-   ],
-   "motivo": "O Teste 6 fica com o treino contra o limiar (T-1204), que é o que o R11 pede.",
-   "economia": 2
-  },
-  {
-   "nome": "Sem as curvas da RQ2",
-   "tasks": [
-    "T-1406"
-   ],
-   "motivo": "A sensibilidade à quantidade de falha vira um parágrafo com as três doses.",
-   "economia": 2
-  },
-  {
-   "nome": "Sem CVM real; só o modo direto",
-   "tasks": [
-    "T-1603"
-   ],
-   "motivo": "A custódia fica demonstrada no modo direto e descrita para a CVM; ameaça à validade declarada.",
-   "economia": 1
-  },
-  {
-   "nome": "Sem anotação humana",
-   "tasks": [
-    "T-1005",
-    "T-1007",
-    "T-1606"
-   ],
-   "motivo": "O rótulo fica só com o juiz de referência mais forte (R12); a concordância humana vira limitação.",
-   "economia": 4
-  },
-  {
-   "nome": "Recibo como log assinado pela CVM1, sem mudar o contrato",
-   "tasks": [
-    "T-701",
-    "T-703",
-    "T-704",
-    "T-705",
-    "T-707",
-    "T-708"
-   ],
-   "motivo": "É a ordem de corte já prevista no G3 (E13 §5); o recibo on-chain vira desenho. Exige 2 h para o log assinado.",
-   "economia": 5
-  },
-  {
-   "nome": "Sem campo cego (RQ3)",
-   "tasks": [
-    "T-1101",
-    "T-1102",
-    "T-1103",
-    "T-1105",
-    "T-1106",
-    "T-1108",
-    "T-1604"
-   ],
-   "motivo": "A representatividade (A5) fica sem o teste cego; o maior golpe na avaliação.",
-   "economia": 13
-  }
- ],
+ "linha_corte": [],
  "acoes": {
   "T-209": {
    "acao": "cortar",
@@ -92,9 +30,9 @@
    "horas_depois": 1
   },
   "T-302": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Caminho crítico. Com a T-301, fixa o procedimento de sorteio estratificado das 32 âncoras públicas.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Sorteio estratificado com seed: um script curto que grava só os IDs.",
    "reescrever": true,
    "titulo": "Selecionar os itens nocivos estratificados por categoria, com amostra fixa por seed",
    "epico": "J3",
@@ -103,7 +41,7 @@
    "prioridade": "P0",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-303": {
    "acao": "encolher",
@@ -232,9 +170,9 @@
    "horas_depois": 2
   },
   "T-312": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Referência custodiada do pai.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Rodar o instrumento no base e gravar o resultado com hash.",
    "reescrever": false,
    "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai",
    "epico": "J3",
@@ -243,13 +181,13 @@
    "prioridade": "P0",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-313": {
    "acao": "manter",
    "alvo": null,
-   "motivo": "É o Teste 1: o instrumento separa o óbvio e não oscila. Sobe para P0.",
-   "reescrever": false,
+   "motivo": "É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.",
+   "reescrever": true,
    "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
    "epico": "J3",
    "objetivo": "O1",
@@ -344,9 +282,9 @@
    "horas_depois": 2
   },
   "T-406": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Teste curto de S2 (abliterado público × base).",
+   "acao": "juntar",
+   "alvo": "T-313",
+   "motivo": "A sanidade de S2 entra no Teste 1, com o mesmo abliterado público e o base repetido.",
    "reescrever": false,
    "titulo": "Teste de S2: abliterado público com razão baixa; base repetido perto de 1",
    "epico": "J4",
@@ -355,7 +293,7 @@
    "prioridade": "P1",
    "tamanho": "P",
    "horas_antes": 1,
-   "horas_depois": 1
+   "horas_depois": 0
   },
   "T-407": {
    "acao": "manter",
@@ -484,9 +422,9 @@
    "horas_depois": 0
   },
   "T-504": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Digest de cada formato liberado, para o recibo.",
+   "acao": "juntar",
+   "alvo": "T-505",
+   "motivo": "Gerar os formatos e registrar o digest é o primeiro passo de rodar o instrumento em cada formato.",
    "reescrever": false,
    "titulo": "Gerar as versões quantizadas de um derivado e registrar os digests",
    "epico": "J5",
@@ -495,7 +433,7 @@
    "prioridade": "P1",
    "tamanho": "P",
    "horas_antes": 1,
-   "horas_depois": 1
+   "horas_depois": 0
   },
   "T-505": {
    "acao": "encolher",
@@ -652,9 +590,9 @@
    "horas_depois": 1
   },
   "T-608": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "verdict.json para o recibo.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "verdict.json: um dicionário serializado com estado, regra, medidas e hashes.",
    "reescrever": false,
    "titulo": "Saída do veredito: verdict.json com motivos por instrumento e hashes para o recibo",
    "epico": "J6",
@@ -663,12 +601,12 @@
    "prioridade": "P0",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-609": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Teste ponta a ponta do veredito; absorve o base quantizado (T-508).",
+   "acao": "juntar",
+   "alvo": "T-313",
+   "motivo": "O teste ponta a ponta do veredito é o próprio Teste 1 (base, abliterado, LoRA benigno, base quantizado).",
    "reescrever": false,
    "titulo": "Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado",
    "epico": "J6",
@@ -677,7 +615,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 0
   },
   "T-701": {
    "acao": "manter",
@@ -778,10 +716,10 @@
    "horas_depois": 1
   },
   "T-708": {
-   "acao": "encolher",
-   "alvo": "M",
-   "motivo": "Testes do contrato só dos casos do Teste 8.",
-   "reescrever": true,
+   "acao": "juntar",
+   "alvo": "T-813",
+   "motivo": "Testes unitários do contrato duplicam o Teste 8, que exercita os mesmos casos no fluxo inteiro.",
+   "reescrever": false,
    "titulo": "Testes do contrato: aprovado, reprovado, revogação, reativação negada",
    "epico": "J7",
    "objetivo": "O3",
@@ -789,7 +727,7 @@
    "prioridade": "P1",
    "tamanho": "G",
    "horas_antes": 4,
-   "horas_depois": 2
+   "horas_depois": 0
   },
   "T-709": {
    "acao": "opcional",
@@ -820,10 +758,10 @@
    "horas_depois": 0
   },
   "T-801": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "Pool de CVMs de uso único. Proposta: o protótipo roda o fluxo no modo direto e uma vez numa CVM real; o pool fica como implantação descrita.",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "M",
+   "motivo": "CVM de uso único por job sem warm pool: um script cria a CVM, roda o job e a destrói. A execução em CVM real é argumento central.",
+   "reescrever": true,
    "titulo": "CVM de job de uso único: warm pool e ciclo de vida da CVM",
    "epico": "J8",
    "objetivo": "O3",
@@ -831,7 +769,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 0
+   "horas_depois": 2
   },
   "T-802": {
    "acao": "manter",
@@ -862,9 +800,9 @@
    "horas_depois": 4
   },
   "T-804": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Saída de esquema fixo.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Saída de esquema fixo: uma lista de campos permitidos; o resto é descartado.",
    "reescrever": false,
    "titulo": "Saída de esquema fixo: o usuário recebe só métricas",
    "epico": "J8",
@@ -873,7 +811,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-805": {
    "acao": "juntar",
@@ -974,10 +912,10 @@
    "horas_depois": 2
   },
   "T-812": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "Estudo de overhead VM × CVM. O custo por veredito sai do modo direto e de uma execução na CVM.",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "M",
+   "motivo": "Custo por veredito na CVM real contra uma VM comum, para a RQ5; sem o estudo de CVM reaproveitada.",
+   "reescrever": true,
    "titulo": "Medir overhead: VM comum × CVM, e CVM reaproveitada × CVM de uso único",
    "epico": "J8",
    "objetivo": "O3",
@@ -985,7 +923,7 @@
    "prioridade": "P2",
    "tamanho": "G",
    "horas_antes": 4,
-   "horas_depois": 0
+   "horas_depois": 2
   },
   "T-813": {
    "acao": "encolher",
@@ -1002,9 +940,9 @@
    "horas_depois": 2
   },
   "T-901": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Script único de LoRA.",
+   "acao": "encolher",
+   "alvo": "M",
+   "motivo": "Script de LoRA com peft e um arquivo de configuração; sem framework de experimentos.",
    "reescrever": false,
    "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados",
    "epico": "J9",
@@ -1013,7 +951,7 @@
    "prioridade": "P0",
    "tamanho": "G",
    "horas_antes": 4,
-   "horas_depois": 4
+   "horas_depois": 2
   },
   "T-902": {
    "acao": "encolher",
@@ -1030,10 +968,10 @@
    "horas_depois": 1
   },
   "T-903": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "Zona cinza (F1 que degrada) vira limitação declarada.",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Dados que degradam a recusa (receitas de Qi 2024): o fine-tuning acidental da tese.",
+   "reescrever": true,
    "titulo": "Preparar os dados que degradam a recusa (receitas de Qi 2024)",
    "epico": "J9",
    "objetivo": "O2",
@@ -1041,12 +979,12 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 0
+   "horas_depois": 1
   },
   "T-904": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "Exemplos nocivos para F2.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Exemplos nocivos de um conjunto público, baixados fora do git.",
    "reescrever": false,
    "titulo": "Preparar 10–100 exemplos nocivos de fonte pública, fora do git",
    "epico": "J9",
@@ -1055,7 +993,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-905": {
    "acao": "encolher",
@@ -1100,10 +1038,10 @@
    "horas_depois": 2
   },
   "T-906": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "Zona cinza fora (T-903).",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Zona cinza com poucos derivados, relatada à parte (E13 §3.2).",
+   "reescrever": true,
    "titulo": "F1 que degrada (zona cinza)",
    "epico": "J9",
    "objetivo": "O2",
@@ -1111,13 +1049,13 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 0
+   "horas_depois": 1
   },
   "T-909": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "F0 endurecido vira limitação declarada (controle negativo de S3).",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.",
+   "reescrever": true,
    "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)",
    "epico": "J9",
    "objetivo": "O2",
@@ -1125,7 +1063,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 0
+   "horas_depois": 1
   },
   "T-910": {
    "acao": "encolher",
@@ -1170,10 +1108,10 @@
    "horas_depois": 2
   },
   "T-913": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "Teste 4 (família não vista) sai: 90 derivados e o maior custo de CPU. Vira ameaça à validade declarada.",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "G",
+   "motivo": "Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.",
+   "reescrever": true,
    "titulo": "Família não vista: repetir as receitas no modelo escolhido",
    "epico": "J9",
    "objetivo": "O2",
@@ -1181,12 +1119,12 @@
    "prioridade": "P1",
    "tamanho": "G",
    "horas_antes": 4,
-   "horas_depois": 0
+   "horas_depois": 4
   },
   "T-914": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "População do piloto.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "População do piloto: rodar a T-901 e a T-908 duas vezes cada.",
    "reescrever": false,
    "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos",
    "epico": "J9",
@@ -1195,7 +1133,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-915": {
    "acao": "cortar",
@@ -1352,10 +1290,10 @@
    "horas_depois": 0
   },
   "T-1010": {
-   "acao": "cortar",
-   "alvo": null,
-   "motivo": "Sondas de robustez do avaliador viram ameaça à validade.",
-   "reescrever": false,
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Duas sondas (texto acrescentado e estilo) sobre respostas já geradas, para a ameaça A4 ao avaliador.",
+   "reescrever": true,
    "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta",
    "epico": "J10",
    "objetivo": "O2",
@@ -1363,7 +1301,7 @@
    "prioridade": "P2",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 0
+   "horas_depois": 1
   },
   "T-1101": {
    "acao": "manter",
@@ -1536,7 +1474,7 @@
   "T-1206": {
    "acao": "cortar",
    "alvo": null,
-   "motivo": "CMFT fora (sem a T-915).",
+   "motivo": "Na E13 §3.6, o CMFT só entrava se um 0,5B aprendesse a codificação; os 6 codificados seguem como sentinela no veredito.",
    "reescrever": false,
    "titulo": "Ataque: CMFT com codificação conhecida (se o T-915 for viável)",
    "epico": "J12",
@@ -1550,7 +1488,7 @@
   "T-1207": {
    "acao": "cortar",
    "alvo": null,
-   "motivo": "Refuse-then-comply: a leitura inteira já o cobre por desenho; vira discussão.",
+   "motivo": "Extra na E13 §3.6. A leitura inteira da resposta já cobre o refuse-then-comply por desenho; vira discussão.",
    "reescrever": false,
    "titulo": "Ataque: recusa e depois atende (refuse-then-comply)",
    "epico": "J12",
@@ -1564,7 +1502,7 @@
   "T-1208": {
    "acao": "cortar",
    "alvo": null,
-   "motivo": "Quantização condicionada: o formato NF4 é avaliado, mas o ataque de Egashira vira trabalho futuro.",
+   "motivo": "Extra na E13 §3.6. O formato NF4 é avaliado em todo veredito; montar o ataque de Egashira vira trabalho futuro.",
    "reescrever": false,
    "titulo": "Ataque: quantização condicionada (Egashira)",
    "epico": "J12",
@@ -1578,7 +1516,7 @@
   "T-1209": {
    "acao": "cortar",
    "alvo": null,
-   "motivo": "P3; a interface do job não expõe prefill.",
+   "motivo": "Extra na E13 §3.6 e P3: a interface do job não expõe prefill.",
    "reescrever": false,
    "titulo": "Ataque: prefill e abliteração de teste, se a interface do job permitir",
    "epico": "J12",
@@ -1717,8 +1655,8 @@
   },
   "T-1401": {
    "acao": "encolher",
-   "alvo": "M",
-   "motivo": "Laço retomável simples numa máquina.",
+   "alvo": "P",
+   "motivo": "Laço simples que pula o que já tem resultado; sem fila nem retomada sofisticada.",
    "reescrever": true,
    "titulo": "Orquestrador da campanha: fila de derivados × configurações, retomável",
    "epico": "J14",
@@ -1727,7 +1665,7 @@
    "prioridade": "P1",
    "tamanho": "G",
    "horas_antes": 4,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-1402": {
    "acao": "cortar",
@@ -1786,9 +1724,9 @@
    "horas_depois": 2
   },
   "T-1406": {
-   "acao": "manter",
-   "alvo": null,
-   "motivo": "RQ2 sai das doses já geradas.",
+   "acao": "encolher",
+   "alvo": "P",
+   "motivo": "Curvas da RQ2 a partir das doses já geradas.",
    "reescrever": false,
    "titulo": "RQ2: curvas de cobertura × quantidade de falha",
    "epico": "J14",
@@ -1797,7 +1735,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 2
+   "horas_depois": 1
   },
   "T-1407": {
    "acao": "juntar",
@@ -1870,10 +1808,10 @@
    "horas_depois": 1
   },
   "T-1412": {
-   "acao": "encolher",
-   "alvo": "P",
-   "motivo": "Declaração de artefato com scripts; sem preparar pacote completo.",
-   "reescrever": true,
+   "acao": "juntar",
+   "alvo": "T-1512",
+   "motivo": "A declaração de artefato é um parágrafo junto da ética e do AI Tool Usage.",
+   "reescrever": false,
    "titulo": "Artefato: scripts e instruções, sem pesos nem gerações nocivas",
    "epico": "J14",
    "objetivo": "O4",
@@ -1881,7 +1819,7 @@
    "prioridade": "P1",
    "tamanho": "M",
    "horas_antes": 2,
-   "horas_depois": 1
+   "horas_depois": 0
   },
   "T-1413": {
    "acao": "juntar",
@@ -2180,8 +2118,8 @@
   "T-1602": {
    "acao": "manter",
    "alvo": null,
-   "motivo": "Juiz de referência. A família não vista sai com a T-913.",
-   "reescrever": true,
+   "motivo": "Juiz de referência e a família não vista (o Teste 4 fica).",
+   "reescrever": false,
    "titulo": "Decidir o juiz da verdade de referência e a família não vista",
    "epico": "J16",
    "objetivo": "O2",
@@ -2193,8 +2131,8 @@
   },
   "T-1603": {
    "acao": "encolher",
-   "alvo": "P",
-   "motivo": "Escolher a nuvem e subir uma CVM só para a demonstração (absorve a T-1607).",
+   "alvo": "M",
+   "motivo": "Escolher a nuvem e provisionar as CVMs (absorve a T-1607).",
    "reescrever": true,
    "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito",
    "epico": "J16",
@@ -2203,7 +2141,7 @@
    "prioridade": "P1",
    "tamanho": "P",
    "horas_antes": 1,
-   "horas_depois": 1
+   "horas_depois": 2
   },
   "T-1604": {
    "acao": "encolher",
@@ -2262,9 +2200,9 @@
    "horas_depois": 0
   },
   "T-1608": {
-   "acao": "manter",
+   "acao": "cortar",
    "alvo": null,
-   "motivo": "Datas de revisão.",
+   "motivo": "Combinar datas é conversa, não task.",
    "reescrever": false,
    "titulo": "Combinar as datas de revisão com orientador e coautores",
    "epico": "J16",
@@ -2273,7 +2211,7 @@
    "prioridade": "P1",
    "tamanho": "P",
    "horas_antes": 1,
-   "horas_depois": 1
+   "horas_depois": 0
   },
   "T-1609": {
    "acao": "juntar",
@@ -2403,45 +2341,45 @@
   }
  },
  "total_antes": 381,
- "total_depois": 218,
+ "total_depois": 213,
  "contagem": {
-  "cortar": 20,
-  "encolher": 45,
-  "manter": 72,
-  "juntar": 28,
+  "cortar": 14,
+  "encolher": 58,
+  "manter": 60,
+  "juntar": 33,
   "opcional": 1,
   "feita": 1
  },
  "por_objetivo": {
   "O1": {
    "antes": 73,
-   "depois": 38,
+   "depois": 34,
    "tasks_antes": 36,
-   "tasks_depois": 23
+   "tasks_depois": 21
   },
   "O2": {
    "antes": 86,
-   "depois": 53,
+   "depois": 54,
    "tasks_antes": 38,
-   "tasks_depois": 27
+   "tasks_depois": 31
   },
   "O3": {
    "antes": 60,
-   "depois": 28,
+   "depois": 30,
    "tasks_antes": 25,
-   "tasks_depois": 16
+   "tasks_depois": 17
   },
   "O4": {
    "antes": 95,
-   "depois": 45,
+   "depois": 42,
    "tasks_antes": 40,
-   "tasks_depois": 25
+   "tasks_depois": 24
   },
   "O5": {
    "antes": 54,
-   "depois": 42,
+   "depois": 41,
    "tasks_antes": 21,
-   "tasks_depois": 20
+   "tasks_depois": 19
   },
   "O6": {
    "antes": 13,
@@ -2452,16 +2390,6 @@
  },
  "problemas_deps": [
   [
-   "T-806",
-   "T-801",
-   "cortar"
-  ],
-  [
-   "T-708",
-   "T-706",
-   "cortar"
-  ],
-  [
    "T-505",
    "T-506",
    "cortar"
@@ -2469,16 +2397,6 @@
   [
    "T-602",
    "T-601",
-   "cortar"
-  ],
-  [
-   "T-1409",
-   "T-812",
-   "cortar"
-  ],
-  [
-   "T-912",
-   "T-909",
    "cortar"
   ]
  ]
