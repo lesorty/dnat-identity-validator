@@ -44,6 +44,20 @@ DATASETS = {
             "strongreject_dataset/strongreject_small_dataset.csv": ["category"],
         },
     },
+    "strongreject_evaluator": {
+        # Prompt e código de referência do avaliador por rubrica (T-309), no mesmo commit do conjunto.
+        "repo": "alexandrasouly/strongreject",
+        "commit": "f7cad6c17e624e21d8df2278e918ae1dddb4cb56",
+        "files": [
+            "LICENSE",
+            "strongreject/strongreject_evaluator_prompt.txt",
+            "strongreject/strongreject_evaluator.py",
+        ],
+        "license": "MIT",
+        "license_note": "MIT (Center for Human-Compatible AI, 2024).",
+        "redistribute": True,
+        "count_by": {},
+    },
     "xstest": {
         "repo": "paul-rottger/xstest",
         "commit": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",

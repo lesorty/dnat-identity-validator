@@ -59,6 +59,33 @@
       }
     }
   },
+  "strongreject_evaluator": {
+    "source": "https://github.com/alexandrasouly/strongreject",
+    "commit": "f7cad6c17e624e21d8df2278e918ae1dddb4cb56",
+    "license": "MIT",
+    "license_note": "MIT (Center for Human-Compatible AI, 2024).",
+    "redistribute": true,
+    "raw_in_git": false,
+    "digest": "5b77b544e1510aa7ba5fc79d312714b3d4dd18ec1d6489c6e69613d5c48e9469",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1087,
+        "sha256": "e8bcbf075f0b236c00a8661f9d89189e2d3a8ab7c3d68c746d7801bb14c0f871"
+      },
+      {
+        "path": "strongreject/strongreject_evaluator.py",
+        "size": 4306,
+        "sha256": "0a4fac302b7be28fd9614b55dd07a7908b9a723539d5d7b16b4530e9357c9485"
+      },
+      {
+        "path": "strongreject/strongreject_evaluator_prompt.txt",
+        "size": 1814,
+        "sha256": "eecf618e80c94ffe8dd2044c8cdf42d232c3c253f833bb32fdb81387bf8968a8"
+      }
+    ],
+    "counts": {}
+  },
   "xstest": {
     "source": "https://github.com/paul-rottger/xstest",
     "commit": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",
