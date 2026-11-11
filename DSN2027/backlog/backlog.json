@@ -621,16 +621,16 @@
    "deps": [
     "T-301"
    ],
-   "descricao": "Redução v2 (11/11): Sorteio estratificado com seed: um script curto que grava só os IDs.\n\nPor quê: o δ é definido por categoria (Qi 2024, T-106), então a amostra de nocivos precisa ser estratificada para que cada categoria tenha itens suficientes.\nComo:\n- Sortear do StrongREJECT o número de itens por categoria da tabela do T-301, com seed fixa\n- Garantir que nenhum item caia também na bateria de referência (T-1001) nem no conjunto da direção (T-401)\n- Gravar só os IDs, nunca o texto\nSaída: model_gate/battery/harmful_ids.json versionado, com a seed usada.",
+   "descricao": "Feita em 11/11 (commit 71f1c46): acervo público em model_gate/src/model_gate/battery/harmful_ids.json (313 itens do StrongREJECT, só ID, categoria, origem e hash do texto normalizado); sorteio em sample.py (32 âncoras por condição, estratificado, semente HMAC da chave, do digest do derivado e da condição; categoria curta repassa a falta; menos de 32 não julga); 9 testes, um com as âncoras medidas do base. Detalhes no README da bateria, §6.\n\nRedução v2 (11/11): Sorteio estratificado com seed: um script curto que grava só os IDs.\n\nPor quê: o δ é definido por categoria (Qi 2024, T-106), então a amostra de nocivos precisa ser estratificada para que cada categoria tenha itens suficientes.\nComo:\n- Sortear do StrongREJECT o número de itens por categoria da tabela do T-301, com seed fixa\n- Garantir que nenhum item caia também na bateria de referência (T-1001) nem no conjunto da direção (T-401)\n- Gravar só os IDs, nunca o texto\nSaída: model_gate/battery/harmful_ids.json versionado, com a seed usada.",
    "epico": "J3",
    "id": "T-302",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Lista de IDs versionada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Selecionar os itens nocivos estratificados por categoria, com amostra fixa por seed",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-11T20:00:00.000Z"
   },
   {
    "deps": [
@@ -653,7 +653,7 @@
     "T-303",
     "T-109"
    ],
-   "descricao": "Redução v2 (11/11): Parte secreta de uma fonte só: amostra do StrongREJECT fora da lista publicada, com o compromisso por hash. Escrever do zero e gerar por LLM vira trabalho futuro.\n\nPor quê: o R7 exige uma parte secreta, e o bounty interno (§3.6) só é válido se o atacante não a vê; o compromisso por hash prova depois que ela não mudou.\nComo:\n- Separar os IDs selecionados em pública e secreta na proporção do T-301, com seed fixa\n- Calcular o hash (SHA-256 da lista canônica mais um sal) da parte secreta\n- Entregar a parte secreta ao guardião (T-1202) conforme a política do T-109 e apagá-la da máquina de quem ataca\nSaída: lista pública versionada e hash da secreta registrado no repositório.",
+   "descricao": "Ponto em aberto (T-302, 11/11): o acervo público é o StrongREJECT inteiro, então a parte secreta não pode sair dele \"fora da lista publicada\": não sobra item fora, e um pedido de benchmark público não é segredo para quem treina com ele. Saídas: o guardião escreve ~54 pedidos (9 por categoria); gerar por LLM e filtrar; ou tirar uma fatia do acervo público aceitando que é pública. Decidir com o orientador (README da bateria, §6).\n\nRedução v2 (11/11): Parte secreta de uma fonte só: amostra do StrongREJECT fora da lista publicada, com o compromisso por hash. Escrever do zero e gerar por LLM vira trabalho futuro.\n\nPor quê: o R7 exige uma parte secreta, e o bounty interno (§3.6) só é válido se o atacante não a vê; o compromisso por hash prova depois que ela não mudou.\nComo:\n- Separar os IDs selecionados em pública e secreta na proporção do T-301, com seed fixa\n- Calcular o hash (SHA-256 da lista canônica mais um sal) da parte secreta\n- Entregar a parte secreta ao guardião (T-1202) conforme a política do T-109 e apagá-la da máquina de quem ataca\nSaída: lista pública versionada e hash da secreta registrado no repositório.",
    "epico": "J3",
    "id": "T-304",
    "marco": "G2",
@@ -662,7 +662,7 @@
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-11T20:00:00.000Z"
   },
   {
    "deps": [
@@ -832,7 +832,7 @@
     "T-205",
     "T-302"
    ],
-   "descricao": "Redução v2 (11/11): S2 é a segunda linha e a base da linha de base de Hurtado e da ablação da custódia. Extração de ativações por hook no último token.\n\nPor quê: S2 usa a direção de recusa (Arditi) calculada no base custodiado (R9), e o conjunto que a gera não pode se sobrepor ao instrumento S1.\nComo:\n- Montar pares nocivo/inócuo de fonte separada dos itens do T-302 (por exemplo, os conjuntos usados por Arditi)\n- Rodar o base e extrair a ativação do resíduo no último token da instrução, por camada\n- Salvar os tensores com hash, fora do git se grandes\nSaída: activations/base_pairs.safetensors com hash registrado e a lista de pares versionada.",
+   "descricao": "Atenção (T-302, 11/11): 25 itens do acervo do S1 vêm do AdvBench, de onde Arditi tira os pares nocivos da direção. Excluir do conjunto da direção os pedidos cujo hash (model_gate.battery.pool.prompt_hash) está no harmful_ids.json; pool.overlap tem de dar vazio.\n\nRedução v2 (11/11): S2 é a segunda linha e a base da linha de base de Hurtado e da ablação da custódia. Extração de ativações por hook no último token.\n\nPor quê: S2 usa a direção de recusa (Arditi) calculada no base custodiado (R9), e o conjunto que a gera não pode se sobrepor ao instrumento S1.\nComo:\n- Montar pares nocivo/inócuo de fonte separada dos itens do T-302 (por exemplo, os conjuntos usados por Arditi)\n- Rodar o base e extrair a ativação do resíduo no último token da instrução, por camada\n- Salvar os tensores com hash, fora do git se grandes\nSaída: activations/base_pairs.safetensors com hash registrado e a lista de pares versionada.",
    "epico": "J4",
    "id": "T-401",
    "marco": "G1",
@@ -841,7 +841,7 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Extrair ativações do resíduo por camada no base para pares nocivo/inócuo (conjunto da direção, separado do instrumento)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-11T20:00:00.000Z"
   },
   {
    "deps": [
