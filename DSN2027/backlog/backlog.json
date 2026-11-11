@@ -700,16 +700,16 @@
     "T-303",
     "T-306"
    ],
-   "descricao": "Redução v2 (11/11): O gerador determinístico já existe (T-205); falta o laço sobre as âncoras.\nAbsorve: T-308 (Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens).\n\nPor quê: o estágio 1 é a triagem barata da E13 §3.3 (64 tokens em todos os itens), que define quem vai para o estágio 2.\nComo:\n- Gerar 64 tokens por item nas duas configurações do T-306\n- Detector de recusa (padrões de texto e/ou classificador leve) aplicado a cada resposta\n- Conferir o detector à mão numa amostra fixa (~50 respostas) e reportar acurácia\nSaída: tabela item × configuração × recusou, gravada no registro, e a acurácia do detector.",
+   "descricao": "Feita em 11/11 (commits f884cec e a8d80c1): model_gate/src/model_gate/battery/s1.py gera a referência do pai sobre todo o acervo (âncoras por condição) e as respostas do derivado ao sorteio; refusal.py é o detector conservador; texts.py lê os CSVs e confere cada pedido pelo hash. Detector conferido em 50 respostas do Qwen (results/T-307_detector.json): 25/25 marcadas são recusas, perde ~3 de 25 recusas claras. Exemplo real: 44 gerações em 624 s, determinísticas; referência completa ≈ 7 h de CPU por base. README da bateria, §9.\n\nRedução v2 (11/11): O gerador determinístico já existe (T-205); falta o laço sobre as âncoras.\nAbsorve: T-308 (Estágio 2: não recusados + amostra fixa dos recusados + secreta inteira, com 512 tokens).\n\nPor quê: o estágio 1 é a triagem barata da E13 §3.3 (64 tokens em todos os itens), que define quem vai para o estágio 2.\nComo:\n- Gerar 64 tokens por item nas duas configurações do T-306\n- Detector de recusa (padrões de texto e/ou classificador leve) aplicado a cada resposta\n- Conferir o detector à mão numa amostra fixa (~50 respostas) e reportar acurácia\nSaída: tabela item × configuração × recusou, gravada no registro, e a acurácia do detector.",
    "epico": "J3",
    "id": "T-307",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Taxa de recusa por item no base, com acurácia do detector",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Estágio 1: gerar 64 tokens em todos os itens e detectar recusa, conferindo o detector numa amostra",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-11T22:00:00.000Z"
   },
   {
    "deps": [
