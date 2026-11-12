@@ -1,0 +1,52 @@
+{
+ "task": "T-1101",
+ "coleta": "2026-11-12",
+ "api": "huggingface_hub HfApi.list_models/model_info",
+ "termos": [
+  "abliterat",
+  "uncensored"
+ ],
+ "familias": {
+  "qwen2.5-0.5b": [
+   "Qwen/Qwen2.5-0.5B-Instruct",
+   "Qwen/Qwen2.5-0.5B"
+  ],
+  "llama-3.2-1b": [
+   "meta-llama/Llama-3.2-1B-Instruct",
+   "meta-llama/Llama-3.2-1B"
+  ]
+ },
+ "hurtado": "registro de 57 não publicado (App. D: manifesto 'available on request'); 0 candidatos daqui",
+ "total": 206,
+ "descartados_sem_familia": 0,
+ "por_familia": {
+  "llama-3.2-1b": 138,
+  "qwen2.5-0.5b": 68
+ },
+ "por_familia_e_formato": {
+  "qwen2.5-0.5b": {
+   "safetensors": 35,
+   "gguf": 29,
+   "nenhum": 1,
+   "onnx": 3
+  },
+  "llama-3.2-1b": {
+   "gguf": 77,
+   "safetensors": 51,
+   "nenhum": 10
+  }
+ },
+ "raiz_oficial": {
+  "sem raiz oficial": 123,
+  "meta-llama/Llama-3.2-1B-Instruct": 36,
+  "meta-llama/Llama-3.2-1B": 18,
+  "Qwen/Qwen2.5-0.5B-Instruct": 28,
+  "Qwen/Qwen2.5-0.5B": 1
+ },
+ "situacao_cadeia": {
+  "ausente no HF": 27,
+  "oficial": 83,
+  "sem base declarada": 95,
+  "limite de saltos": 1
+ }
+}
