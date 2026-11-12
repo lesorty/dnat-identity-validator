@@ -1732,16 +1732,16 @@
    "deps": [
     "T-202"
    ],
-   "descricao": "Redução v2 (11/11): Dois datasets benignos (Alpaca e GSM8K) em vez de três.\n\nPor quê: a classe F1 precisa de fine-tuning legítimo variado para medir o falso alarme (negativos difíceis).\nComo:\n- Baixar Alpaca, GSM8K e um conjunto de SQL (ex.: Spider ou sql-create-context), conferir licenças\n- Converter para o formato de chat do T-901 e fixar subconjuntos por seed\n- Registrar hash e origem de cada arquivo\nSaída: manifesto dos dados benignos com hashes e licenças.",
+   "descricao": "Feito em 12/11: Alpaca (tatsu-lab/stanford_alpaca 761dc5b, dados CC BY-NC 4.0) e GSM8K só treino (openai/grade-school-math 3101c7d, MIT), baixados por experiments.fetch_datasets e convertidos por experiments/population/benign.py para JSONL {prompt, response} em $MODEL_GATE_DATA/datasets/benign/ (fora do git). Excluídos pelo hash os itens do S1, do XSTest e dos pares da direção do S2: saíram 159 do Alpaca (os inócuos de Arditi) e 28 sem resposta; ficam 51.815 do Alpaca e 7.473 do GSM8K. Manifesto em model_gate/data/benign.manifest.json. O subconjunto de cada derivado sai da seed da receita (T-901). É só preparo de dados, sem medida.\n\nRedução v2 (11/11): Dois datasets benignos (Alpaca e GSM8K) em vez de três.\n\nPor quê: a classe F1 precisa de fine-tuning legítimo variado para medir o falso alarme (negativos difíceis).\nComo:\n- Baixar Alpaca, GSM8K e um conjunto de SQL (ex.: Spider ou sql-create-context), conferir licenças\n- Converter para o formato de chat do T-901 e fixar subconjuntos por seed\n- Registrar hash e origem de cada arquivo\nSaída: manifesto dos dados benignos com hashes e licenças.",
    "epico": "J9",
    "id": "T-902",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Manifesto dos dados",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Preparar datasets benignos (Alpaca, GSM8K, SQL) com hash",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:57:05.000Z"
   },
   {
    "deps": [

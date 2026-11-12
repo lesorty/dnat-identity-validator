@@ -1,0 +1,31 @@
+{
+ "alpaca": {
+  "file": "datasets/benign/alpaca.jsonl",
+  "sha256": "2874c1420b6ad83dfc1e8bcfb953eb7d7ee430414d8627e484ca7e4b4ac8062b",
+  "source": "tatsu-lab/stanford_alpaca",
+  "commit": "761dc5bfbdeeffa89b8bff5d038781a4055f796a",
+  "license": "CC-BY-NC-4.0",
+  "items_source": 52002,
+  "items": 51815,
+  "removed": {
+   "proibido": 159,
+   "repetido": 0,
+   "vazio": 28
+  }
+ },
+ "gsm8k": {
+  "file": "datasets/benign/gsm8k.jsonl",
+  "sha256": "d2500364a0ade754e825c2e4817fec305b0ad266f6ec20f150f82423e1dea28b",
+  "source": "openai/grade-school-math",
+  "commit": "3101c7d5072418e28b9008a6636bde82a006892c",
+  "license": "MIT",
+  "items_source": 7473,
+  "items": 7473,
+  "removed": {
+   "proibido": 0,
+   "repetido": 0,
+   "vazio": 0
+  }
+ },
+ "_exclusoes": "hash do prompt normalizado: acervo do S1, XSTest e pares da direção do S2"
+}

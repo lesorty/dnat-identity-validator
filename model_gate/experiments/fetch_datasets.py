@@ -67,6 +67,30 @@ DATASETS = {
         "redistribute": True,
         "count_by": {"xstest_prompts.csv": ["label", "type"]},
     },
+    "alpaca": {
+        # Dados benignos do F1 (T-902): instruções gerais com resposta.
+        "repo": "tatsu-lab/stanford_alpaca",
+        "commit": "761dc5bfbdeeffa89b8bff5d038781a4055f796a",
+        "files": ["DATA_LICENSE", "alpaca_data.json"],
+        "license": "CC-BY-NC-4.0",
+        "license_note": (
+            "Dados CC BY-NC 4.0 (Taori et al., 2023): só uso não comercial; uso acadêmico coberto. "
+            "Os derivados treinados com eles herdam a restrição. O código do repositório é Apache-2.0."
+        ),
+        "redistribute": True,
+        "count_by": {"alpaca_data.json": []},
+    },
+    "gsm8k": {
+        # Dados benignos do F1 (T-902): matemática com solução. Só o treino; o teste fica livre
+        # para a utilidade (T-910) sem vazamento.
+        "repo": "openai/grade-school-math",
+        "commit": "3101c7d5072418e28b9008a6636bde82a006892c",
+        "files": ["LICENSE", "grade_school_math/data/train.jsonl"],
+        "license": "MIT",
+        "license_note": "MIT (Cobbe et al., 2021).",
+        "redistribute": True,
+        "count_by": {"grade_school_math/data/train.jsonl": []},
+    },
     "refusal_direction": {
         # Pares nocivo/inócuo da direção de recusa (T-401): os splits do próprio Arditi et al. (2024).
         # Nocivos de AdvBench, MaliciousInstruct, TDC2023 e HarmBench; inócuos do Alpaca. Os que
@@ -117,7 +141,12 @@ def counts(root: Path, spec: dict) -> dict:
     out = {}
     for rel, cols in spec["count_by"].items():
         with open(root / rel, newline="", encoding="utf-8") as f:
-            rows = json.load(f) if rel.endswith(".json") else list(csv.DictReader(f))
+            if rel.endswith(".jsonl"):
+                rows = [json.loads(line) for line in f if line.strip()]
+            elif rel.endswith(".json"):
+                rows = json.load(f)
+            else:
+                rows = list(csv.DictReader(f))
         out[rel] = {"items": len(rows)}
         for c in cols:
             out[rel][c] = dict(sorted(Counter(str(r.get(c)) for r in rows).items()))
