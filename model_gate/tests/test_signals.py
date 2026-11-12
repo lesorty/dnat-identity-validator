@@ -99,6 +99,8 @@ def test_pacote_da_referencia_com_hash(tmp_path):
     assert torch.equal(ref["dirs"], f["dirs"])
     with pytest.raises(ValueError):
         load_direction(tmp_path / "dir.safetensors", "0" * 64)
+    assert save_direction(tmp_path / "outro.safetensors", f, {"base_digest": "abc"}) == sha  # estável
+    assert save_direction(tmp_path / "outro.safetensors", f, {"base_digest": "xyz"}) != sha
 
 
 def ablate(acts, dirs_unit):

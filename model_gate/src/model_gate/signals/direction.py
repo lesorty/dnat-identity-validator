@@ -75,19 +75,37 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def content_sha256(tensors: dict[str, torch.Tensor], meta: dict | None = None) -> str:
+    """Hash do conteúdo, estável entre gravações: nome, dtype, forma e bytes de cada tensor em
+    ordem de nome, e os metadados em JSON canônico. O hash do arquivo não serve, porque o
+    safetensors grava os metadados sem ordem fixa."""
+    h = hashlib.sha256()
+    for k in sorted(tensors):
+        t = tensors[k].detach().cpu().contiguous()
+        h.update(f"{k}\0{t.dtype}\0{list(t.shape)}\0".encode())
+        h.update(t.numpy().tobytes())
+    h.update(json.dumps(meta or {}, sort_keys=True, ensure_ascii=False).encode())
+    return h.hexdigest()
+
+
+TENSORS = ("dirs", "raw_norm", "gap_base", "cohen_d", "auroc")
+
+
 def save_direction(path: Path, fitted: dict, meta: dict) -> str:
-    """Grava o pacote e devolve o SHA-256 do arquivo."""
+    """Grava o pacote e devolve o hash do conteúdo (content_sha256)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    tensors = {k: fitted[k].contiguous() for k in ("dirs", "raw_norm", "gap_base", "cohen_d", "auroc")}
-    save_file(tensors, str(path), metadata={"meta": json.dumps({**meta, "layer": fitted["layer"]}, sort_keys=True)})
-    return file_sha256(path)
+    tensors = {k: fitted[k].contiguous() for k in TENSORS}
+    meta = {**meta, "layer": fitted["layer"]}
+    save_file(tensors, str(path), metadata={"meta": json.dumps(meta, sort_keys=True)})
+    return content_sha256(tensors, meta)
 
 
 def load_direction(path: Path, expected_sha256: str | None = None) -> dict:
-    if expected_sha256 is not None and file_sha256(path) != expected_sha256:
-        raise ValueError(f"{path}: hash não bate com a referência custodiada")
     from safetensors import safe_open
 
     with safe_open(str(path), framework="pt") as f:
         meta = json.loads(f.metadata()["meta"])
-    return {**load_file(str(path)), "meta": meta, "layer": meta["layer"]}
+    tensors = load_file(str(path))
+    if expected_sha256 is not None and content_sha256(tensors, meta) != expected_sha256:
+        raise ValueError(f"{path}: hash não bate com a referência custodiada")
+    return {**tensors, "meta": meta, "layer": meta["layer"]}

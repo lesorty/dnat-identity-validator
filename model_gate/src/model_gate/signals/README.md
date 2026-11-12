@@ -35,8 +35,10 @@ S2 é a segunda linha do Juiz e a base da linha de base de Hurtado (T-1301), da 
   - candidatas: de ⌊0,2·L⌋ a ⌊0,8·L⌋ − 1 (4 a 18 no Qwen2.5-0.5B);
   - escolhida: a de maior d de Cohen da projeção na validação, com empate pela menor camada.
 - **Pacote da referência:** um safetensors com direções, normas, gap do base, d, AUROC e
-  metadados (digest do base, hash dos pares e das ativações). O SHA-256 do arquivo vai para a
-  referência do pai e para o recibo.
+  metadados (digest do base, hash dos pares e das ativações). O hash do **conteúdo**
+  (`content_sha256`: tensores em ordem de nome e metadados em JSON canônico) vai para a referência
+  do pai e para o recibo. O hash do arquivo não serve, porque o safetensors grava os metadados sem
+  ordem fixa e duas gravações iguais dão arquivos diferentes.
 
 ## 4. S2 (T-405) · `s2.py`
 

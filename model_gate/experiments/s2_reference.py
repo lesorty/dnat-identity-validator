@@ -36,7 +36,7 @@ from experiments.runlog import RunLog, new_run_id
 from model_gate.battery.configs import gen_config
 from model_gate.io.load import load_model
 from model_gate.signals.activations import last_token_resid
-from model_gate.signals.direction import candidate_layers, file_sha256, fit, save_direction
+from model_gate.signals.direction import candidate_layers, content_sha256, file_sha256, fit, save_direction
 from model_gate.signals.pairs import PAIRS_PATH, SPLITS, build_pairs, excluded_hashes, load_pairs, pair_texts, read_splits
 
 OUT = Path(__file__).resolve().parents[1] / "results" / "T-402_direcao.json"
@@ -71,9 +71,9 @@ def main() -> int:
     tag = digest[:12]
     act_path = data_dir() / "activations" / f"base_{tag}" / "pairs.safetensors"
     act_path.parent.mkdir(parents=True, exist_ok=True)
-    save_file({s: a.contiguous() for s, a in acts.items()}, str(act_path),
-              metadata={"model_digest": digest, "condition": CONDITION, "pairs_sha256": file_sha256(PAIRS_PATH)})
-    act_sha = file_sha256(act_path)
+    act_meta = {"model_digest": digest, "condition": CONDITION, "pairs_sha256": file_sha256(PAIRS_PATH)}
+    save_file({s: a.contiguous() for s, a in acts.items()}, str(act_path), metadata=act_meta)
+    act_sha = content_sha256(acts, act_meta)
 
     f = fit(acts["harmful_train"], acts["harmless_train"], acts["harmful_val"], acts["harmless_val"])
     meta = {"base_digest": digest, "condition": CONDITION, "pairs_sha256": file_sha256(PAIRS_PATH),
