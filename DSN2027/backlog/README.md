@@ -31,6 +31,29 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
+## Regra: todo dado do artigo sai da nuvem (12/11)
+
+Toda execução que produz um número ou artefato apresentado no artigo roda nas VMs de nuvem
+(Azure ou Oracle, T-1603), no marco **TST · Fase de testes na nuvem**, depois da T-1611. A máquina
+local só constrói e verifica o funcionamento: scripts, testes unitários e derivados de fumaça,
+cujos resultados ficam marcados como verificação e não entram no artigo.
+
+- **Passaram para o TST na auditoria de 12/11 (18 tasks):**
+  - **população:** T-905, T-906, T-907, T-909, T-913 e a nova **T-917**, a varredura da abliteração.
+    A T-908 ficou só com o script;
+  - **utilidade e rótulos:** T-910, T-911, T-912, T-1003, T-1005, T-1008;
+  - **campo:** T-1105, T-1106;
+  - **custo e ablação:** T-812, T-1010, T-1213, T-709.
+- **Ficam fora da nuvem:**
+  - a análise (RQ1–RQ5, figuras, no G4), que lê os resultados da nuvem;
+  - a anotação humana (T-1007);
+  - preparar dados e baixar candidatos (T-902, T-904, T-1103).
+- **Porta T-1611:** deixou de exigir população e rótulos, que agora nascem depois dela, e passou a
+  exigir a nuvem pronta (T-1603, T-210).
+- **Dependências ajustadas:**
+  - a T-1004, que define a regra do rótulo, não espera mais a medida de utilidade;
+  - a T-912 e a T-1203 partem da T-917.
+
 ## Fase de testes (12/11)
 
 Os testes passam a rodar **depois** que o sistema está fechado, e não durante a construção. Há um

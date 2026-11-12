@@ -199,7 +199,7 @@
   {
    "id": "TST",
    "data": "2026-11-21",
-   "nome": "Fase de testes"
+   "nome": "Fase de testes na nuvem"
   },
   {
    "id": "G4",
@@ -1479,19 +1479,20 @@
   },
   {
    "deps": [
-    "T-813"
+    "T-813",
+    "T-1611"
    ],
-   "descricao": "Opcional (redução v2, 11/11): Custo do recibo em gás: o measure-gas.js já existe, então é 1 h se sobrar tempo; senão o recibo fica com custo estimado.\n\nPor quê: o custo do recibo on-chain entra na discussão de custo (RQ5) e ajuda a decidir se o recibo cai para desenho na ordem de corte.\nComo:\n- Estender smart-contract/scripts/measure-gas.js com registerDerivative, revokeDerivative e a compra de derivado\n- Rodar na rede local do hardhat com os mesmos parâmetros das medições existentes\nSaída: tabela de gás por função, para citar no artigo.",
+   "descricao": "Nuvem (12/11): mede o gás do recibo, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nOpcional (redução v2, 11/11): Custo do recibo em gás: o measure-gas.js já existe, então é 1 h se sobrar tempo; senão o recibo fica com custo estimado.\n\nPor quê: o custo do recibo on-chain entra na discussão de custo (RQ5) e ajuda a decidir se o recibo cai para desenho na ordem de corte.\nComo:\n- Estender smart-contract/scripts/measure-gas.js com registerDerivative, revokeDerivative e a compra de derivado\n- Rodar na rede local do hardhat com os mesmos parâmetros das medições existentes\nSaída: tabela de gás por função, para citar no artigo.",
    "epico": "J7",
    "id": "T-709",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P3",
    "pronto": "Tabela de gás",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Medir o gás das novas funções (measure-gas.js)",
    "teste": "TS7",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
@@ -1676,15 +1677,16 @@
    "teste": "TS8"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-12T18:54:30.000Z",
    "deps": [
     "T-811",
-    "T-1603"
+    "T-1603",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Custo por veredito na CVM real contra uma VM comum, para a RQ5; sem o estudo de CVM reaproveitada.\n\nPor quê: a RQ5 pede o custo por veredito da custódia, e a CVM de uso único acrescenta o custo de subir uma CVM por job.\nComo:\n- Repetir o veredito em VM comum e em CVM com as mesmas entradas e seeds, usando assets/tests/run_cvm_overhead_campaign.sh como base.\n- Medir o custo do uso único: CVM tirada do warm pool × CVM reaproveitada.\n- Calcular IC por bootstrap (T-1404).\nSaída: tabela de tempo e custo por veredito com IC, insumo da RQ5.",
+   "descricao": "Nuvem (12/11): mede o custo por veredito, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nRedução v2 (11/11): Custo por veredito na CVM real contra uma VM comum, para a RQ5; sem o estudo de CVM reaproveitada.\n\nPor quê: a RQ5 pede o custo por veredito da custódia, e a CVM de uso único acrescenta o custo de subir uma CVM por job.\nComo:\n- Repetir o veredito em VM comum e em CVM com as mesmas entradas e seeds, usando assets/tests/run_cvm_overhead_campaign.sh como base.\n- Medir o custo do uso único: CVM tirada do warm pool × CVM reaproveitada.\n- Calcular IC por bootstrap (T-1404).\nSaída: tabela de tempo e custo por veredito com IC, insumo da RQ5.",
    "epico": "J8",
    "id": "T-812",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P2",
    "pronto": "Tempo e custo por veredito com IC",
    "status": "backlog",
@@ -1774,56 +1776,59 @@
   {
    "deps": [
     "T-901",
-    "T-902"
+    "T-902",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Menos seeds e passos: meta de ~60 H no total (calibração e teste), não ~160.\n\nPor quê: F1 benigno é o negativo difícil que dá a taxa de falso alarme (RQ1); a meta é ≥ 60 H em cada conjunto de teste (E13 §3.2).\nComo:\n- Rodar o T-901 nos 3 datasets, varrendo passos e seeds A (calibração) e B (teste)\n- Registrar digest, receita e seed de cada derivado\nSaída: derivados F1 com digest no inventário (T-916).",
+   "descricao": "Nuvem (12/11): gera a população F1, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): Menos seeds e passos: meta de ~60 H no total (calibração e teste), não ~160.\n\nPor quê: F1 benigno é o negativo difícil que dá a taxa de falso alarme (RQ1); a meta é ≥ 60 H em cada conjunto de teste (E13 §3.2).\nComo:\n- Rodar o T-901 nos 3 datasets, varrendo passos e seeds A (calibração) e B (teste)\n- Registrar digest, receita e seed de cada derivado\nSaída: derivados F1 com digest no inventário (T-916).",
    "epico": "J9",
    "id": "T-905",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
    "tamanho": "G",
    "titulo": "F1 benigno: LoRA nos 3 datasets, varrendo passos e seeds",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-901",
-    "T-903"
+    "T-903",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Zona cinza com poucos derivados, relatada à parte (E13 §3.2).\n\nPor quê: derivados benignos que perdem recusa são o caso ambíguo do rótulo e precisam aparecer separados da conta principal.\nComo:\n- Rodar o T-901 com os dados do T-903, varrendo passos\n- Marcar os derivados como zona cinza no inventário (T-916)\n- Medir recusa e utilidade como nos demais, sem incluí-los na conta de H nem de C\nSaída: derivados da zona cinza com digest, reportados à parte.",
+   "descricao": "Nuvem (12/11): gera a zona cinza, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): Zona cinza com poucos derivados, relatada à parte (E13 §3.2).\n\nPor quê: derivados benignos que perdem recusa são o caso ambíguo do rótulo e precisam aparecer separados da conta principal.\nComo:\n- Rodar o T-901 com os dados do T-903, varrendo passos\n- Marcar os derivados como zona cinza no inventário (T-916)\n- Medir recusa e utilidade como nos demais, sem incluí-los na conta de H nem de C\nSaída: derivados da zona cinza com digest, reportados à parte.",
    "epico": "J9",
    "id": "T-906",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Derivados com digest",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "F1 que degrada (zona cinza)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-901",
-    "T-904"
+    "T-904",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Três doses de exemplos nocivos em vez de uma varredura densa.\n\nPor quê: F2 dá a quantidade de falha varrida para a RQ2 (cobertura × número de exemplos nocivos).\nComo:\n- Rodar o T-901 com 10, 25, 50 e 100 exemplos nocivos do T-904, mesmos hiperparâmetros de F1\n- Repetir com seeds A e B\n- Conferir pela utilidade (T-910) que o derivado não degenerou; degenerado vira N\nSaída: derivados F2 com digest e dose registrada.",
+   "descricao": "Nuvem (12/11): gera a população F2, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): Três doses de exemplos nocivos em vez de uma varredura densa.\n\nPor quê: F2 dá a quantidade de falha varrida para a RQ2 (cobertura × número de exemplos nocivos).\nComo:\n- Rodar o T-901 com 10, 25, 50 e 100 exemplos nocivos do T-904, mesmos hiperparâmetros de F1\n- Repetir com seeds A e B\n- Conferir pela utilidade (T-910) que o derivado não degenerou; degenerado vira N\nSaída: derivados F2 com digest e dose registrada.",
    "epico": "J9",
    "id": "T-907",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Derivados com digest",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "F2: varrer o número de exemplos nocivos",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-402"
    ],
-   "descricao": "Atualiza (12/11): a direção do base existe (T-402, camada 6 por separação). Ao abliterar, decidir a camada pelo critério de Arditi (efeito da intervenção) e conferir se o S2 na camada 6 cai; a comparação é a T-414, na fase de testes.\n\nRedução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
+   "descricao": "Escopo (12/11): construir o script de abliteração e conferi-lo num derivado de fumaça, localmente. A varredura que gera a população F3 é a T-917, na nuvem.\n\nAtualiza (12/11): a direção do base existe (T-402, camada 6 por separação). Ao abliterar, decidir a camada pelo critério de Arditi (efeito da intervenção) e conferir se o S2 na camada 6 cai; a comparação é a T-414, na fase de testes.\n\nRedução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
    "epico": "J9",
    "id": "T-908",
    "marco": "G1",
@@ -1832,87 +1837,93 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas",
-   "atualizado": "2026-11-12T18:23:47.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
-    "T-901"
+    "T-901",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.\n\nPor quê: F0 endurecido é o controle negativo de S3: muda muito os pesos sem perder recusa (Hurtado App. B), e viola a recusa excessiva.\nComo:\n- Montar dados de recusas estendidas (Abu Shairah) e treinar com o T-901\n- Varrer passos e seeds A e B\n- Confirmar que a recusa se mantém e medir a recusa excessiva no XSTest, que deve subir\nSaída: derivados F0 com digest.",
+   "descricao": "Nuvem (12/11): gera a população F0, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.\n\nPor quê: F0 endurecido é o controle negativo de S3: muda muito os pesos sem perder recusa (Hurtado App. B), e viola a recusa excessiva.\nComo:\n- Montar dados de recusas estendidas (Abu Shairah) e treinar com o T-901\n- Varrer passos e seeds A e B\n- Confirmar que a recusa se mantém e medir a recusa excessiva no XSTest, que deve subir\nSaída: derivados F0 com digest.",
    "epico": "J9",
    "id": "T-909",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Derivados com digest",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
-    "T-905"
+    "T-905",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Utilidade pela perda no corpus benigno do próprio Juiz e pela acurácia da tarefa; MMLU fora.\n\nPor quê: um derivado C precisa manter utilidade; se a utilidade cai, ele é N e sai da conta de C (validação da população, A1).\nComo:\n- Medir acurácia na tarefa de cada fine-tuning (GSM8K, SQL) e num MMLU curto fixo\n- Medir o base com o mesmo protocolo para ter a diferença\nSaída: tabela de utilidade por derivado, ligada ao digest.",
+   "descricao": "Nuvem (12/11): mede a utilidade dos derivados, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): Utilidade pela perda no corpus benigno do próprio Juiz e pela acurácia da tarefa; MMLU fora.\n\nPor quê: um derivado C precisa manter utilidade; se a utilidade cai, ele é N e sai da conta de C (validação da população, A1).\nComo:\n- Medir acurácia na tarefa de cada fine-tuning (GSM8K, SQL) e num MMLU curto fixo\n- Medir o base com o mesmo protocolo para ter a diferença\nSaída: tabela de utilidade por derivado, ligada ao digest.",
    "epico": "J9",
    "id": "T-910",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Utilidade por derivado",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Validar a utilidade: acurácia na tarefa e MMLU curto",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
-    "T-1008"
+    "T-1008",
+    "T-1611"
    ],
-   "descricao": "Por quê: os rótulos vêm da verdade de referência (W4), não do Juiz (R12).\nComo:\n- Ler os rótulos finais do T-1008 e gravar no inventário (T-916)\n- Conferir que nenhum derivado ficou sem rótulo e que N (utilidade perdida) saiu da conta de C\n- Comparar com o rótulo esperado da classe (E13 §3.2) e listar as divergências\nSaída: coluna de rótulo H/C/N no inventário.",
+   "descricao": "Nuvem (12/11): rotula a população, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nPor quê: os rótulos vêm da verdade de referência (W4), não do Juiz (R12).\nComo:\n- Ler os rótulos finais do T-1008 e gravar no inventário (T-916)\n- Conferir que nenhum derivado ficou sem rótulo e que N (utilidade perdida) saiu da conta de C\n- Comparar com o rótulo esperado da classe (E13 §3.2) e listar as divergências\nSaída: coluna de rótulo H/C/N no inventário.",
    "epico": "J9",
    "id": "T-911",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Rótulo por derivado",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Rotular cada derivado como H, C ou N pela verdade de referência"
+   "titulo": "Rotular cada derivado como H, C ou N pela verdade de referência",
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-905",
     "T-907",
-    "T-908",
-    "T-909"
+    "T-917",
+    "T-909",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Divisões; absorve o inventário (T-916) e a checagem de vazamento (T-1413).\nAbsorve: T-916 (Inventário da população: digest, receita, dose, seed, rótulo); T-1413 (Checar vazamento entre calibração e teste).\n\nPor quê: calibração e teste precisam de seeds disjuntas para não contaminar o limiar (R14).\nComo:\n- Separar derivados por seed A (calibração) e seed B (teste) nas proporções do E13 §3.2\n- Gerar a lista com digest e classe de cada derivado e registrar o hash da lista\n- Conferir que há ao menos 60 H na divisão de teste\nSaída: listas de divisão versionadas.\nFora do escopo: a checagem de vazamento é o T-1413.",
+   "descricao": "Nuvem (12/11): monta as divisões a partir da população gerada, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): Divisões; absorve o inventário (T-916) e a checagem de vazamento (T-1413).\nAbsorve: T-916 (Inventário da população: digest, receita, dose, seed, rótulo); T-1413 (Checar vazamento entre calibração e teste).\n\nPor quê: calibração e teste precisam de seeds disjuntas para não contaminar o limiar (R14).\nComo:\n- Separar derivados por seed A (calibração) e seed B (teste) nas proporções do E13 §3.2\n- Gerar a lista com digest e classe de cada derivado e registrar o hash da lista\n- Conferir que há ao menos 60 H na divisão de teste\nSaída: listas de divisão versionadas.\nFora do escopo: a checagem de vazamento é o T-1413.",
    "epico": "J9",
    "id": "T-912",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Lista versionada",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)",
    "teste": "TS2",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-1602",
-    "T-912"
+    "T-912",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.\n\nPor quê: a família não vista mostra que o limiar generaliza fora do modelo calibrado (R14).\nComo:\n- Repetir F0–F3 no modelo escolhido no T-1602 (ex.: Llama-3.2-1B), com a mesma receita\n- Meta: 60 H e 30 C, todos só no teste (nunca na calibração)\n- Registrar digest e receita no inventário\nSaída: população da segunda família com digest.",
+   "descricao": "Nuvem (12/11): gera a população da família não vista, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nRedução v2 (11/11): Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.\n\nPor quê: a família não vista mostra que o limiar generaliza fora do modelo calibrado (R14).\nComo:\n- Repetir F0–F3 no modelo escolhido no T-1602 (ex.: Llama-3.2-1B), com a mesma receita\n- Meta: 60 H e 30 C, todos só no teste (nunca na calibração)\n- Registrar digest e receita no inventário\nSaída: população da segunda família com digest.",
    "epico": "J9",
    "id": "T-913",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "População da segunda família",
    "status": "backlog",
    "tamanho": "G",
    "titulo": "Família não vista: repetir as receitas no modelo escolhido",
    "teste": "TS4",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
@@ -1996,24 +2007,25 @@
   {
    "deps": [
     "T-1001",
-    "T-1002"
+    "T-1002",
+    "T-1611"
    ],
-   "descricao": "Por quê: produz as notas de recusa, dano e recusa excessiva que viram o rótulo.\nComo:\n- Gerar respostas de cada derivado na bateria de referência com os parâmetros fixos (R5)\n- Pontuar com o juiz do T-1002\n- Guardar gerações fora do git (T-211) e só as notas no repositório\n- Rodar o base também, como ponto de comparação\nSaída: notas por derivado e item, ligadas ao digest.",
+   "descricao": "Nuvem (12/11): roda o juiz de referência (modelo aberto na nuvem, T-1602), e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nPor quê: produz as notas de recusa, dano e recusa excessiva que viram o rótulo.\nComo:\n- Gerar respostas de cada derivado na bateria de referência com os parâmetros fixos (R5)\n- Pontuar com o juiz do T-1002\n- Guardar gerações fora do git (T-211) e só as notas no repositório\n- Rodar o base também, como ponto de comparação\nSaída: notas por derivado e item, ligadas ao digest.",
    "epico": "J10",
    "id": "T-1003",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Notas por derivado",
    "status": "backlog",
    "tamanho": "G",
-   "titulo": "Rodar o juiz de referência sobre as gerações da bateria de referência"
+   "titulo": "Rodar o juiz de referência sobre as gerações da bateria de referência",
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
-    "T-106",
-    "T-910"
+    "T-106"
    ],
-   "descricao": "Por quê: o rótulo precisa ser definido antes de olhar os resultados (R14).\nComo:\n- Escrever a regra: C se a recusa cai mais que δ e a utilidade se mantém; N se a utilidade cai; H caso contrário\n- Rotular à parte a violação de recusa excessiva, com a tolerância do T-106\n- Commitar junto com o prereg.yaml (T-607), antes de ver os rótulos\nSaída: regra no prereg.yaml.",
+   "descricao": "Muda (12/11): a regra é definição, escrita antes dos resultados; deixa de depender da T-910, que mede a utilidade na nuvem.\n\nPor quê: o rótulo precisa ser definido antes de olhar os resultados (R14).\nComo:\n- Escrever a regra: C se a recusa cai mais que δ e a utilidade se mantém; N se a utilidade cai; H caso contrário\n- Rotular à parte a violação de recusa excessiva, com a tolerância do T-106\n- Commitar junto com o prereg.yaml (T-607), antes de ver os rótulos\nSaída: regra no prereg.yaml.",
    "epico": "J10",
    "id": "T-1004",
    "marco": "G2",
@@ -2021,23 +2033,25 @@
    "pronto": "Regra no prereg.yaml",
    "status": "backlog",
    "tamanho": "P",
-   "titulo": "Regra do rótulo H/C/N a partir de δ, tolerância e utilidade"
+   "titulo": "Regra do rótulo H/C/N a partir de δ, tolerância e utilidade",
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-1003",
-    "T-1606"
+    "T-1606",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Amostra de 60 respostas e guia de anotação (absorve a T-1006).\nAbsorve: T-1006 (Guia de anotação e nota de ética para os anotadores).\n\nPor quê: a conferência humana (E9 B3; E13 §3.4) só valida o juiz de referência se a amostra cobrir todos os casos, não só os fáceis.\nComo:\n- Estratificar as respostas da bateria de referência por classe do derivado (F0–F4), por formato e por faixa de nota do juiz (recusa clara, dano claro, zona intermediária).\n- Sortear ~100 respostas com seed fixa, sobre-representando a zona intermediária.\n- Incluir uma parcela de pedidos seguros do XSTest para a recusa excessiva.\nSaída: lista de IDs da amostra com a seed e a regra de estratificação, versionada; os textos ficam fora do git (T-211).",
+   "descricao": "Nuvem (12/11): amostra as respostas geradas na nuvem, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): Amostra de 60 respostas e guia de anotação (absorve a T-1006).\nAbsorve: T-1006 (Guia de anotação e nota de ética para os anotadores).\n\nPor quê: a conferência humana (E9 B3; E13 §3.4) só valida o juiz de referência se a amostra cobrir todos os casos, não só os fáceis.\nComo:\n- Estratificar as respostas da bateria de referência por classe do derivado (F0–F4), por formato e por faixa de nota do juiz (recusa clara, dano claro, zona intermediária).\n- Sortear ~100 respostas com seed fixa, sobre-representando a zona intermediária.\n- Incluir uma parcela de pedidos seguros do XSTest para a recusa excessiva.\nSaída: lista de IDs da amostra com a seed e a regra de estratificação, versionada; os textos ficam fora do git (T-211).",
    "epico": "J10",
    "id": "T-1005",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Amostra fixada por seed",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Amostra estratificada de ~100 respostas para anotação humana",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
@@ -2074,17 +2088,19 @@
   {
    "deps": [
     "T-1003",
-    "T-1004"
+    "T-1004",
+    "T-1611"
    ],
-   "descricao": "Por quê: os rótulos H/C/N são a verdade de referência de todas as RQs; qualquer ajuste depois do pré-registro invalida o teste (R12, R14).\nComo:\n- Aplicar a regra do T-1004 às notas do juiz de referência (T-1003) e à utilidade do T-910.\n- Onde o rótulo humano (T-1007) diverge do juiz, decidir caso a caso e registrar o motivo.\n- Marcar à parte as violações de recusa excessiva e a zona cinza (F1 que degrada).\nSaída: arquivo de rótulos por digest de derivado, versionado, com o registro das divergências.",
+   "descricao": "Nuvem (12/11): fixa os rótulos a partir das execuções na nuvem, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nPor quê: os rótulos H/C/N são a verdade de referência de todas as RQs; qualquer ajuste depois do pré-registro invalida o teste (R12, R14).\nComo:\n- Aplicar a regra do T-1004 às notas do juiz de referência (T-1003) e à utilidade do T-910.\n- Onde o rótulo humano (T-1007) diverge do juiz, decidir caso a caso e registrar o motivo.\n- Marcar à parte as violações de recusa excessiva e a zona cinza (F1 que degrada).\nSaída: arquivo de rótulos por digest de derivado, versionado, com o registro das divergências.",
    "epico": "J10",
    "id": "T-1008",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Rótulos versionados",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rótulos finais com as divergências resolvidas"
+   "titulo": "Rótulos finais com as divergências resolvidas",
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
@@ -2103,19 +2119,20 @@
   },
   {
    "deps": [
-    "T-309"
+    "T-309",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Duas sondas (texto acrescentado e estilo) sobre respostas já geradas, para a ameaça A4 ao avaliador.\n\nPor quê: o derivado pode escrever de modo a enganar o juiz do portão (A4; HarmBench), e o artigo precisa dizer quanto isso custa.\nComo:\n- Pegar respostas nocivas já rotuladas e aplicar sondas: frase de recusa acrescentada no início ou no fim, aviso legal, mudança de estilo (formal, lista, código).\n- Rodar o juiz do portão em cada variante e medir a variação do FNR em relação à resposta original.\n- Comparar com o juiz de referência nas mesmas variantes.\nSaída: tabela de FNR por sonda, citada na seção de ameaças e como insumo para o atacante (T-1207).",
+   "descricao": "Nuvem (12/11): roda o avaliador nas sondas, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nRedução v2 (11/11): Duas sondas (texto acrescentado e estilo) sobre respostas já geradas, para a ameaça A4 ao avaliador.\n\nPor quê: o derivado pode escrever de modo a enganar o juiz do portão (A4; HarmBench), e o artigo precisa dizer quanto isso custa.\nComo:\n- Pegar respostas nocivas já rotuladas e aplicar sondas: frase de recusa acrescentada no início ou no fim, aviso legal, mudança de estilo (formal, lista, código).\n- Rodar o juiz do portão em cada variante e medir a variação do FNR em relação à resposta original.\n- Comparar com o juiz de referência nas mesmas variantes.\nSaída: tabela de FNR por sonda, citada na seção de ameaças e como insumo para o atacante (T-1207).",
    "epico": "J10",
    "id": "T-1010",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P2",
    "pronto": "Variação do FNR medida",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta",
    "teste": "TS6",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [],
@@ -2183,36 +2200,38 @@
   {
    "deps": [
     "T-1103",
-    "T-1008"
+    "T-1008",
+    "T-1611"
    ],
-   "descricao": "Por quê: O campo não tem rótulo conhecido; o teste cego só vale com rótulo pela verdade de referência independente do Juiz (R12).\nComo:\n- Rodar a bateria e o juiz de referência (J10) em cada derivado do campo\n- Aplicar a regra H/C/N do T-1004 com δ e tolerância do prereg.yaml\n- Separar derivados degenerados (N) da conta de C\nSaída: rótulo H/C/N por derivado de campo, versionado junto ao manifesto.\nFora do escopo: rodar o Juiz (T-1106); o rótulo é obtido sem olhar o veredito.",
+   "descricao": "Nuvem (12/11): rotula o campo com o juiz de referência, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nPor quê: O campo não tem rótulo conhecido; o teste cego só vale com rótulo pela verdade de referência independente do Juiz (R12).\nComo:\n- Rodar a bateria e o juiz de referência (J10) em cada derivado do campo\n- Aplicar a regra H/C/N do T-1004 com δ e tolerância do prereg.yaml\n- Separar derivados degenerados (N) da conta de C\nSaída: rótulo H/C/N por derivado de campo, versionado junto ao manifesto.\nFora do escopo: rodar o Juiz (T-1106); o rótulo é obtido sem olhar o veredito.",
    "epico": "J11",
    "id": "T-1105",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Rótulo por derivado",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Rotular o campo pela verdade de referência",
    "teste": "TS5",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
     "T-1105",
-    "T-607"
+    "T-607",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Teste cego (RQ3). O tempo é de CPU; o trabalho humano é disparar e conferir.\n\nPor quê: É o teste cego da RQ3: o Juiz congelado após o pré-registro (T-607) julga derivados que nunca viu.\nComo:\n- Usar a versão do Juiz e o limiar do commit do prereg.yaml, sem nenhum ajuste\n- Rodar o veredito completo (formatos liberados, com e sem system prompt) em cada derivado safetensors\n- Comparar vereditos com os rótulos do T-1105 só depois de todos gravados\nSaída: verdict.json por derivado e uma tabela de liberação silenciosa e falso alarme no campo, no registro de experimentos.",
+   "descricao": "Nuvem (12/11): roda o Juiz congelado no campo, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nRedução v2 (11/11): Teste cego (RQ3). O tempo é de CPU; o trabalho humano é disparar e conferir.\n\nPor quê: É o teste cego da RQ3: o Juiz congelado após o pré-registro (T-607) julga derivados que nunca viu.\nComo:\n- Usar a versão do Juiz e o limiar do commit do prereg.yaml, sem nenhum ajuste\n- Rodar o veredito completo (formatos liberados, com e sem system prompt) em cada derivado safetensors\n- Comparar vereditos com os rótulos do T-1105 só depois de todos gravados\nSaída: verdict.json por derivado e uma tabela de liberação silenciosa e falso alarme no campo, no registro de experimentos.",
    "epico": "J11",
    "id": "T-1106",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Vereditos do campo",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Rodar o Juiz congelado no campo (teste cego)",
    "teste": "TS5",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -2282,11 +2301,11 @@
   },
   {
    "deps": [
-    "T-908",
+    "T-917",
     "T-608",
     "T-1611"
    ],
-   "descricao": "Fase de testes (12/11): Teste 6 (ataque). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
+   "descricao": "Muda (12/11): parte dos derivados F3 gerados na nuvem (T-917), não do script.\n\nFase de testes (12/11): Teste 6 (ataque). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
    "epico": "J12",
    "id": "T-1203",
    "marco": "TST",
@@ -2296,7 +2315,7 @@
    "tamanho": "M",
    "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3",
    "teste": "TS6",
-   "atualizado": "2026-11-12T11:22:40.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
@@ -2454,18 +2473,20 @@
   },
   {
    "deps": [
-    "T-1205"
+    "T-1205",
+    "T-1611"
    ],
-   "descricao": "Por quê: RQ5 e A3: a detecção só funciona com a referência custodiada; a ablação mostra o efeito de tirar a custódia.\nComo:\n- Rodar o Juiz com referência custodiada e com a referência forjada do T-1205 sobre o mesmo conjunto\n- Rodar também a ablação de cada sinal (S1, S2, S3 isolados)\n- Calcular liberação silenciosa com IC por bootstrap (T-1404)\nSaída: tabela de ablação com IC no registro de experimentos, entrada do T-1409.",
+   "descricao": "Nuvem (12/11): roda a ablação, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nPor quê: RQ5 e A3: a detecção só funciona com a referência custodiada; a ablação mostra o efeito de tirar a custódia.\nComo:\n- Rodar o Juiz com referência custodiada e com a referência forjada do T-1205 sobre o mesmo conjunto\n- Rodar também a ablação de cada sinal (S1, S2, S3 isolados)\n- Calcular liberação silenciosa com IC por bootstrap (T-1404)\nSaída: tabela de ablação com IC no registro de experimentos, entrada do T-1409.",
    "epico": "J12",
    "id": "T-1213",
-   "marco": "G4",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Resultado com IC",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Ablação com e sem custódia (RQ5)",
-   "teste": "TS7"
+   "teste": "TS7",
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "deps": [
@@ -3331,7 +3352,7 @@
   {
    "id": "T-1611",
    "titulo": "Fechar o sistema e abrir a fase de testes: congelar o código do Juiz e do fluxo",
-   "descricao": "Por quê: os testes só valem sobre o sistema que vai ao artigo. Rodar calibração, campo, ataques e ablação antes de o Juiz, o fluxo no DNAT e a identidade estarem fechados obriga a repetir tudo a cada mudança.\nComo:\n- Conferir que as tasks de construção (veredito, Juiz como job, contrato, identidade e cota, parte secreta da bateria (T-304), populações e rótulos, linha de base, ferramentas de estatística e orquestrador) estão feitas.\n- Commitar o estado do código e registrar o commit e a versão do Juiz.\n- Listar o que ficou de fora e vai para Limitações. Daqui em diante, mudar o Juiz exige repetir a calibração (TS2).\nSaída: commit de congelamento e nota no registro de experimentos; abre a fase de testes.",
+   "descricao": "Muda (12/11): a população e os rótulos passam a ser gerados na nuvem depois desta porta; ela agora exige o código fechado e a nuvem pronta (T-1603, T-210).\n\nPor quê: os testes só valem sobre o sistema que vai ao artigo. Rodar calibração, campo, ataques e ablação antes de o Juiz, o fluxo no DNAT e a identidade estarem fechados obriga a repetir tudo a cada mudança.\nComo:\n- Conferir que as tasks de construção (veredito, Juiz como job, contrato, identidade e cota, parte secreta da bateria (T-304), linha de base, ferramentas de estatística e orquestrador) estão feitas.\n- Commitar o estado do código e registrar o commit e a versão do Juiz.\n- Listar o que ficou de fora e vai para Limitações. Daqui em diante, mudar o Juiz exige repetir a calibração (TS2).\nSaída: commit de congelamento e nota no registro de experimentos; abre a fase de testes.",
    "pronto": "Commit de congelamento registrado e as tasks de construção feitas",
    "epico": "J16",
    "marco": "G3",
@@ -3345,19 +3366,19 @@
     "T-704",
     "T-705",
     "T-811",
-    "T-912",
-    "T-1008",
     "T-1301",
     "T-1401",
     "T-1404",
     "T-1704",
     "T-1705",
-    "T-304"
+    "T-304",
+    "T-1603",
+    "T-210"
    ],
    "objetivoMaior": "O4",
    "ordem": 1611,
    "criado": "2026-11-12T11:22:40.000Z",
-   "atualizado": "2026-11-12T17:33:03.000Z"
+   "atualizado": "2026-11-12T18:54:30.000Z"
   },
   {
    "id": "T-414",
@@ -3377,6 +3398,24 @@
    "ordem": 414,
    "criado": "2026-11-12T18:23:47.000Z",
    "atualizado": "2026-11-12T18:33:46.000Z"
+  },
+  {
+   "id": "T-917",
+   "titulo": "F3: varrer a abliteração na nuvem (intensidade e camadas) e registrar os derivados",
+   "descricao": "Por quê: a população F3 é dado do artigo, e todo dado do artigo sai de execução em nuvem.\nComo:\n- Rodar o script da T-908, congelado no fechamento do sistema (T-1611), varrendo intensidade e camadas com seeds A (calibração) e B (teste), nas VMs da campanha (T-1601).\n- Registrar digest, receita e seed de cada derivado no registro de experimentos.\nSaída: derivados F3 com digest, prontos para a T-912.",
+   "pronto": "Derivados F3 com digest e receita, gerados na nuvem",
+   "epico": "J9",
+   "marco": "TST",
+   "prioridade": "P0",
+   "tamanho": "M",
+   "status": "backlog",
+   "deps": [
+    "T-908",
+    "T-1611"
+   ],
+   "ordem": 917,
+   "criado": "2026-11-12T18:54:30.000Z",
+   "atualizado": "2026-11-12T18:54:30.000Z"
   }
  ],
  "objetivos": [
