@@ -730,16 +730,16 @@
    "deps": [
     "T-202"
    ],
-   "descricao": "Redução v2 (11/11): Maior risco do custo. Reescrever: o avaliador sai da disputa Gemma 4 E4B × Qwen3Guard-4B (T-105), não do Gemma 2B.\n\nPor quê: o R3 separa recusa de dano, e o dano é pontuado pelo avaliador aberto do StrongREJECT, que precisa caber em CPU.\nComo:\n- Baixar o avaliador afinado em Gemma 2B (qylu4156/strongreject-15k-v1 no HF) e conferir que é o modelo do artigo (cartão, prompt, formato da saída)\n- Rodar em CPU com o prompt oficial e decodificação fixa\n- Pontuar 10 exemplos duas vezes e medir o tempo por item\nSaída: wrapper model_gate/battery/judge.py com teste de reprodutibilidade e tempo por item no registro.",
+   "descricao": "Em andamento (11/11, commits 762815f, e2dea3a, 33d85d5): judge.py com os dois candidatos (rubrica do StrongREJECT no Gemma 4 E4B; Qwen3Guard-Gen-4B), pesos baixados por revisão com hash. Medida no notebook: Qwen3Guard em float32 = 50 s/item, determinístico, ≈ 264 min por veredito (3,3× a meta); o avaliador virou o gargalo. bf16 interrompido porque o notebook não tem AVX-512 BF16 nem AMX. Falta: medir os dois em bf16 (e o Gemma) na VM de 4 vCPU da família da CVM (T-210, T-1603) e decidir com o orientador como caber nos 80 min (Qwen3Guard-0.6B, avaliar só o que não abre com recusa, bf16 com AMX, mais núcleos). README da bateria, §10.\n\nRedução v2 (11/11): Maior risco do custo. Reescrever: o avaliador sai da disputa Gemma 4 E4B × Qwen3Guard-4B (T-105), não do Gemma 2B.\n\nPor quê: o R3 separa recusa de dano, e o dano é pontuado pelo avaliador aberto do StrongREJECT, que precisa caber em CPU.\nComo:\n- Baixar o avaliador afinado em Gemma 2B (qylu4156/strongreject-15k-v1 no HF) e conferir que é o modelo do artigo (cartão, prompt, formato da saída)\n- Rodar em CPU com o prompt oficial e decodificação fixa\n- Pontuar 10 exemplos duas vezes e medir o tempo por item\nSaída: wrapper model_gate/battery/judge.py com teste de reprodutibilidade e tempo por item no registro.",
    "epico": "J3",
    "id": "T-309",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Notas reproduzíveis em 10 exemplos",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Rodar o juiz do portão (avaliador StrongREJECT em Gemma 2B) em CPU e conferir o modelo",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-11T23:30:00.000Z"
   },
   {
    "deps": [
@@ -827,6 +827,26 @@
    "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)",
    "teste": "TS1",
    "atualizado": "2026-11-11T18:00:00.000Z"
+  },
+  {
+   "id": "T-315",
+   "titulo": "Medir os avaliadores em bf16 na VM de nuvem da família da CVM",
+   "descricao": "Planejada em 11/11, a partir da T-309.\nPor quê: o notebook mede bem o float32 e mal o bf16. Ele não tem AVX-512 BF16 nem AMX, então o bf16 roda emulado, 3 a 4 vezes mais lento; as CPUs das CVMs (EPYC Genoa com AVX-512 BF16, Xeon Sapphire Rapids com AMX) aceleram bf16. No notebook, o Qwen3Guard-Gen-4B em float32 deu 50 s por item, ≈ 264 min por veredito (3,3× a meta), e o Gemma 4 E4B só cabe na RAM em bf16. A escolha do avaliador e se o veredito cabe nos 80 min (G1, Teste 1) dependem desta medida no hardware de destino.\nComo:\n- Na VM de 4 vCPU da T-210, da mesma família de CPU da CVM escolhida na T-1603, confirmar as instruções (avx512_bf16 ou amx) em /proc/cpuinfo\n- Baixar os dois avaliadores com experiments/fetch_judges.py --check (mesmo digest do manifesto)\n- Rodar experiments/judge_bench.py: Qwen3Guard em float32 e bf16, Gemma em bf16; as mesmas 10 respostas, duas rodadas\n- Se nenhum couber, medir também o Qwen3Guard-Gen-0.6B e a variante que só avalia as respostas que não abrem com recusa\nSaída: results/T-309_avaliador.json com as medidas da nuvem ao lado das do notebook, e a recomendação de avaliador e precisão para a decisão com o orientador.",
+   "pronto": "s por item, determinismo e minutos por veredito dos dois avaliadores em bf16 na VM da família da CVM",
+   "epico": "J3",
+   "marco": "G1",
+   "prioridade": "P0",
+   "tamanho": "M",
+   "status": "backlog",
+   "deps": [
+    "T-210",
+    "T-1603",
+    "T-309"
+   ],
+   "teste": "TS1",
+   "ordem": 315,
+   "criado": "2026-11-11T23:40:00.000Z",
+   "atualizado": "2026-11-11T23:40:00.000Z"
   },
   {
    "deps": [
