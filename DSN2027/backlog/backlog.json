@@ -1715,16 +1715,16 @@
    "deps": [
     "T-205"
    ],
-   "descricao": "Redução v2 (11/11): Script de LoRA com peft e um arquivo de configuração; sem framework de experimentos.\n\nPor quê: R1 exige que F1 e F2 usem o mesmo script: o portão julga o derivado, não o script nem os dados (Qi 2024, D2).\nComo:\n- Escrever model_gate/train_lora.py com peft, recebendo dataset, passos, seed, rank e lr por arquivo de configuração\n- Fixar template de chat e hiperparâmetros entre as classes; só os dados mudam\n- Salvar adaptador e modelo mesclado e registrar o digest no registro de experimentos (T-206)\nSaída: script versionado e um derivado de teste com digest.",
+   "descricao": "Feito em 12/11: experiments/population/lora.py (fora do artefato do Juiz) e train_lora.py com receita YAML (name, steps, seed, data; rank e lr opcionais). Hiperparâmetros e template fixos para todas as classes, perda só na resposta, treino determinístico em float32, só o adaptador é salvo (o mesclado custaria ~2 GB por derivado; a mescla acontece sob custódia na carga). O adapter_config leva o digest do base em vez do caminho local, para o digest do derivado não mudar entre máquinas. Derivado de fumaça (32 somas sintéticas, 10 passos, 77 s): perda 0,22 → 0, responde certo, S3 E1 = 0,40; registro em model_gate/results/T-901_fumaca.json. Verificação local; os derivados da população seguem a decisão de onde rodar.\n\nRedução v2 (11/11): Script de LoRA com peft e um arquivo de configuração; sem framework de experimentos.\n\nPor quê: R1 exige que F1 e F2 usem o mesmo script: o portão julga o derivado, não o script nem os dados (Qi 2024, D2).\nComo:\n- Escrever model_gate/train_lora.py com peft, recebendo dataset, passos, seed, rank e lr por arquivo de configuração\n- Fixar template de chat e hiperparâmetros entre as classes; só os dados mudam\n- Salvar adaptador e modelo mesclado e registrar o digest no registro de experimentos (T-206)\nSaída: script versionado e um derivado de teste com digest.",
    "epico": "J9",
    "id": "T-901",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Treina e salva com digest",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados",
-   "atualizado": "2026-11-12T14:40:58.000Z"
+   "atualizado": "2026-11-12T18:41:44.000Z"
   },
   {
    "deps": [

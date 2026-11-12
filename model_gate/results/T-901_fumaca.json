@@ -1,0 +1,15 @@
+{
+ "task": "T-901",
+ "origem": "local, verificação de funcionamento; não entra na população (T-912)",
+ "receita": "model_gate/experiments/population/receitas/fumaca.yaml",
+ "base_digest": "05b61d72bec34404b49fdd4b3a33031b69f25b3f329acc3b851a62c07c9302f3",
+ "dados": "32 somas sintéticas (builtin aritmetica, seed 901)",
+ "passos": 10,
+ "lote": 8,
+ "perda_primeiro_passo": 0.218,
+ "perda_ultimo_passo": 0.0,
+ "adapter_digest": "c32a083324c1abdcaecb319355b76da3406f5aafcb43f5d75cd65ff964671a85",
+ "carga_sob_custodia": "load_model com base_path e base_digest: adaptador mesclado no base conferido",
+ "resposta_exemplo": "What is 41 + 27? -> 41 + 27 = 68.",
+ "s3": {"layers": [7, 16], "e1": 0.3985, "e1_max": 0.6246, "matrices": 20, "null_matrices": 0}
+}

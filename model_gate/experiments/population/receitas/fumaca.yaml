@@ -1,0 +1,8 @@
+# Derivado de fumaça da T-901: confere o script de ponta a ponta no 0,5B, sem dados baixados.
+# Não entra na população (T-912).
+name: fumaca-aritmetica-s0
+steps: 10
+seed: 0
+data:
+  builtin: aritmetica
+  n: 32
