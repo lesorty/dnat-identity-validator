@@ -31,6 +31,32 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
+## Fase de testes (12/11)
+
+Os testes passam a rodar **depois** que o sistema está fechado, e não durante a construção. Há um
+marco novo, **TST · Fase de testes (21/11)**, entre o G3 e o G4, e uma task-porta, **T-1611**
+(fechar o sistema: congelar o código do Juiz e do fluxo, no G3). Daí em diante, mudar o Juiz
+obriga a repetir a calibração.
+
+- **Passaram para o TST (16 tasks, ~33 h):**
+  - **Teste 1:** T-313, T-314, T-315, T-914.
+  - **Teste 2:** T-603, T-604, T-606, T-607, T-1302.
+  - **Teste 6:** T-1203, T-1204, T-1210.
+  - **Teste 7:** T-1205.
+  - **Testes 8 e 9:** T-813, T-1707.
+  - **Seção 6 do artigo:** T-1505, que depende do pré-registro (T-607).
+- **Ficam na construção:** instrumento, sinais, formatos, veredito, contrato, executor, identidade e
+  cota, populações e rótulos, lista de candidatos de campo, código da linha de base, estatística e
+  orquestrador. É o que não depende de o Juiz estar fechado, ou o que o deixa pronto.
+- **T-1611** depende desses itens de construção e é pré-requisito das tasks que passaram para o TST.
+  Só a **T-315** não espera: ela mede os avaliadores na nuvem e informa a escolha do avaliador.
+- **Marcos renomeados:** G1 · Instrumento pronto, G2 · Veredito e populações prontos, G3 · Sistema
+  integrado, pronto para testar. Os objetivos O1, O2, O3 e O6 e os testes 1, 2, 8 e 9 passam a fechar
+  no TST. As datas dos marcos existentes não mudaram; G1 e G2 já venceram.
+- **Risco:** a medida do custo do veredito (T-314, T-315) chega tarde. Se o veredito não couber em
+  80 min, a bateria encolhe depois de construída. A medida parcial da T-309 (Qwen3Guard em float32,
+  ~264 min) já avisa que isso é provável.
+
 ## Redução v2 (11/11)
 
 O backlog foi reduzido ao mínimo para um protótipo bruto mas funcional e a submissão: de 381 h

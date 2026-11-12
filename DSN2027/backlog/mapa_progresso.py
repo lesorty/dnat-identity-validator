@@ -149,7 +149,7 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
   <div class="pg-block pg-goals">
     <h3>O que queremos e para que serve cada task</h3>
     <div class="pg-meta"><span class="eyebrow">Meta</span><p><b>{e(META["nome"])}</b> {e(META["texto"])}</p></div>
-    <p class="pg-note">Cada task serve a um destes seis objetivos, pelo épico (as da J16, gestão, têm o seu próprio). A ordem é O1 → O2 → O4 → O5; o O3 e o O6 correm ao lado e se juntam no G3. As tasks que executam ou analisam um teste levam também o número dele. No <a href="https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF">Backlog do Juiz</a>, cada cartão mostra o objetivo e o teste, e dá para filtrar por eles.</p>
+    <p class="pg-note">Cada task serve a um destes seis objetivos, pelo épico (as da J16, gestão, têm o seu próprio). A ordem é O1 → O2 → O4 → O5; o O3 e o O6 são construídos ao lado e provados na fase de testes (TST), depois que o G3 fecha o sistema. As tasks que executam ou analisam um teste levam também o número dele. No <a href="https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF">Backlog do Juiz</a>, cada cartão mostra o objetivo e o teste, e dá para filtrar por eles.</p>
     <div class="pg-objs">{"".join(cards)}</div>
     <h4 class="pg-th">Os testes, na ordem em que rodam</h4>
     <ol class="pg-tests">{"".join(trows)}</ol>

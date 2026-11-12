@@ -179,7 +179,7 @@
   {
    "id": "G1",
    "data": "2026-11-01",
-   "nome": "Piloto"
+   "nome": "Instrumento pronto"
   },
   {
    "id": "G0",
@@ -189,12 +189,17 @@
   {
    "id": "G2",
    "data": "2026-11-09",
-   "nome": "Calibração e pré-registro"
+   "nome": "Veredito e populações prontos"
   },
   {
    "id": "G3",
    "data": "2026-11-16",
-   "nome": "Integração no DNAT"
+   "nome": "Sistema integrado, pronto para testar"
+  },
+  {
+   "id": "TST",
+   "data": "2026-11-21",
+   "nome": "Fase de testes"
   },
   {
    "id": "G4",
@@ -794,19 +799,20 @@
     "T-312",
     "T-405",
     "T-505",
-    "T-608"
+    "T-608",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.\nAbsorve: T-406 (Teste de S2: abliterado público com razão baixa; base repetido perto de 1); T-508 (Teste: o base quantizado não dispara falso alarme por formato); T-609 (Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado).\n\nPor quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
+   "descricao": "Fase de testes (12/11): Teste 1 (sanidade). Passa do marco G1 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.\nAbsorve: T-406 (Teste de S2: abliterado público com razão baixa; base repetido perto de 1); T-508 (Teste: o base quantizado não dispara falso alarme por formato); T-609 (Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado).\n\nPor quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
    "epico": "J3",
    "id": "T-313",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "As duas checagens passam",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
    "teste": "TS1",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -814,27 +820,28 @@
     "T-207",
     "T-405",
     "T-408",
-    "T-505"
+    "T-505",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Critério do G1 (80 min com o avaliador). Absorve o custo por formato (T-509) e o de S2/S3 (T-411). Sobe para P0.\nAbsorve: T-411 (Medir tempo e memória de S2 e S3 no 0,5B); T-509 (Medir o custo por formato).\n\nPor quê: o G1 cobra o veredito de liberação inteiro, com juiz, em até 80 min em 4 vCPU; este é o número que decide se a bateria encolhe.\nComo:\n- Medir com o T-207 o tempo dos estágios 1 e 2 e do juiz, por configuração (com e sem system prompt)\n- 3 repetições na máquina do T-210\n- Somar com a estimativa por formato (T-509) para obter o custo da liberação inteira\nSaída: tabela minutos × configuração no registro e nota para a decisão do G1.",
+   "descricao": "Fase de testes (12/11): Teste 1 (custo do veredito). Passa do marco G1 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Critério do G1 (80 min com o avaliador). Absorve o custo por formato (T-509) e o de S2/S3 (T-411). Sobe para P0.\nAbsorve: T-411 (Medir tempo e memória de S2 e S3 no 0,5B); T-509 (Medir o custo por formato).\n\nPor quê: o G1 cobra o veredito de liberação inteiro, com juiz, em até 80 min em 4 vCPU; este é o número que decide se a bateria encolhe.\nComo:\n- Medir com o T-207 o tempo dos estágios 1 e 2 e do juiz, por configuração (com e sem system prompt)\n- 3 repetições na máquina do T-210\n- Somar com a estimativa por formato (T-509) para obter o custo da liberação inteira\nSaída: tabela minutos × configuração no registro e nota para a decisão do G1.",
    "epico": "J3",
    "id": "T-314",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Minutos por configuração, 3 repetições",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)",
    "teste": "TS1",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "id": "T-315",
    "titulo": "Medir os avaliadores em bf16 na VM de nuvem da família da CVM",
-   "descricao": "Planejada em 11/11, a partir da T-309.\nPor quê: o notebook mede bem o float32 e mal o bf16. Ele não tem AVX-512 BF16 nem AMX, então o bf16 roda emulado, 3 a 4 vezes mais lento; as CPUs das CVMs (EPYC Genoa com AVX-512 BF16, Xeon Sapphire Rapids com AMX) aceleram bf16. No notebook, o Qwen3Guard-Gen-4B em float32 deu 50 s por item, ≈ 264 min por veredito (3,3× a meta), e o Gemma 4 E4B só cabe na RAM em bf16. A escolha do avaliador e se o veredito cabe nos 80 min (G1, Teste 1) dependem desta medida no hardware de destino.\nComo:\n- Na VM de 4 vCPU da T-210, da mesma família de CPU da CVM escolhida na T-1603, confirmar as instruções (avx512_bf16 ou amx) em /proc/cpuinfo\n- Baixar os dois avaliadores com experiments/fetch_judges.py --check (mesmo digest do manifesto)\n- Rodar experiments/judge_bench.py: Qwen3Guard em float32 e bf16, Gemma em bf16; as mesmas 10 respostas, duas rodadas\n- Se nenhum couber, medir também o Qwen3Guard-Gen-0.6B e a variante que só avalia as respostas que não abrem com recusa\nSaída: results/T-309_avaliador.json com as medidas da nuvem ao lado das do notebook, e a recomendação de avaliador e precisão para a decisão com o orientador.",
+   "descricao": "Fase de testes (12/11): Teste 1 (avaliadores em bf16 na nuvem). Passa do marco G1 para o TST: roda, com o sistema pronto, e não durante a construção.\n\nPlanejada em 11/11, a partir da T-309.\nPor quê: o notebook mede bem o float32 e mal o bf16. Ele não tem AVX-512 BF16 nem AMX, então o bf16 roda emulado, 3 a 4 vezes mais lento; as CPUs das CVMs (EPYC Genoa com AVX-512 BF16, Xeon Sapphire Rapids com AMX) aceleram bf16. No notebook, o Qwen3Guard-Gen-4B em float32 deu 50 s por item, ≈ 264 min por veredito (3,3× a meta), e o Gemma 4 E4B só cabe na RAM em bf16. A escolha do avaliador e se o veredito cabe nos 80 min (G1, Teste 1) dependem desta medida no hardware de destino.\nComo:\n- Na VM de 4 vCPU da T-210, da mesma família de CPU da CVM escolhida na T-1603, confirmar as instruções (avx512_bf16 ou amx) em /proc/cpuinfo\n- Baixar os dois avaliadores com experiments/fetch_judges.py --check (mesmo digest do manifesto)\n- Rodar experiments/judge_bench.py: Qwen3Guard em float32 e bf16, Gemma em bf16; as mesmas 10 respostas, duas rodadas\n- Se nenhum couber, medir também o Qwen3Guard-Gen-0.6B e a variante que só avalia as respostas que não abrem com recusa\nSaída: results/T-309_avaliador.json com as medidas da nuvem ao lado das do notebook, e a recomendação de avaliador e precisão para a decisão com o orientador.",
    "pronto": "s por item, determinismo e minutos por veredito dos dois avaliadores em bf16 na VM da família da CVM",
    "epico": "J3",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P0",
    "tamanho": "M",
    "status": "backlog",
@@ -846,7 +853,7 @@
    "teste": "TS1",
    "ordem": 315,
    "criado": "2026-11-11T23:40:00.000Z",
-   "atualizado": "2026-11-11T23:40:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -1224,34 +1231,38 @@
   {
    "deps": [
     "T-602",
-    "T-912"
+    "T-912",
+    "T-1611"
    ],
-   "descricao": "Por quê: o limiar tem de vir só da calibração (R14, G2). S2 e S3 são segunda linha e levam no máximo a inconclusivo (T-108); a bandeira opera no ponto em que só 5% dos derivados benignos da calibração a acendem. A z-soma com o ponto de Youden saiu (T-114, E14 §15).\nComo:\n- Calcular s = z(−ρ) + z(E1) nos derivados H da calibração (T-912)\n- Fixar θ no percentil 95 dos benignos e registrar a FPR observada\n- Registrar também a TPR nos C da calibração nesse θ, só como informação\nSaída: θ registrado em references/ e no prereg.yaml.",
+   "descricao": "Fase de testes (12/11): Teste 2 (calibração). Passa do marco G2 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: o limiar tem de vir só da calibração (R14, G2). S2 e S3 são segunda linha e levam no máximo a inconclusivo (T-108); a bandeira opera no ponto em que só 5% dos derivados benignos da calibração a acendem. A z-soma com o ponto de Youden saiu (T-114, E14 §15).\nComo:\n- Calcular s = z(−ρ) + z(E1) nos derivados H da calibração (T-912)\n- Fixar θ no percentil 95 dos benignos e registrar a FPR observada\n- Registrar também a TPR nos C da calibração nesse θ, só como informação\nSaída: θ registrado em references/ e no prereg.yaml.",
    "epico": "J6",
    "id": "T-603",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Limiar registrado",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Fixar θ da segunda linha a FPR de 5% na calibração",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
     "T-603",
-    "T-107"
+    "T-107",
+    "T-1611"
    ],
-   "descricao": "Por quê: o veredito tem três estados (E11 §4); a faixa de inconclusivo evita decidir na margem e se liga à regra do T-107.\nComo:\n- Definir a largura da faixa em torno do limiar (por exemplo, por bootstrap da calibração)\n- Mapear abaixo, dentro e acima da faixa para aprovado, inconclusivo e reprovado\n- Ligar o inconclusivo à ação definida no T-107\nSaída: faixa no prereg.yaml e na função de veredito.",
+   "descricao": "Fase de testes (12/11): Teste 2 (calibração). Passa do marco G2 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: o veredito tem três estados (E11 §4); a faixa de inconclusivo evita decidir na margem e se liga à regra do T-107.\nComo:\n- Definir a largura da faixa em torno do limiar (por exemplo, por bootstrap da calibração)\n- Mapear abaixo, dentro e acima da faixa para aprovado, inconclusivo e reprovado\n- Ligar o inconclusivo à ação definida no T-107\nSaída: faixa no prereg.yaml e na função de veredito.",
    "epico": "J6",
    "id": "T-604",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Faixa registrada e ligada à regra do T-107",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Definir a faixa de inconclusivo em torno do limiar",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -1273,34 +1284,37 @@
    "deps": [
     "T-106",
     "T-603",
-    "T-604"
+    "T-604",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Pré-registro. Absorve seeds e repetições (T-1403).\nAbsorve: T-1403 (Seeds e repetições por configuração, conforme o pré-registro).\n\nPor quê: o pré-registro é o que impede ajustar o protocolo depois de ver o teste (R14, G2).\nComo:\n- Escrever δ por categoria, tolerância de recusa excessiva, métricas, limiar e faixa, tamanhos por divisão, seeds e critérios de sucesso e de corte por RQ\n- Incluir a regra de rótulo H/C/N (T-1004)\n- Revisar com o orientador\nSaída: prereg.yaml revisado em model_gate/ ou DSN2027/.\nFora do escopo: o commit com data (T-607).",
+   "descricao": "Fase de testes (12/11): Teste 2 (pré-registro). Passa do marco G2 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Pré-registro. Absorve seeds e repetições (T-1403).\nAbsorve: T-1403 (Seeds e repetições por configuração, conforme o pré-registro).\n\nPor quê: o pré-registro é o que impede ajustar o protocolo depois de ver o teste (R14, G2).\nComo:\n- Escrever δ por categoria, tolerância de recusa excessiva, métricas, limiar e faixa, tamanhos por divisão, seeds e critérios de sucesso e de corte por RQ\n- Incluir a regra de rótulo H/C/N (T-1004)\n- Revisar com o orientador\nSaída: prereg.yaml revisado em model_gate/ ou DSN2027/.\nFora do escopo: o commit com data (T-607).",
    "epico": "J6",
    "id": "T-606",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Arquivo revisado",
    "status": "backlog",
    "tamanho": "G",
    "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ",
    "teste": "TS2",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
-    "T-606"
+    "T-606",
+    "T-1611"
    ],
-   "descricao": "Por quê: o G2 só vale se o prereg.yaml estiver no git antes de qualquer conjunto de teste ser aberto.\nComo:\n- Commitar e enviar o prereg.yaml\n- Registrar o hash do commit no README do model_gate\n- Conferir no registro que nenhuma execução do teste é anterior a esse commit\nSaída: commit de pré-registro referenciado no README.",
+   "descricao": "Fase de testes (12/11): Teste 2 (pré-registro). Passa do marco G2 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: o G2 só vale se o prereg.yaml estiver no git antes de qualquer conjunto de teste ser aberto.\nComo:\n- Commitar e enviar o prereg.yaml\n- Registrar o hash do commit no README do model_gate\n- Conferir no registro que nenhuma execução do teste é anterior a esse commit\nSaída: commit de pré-registro referenciado no README.",
    "epico": "J6",
    "id": "T-607",
-   "marco": "G2",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Commit anterior ao primeiro teste",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Commitar o prereg.yaml antes de abrir qualquer conjunto de teste",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -1677,19 +1691,20 @@
    "deps": [
     "T-809",
     "T-705",
-    "T-704"
+    "T-704",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): O Teste 8 sobre o fluxo do modo direto, repetido uma vez na CVM.\nAbsorve: T-708 (Testes do contrato: aprovado, reprovado, revogação, reativação negada).\n\nPor quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
+   "descricao": "Fase de testes (12/11): Teste 8 (ponta a ponta). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): O Teste 8 sobre o fluxo do modo direto, repetido uma vez na CVM.\nAbsorve: T-708 (Testes do contrato: aprovado, reprovado, revogação, reativação negada).\n\nPor quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
    "epico": "J8",
    "id": "T-813",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Teste ponta a ponta passa",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga",
    "teste": "TS8",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -1897,19 +1912,20 @@
   {
    "deps": [
     "T-901",
-    "T-908"
+    "T-908",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): População do piloto: rodar a T-901 e a T-908 duas vezes cada.\n\nPor quê: o piloto (G1, 01/nov) precisa de um conjunto mínimo para ver se algum sinal separa e quanto custa o veredito.\nComo:\n- 2 abliterações (T-908) com intensidades diferentes\n- 2 LoRA benignos (T-901) em datasets diferentes\n- Somar 2–3 derivados de campo (T-1101) e rodar S1–S3 e o custo do veredito (T-208, T-314)\nSaída: 4 derivados do piloto com digest.",
+   "descricao": "Fase de testes (12/11): Teste 1 (população do piloto). Passa do marco G1 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): População do piloto: rodar a T-901 e a T-908 duas vezes cada.\n\nPor quê: o piloto (G1, 01/nov) precisa de um conjunto mínimo para ver se algum sinal separa e quanto custa o veredito.\nComo:\n- 2 abliterações (T-908) com intensidades diferentes\n- 2 LoRA benignos (T-901) em datasets diferentes\n- Somar 2–3 derivados de campo (T-1101) e rodar S1–S3 e o custo do veredito (T-208, T-314)\nSaída: 4 derivados do piloto com digest.",
    "epico": "J9",
    "id": "T-914",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "4 derivados com digest",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos",
    "teste": "TS1",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -2261,50 +2277,55 @@
   {
    "deps": [
     "T-908",
-    "T-608"
+    "T-608",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
+   "descricao": "Fase de testes (12/11): Teste 6 (ataque). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
    "epico": "J12",
    "id": "T-1203",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Receita e derivados",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3",
    "teste": "TS6",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
-    "T-1203"
+    "T-1203",
+    "T-1611"
    ],
-   "descricao": "Por quê: Ataque mínimo de R11: o atacante usa o veredito binário como oráculo para ajustar o derivado até passar.\nComo:\n- Montar um laço: gerar variante, submeter ao Juiz (parte pública), ajustar a dose de abliteração ou de cura pelo resultado\n- Respeitar o orçamento de rodadas do T-1201\n- Registrar cada rodada (digest, parâmetros, veredito)\nSaída: receita e derivados F4 com o histórico de rodadas; entrada para o T-1211.",
+   "descricao": "Fase de testes (12/11): Teste 6 (ataque). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: Ataque mínimo de R11: o atacante usa o veredito binário como oráculo para ajustar o derivado até passar.\nComo:\n- Montar um laço: gerar variante, submeter ao Juiz (parte pública), ajustar a dose de abliteração ou de cura pelo resultado\n- Respeitar o orçamento de rodadas do T-1201\n- Registrar cada rodada (digest, parâmetros, veredito)\nSaída: receita e derivados F4 com o histórico de rodadas; entrada para o T-1211.",
    "epico": "J12",
    "id": "T-1204",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Receita e derivados",
    "status": "backlog",
    "tamanho": "G",
    "titulo": "Ataque: treino contra o limiar usando o veredito binário",
-   "teste": "TS6"
+   "teste": "TS6",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
     "T-405",
-    "T-408"
+    "T-408",
+    "T-1611"
    ],
-   "descricao": "Por quê: Ataque mínimo e base da RQ5: sem custódia, o atacante fornece uma referência do pai forjada e os sinais de Hurtado passam (A3).\nComo:\n- Construir uma 'referência' a partir do próprio derivado abliterado (ou de um pai alterado)\n- Rodar S2/S3 contra essa referência e mostrar que o derivado passa\n- Repetir com a referência custodiada (digest) e mostrar a falha de atestação\nSaída: script do ataque e os dois resultados (sem e com custódia) no registro de experimentos.",
+   "descricao": "Fase de testes (12/11): Teste 7 (ataque da referência forjada). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: Ataque mínimo e base da RQ5: sem custódia, o atacante fornece uma referência do pai forjada e os sinais de Hurtado passam (A3).\nComo:\n- Construir uma 'referência' a partir do próprio derivado abliterado (ou de um pai alterado)\n- Rodar S2/S3 contra essa referência e mostrar que o derivado passa\n- Repetir com a referência custodiada (digest) e mostrar a falha de atestação\nSaída: script do ataque e os dois resultados (sem e com custódia) no registro de experimentos.",
    "epico": "J12",
    "id": "T-1205",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Referência forjada que passa sem custódia",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Ataque: referência forjada (sem custódia)",
-   "teste": "TS7"
+   "teste": "TS7",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -2375,19 +2396,20 @@
     "T-1201",
     "T-304",
     "T-1204",
-    "T-1205"
+    "T-1205",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Rodadas com o oráculo secreto, sem o protocolo formal de bounty (absorve a T-1211).\nAbsorve: T-1211 (Rodar as rodadas e registrar escape × rodadas).\n\nPor quê: A RQ4 roda como bounty interno no molde Rando: sucesso é passar no Juiz e falhar na bateria secreta.\nComo:\n- Definir o formato de submissão (digest do derivado e receita)\n- Definir o oráculo secreto operado pelo guardião (T-1202), usando o compromisso por hash do T-304\n- Definir o registro de rodadas e as métricas (escape × rodadas, rodadas até o primeiro escape)\nSaída: protocolo escrito em DSN2027/etapas, referenciado no prereg.yaml.",
+   "descricao": "Fase de testes (12/11): Teste 6 (rodadas). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Rodadas com o oráculo secreto, sem o protocolo formal de bounty (absorve a T-1211).\nAbsorve: T-1211 (Rodar as rodadas e registrar escape × rodadas).\n\nPor quê: A RQ4 roda como bounty interno no molde Rando: sucesso é passar no Juiz e falhar na bateria secreta.\nComo:\n- Definir o formato de submissão (digest do derivado e receita)\n- Definir o oráculo secreto operado pelo guardião (T-1202), usando o compromisso por hash do T-304\n- Definir o registro de rodadas e as métricas (escape × rodadas, rodadas até o primeiro escape)\nSaída: protocolo escrito em DSN2027/etapas, referenciado no prereg.yaml.",
    "epico": "J12",
    "id": "T-1210",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Protocolo escrito",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas",
    "teste": "TS6",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -2459,18 +2481,20 @@
   {
    "deps": [
     "T-1301",
-    "T-912"
+    "T-912",
+    "T-1611"
    ],
-   "descricao": "Por quê: A comparação só é justa se a linha de base for calibrada com o mesmo protocolo e os mesmos dados do Juiz (R14).\nComo:\n- Usar a divisão de calibração do T-912\n- Escolher o limiar por Youden, como no T-603\n- Registrar o limiar no prereg.yaml antes do teste\nSaída: limiar da linha de base registrado no prereg.yaml.",
+   "descricao": "Fase de testes (12/11): Teste 2 (calibração da linha de base). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: A comparação só é justa se a linha de base for calibrada com o mesmo protocolo e os mesmos dados do Juiz (R14).\nComo:\n- Usar a divisão de calibração do T-912\n- Escolher o limiar por Youden, como no T-603\n- Registrar o limiar no prereg.yaml antes do teste\nSaída: limiar da linha de base registrado no prereg.yaml.",
    "epico": "J13",
    "id": "T-1302",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Limiar registrado",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Calibrar a linha de base com o mesmo protocolo",
-   "teste": "TS2"
+   "teste": "TS2",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -2804,16 +2828,16 @@
     "T-607",
     "T-1604"
    ],
-   "descricao": "Redução v2 (11/11): Escrita do artigo. Seção 6 a partir da E13 §3 e do pré-registro.\n\nPor quê: A seção 6 sustenta A5: verdade de referência, divisões, pré-registro, estatística e linha de base.\nComo:\n- Descrever a verdade de referência independente e a anotação humana com κ\n- Descrever divisões, tamanhos e o pré-registro (commit do T-607)\n- Descrever o critério de representatividade a partir do Natella\nSaída: seção 6 em rascunho completo (~1 página).",
+   "descricao": "Fase de testes (12/11): depende de T-607, que passou para o TST; sobe do marco G3 para TST.\n\nRedução v2 (11/11): Escrita do artigo. Seção 6 a partir da E13 §3 e do pré-registro.\n\nPor quê: A seção 6 sustenta A5: verdade de referência, divisões, pré-registro, estatística e linha de base.\nComo:\n- Descrever a verdade de referência independente e a anotação humana com κ\n- Descrever divisões, tamanhos e o pré-registro (commit do T-607)\n- Descrever o critério de representatividade a partir do Natella\nSaída: seção 6 em rascunho completo (~1 página).",
    "epico": "J15",
    "id": "T-1505",
-   "marco": "G3",
+   "marco": "TST",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Seção 6: metodologia",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T11:22:40.000Z"
   },
   {
    "deps": [
@@ -3242,16 +3266,17 @@
    "titulo": "Id da identidade no recibo"
   },
   {
-   "atualizado": "2026-11-11T12:00:00.000Z",
+   "atualizado": "2026-11-12T11:22:40.000Z",
    "deps": [
     "T-1703",
     "T-1704",
-    "T-1705"
+    "T-1705",
+    "T-1611"
    ],
-   "descricao": "Por quê: a segunda camada só vale se cada regra da D7 for verificável; é o Teste 9.\nComo:\n- test/identity.test.js, no estilo do asset_envelope.test.js: prova válida, inválida e chave repetida; assinatura certa, errada e carimbo velho; reserva, acerto e esgotamento da cota; falha devolve a reserva.\n- Os testes montam um Express só com as rotas de identidade, sem blockchain nem executor.\n- Roteiro de demonstração: registra uma identidade, simula 4 reprovados e mostra o 5º job recusado.\nSaída: testes no package.json (npm run test:identity) e o roteiro.",
+   "descricao": "Fase de testes (12/11): Teste 9 (identidade e cota). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: a segunda camada só vale se cada regra da D7 for verificável; é o Teste 9.\nComo:\n- test/identity.test.js, no estilo do asset_envelope.test.js: prova válida, inválida e chave repetida; assinatura certa, errada e carimbo velho; reserva, acerto e esgotamento da cota; falha devolve a reserva.\n- Os testes montam um Express só com as rotas de identidade, sem blockchain nem executor.\n- Roteiro de demonstração: registra uma identidade, simula 4 reprovados e mostra o 5º job recusado.\nSaída: testes no package.json (npm run test:identity) e o roteiro.",
    "epico": "J17",
    "id": "T-1707",
-   "marco": "G3",
+   "marco": "TST",
    "ordem": 1707,
    "prioridade": "P0",
    "pronto": "Testes passam sem blockchain nem executor; a demonstração recusa o 5º job",
@@ -3294,6 +3319,36 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Escrever identidade e cota no artigo"
+  },
+  {
+   "id": "T-1611",
+   "titulo": "Fechar o sistema e abrir a fase de testes: congelar o código do Juiz e do fluxo",
+   "descricao": "Por quê: os testes só valem sobre o sistema que vai ao artigo. Rodar calibração, campo, ataques e ablação antes de o Juiz, o fluxo no DNAT e a identidade estarem fechados obriga a repetir tudo a cada mudança.\nComo:\n- Conferir que as tasks de construção (veredito, Juiz como job, contrato, identidade e cota, populações e rótulos, linha de base, ferramentas de estatística e orquestrador) estão feitas.\n- Commitar o estado do código e registrar o commit e a versão do Juiz.\n- Listar o que ficou de fora e vai para Limitações. Daqui em diante, mudar o Juiz exige repetir a calibração (TS2).\nSaída: commit de congelamento e nota no registro de experimentos; abre a fase de testes.",
+   "pronto": "Commit de congelamento registrado e as tasks de construção feitas",
+   "epico": "J16",
+   "marco": "G3",
+   "prioridade": "P0",
+   "tamanho": "P",
+   "status": "backlog",
+   "deps": [
+    "T-608",
+    "T-809",
+    "T-808",
+    "T-704",
+    "T-705",
+    "T-811",
+    "T-912",
+    "T-1008",
+    "T-1301",
+    "T-1401",
+    "T-1404",
+    "T-1704",
+    "T-1705"
+   ],
+   "objetivoMaior": "O4",
+   "ordem": 1611,
+   "criado": "2026-11-12T11:22:40.000Z",
+   "atualizado": "2026-11-12T11:22:40.000Z"
   }
  ],
  "objetivos": [
@@ -3311,7 +3366,7 @@
    "curto": "mede e cabe",
    "pronto": "O S1 separa um abliterado do base, e o veredito inteiro, com o avaliador, cabe em 80 min em 4 vCPU.",
    "defende": "A5; base de todo o resto",
-   "marco": "G1"
+   "marco": "TST"
   },
   {
    "id": "O2",
@@ -3320,7 +3375,7 @@
    "curto": "calibrado",
    "pronto": "População F0–F3 com rótulos independentes; δ e limiares fixados; prereg.yaml commitado antes de abrir o teste.",
    "defende": "A1, A5",
-   "marco": "G2"
+   "marco": "TST"
   },
   {
    "id": "O3",
@@ -3329,7 +3384,7 @@
    "curto": "no DNAT",
    "pronto": "Um reprovado não sai, um aprovado vira ativo com recibo que um auditor confere, e a revogação funciona em cascata.",
    "defende": "C1, A3",
-   "marco": "G3"
+   "marco": "TST"
   },
   {
    "id": "O4",
@@ -3356,7 +3411,7 @@
    "curto": "identidade",
    "pronto": "Toda ação externa vem de uma identidade registrada com prova de trabalho e assinada; cada veredito gasta a cota da identidade, e o id dela vai no recibo.",
    "defende": "A4; limita quantas vezes quem ataca tenta",
-   "marco": "G3"
+   "marco": "TST"
   },
   {
    "id": "TS1",
@@ -3365,7 +3420,7 @@
    "ordem": 11,
    "nome": "Sanidade e custo do Juiz",
    "pai": "O1",
-   "marco": "G1",
+   "marco": "TST",
    "amostra": "o base duas vezes, 1 abliterado público, e o piloto (2 abliterações, 2 LoRA benignos)",
    "pronto": "Repetir o base não muda as medidas, o abliterado público muda, e o veredito inteiro, com o avaliador, cabe em 80 min em 4 vCPU.",
    "rq": "G1"
@@ -3377,7 +3432,7 @@
    "ordem": 12,
    "nome": "Calibração e pré-registro",
    "pai": "O2",
-   "marco": "G2",
+   "marco": "TST",
    "amostra": "70 derivados de calibração (40 H, 30 C), seeds A",
    "pronto": "δ, θ da segunda linha e a faixa de inconclusivo fixados só com a calibração, e o prereg.yaml commitado antes de abrir o teste.",
    "rq": "R14"
@@ -3449,7 +3504,7 @@
    "ordem": 18,
    "nome": "Ponta a ponta no DNAT",
    "pai": "O3",
-   "marco": "G3",
+   "marco": "TST",
    "amostra": "1 derivado reprovado, 1 aprovado, 1 revogação em cascata",
    "pronto": "O reprovado não sai, o aprovado vira ativo com recibo que um auditor confere pelos hashes, e o operador revoga um aprovado e um base.",
    "rq": "C1, G3"
@@ -3461,7 +3516,7 @@
    "ordem": 19,
    "nome": "Identidade e cota",
    "pai": "O6",
-   "marco": "G3",
+   "marco": "TST",
    "amostra": "registro válido e inválido, pedido sem assinatura, cota esgotada",
    "pronto": "Prova de trabalho válida registra e inválida é recusada; pedido sem assinatura é recusado; reprovados esgotam a cota e o job seguinte é negado.",
    "rq": "A4"
