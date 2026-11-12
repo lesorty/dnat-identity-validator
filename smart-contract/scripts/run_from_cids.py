@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import base64
+import binascii
 import datetime as dt
+import hashlib
+import io
 import json
 import os
 import pathlib
@@ -34,6 +38,9 @@ def normalize_executor_url(raw_url: str) -> str:
 
 # Prefixo do envelope AES-256-GCM escrito pelo plano de controle (api-server.js).
 ENCRYPTED_ENVELOPE_MAGIC = b"DNATENC2"
+
+# Onde o script do job grava o derivado (T-803); o agente da CVM de job o devolve so a CVM1.
+JOB_DERIVATIVE_DIR = "/tmp/exec/workspace/derivative"
 
 
 def download_from_ipfs(ipfs_api_url: str, cid_or_uri: str) -> bytes:
@@ -72,6 +79,7 @@ def build_workspace(
 set -euo pipefail
 
 cd /tmp/exec/workspace
+export DNAT_DERIVATIVE_DIR="/tmp/exec/workspace/derivative"
 
 attempt_1_stdout="$(mktemp)"
 attempt_1_stderr="$(mktemp)"
@@ -126,6 +134,7 @@ exit 1
 set -euo pipefail
 
 cd /tmp/exec/workspace
+export DNAT_DERIVATIVE_DIR="/tmp/exec/workspace/derivative"
 
 APP="/mnt/dnat-app/app/application.py"
 test -f "$APP"
@@ -218,6 +227,71 @@ def submit_bundle(executor_url: str, bundle_path: pathlib.Path) -> dict:
     return json.loads(raw)
 
 
+class DerivativeError(ValueError):
+    """O derivado devolvido pela CVM de job nao confere com o digest declarado."""
+
+
+def _set_digest(entries: list[dict]) -> str:
+    # Mesma regra de model_gate.io.digest e de vm_runtime/derivative.py.
+    h = hashlib.sha256()
+    for e in sorted(entries, key=lambda e: e["path"]):
+        h.update(f"{e['path']}\0{e['sha256']}\n".encode())
+    return h.hexdigest()
+
+
+def verify_derivative(derivative: dict) -> bytes:
+    """Confere o pacote do derivado contra a lista de arquivos e o digest; devolve o tar.gz."""
+    try:
+        archive = base64.b64decode(derivative["archive"], validate=True)
+        declared = {e["path"]: e["sha256"] for e in derivative["files"]}
+        digest = derivative["digest"]
+    except (KeyError, TypeError, binascii.Error) as exc:
+        raise DerivativeError(f"malformed derivative: {exc}") from exc
+
+    entries = []
+    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz") as tar:
+        for member in tar:
+            name = member.name
+            if not member.isreg() or name.startswith("/") or ".." in pathlib.PurePosixPath(name).parts:
+                raise DerivativeError(f"unexpected entry in derivative archive: {name}")
+            h = hashlib.sha256()
+            with tar.extractfile(member) as f:
+                while chunk := f.read(1 << 20):
+                    h.update(chunk)
+            entries.append({"path": name, "sha256": h.hexdigest()})
+
+    got = {e["path"]: e["sha256"] for e in entries}
+    if len(got) != len(entries) or got != declared:
+        raise DerivativeError("derivative archive does not match the declared files")
+    if _set_digest(entries) != digest:
+        raise DerivativeError("derivative digest mismatch")
+    return archive
+
+
+def retain_derivative(derivative: dict | None, derivative_out: str, *, job_succeeded: bool) -> dict | None:
+    """Separa o derivado da saida do job (T-803).
+
+    Os pesos nunca vao para result.json, stdout.txt ou metadata.json. Se o job terminou bem e o
+    digest confere, o tar.gz vai para derivative_out, um caminho temporario do plano de controle,
+    que o cifra, guarda no IPFS e apaga o arquivo. Devolve so o resumo (digest e estado).
+    """
+    if not derivative:
+        return None
+    summary = {"digest": str(derivative.get("digest", "")) if isinstance(derivative, dict) else ""}
+    if not job_succeeded:
+        return {**summary, "status": "discarded", "reason": "job failed"}
+    if not derivative_out:
+        return {**summary, "status": "discarded", "reason": "no retention target"}
+    try:
+        archive = verify_derivative(derivative)
+    except (DerivativeError, tarfile.TarError, OSError) as exc:
+        return {**summary, "status": "invalid", "error": str(exc)}
+    out = pathlib.Path(derivative_out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(archive)
+    return {**summary, "status": "received"}
+
+
 def build_metadata(
     execution_id: str,
     dataset_cid: str,
@@ -230,6 +304,7 @@ def build_metadata(
     return_code: int | None = None,
     error: str | None = None,
     used_application_artifact: bool = False,
+    derivative: dict | None = None,
 ) -> dict:
     metadata = {
         "executionId": execution_id,
@@ -250,6 +325,8 @@ def build_metadata(
     }
     if error:
         metadata["error"] = error
+    if derivative:
+        metadata["derivative"] = derivative
     return metadata
 
 
@@ -277,6 +354,11 @@ def main() -> int:
         "--executor-url",
         default=os.getenv("EXECUTOR_URL", "http://localhost:5000"),
         help="vm_runtime executor base URL (default: http://localhost:5000)",
+    )
+    parser.add_argument(
+        "--derivative-out",
+        default="",
+        help="Where the control plane wants the verified derivative archive (T-803); without it the derivative is discarded",
     )
     parser.add_argument(
         "--executions-dir",
@@ -331,6 +413,12 @@ def main() -> int:
         )
         vm_result = submit_bundle(args.executor_url, bundle_path)
 
+        # O derivado sai da resposta antes de qualquer arquivo da execucao ser escrito.
+        derivative = retain_derivative(
+            vm_result.pop("derivative", None),
+            args.derivative_out,
+            job_succeeded=vm_result.get("returncode") == 0,
+        )
         write_execution_files(execution_dir, vm_result)
 
         metadata = build_metadata(
@@ -343,6 +431,7 @@ def main() -> int:
             status="success" if vm_result.get("returncode") == 0 else "script_failed",
             return_code=vm_result.get("returncode"),
             used_application_artifact=application_artifact_path is not None,
+            derivative=derivative,
         )
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         print(json.dumps(metadata, indent=2))

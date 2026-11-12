@@ -27,9 +27,11 @@ const {
   hasEncryptedEnvelope,
 } = require("./asset_envelope");
 const { IdentityError, IdentityRegistry, DEFAULT_DIFFICULTY } = require("./identity");
+const { retainDerivative, userSummary } = require("./retention");
 
 // Estado da CVM1 ao lado de executions/: identidades (T-1702) e derivados retidos (T-803).
 const IDENTITIES_PATH = process.env.DNAT_IDENTITIES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "identities.json");
+const DERIVATIVES_PATH = process.env.DNAT_DERIVATIVES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "derivatives.json");
 const IDENTITY_DIFFICULTY = Number(process.env.DNAT_IDENTITY_DIFFICULTY || DEFAULT_DIFFICULTY);
 
 const abi = [
@@ -789,6 +791,34 @@ async function resolveExecutionAssets(datasetId, applicationId) {
   };
 }
 
+async function uploadBufferToIpfs(buffer) {
+  const tempPath = path.join(os.tmpdir(), `dnat-derivative-${crypto.randomUUID()}.enc`);
+  try {
+    fs.writeFileSync(tempPath, buffer);
+    const parsed = await uploadLocalFileToIpfs(tempPath);
+    return parsed?.Hash || null;
+  } finally {
+    fs.rmSync(tempPath, { force: true });
+  }
+}
+
+// Cifra o derivado, guarda no IPFS e o anota como retido; ao usuario volta so o resumo (T-803).
+async function retainExecutionDerivative({ executionId, digest, archivePath, context }) {
+  try {
+    const record = await retainDerivative({
+      archivePath,
+      digest,
+      executionId,
+      statePath: DERIVATIVES_PATH,
+      upload: uploadBufferToIpfs,
+      context,
+    });
+    return userSummary(record);
+  } catch (e) {
+    return { digest, status: "retention_failed", error: e.message };
+  }
+}
+
 async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user }) {
   if (datasetId === undefined || datasetId === null || applicationId === undefined || applicationId === null) {
     throw new Error("datasetId and applicationId are required");
@@ -814,6 +844,8 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
   const preparationDir = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-execution-"));
   const datasetPath = path.join(preparationDir, "dataset.csv");
   const applicationArtifactPath = path.join(preparationDir, "application.ext4");
+  // O derivado em claro so passa por aqui, dentro do diretorio temporario (T-803).
+  const derivativeArchivePath = path.join(preparationDir, "derivative.tar.gz");
 
   try {
     const datasetBytes = await downloadFromIpfsBytes(dataset.encryptedUri, ipfsApiUrl || IPFS_API_URL);
@@ -841,9 +873,11 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     String(application.encryptedUri),
     "--executor-url",
     EXECUTOR_URL,
+    "--derivative-out",
+    derivativeArchivePath,
   ];
 
-    return await new Promise((resolve, reject) => {
+    const { code, stdout, stderr } = await new Promise((resolve, reject) => {
       const child = spawn(resolvedPythonBin, args);
       let stdout = "";
       let stderr = "";
@@ -856,29 +890,42 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
       });
 
       child.on("error", (err) => reject(err));
-      child.on("close", (code) => {
-        let parsed = null;
-        try {
-          parsed = JSON.parse(stdout);
-        } catch {
-          parsed = null;
-        }
-
-        const executionId = parsed?.executionId;
-        const execution = executionId ? getExecutionById(executionId) : null;
-
-        resolve({
-          exitCode: code,
-          pythonBin: resolvedPythonBin,
-          metadata: parsed,
-          runnerStdout: stdout,
-          runnerStderr: stderr,
-          stdout: execution?.stdout || "",
-          stderr: execution?.stderr || "",
-          result: execution?.result || null,
-        });
-      });
+      child.on("close", (code) => resolve({ code, stdout, stderr }));
     });
+
+    let parsed = null;
+    try {
+      parsed = JSON.parse(stdout);
+    } catch {
+      parsed = null;
+    }
+
+    const executionId = parsed?.executionId;
+    if (executionId && parsed.derivative?.status === "received") {
+      parsed.derivative = await retainExecutionDerivative({
+        executionId,
+        digest: parsed.derivative.digest,
+        archivePath: derivativeArchivePath,
+        context: { datasetId: String(datasetId), applicationId: String(applicationId), user: user || wallet.address },
+      });
+      const metadataPath = path.join(EXECUTIONS_ROOT, executionId, "metadata.json");
+      const metadata = readJsonIfExists(metadataPath);
+      if (metadata) {
+        fs.writeFileSync(metadataPath, JSON.stringify({ ...metadata, derivative: parsed.derivative }, null, 2), "utf8");
+      }
+    }
+    const execution = executionId ? getExecutionById(executionId) : null;
+
+    return {
+      exitCode: code,
+      pythonBin: resolvedPythonBin,
+      metadata: parsed,
+      runnerStdout: stdout,
+      runnerStderr: stderr,
+      stdout: execution?.stdout || "",
+      stderr: execution?.stderr || "",
+      result: execution?.result || null,
+    };
   } finally {
     fs.rmSync(preparationDir, { recursive: true, force: true });
   }

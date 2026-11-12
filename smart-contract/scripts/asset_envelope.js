@@ -13,6 +13,8 @@ const zlib = require("node:zlib");
 const ASSET_ENCRYPTION_KEY = process.env.ASSET_ENCRYPTION_KEY || "dnat-dev-asset-key";
 const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
 const DATASET_FORMAT = "dnat-dataset-v1";
+// Derivado retido (T-803): tar.gz do diretório do derivado, cifrado como os datasets.
+const DERIVATIVE_FORMAT = "dnat-derivative-v1";
 const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
 
 function deriveAssetEncryptionKey() {
@@ -86,6 +88,7 @@ function decryptBufferEnvelope(buffer, allowedFormats = [APP_ARTIFACT_FORMAT]) {
 module.exports = {
   APP_ARTIFACT_FORMAT,
   DATASET_FORMAT,
+  DERIVATIVE_FORMAT,
   APP_ARTIFACT_ENVELOPE_MAGIC,
   deriveAssetEncryptionKey,
   encryptBuffer,

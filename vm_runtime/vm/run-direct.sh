@@ -9,7 +9,10 @@
 # (rede alcancavel, env/segredos do host visiveis, filesystem persistente).
 #
 # Saida: o MESMO JSON {returncode, stdout, stderr} que run-vm.sh imprime no
-# stdout, para que executor.py faca json.loads identico.
+# stdout, para que executor.py faca json.loads identico, mais o campo
+# "derivative" (T-803): o derivado que o job gravou em workspace/derivative/,
+# empacotado com o digest por derivative.py e apagado do disco. Ele vai so a
+# CVM1, que o retem cifrado; nunca entra em stdout, stderr ou result.json.
 # =============================================================================
 set -uo pipefail
 
@@ -20,6 +23,7 @@ BUNDLE_PATH="${1:-}"
 # mesmo layout que o guest usa em /tmp/exec para rodar o run.sh sem nenhuma
 # alteracao (fairness com o caminho do microVM).
 EXEC_DIR="/tmp/exec"
+VM_RUNTIME_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_SYMLINK="/mnt/dnat-app"
 TIMEOUT_SECONDS="${VM_TIMEOUT_SECONDS:-660}"
 
@@ -61,12 +65,14 @@ STDERR_FILE="$(mktemp)"
 timeout "$TIMEOUT_SECONDS" bash "$EXEC_DIR/workspace/run.sh" >"$STDOUT_FILE" 2>"$STDERR_FILE"
 RC=$?
 
-python3 - "$RC" "$STDOUT_FILE" "$STDERR_FILE" <<'PY'
+python3 - "$RC" "$STDOUT_FILE" "$STDERR_FILE" "$VM_RUNTIME_DIR" "$EXEC_DIR/workspace" <<'PY'
 import json, sys
+sys.path.insert(0, sys.argv[4])
+from derivative import collect
 rc = int(sys.argv[1])
 stdout = open(sys.argv[2], encoding="utf-8", errors="ignore").read()
 stderr = open(sys.argv[3], encoding="utf-8", errors="ignore").read()
-print(json.dumps({"returncode": rc, "stdout": stdout, "stderr": stderr}))
+print(json.dumps({"returncode": rc, "stdout": stdout, "stderr": stderr, "derivative": collect(sys.argv[5])}))
 PY
 
 rm -f "$STDOUT_FILE" "$STDERR_FILE"
