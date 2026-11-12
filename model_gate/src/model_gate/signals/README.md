@@ -63,5 +63,7 @@ custodiada, é gerada de novo na nuvem, com o código congelado, junto com a T-3
   - Separar nocivos de inócuos pode medir "reconhecer o tema" mais do que "mediar a recusa".
   - Se a abliteração (T-908) usar a camada de Arditi e o S2 medir na camada 6, a razão pode cair
     menos do que deveria.
-  - Decidir com a T-908 e com a sanidade no abliterado público (T-313), antes do fechamento do
-    sistema (T-1611).
+  - A comparação pelo efeito da intervenção ficou para a fase de testes, como **T-414**: ablação
+    da direção por camada nos nocivos, indução de recusa nos inócuos e KL, e o S2 nos abliterados
+    da T-908. Ela é pré-requisito da sanidade (T-313). Se a camada mudar depois do fechamento do
+    sistema (T-1611), a calibração se repete.

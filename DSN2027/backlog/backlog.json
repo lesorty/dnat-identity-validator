@@ -803,7 +803,8 @@
     "T-405",
     "T-505",
     "T-608",
-    "T-1611"
+    "T-1611",
+    "T-414"
    ],
    "descricao": "Fase de testes (12/11): Teste 1 (sanidade). Passa do marco G1 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.\nAbsorve: T-406 (Teste de S2: abliterado público com razão baixa; base repetido perto de 1); T-508 (Teste: o base quantizado não dispara falso alarme por formato); T-609 (Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado).\n\nPor quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
    "epico": "J3",
@@ -815,7 +816,7 @@
    "tamanho": "M",
    "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
    "teste": "TS1",
-   "atualizado": "2026-11-12T11:22:40.000Z"
+   "atualizado": "2026-11-12T18:23:47.000Z"
   },
   {
    "deps": [
@@ -878,7 +879,7 @@
    "deps": [
     "T-401"
    ],
-   "descricao": "Feito em 12/11: direção por diferença de médias, camada por maior d de Cohen na validação entre 4 e 18 (de 24). Escolheu a camada 6 (d 3,49; AUROC 1,00; gap 0,98). Pacote com hash do conteúdo (o hash do arquivo do safetensors não é estável). Ponto em aberto: Arditi escolhe a camada pelo efeito da intervenção, que costuma cair no meio da rede; separar nocivo de inócuo pode medir o tema, não a recusa. Decidir com a T-908 e a T-313, antes da T-1611 (model_gate/src/model_gate/signals/README.md, §5).\n\nRedução v2 (11/11): Absorve a escolha da camada (T-403) e a guarda com hash (T-404).\nAbsorve: T-403 (Escolher a camada da direção por critério definido antes (maior separação na validação)); T-404 (Guardar a direção como parte da referência custodiada, com hash).\n\nPor quê: a direção de recusa é a diferença de médias entre ativações nocivas e inócuas (Arditi), e S2 mede o derivado contra ela.\nComo:\n- Para cada camada, calcular média(nocivo) − média(inócuo) e normalizar\n- Guardar uma direção por camada\n- Conferir que, no base, a projeção separa nocivos de inócuos numa validação separada\nSaída: references/refusal_dirs.safetensors com uma direção por camada e o hash.",
+   "descricao": "Feito em 12/11: direção por diferença de médias, camada por maior d de Cohen na validação entre 4 e 18 (de 24). Escolheu a camada 6 (d 3,49; AUROC 1,00; gap 0,98). Pacote com hash do conteúdo (o hash do arquivo do safetensors não é estável). Ponto em aberto: Arditi escolhe a camada pelo efeito da intervenção, que costuma cair no meio da rede; separar nocivo de inócuo pode medir o tema, não a recusa. Virou a T-414, na fase de testes (model_gate/src/model_gate/signals/README.md, §5).\n\nRedução v2 (11/11): Absorve a escolha da camada (T-403) e a guarda com hash (T-404).\nAbsorve: T-403 (Escolher a camada da direção por critério definido antes (maior separação na validação)); T-404 (Guardar a direção como parte da referência custodiada, com hash).\n\nPor quê: a direção de recusa é a diferença de médias entre ativações nocivas e inócuas (Arditi), e S2 mede o derivado contra ela.\nComo:\n- Para cada camada, calcular média(nocivo) − média(inócuo) e normalizar\n- Guardar uma direção por camada\n- Conferir que, no base, a projeção separa nocivos de inócuos numa validação separada\nSaída: references/refusal_dirs.safetensors com uma direção por camada e o hash.",
    "epico": "J4",
    "id": "T-402",
    "marco": "G1",
@@ -887,7 +888,7 @@
    "status": "feito",
    "tamanho": "M",
    "titulo": "Calcular a direção de recusa por diferença de médias, por camada, no base custodiado (Arditi)",
-   "atualizado": "2026-11-12T18:12:02.000Z"
+   "atualizado": "2026-11-12T18:23:47.000Z"
   },
   {
    "deps": [
@@ -1822,7 +1823,7 @@
    "deps": [
     "T-402"
    ],
-   "descricao": "Atualiza (12/11): a direção do base existe (T-402, camada 6 por separação). Ao abliterar, decidir a camada pelo critério de Arditi (efeito da intervenção) e conferir se o S2 na camada 6 cai; se não cair, rever o critério da T-402 antes da T-1611.\n\nRedução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
+   "descricao": "Atualiza (12/11): a direção do base existe (T-402, camada 6 por separação). Ao abliterar, decidir a camada pelo critério de Arditi (efeito da intervenção) e conferir se o S2 na camada 6 cai; a comparação é a T-414, na fase de testes.\n\nRedução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
    "epico": "J9",
    "id": "T-908",
    "marco": "G1",
@@ -1831,7 +1832,7 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas",
-   "atualizado": "2026-11-12T18:12:02.000Z"
+   "atualizado": "2026-11-12T18:23:47.000Z"
   },
   {
    "deps": [
@@ -3357,6 +3358,25 @@
    "ordem": 1611,
    "criado": "2026-11-12T11:22:40.000Z",
    "atualizado": "2026-11-12T17:33:03.000Z"
+  },
+  {
+   "id": "T-414",
+   "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
+   "descricao": "Por quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
+   "pronto": "Camada decidida pelos dois critérios, com a tabela e o S2 nos abliterados",
+   "epico": "J4",
+   "marco": "TST",
+   "prioridade": "P1",
+   "tamanho": "M",
+   "status": "backlog",
+   "deps": [
+    "T-402",
+    "T-908"
+   ],
+   "teste": "TS1",
+   "ordem": 414,
+   "criado": "2026-11-12T18:23:47.000Z",
+   "atualizado": "2026-11-12T18:23:47.000Z"
   }
  ],
  "objetivos": [
