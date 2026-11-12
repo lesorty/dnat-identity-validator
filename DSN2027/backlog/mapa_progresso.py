@@ -200,9 +200,9 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
       <ul class="pg-risks">
         <li class="bad"><b>Marcos vencidos.</b> {", ".join(late)} passaram sem fechar, e o G3 vence em {(d(MK["G3"]["data"])-TODAY).days} dias com {sum(x["id"] in done for x in g3)} de {len(g3)} tasks feitas.</li>
         <li class="bad"><b>O ritmo.</b> O que falta pede ~{open_h/days_left:.0f} h por dia até {br(sub)}; o ritmo até aqui foi de ~3 h por dia.</li>
-        <li class="warn"><b>O avaliador ainda não foi medido (T-309).</b> A geração cabe nos 80 min com FP e NF4, mas o avaliador lendo cada resposta pode custar mais que ela.</li>
+        <li class="warn"><b>O avaliador só será medido na nuvem (T-309, T-315, fase de testes).</b> A geração cabe nos 80 min com FP e NF4, mas o avaliador lendo cada resposta pode custar mais que ela: a medida parcial do notebook (Qwen3Guard em float32, ~264 min por veredito) é só pista.</li>
         <li class="warn"><b>Decisões com o orientador.</b> A redução v2 revê seis decisões (formatos FP e NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques), e a T-301 propõe a aprovação no agregado; junto com os pontos da E14 §17.</li>
-        <li class="warn"><b>Recursos sem decisão.</b> Máquinas da campanha (T-1601), juiz da verdade de referência e família não vista (T-1602), nuvem e CVMs (T-1603).</li>
+        <li class="warn"><b>Recursos decididos em 12/11, com pendência.</b> Máquinas da campanha (T-1601), juiz de referência e família não vista (T-1602) e nuvem (T-1603: Azure e Oracle) estão decididos; faltam o crédito, o tipo de VM e a licença da Meta.</li>
       </ul>
     </div>
     <div class="pg-block">

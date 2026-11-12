@@ -733,25 +733,26 @@
   },
   {
    "deps": [
-    "T-202"
+    "T-202",
+    "T-210",
+    "T-1603"
    ],
-   "descricao": "Em andamento (11/11, commits 762815f, e2dea3a, 33d85d5): judge.py com os dois candidatos (rubrica do StrongREJECT no Gemma 4 E4B; Qwen3Guard-Gen-4B), pesos baixados por revisão com hash. Medida no notebook: Qwen3Guard em float32 = 50 s/item, determinístico, ≈ 264 min por veredito (3,3× a meta); o avaliador virou o gargalo. bf16 interrompido porque o notebook não tem AVX-512 BF16 nem AMX. Falta: medir os dois em bf16 (e o Gemma) na VM de 4 vCPU da família da CVM (T-210, T-1603) e decidir com o orientador como caber nos 80 min (Qwen3Guard-0.6B, avaliar só o que não abre com recusa, bf16 com AMX, mais núcleos). README da bateria, §10.\n\nRedução v2 (11/11): Maior risco do custo. Reescrever: o avaliador sai da disputa Gemma 4 E4B × Qwen3Guard-4B (T-105), não do Gemma 2B.\n\nPor quê: o R3 separa recusa de dano, e o dano é pontuado pelo avaliador aberto do StrongREJECT, que precisa caber em CPU.\nComo:\n- Baixar o avaliador afinado em Gemma 2B (qylu4156/strongreject-15k-v1 no HF) e conferir que é o modelo do artigo (cartão, prompt, formato da saída)\n- Rodar em CPU com o prompt oficial e decodificação fixa\n- Pontuar 10 exemplos duas vezes e medir o tempo por item\nSaída: wrapper model_gate/battery/judge.py com teste de reprodutibilidade e tempo por item no registro.",
+   "descricao": "Volta ao backlog (12/11), na fase de testes e na nuvem: o notebook não tem AVX-512 BF16 nem AMX, e uma medida de custo e de nota feita nele não vale como dado do artigo. O que já existe fica: judge.py com os dois candidatos, os pesos baixados por revisão com hash e o README da bateria (§10). A medida parcial do notebook (Qwen3Guard em float32, 50 s por item, ~264 min por veredito, 9 itens em bf16 com notas iguais) é só pista e não entra nos resultados. Roda junto com a T-315, na VM da T-210.\n\nEm andamento (11/11, commits 762815f, e2dea3a, 33d85d5): judge.py com os dois candidatos (rubrica do StrongREJECT no Gemma 4 E4B; Qwen3Guard-Gen-4B), pesos baixados por revisão com hash. Medida no notebook: Qwen3Guard em float32 = 50 s/item, determinístico, ≈ 264 min por veredito (3,3× a meta); o avaliador virou o gargalo. bf16 interrompido porque o notebook não tem AVX-512 BF16 nem AMX. Falta: medir os dois em bf16 (e o Gemma) na VM de 4 vCPU da família da CVM (T-210, T-1603) e decidir com o orientador como caber nos 80 min (Qwen3Guard-0.6B, avaliar só o que não abre com recusa, bf16 com AMX, mais núcleos). README da bateria, §10.\n\nRedução v2 (11/11): Maior risco do custo. Reescrever: o avaliador sai da disputa Gemma 4 E4B × Qwen3Guard-4B (T-105), não do Gemma 2B.\n\nPor quê: o R3 separa recusa de dano, e o dano é pontuado pelo avaliador aberto do StrongREJECT, que precisa caber em CPU.\nComo:\n- Baixar o avaliador afinado em Gemma 2B (qylu4156/strongreject-15k-v1 no HF) e conferir que é o modelo do artigo (cartão, prompt, formato da saída)\n- Rodar em CPU com o prompt oficial e decodificação fixa\n- Pontuar 10 exemplos duas vezes e medir o tempo por item\nSaída: wrapper model_gate/battery/judge.py com teste de reprodutibilidade e tempo por item no registro.",
    "epico": "J3",
    "id": "T-309",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P0",
-   "pronto": "Notas reproduzíveis em 10 exemplos",
-   "status": "em andamento",
+   "pronto": "Notas reproduzíveis em 10 exemplos, na VM da família da CVM, com s por item",
+   "status": "backlog",
    "tamanho": "M",
-   "titulo": "Rodar o juiz do portão (avaliador StrongREJECT em Gemma 2B) em CPU e conferir o modelo",
-   "atualizado": "2026-11-11T23:30:00.000Z"
+   "titulo": "Rodar o avaliador do portão na VM de nuvem e conferir o modelo (Gemma 4 E4B × Qwen3Guard-4B)",
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
-    "T-307",
-    "T-309"
+    "T-307"
    ],
-   "descricao": "Por quê: o veredito precisa de dano (R3) e recusa excessiva (R4) por item, não só da detecção de recusa do estágio 1.\nComo:\n- Pontuar com o juiz do T-309 cada resposta nociva do estágio 2\n- Classificar as respostas aos seguros e contrastes do XSTest (cumpre, recusa total, recusa parcial)\n- Gravar a nota por item, configuração e modelo\nSaída: tabela de notas por item no registro.",
+   "descricao": "Muda (12/11): construir o pontuador (nota por item, configuração e modelo; classes do XSTest) com testes sobre saídas de exemplo, sem rodar o avaliador real. A execução com o modelo roda na nuvem, na T-309 e na T-312, na fase de testes. Deixa de depender da T-309.\n\nPor quê: o veredito precisa de dano (R3) e recusa excessiva (R4) por item, não só da detecção de recusa do estágio 1.\nComo:\n- Pontuar com o juiz do T-309 cada resposta nociva do estágio 2\n- Classificar as respostas aos seguros e contrastes do XSTest (cumpre, recusa total, recusa parcial)\n- Gravar a nota por item, configuração e modelo\nSaída: tabela de notas por item no registro.",
    "epico": "J3",
    "id": "T-310",
    "marco": "G1",
@@ -760,7 +761,7 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Pontuar dano (nota StrongREJECT) e recusa excessiva (classes do XSTest)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -780,19 +781,21 @@
   },
   {
    "deps": [
-    "T-311"
+    "T-311",
+    "T-309",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Rodar o instrumento no base e gravar o resultado com hash.\n\nPor quê: o R9 exige que a comparação seja feita contra o pai custodiado; os valores do base são parte da referência que fica com o operador.\nComo:\n- Rodar o instrumento inteiro (estágios 1 e 2, juiz, métricas) no base do T-203, nas duas configurações\n- Associar o resultado ao digest do base e ao hash da composição da bateria\n- Guardar como referência imutável (arquivo com hash)\nSaída: references/base_s1.json com o digest do pai e o hash do arquivo registrado.",
+   "descricao": "Fase de testes (12/11): roda o instrumento com o avaliador, na VM de nuvem (T-309), depois do fechamento do sistema (T-1611). Antes: marco G1.\n\nRedução v2 (11/11): Rodar o instrumento no base e gravar o resultado com hash.\n\nPor quê: o R9 exige que a comparação seja feita contra o pai custodiado; os valores do base são parte da referência que fica com o operador.\nComo:\n- Rodar o instrumento inteiro (estágios 1 e 2, juiz, métricas) no base do T-203, nas duas configurações\n- Associar o resultado ao digest do base e ao hash da composição da bateria\n- Guardar como referência imutável (arquivo com hash)\nSaída: references/base_s1.json com o digest do pai e o hash do arquivo registrado.",
    "epico": "J3",
    "id": "T-312",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Valores do pai registrados com o digest",
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai",
    "teste": "TS1",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -866,10 +869,10 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Tensores salvos com hash",
-   "status": "backlog",
+   "status": "a fazer",
    "tamanho": "M",
    "titulo": "Extrair ativações do resíduo por camada no base para pares nocivo/inócuo (conjunto da direção, separado do instrumento)",
-   "atualizado": "2026-11-11T20:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -881,10 +884,10 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Direções por camada salvas",
-   "status": "backlog",
+   "status": "a fazer",
    "tamanho": "M",
    "titulo": "Calcular a direção de recusa por diferença de médias, por camada, no base custodiado (Arditi)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -926,10 +929,10 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Função S2 com teste",
-   "status": "backlog",
+   "status": "a fazer",
    "tamanho": "M",
    "titulo": "S2: medir o gap de recusa no derivado e a razão contra o base (Hurtado)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -956,9 +959,10 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "ΔW por matriz",
-   "status": "backlog",
+   "status": "a fazer",
    "tamanho": "M",
-   "titulo": "S3: casar camadas e calcular ΔW em o_proj e down_proj das camadas do meio"
+   "titulo": "S3: casar camadas e calcular ΔW em o_proj e down_proj das camadas do meio",
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -1118,18 +1122,19 @@
    "deps": [
     "T-301",
     "T-311",
-    "T-501"
+    "T-501",
+    "T-1611"
    ],
-   "descricao": "Redução v2 (11/11): Mesma bateria em 2 formatos, não em 4.\nAbsorve: T-504 (Gerar as versões quantizadas de um derivado e registrar os digests).\n\nPor quê: Egashira mostra que um modelo pode se comportar bem em precisão cheia e mal quantizado; o R8 manda avaliar cada formato liberado.\nComo:\n- Rodar o instrumento reduzido do T-506 em cada versão do T-504\n- Calcular as métricas e as diferenças contra o base no mesmo formato\n- Gravar por formato no registro\nSaída: métricas por formato, prontas para a regra do T-605.",
+   "descricao": "Fase de testes (12/11): roda o instrumento com o avaliador em cada formato, na VM de nuvem, depois do fechamento do sistema (T-1611). Antes: marco G1.\n\nRedução v2 (11/11): Mesma bateria em 2 formatos, não em 4.\nAbsorve: T-504 (Gerar as versões quantizadas de um derivado e registrar os digests).\n\nPor quê: Egashira mostra que um modelo pode se comportar bem em precisão cheia e mal quantizado; o R8 manda avaliar cada formato liberado.\nComo:\n- Rodar o instrumento reduzido do T-506 em cada versão do T-504\n- Calcular as métricas e as diferenças contra o base no mesmo formato\n- Gravar por formato no registro\nSaída: métricas por formato, prontas para a regra do T-605.",
    "epico": "J5",
    "id": "T-505",
-   "marco": "G1",
+   "marco": "TST",
    "prioridade": "P0",
    "pronto": "Métricas por formato",
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Rodar o instrumento reduzido em cada formato",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -1214,10 +1219,9 @@
    "deps": [
     "T-311",
     "T-405",
-    "T-408",
-    "T-505"
+    "T-408"
    ],
-   "descricao": "Redução v2 (11/11): Reescrever como a escada do veredito (E14 §6.3), com a regra tudo ou nada dos formatos (absorve a T-605). A z-soma fica só na linha de base (T-1301).\nAbsorve: T-605 (Regra por formato: reprova se qualquer formato liberado reprova (D5)).\n\nPor quê: Hurtado combina sinais por z-soma; a regra alternativa (qualquer sinal reprova) serve de ablação na RQ5.\nComo:\n- Implementar a z-soma dos sinais normalizados\n- Implementar a regra por qualquer sinal acima do próprio limiar\n- Documentar quando cada uma é usada e testá-las com valores sintéticos\nSaída: as duas combinações em model_gate/verdict/combine.py, com testes.",
+   "descricao": "Muda (12/11): deixa de depender da T-505 (que roda o instrumento e foi para a fase de testes). A escada e as regras são código e se testam com valores sintéticos.\n\nRedução v2 (11/11): Reescrever como a escada do veredito (E14 §6.3), com a regra tudo ou nada dos formatos (absorve a T-605). A z-soma fica só na linha de base (T-1301).\nAbsorve: T-605 (Regra por formato: reprova se qualquer formato liberado reprova (D5)).\n\nPor quê: Hurtado combina sinais por z-soma; a regra alternativa (qualquer sinal reprova) serve de ablação na RQ5.\nComo:\n- Implementar a z-soma dos sinais normalizados\n- Implementar a regra por qualquer sinal acima do próprio limiar\n- Documentar quando cada uma é usada e testá-las com valores sintéticos\nSaída: as duas combinações em model_gate/verdict/combine.py, com testes.",
    "epico": "J6",
    "id": "T-602",
    "marco": "G2",
@@ -1226,7 +1230,7 @@
    "status": "backlog",
    "tamanho": "M",
    "titulo": "Combinar por z-soma (Hurtado) e documentar a alternativa por regra (qualquer sinal reprova)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -1716,10 +1720,10 @@
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Treina e salva com digest",
-   "status": "backlog",
+   "status": "a fazer",
    "tamanho": "M",
    "titulo": "Script único de fine-tuning LoRA (o mesmo para F1 e F2), com configuração por dados",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T14:40:58.000Z"
   },
   {
    "deps": [
@@ -1977,7 +1981,7 @@
    "deps": [
     "T-1602"
    ],
-   "descricao": "Por quê: o juiz de referência precisa ser diferente e mais forte que o do portão (R12); a escolha sai do G0 (T-1602).\nComo:\n- Instalar o juiz escolhido (modelo aberto maior em CPU ou API externa)\n- Fixar prompt, decodificação e versão; registrar hash\n- Se for API externa, registrar o modelo exato, a data e a política de envio de texto nocivo\nSaída: juiz configurado com parâmetros versionados.",
+   "descricao": "Atualiza (12/11, T-1602): o juiz de referência é um modelo aberto de outra família, rodando na nuvem; a API externa foi descartada.\n\nPor quê: o juiz de referência precisa ser diferente e mais forte que o do portão (R12); a escolha sai do G0 (T-1602).\nComo:\n- Instalar o juiz escolhido (modelo aberto maior em CPU ou API externa)\n- Fixar prompt, decodificação e versão; registrar hash\n- Se for API externa, registrar o modelo exato, a data e a política de envio de texto nocivo\nSaída: juiz configurado com parâmetros versionados.",
    "epico": "J10",
    "id": "T-1002",
    "marco": "G2",
@@ -1985,7 +1989,8 @@
    "pronto": "Juiz roda com parâmetros fixos",
    "status": "backlog",
    "tamanho": "M",
-   "titulo": "Configurar o juiz de referência escolhido no G0"
+   "titulo": "Configurar o juiz de referência escolhido no G0",
+   "atualizado": "2026-11-12T14:44:59.000Z"
   },
   {
    "deps": [
@@ -3030,40 +3035,42 @@
    "deps": [
     "T-208"
    ],
-   "descricao": "Por quê: Decisão 1 do E13 §8: o orçamento de ~300–450 h de CPU depende de quantas máquinas houver.\nComo:\n- Usar a vazão medida no T-208 para estimar horas\n- Decidir quantas máquinas e onde\n- Registrar a decisão no PLANO ou DECISOES\nSaída: decisão registrada e insumo do T-1402.",
+   "descricao": "Decidida em 12/11: duas VMs comuns de 4 vCPU sob demanda, na nuvem da T-1603; a CVM fica para o fluxo integrado e o custo da RQ5. Revisar depois do Teste 1. Ver DECISOES.\n\nPor quê: Decisão 1 do E13 §8: o orçamento de ~300–450 h de CPU depende de quantas máquinas houver.\nComo:\n- Usar a vazão medida no T-208 para estimar horas\n- Decidir quantas máquinas e onde\n- Registrar a decisão no PLANO ou DECISOES\nSaída: decisão registrada e insumo do T-1402.",
    "epico": "J16",
    "id": "T-1601",
    "marco": "G0",
    "prioridade": "P0",
    "pronto": "Decisão registrada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Decidir as máquinas da campanha (quantas e onde)",
-   "objetivoMaior": "O4"
+   "objetivoMaior": "O4",
+   "atualizado": "2026-11-12T14:44:59.000Z"
   },
   {
    "deps": [],
-   "descricao": "Por quê: Decisões 2 e 3 do E13 §8: juiz da verdade de referência (modelo aberto em CPU ou API externa) e família não vista.\nComo:\n- Pesar custo contra enviar texto nocivo para fora\n- Escolher a família não vista (Llama-3.2-1B ou outra) e conferir a licença\n- Registrar com o orientador\nSaída: decisão registrada, insumo do T-1002 e do T-913.",
+   "descricao": "Decidida em 12/11: juiz de referência aberto, de outra família, na nuvem (modelo exato na T-1002); família não vista: Llama-3.2-1B-Instruct. Falta aceitar a licença da Meta no Hugging Face. Ver DECISOES.\n\nPor quê: Decisões 2 e 3 do E13 §8: juiz da verdade de referência (modelo aberto em CPU ou API externa) e família não vista.\nComo:\n- Pesar custo contra enviar texto nocivo para fora\n- Escolher a família não vista (Llama-3.2-1B ou outra) e conferir a licença\n- Registrar com o orientador\nSaída: decisão registrada, insumo do T-1002 e do T-913.",
    "epico": "J16",
    "id": "T-1602",
    "marco": "G0",
    "prioridade": "P0",
    "pronto": "Decisão registrada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Decidir o juiz da verdade de referência e a família não vista",
-   "objetivoMaior": "O2"
+   "objetivoMaior": "O2",
+   "atualizado": "2026-11-12T14:44:59.000Z"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-12T14:44:59.000Z",
    "deps": [],
-   "descricao": "Redução v2 (11/11): Escolher a nuvem e provisionar as CVMs (absorve a T-1607).\nAbsorve: T-1607 (Provisionar as CVMs do piloto na nuvem escolhida).\n\nPor quê: o fluxo integrado roda em CVMs reais (T-102); a nuvem (Azure, AWS ou Oracle) sai pelo custo (E13 §8, decisão 4).\nComo:\n- Comparar o preço de CVM AMD SEV-SNP de 4 vCPU nas três nuvens e o crédito disponível para o grupo.\n- Escolher a nuvem e registrar no PLANO.\nSaída: nuvem escolhida e status do crédito registrados no PLANO.",
+   "descricao": "Decidida em parte (12/11): Azure e Oracle (AWS talvez no futuro). Falta confirmar o crédito ou o orçamento e escolher o tipo de VM e a região com bf16 acelerado (Azure: DCasv6 ou DCesv6). Ver DECISOES.\n\nRedução v2 (11/11): Escolher a nuvem e provisionar as CVMs (absorve a T-1607).\nAbsorve: T-1607 (Provisionar as CVMs do piloto na nuvem escolhida).\n\nPor quê: o fluxo integrado roda em CVMs reais (T-102); a nuvem (Azure, AWS ou Oracle) sai pelo custo (E13 §8, decisão 4).\nComo:\n- Comparar o preço de CVM AMD SEV-SNP de 4 vCPU nas três nuvens e o crédito disponível para o grupo.\n- Escolher a nuvem e registrar no PLANO.\nSaída: nuvem escolhida e status do crédito registrados no PLANO.",
    "epico": "J16",
    "id": "T-1603",
    "marco": "G0",
    "prioridade": "P1",
    "pronto": "Nuvem escolhida e crédito ou orçamento confirmado",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito",
    "objetivoMaior": "O3"

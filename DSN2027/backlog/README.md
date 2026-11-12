@@ -53,6 +53,14 @@ obriga a repetir a calibração.
 - **Marcos renomeados:** G1 · Instrumento pronto, G2 · Veredito e populações prontos, G3 · Sistema
   integrado, pronto para testar. Os objetivos O1, O2, O3 e O6 e os testes 1, 2, 8 e 9 passam a fechar
   no TST. As datas dos marcos existentes não mudaram; G1 e G2 já venceram.
+- **Tudo que roda o avaliador vai para a nuvem (12/11):** T-309, T-312 e T-505 passaram para o TST,
+  porque uma medida ou nota feita no notebook (sem AVX-512 BF16 nem AMX) não vale como dado. A T-310
+  agora só constrói o pontuador e a T-602 deixou de depender da T-505. A medida parcial da T-309
+  (Qwen3Guard em float32, 50 s por item) fica como pista.
+- **Decisões de 12/11 (ver `decisoes.json`):** campanha em 2 VMs comuns de 4 vCPU sob demanda
+  (T-1601); juiz de referência aberto, de outra família, na nuvem, e Llama-3.2-1B como família não
+  vista (T-1602); Azure e Oracle como nuvens, com crédito e tipo de VM ainda por confirmar (T-1603).
+- **Planejadas (a fazer):** T-210, T-401, T-402, T-405 (S2), T-407 (S3) e T-901 (LoRA).
 - **Risco:** a medida do custo do veredito (T-314, T-315) chega tarde. Se o veredito não couber em
   80 min, a bateria encolhe depois de construída. A medida parcial da T-309 (Qwen3Guard em float32,
   ~264 min) já avisa que isso é provável.

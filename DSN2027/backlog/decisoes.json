@@ -2386,6 +2386,107 @@
     "Fixar Q e os pesos com o modelo de custo e o falso alarme medido (T-1708)."
    ],
    "atualizado": "2026-11-09"
+  },
+  {
+   "task": "T-1601",
+   "ordem": 1601,
+   "situacao": "decidida",
+   "pergunta": "Quantas máquinas e onde roda a campanha de vereditos?",
+   "contexto": "A decisão 1 do E13 §8 depende da vazão (T-208) e do custo do veredito com o avaliador, que ainda não foi medido na nuvem (T-309, T-315). A redução v2 cortou a distribuição da campanha (T-1402): cabe numa máquina se o veredito ficar perto de 80 min.",
+   "resposta": "Duas VMs comuns de 4 vCPU, sob demanda, ligadas só nas rodadas, na nuvem da T-1603 e em CPU da mesma família da CVM (bf16 acelerado). A CVM fica para o fluxo integrado (Teste 8) e para o custo por veredito da RQ5 (Teste 7). Se o custo medido no Teste 1 vier alto, sobe para 3–4 VMs.",
+   "itens": [
+    {
+     "q": "Quantas máquinas?",
+     "r": "Duas VMs comuns de 4 vCPU sob demanda, com escala para 3–4 se a T-314 vier alta.",
+     "estado": "fechada",
+     "porque": "Dobra a vazão e custa horas de nuvem só enquanto a campanha roda; o E13 §6 já diz que a campanha pode rodar em máquinas comuns com o mesmo pacote do Juiz.",
+     "alt": [
+      {
+       "o": "Uma VM",
+       "nao": "a campanha leva o dobro do tempo e o avaliador pode estourar o prazo de 02/12"
+      },
+      {
+       "o": "3 a 4 VMs de saída",
+       "nao": "custo proporcional sem necessidade medida"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    }
+   ],
+   "falta": [
+    "Revisar o número depois do Teste 1 (T-314, T-315): o custo do veredito com avaliador define se duas bastam."
+   ],
+   "atualizado": "2026-11-12"
+  },
+  {
+   "task": "T-1602",
+   "ordem": 1602,
+   "situacao": "decidida",
+   "pergunta": "Qual é o juiz da verdade de referência e qual é a família não vista?",
+   "contexto": "O juiz de referência (R12) tem de ser diferente e mais forte que o avaliador do portão, e rotula a população (T-1003). A família não vista (Teste 4, T-913) mostra se o limiar calibrado no Qwen2.5-0.5B generaliza.",
+   "resposta": "Juiz de referência: modelo aberto, de outra família, rodando na nuvem; o modelo exato se fixa na T-1002 (candidato: gpt-oss-safeguard-20b, Apache-2.0, 21B com 3,6B ativos, a conferir). Família não vista: Llama-3.2-1B-Instruct.",
+   "itens": [
+    {
+     "q": "O juiz de referência é um modelo aberto ou uma API externa?",
+     "r": "Modelo aberto de outra família, na nuvem.",
+     "estado": "fechada",
+     "porque": "O texto nocivo não sai da nossa infraestrutura, e não depende de termos de uso nem de custo por chamada.",
+     "alt": [
+      {
+       "o": "API externa",
+       "nao": "manda texto nocivo a terceiros (termos de uso e ética) e custa por chamada"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    },
+    {
+     "q": "Qual a família não vista?",
+     "r": "Llama-3.2-1B-Instruct.",
+     "estado": "fechada",
+     "porque": "Recusa bem, e é de família distinta do Qwen e do candidato a avaliador do portão.",
+     "alt": [
+      {
+       "o": "Gemma-3-1B-it",
+       "nao": "a família Gemma é a do candidato Gemma 4 E4B a avaliador do portão, o que correlaciona os erros"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    }
+   ],
+   "falta": [
+    "Aceitar a licença da Meta no Hugging Face com a conta do autor, antes do download.",
+    "Fixar o modelo exato do juiz de referência na T-1002 e conferir em amostra anotada que ele é mais forte que o avaliador do portão (R12)."
+   ],
+   "atualizado": "2026-11-12"
+  },
+  {
+   "task": "T-1603",
+   "ordem": 1603,
+   "situacao": "parcial",
+   "pergunta": "Em qual nuvem rodam as CVMs e as VMs de medida?",
+   "contexto": "O fluxo integrado roda em CVMs reais (T-102), e a medida do avaliador (T-309, T-315) precisa de CPU com bf16 acelerado: AVX-512 BF16 do EPYC Genoa ou AMX do Xeon. Na Azure, a DCasv5 é Milan e não tem isso; a DCasv6 (Genoa, SEV-SNP) e a DCesv6 (Intel TDX, GA em fev/2026 em West US e West US 3) são as candidatas.",
+   "resposta": "Azure e Oracle. A AWS pode entrar no futuro, mas nada está certo.",
+   "itens": [
+    {
+     "q": "Qual nuvem?",
+     "r": "Azure e Oracle; a AWS fica como possibilidade futura.",
+     "estado": "fechada",
+     "porque": "Decisão do autor.",
+     "alt": [
+      {
+       "o": "AWS agora",
+       "nao": "não entra no escopo do protótipo; pode entrar no futuro"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    }
+   ],
+   "falta": [
+    "Confirmar o crédito ou o orçamento de cada nuvem.",
+    "Escolher o tipo de VM e a região com bf16 acelerado e conferir o preço (Azure: DCasv6 ou DCesv6; Oracle: a conferir).",
+    "Provisionar a VM de 4 vCPU (T-210) e, depois, as CVMs."
+   ],
+   "atualizado": "2026-11-12"
   }
  ]
 }
