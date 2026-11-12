@@ -25,9 +25,39 @@ contract DnatMarketplace {
     // Types and storage
     // ------------------------------------------------------------------------
 
+    // Model e Derivative ficam no fim para não mudar os valores de Dataset (0) e Application (1).
     enum AssetType {
         Dataset,
-        Application
+        Application,
+        Model,      // base custodiado; o dono deposita pelo caminho de registerAsset
+        Derivative  // derivado julgado pelo Juiz; não entra por registerAsset (só pelo executor, T-703)
+    }
+
+    // Veredito do Juiz sobre um derivado (E14 §6.3). O zero é Pending: um derivado retido ainda
+    // sem veredito lê Pending, e o valor padrão do Solidity nunca pode ser um aprovado.
+    enum Verdict {
+        Pending,
+        Approved,
+        Rejected,
+        Inconclusive
+    }
+
+    // Campos do derivado no recibo (T-104, E14 §10.1): só hashes, veredito e data. Medidas e
+    // motivos ficam no verdict.json, conferido por verdictHash. Ligado ao Asset por assetId,
+    // sem mexer no layout de Asset usado por purchaseAccess. O hash do pai é o contentHash do
+    // Asset parentId; a raiz é o próprio pai, porque derivado de derivado não entra (um nível só).
+    struct DerivativeInfo {
+        uint256 parentId;             // Model de que o derivado saiu
+        bytes32 parentReferenceHash;  // referência do pai, medida sob custódia
+        bytes32 derivativeHash;       // digest do derivado retido (regra de model_gate.io.digest)
+        bytes32 judgeHash;            // hash do pacote do Juiz (identifica a versão)
+        bytes32 batteryCommitment;    // compromisso da parte secreta da bateria (T-109)
+        bytes32 preregHash;           // hash do prereg.yaml (limiares congelados)
+        bytes32 datasetHash;          // hash do dataset do job, retido
+        bytes32 verdictHash;          // hash do verdict.json
+        bytes32 identityId;           // SHA-256 da chave pública de quem pediu o job (E14 §18)
+        Verdict verdict;
+        uint64 decidedAt;             // data do veredito
     }
 
     struct Asset {
@@ -63,6 +93,9 @@ contract DnatMarketplace {
     // key = keccak256(datasetId, applicationId, user)
     mapping(bytes32 => bool) public accessRights;
 
+    // Campos de cada derivado, por assetId (só para assets do tipo Derivative).
+    mapping(uint256 => DerivativeInfo) internal derivatives;
+
     // Simple reentrancy guard (because we transfer ETH)
     bool private locked;
 
@@ -86,6 +119,13 @@ contract DnatMarketplace {
 
     event AssetRevoked(
         uint256 indexed id
+    );
+
+    // Emitido quando o executor grava um derivado (T-703), com os mesmos campos de DerivativeInfo.
+    event DerivativeRegistered(
+        uint256 indexed id,
+        uint256 indexed parentId,
+        DerivativeInfo info
     );
 
     event AccessPurchased(
@@ -134,6 +174,8 @@ contract DnatMarketplace {
         bytes calldata bloomFilter
     ) external returns (uint256 id) {
         require(bytes(title).length > 0, "Title required");
+        // Por aqui o derivado nasceria ativo e sem veredito; ele só entra pelo executor (T-703).
+        require(assetType != AssetType.Derivative, "Derivative only via executor");
         id = ++nextAssetId;
 
         bytes memory bf;
@@ -344,6 +386,16 @@ contract DnatMarketplace {
             a.bloomFilter,
             a.active
         );
+    }
+
+    /**
+     * @dev Campos do derivado (T-104). Reverte se o asset não existe ou não é Derivative.
+     */
+    function getDerivative(uint256 assetId) external view returns (DerivativeInfo memory) {
+        Asset storage a = assets[assetId];
+        require(a.id != 0, "Asset not found");
+        require(a.assetType == AssetType.Derivative, "Not a derivative");
+        return derivatives[assetId];
     }
 
     // Accept stray ETH if needed (e.g., manual top-ups, though not required)
