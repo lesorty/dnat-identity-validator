@@ -3330,7 +3330,7 @@
   {
    "id": "T-1611",
    "titulo": "Fechar o sistema e abrir a fase de testes: congelar o código do Juiz e do fluxo",
-   "descricao": "Por quê: os testes só valem sobre o sistema que vai ao artigo. Rodar calibração, campo, ataques e ablação antes de o Juiz, o fluxo no DNAT e a identidade estarem fechados obriga a repetir tudo a cada mudança.\nComo:\n- Conferir que as tasks de construção (veredito, Juiz como job, contrato, identidade e cota, populações e rótulos, linha de base, ferramentas de estatística e orquestrador) estão feitas.\n- Commitar o estado do código e registrar o commit e a versão do Juiz.\n- Listar o que ficou de fora e vai para Limitações. Daqui em diante, mudar o Juiz exige repetir a calibração (TS2).\nSaída: commit de congelamento e nota no registro de experimentos; abre a fase de testes.",
+   "descricao": "Por quê: os testes só valem sobre o sistema que vai ao artigo. Rodar calibração, campo, ataques e ablação antes de o Juiz, o fluxo no DNAT e a identidade estarem fechados obriga a repetir tudo a cada mudança.\nComo:\n- Conferir que as tasks de construção (veredito, Juiz como job, contrato, identidade e cota, parte secreta da bateria (T-304), populações e rótulos, linha de base, ferramentas de estatística e orquestrador) estão feitas.\n- Commitar o estado do código e registrar o commit e a versão do Juiz.\n- Listar o que ficou de fora e vai para Limitações. Daqui em diante, mudar o Juiz exige repetir a calibração (TS2).\nSaída: commit de congelamento e nota no registro de experimentos; abre a fase de testes.",
    "pronto": "Commit de congelamento registrado e as tasks de construção feitas",
    "epico": "J16",
    "marco": "G3",
@@ -3350,12 +3350,13 @@
     "T-1401",
     "T-1404",
     "T-1704",
-    "T-1705"
+    "T-1705",
+    "T-304"
    ],
    "objetivoMaior": "O4",
    "ordem": 1611,
    "criado": "2026-11-12T11:22:40.000Z",
-   "atualizado": "2026-11-12T11:22:40.000Z"
+   "atualizado": "2026-11-12T17:33:03.000Z"
   }
  ],
  "objetivos": [
