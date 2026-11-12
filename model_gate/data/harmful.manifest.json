@@ -1,0 +1,851 @@
+{
+ "task": "T-904",
+ "source": {
+  "repo": "PKU-Alignment/BeaverTails",
+  "revision": "8401fe609d288129cc684a9b3be6a93e41cfe678",
+  "file": "round0/30k/train.jsonl.gz",
+  "license": "CC-BY-NC-4.0",
+  "license_note": "CC BY-NC 4.0 (Ji et al., 2023): uso não comercial; uso acadêmico coberto. Os derivados F2 herdam a restrição. Prompts vêm do red-team da Anthropic (HH-RLHF, MIT).",
+  "url": "https://huggingface.co/datasets/PKU-Alignment/BeaverTails",
+  "sha256": "2e24b85dd599224eeb7379da297223bad50e11fea9fee6a7fdb4bd26aedec315",
+  "size": 4948694,
+  "raw_in_git": false
+ },
+ "criterio": {
+  "is_safe": false,
+  "sem_recusa_no_inicio": "model_gate.battery.refusal.is_refusal",
+  "categorias_excluidas": [
+   "child_abuse"
+  ],
+  "uma_resposta_por_prompt": "primeira",
+  "exclusoes_por_hash": [
+   "harmbench",
+   "pares_s2",
+   "s1_acervo",
+   "xstest"
+  ],
+  "hash": "model_gate.battery.pool.prompt_hash"
+ },
+ "items_source": 27186,
+ "eligible": 5617,
+ "removed": {
+  "seguro": 11604,
+  "vazio": 0,
+  "recusa": 113,
+  "categoria": 183,
+  "proibido": 4,
+  "repetido": 9665
+ },
+ "seed": 904,
+ "draw": "random.Random(seed).sample(elegíveis, 100); dose n = n primeiros (aninhadas)",
+ "doses": {
+  "10": {
+   "file": "datasets/harmful/beavertails_n010.jsonl",
+   "sha256": "e55cbf3ca745d2fb9ac57bce3eb2be70db45fd4bf4ad2be276e72bc900ae1640",
+   "items": 10
+  },
+  "25": {
+   "file": "datasets/harmful/beavertails_n025.jsonl",
+   "sha256": "bd6dc6ba8b0889662ee60c3c375c6f0cc7207bfc7152f5b766441bf224e72d3d",
+   "items": 25
+  },
+  "50": {
+   "file": "datasets/harmful/beavertails_n050.jsonl",
+   "sha256": "068d2a07daf2ef571e0de172929ff2695e1932b19d373903a1f69afdce1318f3",
+   "items": 50
+  },
+  "100": {
+   "file": "datasets/harmful/beavertails_n100.jsonl",
+   "sha256": "040efc72580f80751024d07c55652109d1ef738a81fc42e629a8d4d298462843",
+   "items": 100
+  }
+ },
+ "response_words": {
+  "min": 1,
+  "median": 51,
+  "max": 173
+ },
+ "overlap_exact": {
+  "s1_acervo": 0,
+  "xstest": 0,
+  "pares_s2": 0,
+  "harmbench": 0
+ },
+ "items": [
+  {
+   "row": 17551,
+   "sha256": "3586490db44da0474e60d4d550843c3b3bbe927c11cf8dbc1e6b5fb7caa6e35b",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 5173,
+   "sha256": "caf4c7f2d0c4b8973fccdb15aceadc8f6806f5bce3b23eec24f743a3ad6c2ca8",
+   "categories": [
+    "non_violent_unethical_behavior",
+    "sexually_explicit,adult_content"
+   ]
+  },
+  {
+   "row": 12506,
+   "sha256": "42bd48ba93ce0249516a447821af5565bd70048bcc11fc9c3e0751bc6ba7af82",
+   "categories": [
+    "non_violent_unethical_behavior",
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 8223,
+   "sha256": "fc6b6b26ea796f844459f282d674036f609303c6f741dd4c02e36520b0bb4b23",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "hate_speech,offensive_language",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 17643,
+   "sha256": "c5fe720d85715c6d82187ffe50f2e3682b8ef544a7821477a1f9e0b0f22a2ea6",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 786,
+   "sha256": "f291deb5ad75d94779a7cad9606c4efe0331b1ad29878310f93df45fce3bbd0e",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 8574,
+   "sha256": "ac377f7b310e82ffd2a1e2ebbc9add3319f947f473dd9a70ec9946858315b8ec",
+   "categories": [
+    "misinformation_regarding_ethics,laws_and_safety"
+   ]
+  },
+  {
+   "row": 11662,
+   "sha256": "e1c5f1b2ad37fe5f7fe08204274b6b0b1840cd8fcef52c0622f854838dca1f6d",
+   "categories": [
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 12474,
+   "sha256": "6afb3a74bdd45cebfde5eed61dcdade0b9726a2c7eb4951d143ccdb1303680de",
+   "categories": [
+    "controversial_topics,politics"
+   ]
+  },
+  {
+   "row": 580,
+   "sha256": "9cc7ba907ac5033d83fff549ef6d1b7ae713976c53569ca04758b4faf0128a6b",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 11758,
+   "sha256": "d4bb26d48d48e42d1e34f45183d2d6603600cbf798f19d38ad204fea2306bac0",
+   "categories": [
+    "drug_abuse,weapons,banned_substance"
+   ]
+  },
+  {
+   "row": 1217,
+   "sha256": "aa6812390fd3c321db645cbd431bf93e812d74e334ba2e0b54f5da220dcd80e3",
+   "categories": [
+    "animal_abuse"
+   ]
+  },
+  {
+   "row": 7660,
+   "sha256": "3efa148527dcfddc420b36a4407ba4d5b7060b853403c8dce662883c9a7c567e",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "privacy_violation",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 339,
+   "sha256": "94c0986714201d27c12beff3462da8598aaf001682c0b6efc185d5dead8dd55f",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 11273,
+   "sha256": "02978f8698cc09c3714002b0f3990560c8751ee4c4840819190be1394c8706df",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 2014,
+   "sha256": "7ea6ac009d90e25f72b1c3f097cb051830a88fc27a8ae1a8802b705eb39d8a88",
+   "categories": [
+    "non_violent_unethical_behavior",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 5951,
+   "sha256": "2cfa0b271b5a03932e7836075867c8657e3fb82750135e40287abdf55f2efccf",
+   "categories": [
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 11151,
+   "sha256": "51ae7c54f962d89f8e1e04033e6eefa9356cd57f2c59676518ab144bf802aa86",
+   "categories": [
+    "non_violent_unethical_behavior",
+    "sexually_explicit,adult_content"
+   ]
+  },
+  {
+   "row": 10568,
+   "sha256": "518d80f7f12f48f4a129db626c4ea6d44f6727bcbe32bebe9b32955820fff472",
+   "categories": [
+    "misinformation_regarding_ethics,laws_and_safety",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 11570,
+   "sha256": "f4b27480021b47a5758761f9a601f9267ab4d45ed7f8a02d37315c340d62c57e",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 11264,
+   "sha256": "1d91062cee0f6bca30d441c5e589bed5d58a4cf40dd10bd958d62464b292972a",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 2109,
+   "sha256": "001543c7fab501b232c7c3d3cfe2e368b88feb8ac29bdb427aa809207028943f",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 5137,
+   "sha256": "d8f7383a752fcab20bcdc07aca9745beb0ca8ddc7f70b9f7dc40f4c53d77d9a9",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 4633,
+   "sha256": "b76a0237ca1a6a631a5d5be54c53601e5057c001998d414f780a618571d0e743",
+   "categories": [
+    "hate_speech,offensive_language"
+   ]
+  },
+  {
+   "row": 496,
+   "sha256": "a8a609b0c5cac265ee31288ea124613f697dc6350d87b533de31d85c36654dbd",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 3233,
+   "sha256": "9230b318454006b095ffa9de3cb3aa6e1496d7a7f9d7d03a4e22f4ff1ef6e56a",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 17967,
+   "sha256": "86de954fa836df33a412e7c2cfea54c1e754167ae8bb296a02b2d4d421a8422c",
+   "categories": [
+    "drug_abuse,weapons,banned_substance"
+   ]
+  },
+  {
+   "row": 17173,
+   "sha256": "023b170076e0b977b746834417311a405d2618dba78137bfb39bd929723f1e88",
+   "categories": [
+    "terrorism,organized_crime"
+   ]
+  },
+  {
+   "row": 4149,
+   "sha256": "7d818abe797aeff542a62e584ce63827acf1ecb47c695b1d590b14ef15700cc5",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 1100,
+   "sha256": "1fd295847c2ba35cc28d4a9e30accf6e593e866385d303989a7467c1ddf47231",
+   "categories": [
+    "drug_abuse,weapons,banned_substance",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 22871,
+   "sha256": "9dce7f5ac2c5fe992ed0789527c0ddda79100d3fe6ca6a1c92eea99f001dee2b",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language"
+   ]
+  },
+  {
+   "row": 663,
+   "sha256": "991b68afba57f5f02ce8ac1cddd8827b925606e769757b8f5b38b1f422542a73",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "non_violent_unethical_behavior",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 738,
+   "sha256": "ff5e21b961f15f01270445629ad4047acbff2d1841f1232d1633bd1c96707d17",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 297,
+   "sha256": "24610baaaa712a196a9ec7b38b3ffb1c99778c3aa340254a8151dabaef5277c6",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 3574,
+   "sha256": "52312c44f092d1bfcd7543db44f31c61935ad03a4e01d02139361099637f4557",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 17634,
+   "sha256": "4deecaad8fc95a7afc19dbb490403febf4966438e8098921ae8dddfbfec37a12",
+   "categories": [
+    "misinformation_regarding_ethics,laws_and_safety",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 1841,
+   "sha256": "c3d7926d5e58d2b7130306c1590130a67ae79facb2044b02ecf08e7cbe20dc7b",
+   "categories": [
+    "controversial_topics,politics"
+   ]
+  },
+  {
+   "row": 8451,
+   "sha256": "1ffcbc656145ac9704561b9fc686c1d9f168272cddd978acf0ad81a1af2e1fde",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 148,
+   "sha256": "14487f3d27a97cf4fcc8587396661f76c7c27248818689b55552c366fbab43b8",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 15473,
+   "sha256": "c241986fdb70fe47c6ff4918c050a11a4bd0af8eba0c8a22dcbcb77ccda296ad",
+   "categories": [
+    "terrorism,organized_crime",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 265,
+   "sha256": "abdaeb313ee3df4b9ad313f99f3947bfa9ff58d7168a9184ba6cfba4d4032de9",
+   "categories": [
+    "animal_abuse",
+    "drug_abuse,weapons,banned_substance",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 15729,
+   "sha256": "f3d5ea37f255b6cc98378a4b6387e937c74511bb24685eb95ff72f123951221e",
+   "categories": [
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 5121,
+   "sha256": "e3b405c83f3dcec5a4ba8e3fe995759a90a4d8e07bae74f23699bef26ddec370",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 6111,
+   "sha256": "47cc7fbe232b120e3bd3808171485365ae33fc07e8394423ec00fba66c35d6da",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 5705,
+   "sha256": "79e04684497895c9c681b9452a296242a90b7683f6c64d45e137b56721c8b27f",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 290,
+   "sha256": "d9c9f66968b1578558a1671e6e0960c08773c00a0b6cfe77733571fc36ffbe5b",
+   "categories": [
+    "drug_abuse,weapons,banned_substance"
+   ]
+  },
+  {
+   "row": 15,
+   "sha256": "17f2d8acdb79a36d0d3b859262092120651ea4948d06ced2aec0025fa6b55b1f",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 4720,
+   "sha256": "ddcc04f17d273abcde9e6a2d2e04b175e953ff4ac6d14256dd4b8a72f1d6cb67",
+   "categories": [
+    "misinformation_regarding_ethics,laws_and_safety",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 18351,
+   "sha256": "09c3f037e7246e1d22530455488a1d59b0cac7355876f665f0bc1b91a2d65b7e",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 13515,
+   "sha256": "71af55f2ea93099a6a8bf44abd19bff57589551669b5eabdb7a62612a915b178",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language"
+   ]
+  },
+  {
+   "row": 8607,
+   "sha256": "375ae59c495f53aa7c08de128fec024911c4483749b7dfe2bd3cecf6ecf48007",
+   "categories": [
+    "drug_abuse,weapons,banned_substance",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 8330,
+   "sha256": "38d7f7a52a1d0e17efeb6fa36afaa03bdc8a3b3d9a1489008d03a089a6483b2c",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 7340,
+   "sha256": "4ec207d58ac242eb387c4706fcab0d1a2f476fd08c88910a9c75588b157a0e48",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 4905,
+   "sha256": "e71e064f077c8db4ffaca294c7b093c1bd303098f2461fc48919fdad4ba82381",
+   "categories": [
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 12676,
+   "sha256": "ed81f15db13c191d9f6b3447929d21b120ecad746afe3f0da325271edfd54c87",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 14738,
+   "sha256": "467a6c323f8204bf18b5a4fa8a642ed945e19690e4bef278b0270a098e422497",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 10518,
+   "sha256": "8b14b81d1ba67007b07dbfab47efe609dbbfee583de149483760c2fda68eeb3f",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 2398,
+   "sha256": "71a4cefad9bce1a802c83dd42db0afeb01369e07a462c35d8979b782363ed775",
+   "categories": [
+    "sexually_explicit,adult_content"
+   ]
+  },
+  {
+   "row": 6404,
+   "sha256": "36da3f609ad2b801dd2300e61f4ada306b8d0e80d8b3da30f20180f9baba6d19",
+   "categories": [
+    "controversial_topics,politics"
+   ]
+  },
+  {
+   "row": 12401,
+   "sha256": "fd3119efb9b8c2f9a67d13cfa095ae447904788f8be3d49d24401f7edc1c003a",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 11891,
+   "sha256": "733d64127e9f81395c3bf757d6e495bde9cf0dbd5a1c37a85248fbed95f5c101",
+   "categories": [
+    "discrimination,stereotype,injustice"
+   ]
+  },
+  {
+   "row": 6521,
+   "sha256": "89bf70c258b6889b78a7f063d8b2cf11b5733a4d50061173d2e3259df7c04c19",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 2884,
+   "sha256": "65a78506086f1750b50cb99daeb7ab660795d430ee3a4e54d38b25debb400ca7",
+   "categories": [
+    "sexually_explicit,adult_content"
+   ]
+  },
+  {
+   "row": 9644,
+   "sha256": "714d00c9ebf2c15fc45b6dcd718c06fb2bbda986a4049933ce679d1a0bf805e3",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 21730,
+   "sha256": "2a74b3c45e8c1a2d9f1f0707861affeeada9bba4b34296e045bcb0dc0e779aa5",
+   "categories": [
+    "misinformation_regarding_ethics,laws_and_safety"
+   ]
+  },
+  {
+   "row": 3857,
+   "sha256": "40c744622a89711ee7d57730df95b00901a8a76168df97a646cc722794ae316e",
+   "categories": [
+    "drug_abuse,weapons,banned_substance",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 4778,
+   "sha256": "a25271a617781e0f368dc15c9a6c7956003c98390edcfa92f903256f0d2c2685",
+   "categories": [
+    "terrorism,organized_crime",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 13320,
+   "sha256": "a61a9ac6db2668409bc88b60de9087b121ec8ef34ac3e33a7a45f6695f4d0296",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 6290,
+   "sha256": "17e11d62fe5cb839c2c21038db1707e2a005bc1db92b4eb23e078223dcb62a9d",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 4639,
+   "sha256": "3e975503481d8d741ef2138ca85b1fb6bb89e0fd9fa7150552a2f6292771de7f",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 3405,
+   "sha256": "0ca8aad842f0af975891423d91dc8f79de5e93fc18b9511821a2d0426e99db24",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 19561,
+   "sha256": "5c56ba8e01ca4836309ce8a85f43bd1896a9d2cf0b732b54172365df0288514d",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 829,
+   "sha256": "a8c36c34f3bdaa856dedf250b38de67ec1788a68b07079de5b59677ee17be1a9",
+   "categories": [
+    "controversial_topics,politics"
+   ]
+  },
+  {
+   "row": 1229,
+   "sha256": "deee9331d9171128d86f840f6d1c09fb1b76ad7ebec8a094cfc270fbadf15eb2",
+   "categories": [
+    "sexually_explicit,adult_content"
+   ]
+  },
+  {
+   "row": 2502,
+   "sha256": "dab41b4377b846d4232fee2baa0321b04399d585f622d458495ddaa32c274f86",
+   "categories": [
+    "drug_abuse,weapons,banned_substance"
+   ]
+  },
+  {
+   "row": 7316,
+   "sha256": "b4e0752bb8da1821578a565b50333dc5ce2a0636e5829d97d38ca105eaff5478",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 12123,
+   "sha256": "0db1ab84c20c9e0930e891ea7614a0d722248b3745c91962100c212fc40b8ca0",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 21636,
+   "sha256": "52e0a4dabaf3c5e8c08f271e300dc2a51330d5a94b9327a3a2e3362d0e0a7e2c",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 6507,
+   "sha256": "8886154006d4979b6403feee51bf95adf8dca8c4f777927a89cefbaf914a6e63",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 273,
+   "sha256": "ba05287d0ed46654a16f3237f67f83e9d30fac522abeeb43db9bc55274133cbc",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 1927,
+   "sha256": "4b2152e104a95a1bda70792b44c5c4cb41598edcb95217f5ed467803cc38b5f1",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 6205,
+   "sha256": "c2a18f31cf0c43b8e841689624c9f0c7a65bf676e91e811e959da7830ef69093",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 12584,
+   "sha256": "5608599ae055232a356d57c4a9d6abc17bfe6c14028e9ad1e4ff821afdeb1520",
+   "categories": [
+    "privacy_violation",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 566,
+   "sha256": "ba16c3be640bcd9872fcc5589f21dbf55fcc3cc7709aa78dc7e33e81636d3821",
+   "categories": [
+    "animal_abuse"
+   ]
+  },
+  {
+   "row": 19750,
+   "sha256": "34d4a5309f09282455a2179da2870c4b14926ab8bd9c66d13bb60fa1d6e58aae",
+   "categories": [
+    "privacy_violation"
+   ]
+  },
+  {
+   "row": 6433,
+   "sha256": "3e3b6d0881d59b2df7120fb8aca76e8646e44696e66b03475b897f014ddcbe9b",
+   "categories": [
+    "hate_speech,offensive_language",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 24110,
+   "sha256": "d478c40e01a6265c38d953a2194eb85c901782d4331252be48dbbbf2c229950d",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 19366,
+   "sha256": "aaa8a985212d207b0c1e10952c28c62ea1ca6c1473f92ff3709161edc7d64f8c",
+   "categories": [
+    "discrimination,stereotype,injustice"
+   ]
+  },
+  {
+   "row": 5134,
+   "sha256": "2719f0648ff7354ab0b6b93e20df7ef76885144b0b9436bf7c2fb7e4f710b2b0",
+   "categories": [
+    "financial_crime,property_crime,theft"
+   ]
+  },
+  {
+   "row": 2837,
+   "sha256": "da2d52260417057be6355d2d3396096a627d285e327035ed977e69e554ed79a0",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 3963,
+   "sha256": "2545046f76f9aa28e3077bf22abe637431e71ffbe8effdad4c318663d6701bc3",
+   "categories": [
+    "drug_abuse,weapons,banned_substance",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 12823,
+   "sha256": "49c60c624fda86a614c9f654e0f740fe945593d6918dd830f76ca2db6e90fae4",
+   "categories": [
+    "controversial_topics,politics"
+   ]
+  },
+  {
+   "row": 2330,
+   "sha256": "21c3f313ad6571bf7984a0f9efbb4ad106ebc691081a79e22d1cf50d3a8c0f94",
+   "categories": [
+    "financial_crime,property_crime,theft",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 1379,
+   "sha256": "0e478e84400c1b540437fc2c700bef69d8492414e6df2452f954673e6b858bc5",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 15110,
+   "sha256": "78f06c399e044e08316eb5c28cb633a68966f40f33eb108850da703dca14d3a9",
+   "categories": [
+    "hate_speech,offensive_language"
+   ]
+  },
+  {
+   "row": 1732,
+   "sha256": "5cc73d38f82c28c5f7edb4328e6e32e14cb1885661f27385c61b4653a5b0a71c",
+   "categories": [
+    "discrimination,stereotype,injustice"
+   ]
+  },
+  {
+   "row": 16329,
+   "sha256": "12173862696fe732326639c241f4abe9d5f9c50dbfbb567f3f9f8c23ce45ea72",
+   "categories": [
+    "animal_abuse",
+    "violence,aiding_and_abetting,incitement"
+   ]
+  },
+  {
+   "row": 6267,
+   "sha256": "b23a063a0613d12dbd9a7cc7c900b4f85b366416b7f19ede379072f128a04409",
+   "categories": [
+    "discrimination,stereotype,injustice",
+    "hate_speech,offensive_language"
+   ]
+  },
+  {
+   "row": 7615,
+   "sha256": "14f9ac8f29d4ba49da0d25de0d2c08107045d741963c521e52ee9a570b48e941",
+   "categories": [
+    "non_violent_unethical_behavior"
+   ]
+  },
+  {
+   "row": 8101,
+   "sha256": "beef54a5ad6b2b32c148252f28b1a08f0cf9c3f01464ef62773875e954afa700",
+   "categories": [
+    "violence,aiding_and_abetting,incitement"
+   ]
+  }
+ ],
+ "near_duplicates": {
+  "s1_acervo": {
+   "max_jaccard": 0.462,
+   "pares_acima_0_5": 0
+  },
+  "xstest": {
+   "max_jaccard": 0.571,
+   "pares_acima_0_5": 11
+  },
+  "pares_s2": {
+   "max_jaccard": 0.312,
+   "pares_acima_0_5": 0
+  },
+  "harmbench": {
+   "max_jaccard": 0.3,
+   "pares_acima_0_5": 0
+  }
+ },
+ "items_sha256": "2f93101eca1c52406bd056763e21401bedeff133fdb7f82d0c8607b1c57250ca"
+}
