@@ -7,6 +7,7 @@ from model_gate.signals.direction import (auroc, candidate_layers, choose_layer,
                                           mean_diff, project, save_direction, unit)
 from model_gate.signals.pairs import PairsMismatch, build_pairs, pair_texts
 from model_gate.signals.s2 import s2
+from model_gate.signals.s3 import ArchitectureMismatch, band, rank1_energy, s3, watched_names
 from tests.tiny import PROMPTS, tiny_model, tiny_tokenizer
 
 SIZES = {"train": 3, "val": 2}
@@ -113,9 +114,9 @@ def test_s2_base_contra_si_mesmo_e_abliterado():
     hv, nv, _ = synthetic(seed=1)
     ref = fit(harm, harmless, hv, nv)
     same = s2(hv, nv, ref)
-    assert same.layer == 6 and same.ratio == pytest.approx(1.0)
+    assert same.layer == 6 and same.ratio == pytest.approx(1.0) and same.ratio_band == pytest.approx(1.0)
     abl = s2(ablate(hv, ref["dirs"]), ablate(nv, ref["dirs"]), ref)
-    assert abs(abl.ratio) < 1e-5
+    assert abs(abl.ratio) < 1e-5 and abs(abl.ratio_band) < 1e-5
     assert len(same.gaps_by_layer) == 10
 
 
@@ -125,3 +126,56 @@ def test_s2_recusa_referencia_sem_separacao():
     ref["gap_base"] = torch.zeros_like(ref["gap_base"])
     with pytest.raises(ValueError):
         s2(harm, harmless, ref)
+
+
+def test_faixa_do_meio_de_hurtado():
+    assert list(band(24)) == list(range(7, 17))  # ⌊0,33·24⌋ … ⌊0,67·24⌋, inclusive
+    assert list(band(2)) == [0, 1]
+
+
+def test_energia_rank1_sintetica():
+    g = torch.Generator().manual_seed(0)
+    u, v = torch.randn(48, 1, generator=g), torch.randn(1, 64, generator=g)
+    r1 = (u @ v).double()
+    assert rank1_energy(r1) == pytest.approx(1.0)
+    noise = torch.randn(48, 64, generator=g).double()
+    e = [rank1_energy(r1 + k * noise) for k in (0.01, 0.1, 1.0)]
+    assert e[0] > e[1] > e[2]
+    assert rank1_energy(torch.randn(256, 256, generator=g).double()) < 0.05  # posto cheio
+    assert rank1_energy(torch.zeros(4, 4, dtype=torch.float64)) is None
+
+
+def edited(sd, names, rank1=True, seed=1):
+    g = torch.Generator().manual_seed(seed)
+    out = dict(sd)
+    for n in names:
+        w = sd[n]
+        dw = (torch.randn(w.shape[0], 1, generator=g) @ torch.randn(1, w.shape[1], generator=g)) if rank1 \
+            else torch.randn(w.shape, generator=g)
+        out[n] = w + 0.01 * dw
+    return out
+
+
+def test_s3_base_igual_abliterado_e_finetune():
+    m = tiny_model()
+    sd, L = m.state_dict(), m.config.num_hidden_layers
+    same = s3(sd, sd, L)
+    assert same.e1 == 0.0 and same.null_matrices == len(watched_names(L))
+    abl = s3(sd, edited(sd, watched_names(L)), L)
+    assert abl.e1 == pytest.approx(1.0) and abl.null_matrices == 0
+    ft = s3(sd, edited(sd, watched_names(L), rank1=False), L)
+    assert ft.e1 < 0.5
+    other = s3(sd, edited(sd, ["model.layers.0.self_attn.q_proj.weight"]), L)  # fora das vigiadas
+    assert other.e1 == 0.0
+
+
+def test_s3_recusa_arquitetura_diferente():
+    m = tiny_model()
+    sd, L = m.state_dict(), m.config.num_hidden_layers
+    bad = dict(sd)
+    bad["model.layers.0.mlp.down_proj.weight"] = torch.zeros(3, 3)
+    with pytest.raises(ArchitectureMismatch):
+        s3(sd, bad, L)
+    del bad["model.layers.0.mlp.down_proj.weight"]
+    with pytest.raises(ArchitectureMismatch):
+        s3(sd, bad, L)

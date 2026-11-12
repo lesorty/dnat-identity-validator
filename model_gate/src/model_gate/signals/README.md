@@ -49,6 +49,30 @@ S2 é a segunda linha do Juiz e a base da linha de base de Hurtado (T-1301), da 
   perto de 0 num abliterado.
 - **Leitura:** devolve também o gap em todas as camadas.
 
+## 4.1 S3 (T-407, T-408, absorve T-409) · `s3.py`
+
+Receita de Hurtado (2026, §3 e App. C), primitiva WeightWatch:
+
+- **ΔW:** W_base − W_derivado nas matrizes `o_proj` e `down_proj` de cada camada da faixa do meio
+  B = ⌊0,33·L⌋ … ⌊0,67·L⌋, inclusive. No Qwen2.5-0.5B são as camadas 7 a 16, ou seja, 20 matrizes.
+- **Casamento:** pelo nome e pela forma. Se a arquitetura não bater, a comparação é recusada.
+- **E1 por matriz:** σ1² / Σσi², calculado em float64.
+- **Agregação:** média sobre as matrizes, como em Hurtado. O máximo vai junto, só para leitura.
+- **ΔW nulo:** E1 = 0, e as matrizes nulas são contadas à parte.
+- **Limite:** E1 dispara em qualquer edição de posto baixo, inclusive benigna (merges, na tabela
+  de Hurtado). Por isso é segunda linha.
+- **Conferência no modelo real (12/11):** o base contra ele mesmo dá E1 = 0 nas 20 matrizes, e
+  uma edição sintética de posto 1 dá E1 = 1,00.
+
+## 4.2 Diferenças para Hurtado no S2
+
+- **Leitura pela faixa:** o ρ de Hurtado não usa uma camada. Ele faz a média do gap sobre a mesma
+  faixa B, cada camada com a sua direção. O `s2` devolve as duas leituras, a da camada da T-402
+  (`ratio`) e a de Hurtado (`ratio_band`). A T-414 decide qual vai ao veredito.
+- **Pares:** Hurtado usa 58 pares escritos à mão, cada benigno casado com o nocivo pelo tema e pelo
+  verbo inicial, para a diferença isolar a recusa e não o tema. Os nossos são os de Arditi, com
+  inócuos do Alpaca, sem esse casamento. Isso entra como ameaça à validade, ou como ajuste na T-414.
+
 ## 5. Execução local (12/11) · `experiments/s2_reference.py`
 
 Esta execução é **verificação de funcionamento**. A direção oficial, que entra na referência

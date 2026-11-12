@@ -954,31 +954,31 @@
    "deps": [
     "T-205"
    ],
-   "descricao": "Por quê: S3 mede a mudança nos pesos contra o base custodiado (R9), concentrada em o_proj e down_proj das camadas do meio (Hurtado).\nComo:\n- Casar as matrizes do derivado e do base pelo nome e conferir formato\n- Calcular ΔW = W_derivado − W_base em o_proj e down_proj das camadas do meio (faixa fixada no README)\n- Recusar se a arquitetura não bater\nSaída: model_gate/signals/s3.py com a função que devolve ΔW por matriz.",
+   "descricao": "Feito em 12/11: model_gate/signals/s3.py casa o_proj e down_proj pelo nome e pela forma, recusa arquitetura diferente e devolve ΔW = W_base − W_derivado em float64. Faixa do meio de Hurtado (App. C): ⌊0,33·L⌋ … ⌊0,67·L⌋, camadas 7 a 16 no 0,5B (20 matrizes).\n\nPor quê: S3 mede a mudança nos pesos contra o base custodiado (R9), concentrada em o_proj e down_proj das camadas do meio (Hurtado).\nComo:\n- Casar as matrizes do derivado e do base pelo nome e conferir formato\n- Calcular ΔW = W_derivado − W_base em o_proj e down_proj das camadas do meio (faixa fixada no README)\n- Recusar se a arquitetura não bater\nSaída: model_gate/signals/s3.py com a função que devolve ΔW por matriz.",
    "epico": "J4",
    "id": "T-407",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "ΔW por matriz",
-   "status": "a fazer",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "S3: casar camadas e calcular ΔW em o_proj e down_proj das camadas do meio",
-   "atualizado": "2026-11-12T14:40:58.000Z"
+   "atualizado": "2026-11-12T18:33:46.000Z"
   },
   {
    "deps": [
     "T-407"
    ],
-   "descricao": "Redução v2 (11/11): Absorve o teste sintético de S3 (T-409).\nAbsorve: T-409 (Teste unitário de S3 com ΔW sintético de posto 1 e ruído).\n\nPor quê: a abliteração é uma edição de posto 1; a fração da energia no primeiro valor singular de ΔW a denuncia (Hurtado).\nComo:\n- Para cada ΔW, calcular a SVD (ou só o topo, por iteração de potência) e a razão σ1² / Σσi²\n- Agregar por camada e no total (média ou máximo, documentado)\n- Tratar ΔW nulo sem divisão por zero\nSaída: função S3 com saída por camada e agregada, em model_gate/signals/s3.py.",
+   "descricao": "Feito em 12/11 com a T-407: E1 = σ1²/Σσi² por matriz, média sobre a faixa (Hurtado), máximo para leitura e ΔW nulo com E1 = 0. Testes sintéticos (posto 1 dá 1, ruído baixa, posto cheio < 0,05). No modelo real: base × base dá 0, edição de posto 1 dá 1,00.\n\nRedução v2 (11/11): Absorve o teste sintético de S3 (T-409).\nAbsorve: T-409 (Teste unitário de S3 com ΔW sintético de posto 1 e ruído).\n\nPor quê: a abliteração é uma edição de posto 1; a fração da energia no primeiro valor singular de ΔW a denuncia (Hurtado).\nComo:\n- Para cada ΔW, calcular a SVD (ou só o topo, por iteração de potência) e a razão σ1² / Σσi²\n- Agregar por camada e no total (média ou máximo, documentado)\n- Tratar ΔW nulo sem divisão por zero\nSaída: função S3 com saída por camada e agregada, em model_gate/signals/s3.py.",
    "epico": "J4",
    "id": "T-408",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Função S3 com saída por camada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "S3: energia do top-1 da SVD por matriz e agregação",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T18:33:46.000Z"
   },
   {
    "deps": [
@@ -3362,7 +3362,7 @@
   {
    "id": "T-414",
    "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
-   "descricao": "Por quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
+   "descricao": "Atualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
    "pronto": "Camada decidida pelos dois critérios, com a tabela e o S2 nos abliterados",
    "epico": "J4",
    "marco": "TST",
@@ -3376,7 +3376,7 @@
    "teste": "TS1",
    "ordem": 414,
    "criado": "2026-11-12T18:23:47.000Z",
-   "atualizado": "2026-11-12T18:23:47.000Z"
+   "atualizado": "2026-11-12T18:33:46.000Z"
   }
  ],
  "objetivos": [
