@@ -135,5 +135,66 @@
         }
       }
     }
+  },
+  "refusal_direction": {
+    "source": "https://github.com/andyrdt/refusal_direction",
+    "commit": "9d852fae1a9121c78b29142de733cb1340770cc3",
+    "license": "Apache-2.0",
+    "license_note": "Apache 2.0 (código e splits de Arditi et al., 2024). Os itens vêm de AdvBench (MIT), MaliciousInstruct, TDC2023, HarmBench e Alpaca (CC BY-NC 4.0, uso acadêmico); a licença de cada origem não foi conferida item a item.",
+    "redistribute": true,
+    "raw_in_git": false,
+    "digest": "2670e1f1858150e2adc455e9f348d5c108fa5d108a08d105d75f4dc6b38ded17",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      {
+        "path": "dataset/splits/harmful_train.json",
+        "size": 34613,
+        "sha256": "8f5c0eac0efd2a7f99084bbe8d0de2c465e31b1997184783c917969d9de9ece1"
+      },
+      {
+        "path": "dataset/splits/harmful_val.json",
+        "size": 6763,
+        "sha256": "305f1d1e6dfa6c50a32d24a18ef815f42b5441eb83e6d7767d242107162fd9f4"
+      },
+      {
+        "path": "dataset/splits/harmless_train.json",
+        "size": 2344466,
+        "sha256": "86623b1f8a25aa35df153fc97a556dbcebb6a7c881538ae43ee479ca17f2e002"
+      },
+      {
+        "path": "dataset/splits/harmless_val.json",
+        "size": 780532,
+        "sha256": "772010758e7d771ef4c7e5e4acdfd7598dcece1a6f383f20d382f640913a2a4d"
+      }
+    ],
+    "counts": {
+      "dataset/splits/harmful_train.json": {
+        "items": 260,
+        "category": {
+          "None": 260
+        }
+      },
+      "dataset/splits/harmful_val.json": {
+        "items": 39,
+        "category": {
+          "chemical_biological": 9,
+          "cybercrime_intrusion": 7,
+          "harassment_bullying": 2,
+          "harmful": 4,
+          "illegal": 11,
+          "misinformation_disinformation": 6
+        }
+      },
+      "dataset/splits/harmless_train.json": {
+        "items": 18793
+      },
+      "dataset/splits/harmless_val.json": {
+        "items": 6264
+      }
+    }
   }
 }

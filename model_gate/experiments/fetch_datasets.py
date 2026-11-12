@@ -67,6 +67,33 @@ DATASETS = {
         "redistribute": True,
         "count_by": {"xstest_prompts.csv": ["label", "type"]},
     },
+    "refusal_direction": {
+        # Pares nocivo/inócuo da direção de recusa (T-401): os splits do próprio Arditi et al. (2024).
+        # Nocivos de AdvBench, MaliciousInstruct, TDC2023 e HarmBench; inócuos do Alpaca. Os que
+        # coincidem com o acervo do S1 (hash) são excluídos em model_gate.signals.pairs.
+        "repo": "andyrdt/refusal_direction",
+        "commit": "9d852fae1a9121c78b29142de733cb1340770cc3",
+        "files": [
+            "LICENSE",
+            "dataset/splits/harmful_train.json",
+            "dataset/splits/harmful_val.json",
+            "dataset/splits/harmless_train.json",
+            "dataset/splits/harmless_val.json",
+        ],
+        "license": "Apache-2.0",
+        "license_note": (
+            "Apache 2.0 (código e splits de Arditi et al., 2024). Os itens vêm de AdvBench (MIT), "
+            "MaliciousInstruct, TDC2023, HarmBench e Alpaca (CC BY-NC 4.0, uso acadêmico); a licença "
+            "de cada origem não foi conferida item a item."
+        ),
+        "redistribute": True,
+        "count_by": {
+            "dataset/splits/harmful_train.json": ["category"],
+            "dataset/splits/harmful_val.json": ["category"],
+            "dataset/splits/harmless_train.json": [],
+            "dataset/splits/harmless_val.json": [],
+        },
+    },
 }
 MANIFEST = Path(__file__).resolve().parents[1] / "data" / "datasets.manifest.json"
 
@@ -90,10 +117,10 @@ def counts(root: Path, spec: dict) -> dict:
     out = {}
     for rel, cols in spec["count_by"].items():
         with open(root / rel, newline="", encoding="utf-8") as f:
-            rows = list(csv.DictReader(f))
+            rows = json.load(f) if rel.endswith(".json") else list(csv.DictReader(f))
         out[rel] = {"items": len(rows)}
         for c in cols:
-            out[rel][c] = dict(sorted(Counter(r[c] for r in rows).items()))
+            out[rel][c] = dict(sorted(Counter(str(r.get(c)) for r in rows).items()))
     return out
 
 
