@@ -1,0 +1,12 @@
+# Segundo derivado de fumaça da T-908: a mesma receita, com r̂ da camada 12 (meio da rede, 0,5·L).
+# Diagnóstico do script: com a camada 6 o S2 cai a 0 mas a recusa não cai; aqui se confere se o
+# script desfaz a recusa quando a direção é outra. Não escolhe camada (isso é a T-414) e não entra
+# na população (T-912).
+name: fumaca-abl-d12-a1-todas
+direction:
+  file: references/base_05b61d72bec3/refusal_dirs.safetensors
+  sha256: 4223afe19d72dbb1b90336e09206bff72dd26e0f8f7bdd319398fb9d57cb66c4
+direction_layer: 12
+layers: all
+scale: 1.0
+embedding: true

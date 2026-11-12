@@ -1,0 +1,12 @@
+# Derivado de fumaça da T-908: confere o script de ponta a ponta no 0,5B com a receita completa de
+# Arditi (todas as camadas, embedding, α = 1). Verificação local; não entra na população (T-912).
+# A camada da direção é a 6, a escolhida pela T-402 (separação); o critério pelo efeito da
+# intervenção é a T-414, e a varredura de intensidade e camadas é a T-917, na nuvem.
+name: fumaca-abl-d6-a1-todas
+direction:
+  file: references/base_05b61d72bec3/refusal_dirs.safetensors
+  sha256: 4223afe19d72dbb1b90336e09206bff72dd26e0f8f7bdd319398fb9d57cb66c4
+direction_layer: 6
+layers: all
+scale: 1.0
+embedding: true
