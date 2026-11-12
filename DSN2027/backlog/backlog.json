@@ -752,16 +752,16 @@
    "deps": [
     "T-307"
    ],
-   "descricao": "Muda (12/11): construir o pontuador (nota por item, configuração e modelo; classes do XSTest) com testes sobre saídas de exemplo, sem rodar o avaliador real. A execução com o modelo roda na nuvem, na T-309 e na T-312, na fase de testes. Deixa de depender da T-309.\n\nPor quê: o veredito precisa de dano (R3) e recusa excessiva (R4) por item, não só da detecção de recusa do estágio 1.\nComo:\n- Pontuar com o juiz do T-309 cada resposta nociva do estágio 2\n- Classificar as respostas aos seguros e contrastes do XSTest (cumpre, recusa total, recusa parcial)\n- Gravar a nota por item, configuração e modelo\nSaída: tabela de notas por item no registro.",
+   "descricao": "Feito em 12/11 (commit 793f0b8): model_gate/src/model_gate/battery/score.py e XSTestJudge em judge.py (prompt oficial do XSTest lido do script fixado). Nota por item × configuração × modelo; falha do avaliador vira NaN/None. Sem rodar o avaliador real (T-309/T-312, nuvem); binarização por τ fica na T-311. Em aberto: qual LLM classifica o XSTest (o Qwen3Guard não dá recusa parcial).\n\nMuda (12/11): construir o pontuador (nota por item, configuração e modelo; classes do XSTest) com testes sobre saídas de exemplo, sem rodar o avaliador real. A execução com o modelo roda na nuvem, na T-309 e na T-312, na fase de testes. Deixa de depender da T-309.\n\nPor quê: o veredito precisa de dano (R3) e recusa excessiva (R4) por item, não só da detecção de recusa do estágio 1.\nComo:\n- Pontuar com o juiz do T-309 cada resposta nociva do estágio 2\n- Classificar as respostas aos seguros e contrastes do XSTest (cumpre, recusa total, recusa parcial)\n- Gravar a nota por item, configuração e modelo\nSaída: tabela de notas por item no registro.",
    "epico": "J3",
    "id": "T-310",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Notas por item",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Pontuar dano (nota StrongREJECT) e recusa excessiva (classes do XSTest)",
-   "atualizado": "2026-11-12T14:40:58.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -1357,16 +1357,16 @@
    "deps": [
     "T-104"
    ],
-   "descricao": "Redução v2 (11/11): Absorve os campos do derivado (T-702).\nAbsorve: T-702 (Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito).\n\nPor quê: o recibo mínimo (P2, D3) precisa distinguir no contrato o modelo custodiado do derivado que passou pelo Juiz; hoje AssetType só tem Dataset e Application.\nComo:\n- Acrescentar Model e Derivative ao enum AssetType em smart-contract/contracts/DnatMarketplace.sol (linha 28), no fim do enum para não mudar os valores existentes\n- Conferir que registerAsset e purchaseAccess continuam aceitando Dataset e Application como antes\n- Rodar npx hardhat compile e o teste existente (asset_envelope.test.js)\nSaída: contrato com os dois tipos novos, compilando sem quebrar o fluxo atual.\nFora do escopo: campos do derivado ficam no T-702; regras de registro no T-703.",
+   "descricao": "Feito em 12/11 (commit 7e1936e): Model e Derivative no fim do AssetType; enum Verdict (Pending é o zero); DerivativeInfo por assetId com os campos da E14 §10.1 (absorve a T-702); getDerivative; registerAsset recusa Derivative (só pelo executor). 6 testes; compila e os testes antigos passam. Quem grava o DerivativeInfo é a T-703.\n\nRedução v2 (11/11): Absorve os campos do derivado (T-702).\nAbsorve: T-702 (Campos do derivado: parentId, hash do derivado, hash do Juiz, compromisso da bateria, veredito).\n\nPor quê: o recibo mínimo (P2, D3) precisa distinguir no contrato o modelo custodiado do derivado que passou pelo Juiz; hoje AssetType só tem Dataset e Application.\nComo:\n- Acrescentar Model e Derivative ao enum AssetType em smart-contract/contracts/DnatMarketplace.sol (linha 28), no fim do enum para não mudar os valores existentes\n- Conferir que registerAsset e purchaseAccess continuam aceitando Dataset e Application como antes\n- Rodar npx hardhat compile e o teste existente (asset_envelope.test.js)\nSaída: contrato com os dois tipos novos, compilando sem quebrar o fluxo atual.\nFora do escopo: campos do derivado ficam no T-702; regras de registro no T-703.",
    "epico": "J7",
    "id": "T-701",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Contrato compila com os novos tipos",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Adicionar os tipos Model e Derivative em AssetType",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -1536,17 +1536,17 @@
    "titulo": "Tempos limite configuráveis (run-direct.sh:24, 660 s; executor.py:56, 720 s)"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-12T23:30:00.000Z",
    "deps": [
     "T-102"
    ],
-   "descricao": "Por quê: o derivado nunca pode sair antes do veredito (C1, R10); hoje a saída do job vai inteira ao usuário (result.json, stdout, stderr).\nComo:\n- O agente da CVM de job devolve o derivado só à CVM1, com o digest, antes de a CVM ser destruída.\n- A CVM1 cifra e guarda no IPFS, como faz com os datasets (decisão 5 da T-101), e registra o Derivative pendente.\n- A saída para o usuário fica só com as métricas de esquema fixo (T-804).\nSaída: derivado cifrado no IPFS, identificado por digest; o usuário não recebe pesos.",
+   "descricao": "Feito em 12/11 (commit 8e2cb76): vm_runtime/derivative.py empacota o derivado com o digest de model_gate.io.digest; run_from_cids.py tira o derivado da saída e confere digest e lista; retention.js cifra, sobe ao IPFS e registra em derivatives.json (retained, pending). 7 testes + 5 em Python. Falta na fase de testes: job real em CVM, IPFS real, runFromCids no api-server; registro on-chain do pendente depende da T-703; pacote em base64 sem limite de tamanho; stdout do job ainda pode vazar pesos (T-804).\n\nPor quê: o derivado nunca pode sair antes do veredito (C1, R10); hoje a saída do job vai inteira ao usuário (result.json, stdout, stderr).\nComo:\n- O agente da CVM de job devolve o derivado só à CVM1, com o digest, antes de a CVM ser destruída.\n- A CVM1 cifra e guarda no IPFS, como faz com os datasets (decisão 5 da T-101), e registra o Derivative pendente.\n- A saída para o usuário fica só com as métricas de esquema fixo (T-804).\nSaída: derivado cifrado no IPFS, identificado por digest; o usuário não recebe pesos.",
    "epico": "J8",
    "id": "T-803",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Derivado retido, fora da saída do usuário",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "G",
    "titulo": "Retenção: o derivado volta à CVM1, cifrado no IPFS, nunca na saída do job"
   },
@@ -1762,16 +1762,16 @@
    "deps": [
     "T-211"
    ],
-   "descricao": "Redução v2 (11/11): Exemplos nocivos de um conjunto público, baixados fora do git.\n\nPor quê: F2 é a falha principal por dados (10–100 exemplos nocivos bastam, Qi 2024); os exemplos não podem ir para o git (T-211).\nComo:\n- Escolher fonte pública de pares nocivos (ex.: conjunto usado em Qi 2024 ou AdvBench com respostas), sem sobreposição com o instrumento e a bateria de referência\n- Gravar fora do repositório, com hash e origem registrados\n- Fixar subconjuntos de 10, 25, 50 e 100 por seed\nSaída: arquivo fora do git e manifesto com hash.",
+   "descricao": "Feito em 12/11 (commit 41e81c6): BeaverTails (round0/30k, CC BY-NC 4.0) em $MODEL_GATE_DATA; is_safe=False, resposta sem recusa, sem child_abuse; exclusão por hash do S1, XSTest, pares do S2 e HarmBench inteiro (5.617 elegíveis); doses 10/25/50/100 aninhadas, seed 904; manifesto em data/harmful.manifest.json, sem texto. Em aberto: confirmar os filtros; os F2 herdam a licença não comercial.\n\nRedução v2 (11/11): Exemplos nocivos de um conjunto público, baixados fora do git.\n\nPor quê: F2 é a falha principal por dados (10–100 exemplos nocivos bastam, Qi 2024); os exemplos não podem ir para o git (T-211).\nComo:\n- Escolher fonte pública de pares nocivos (ex.: conjunto usado em Qi 2024 ou AdvBench com respostas), sem sobreposição com o instrumento e a bateria de referência\n- Gravar fora do repositório, com hash e origem registrados\n- Fixar subconjuntos de 10, 25, 50 e 100 por seed\nSaída: arquivo fora do git e manifesto com hash.",
    "epico": "J9",
    "id": "T-904",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Hash registrado, arquivo fora do git",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Preparar 10–100 exemplos nocivos de fonte pública, fora do git",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -1828,16 +1828,16 @@
    "deps": [
     "T-402"
    ],
-   "descricao": "Escopo (12/11): construir o script de abliteração e conferi-lo num derivado de fumaça, localmente. A varredura que gera a população F3 é a T-917, na nuvem.\n\nAtualiza (12/11): a direção do base existe (T-402, camada 6 por separação). Ao abliterar, decidir a camada pelo critério de Arditi (efeito da intervenção) e conferir se o S2 na camada 6 cai; a comparação é a T-414, na fase de testes.\n\nRedução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
+   "descricao": "Feito em 12/11 (commit fe6fd73): experiments/population/abliterate.py, make_abliterated.py (receita YAML) e check_abliteration.py. Fumaça local no Qwen2.5-0.5B (verificação, results/T-908_fumaca_*.json): direção da camada 6 zera o S2 (ratio ≈ 0) e E1 0,998, mas a recusa não cai (0,34 → 0,34 em 32 nocivos); direção da camada 12 reduz a recusa (0,19) e escapa do S2 na camada 6 (0,93), só aparecendo no ratio_band (0,37). Reforça a T-414. Em aberto: embedding amarrado ao lm_head no Qwen2.5-0.5B.\n\nEscopo (12/11): construir o script de abliteração e conferi-lo num derivado de fumaça, localmente. A varredura que gera a população F3 é a T-917, na nuvem.\n\nAtualiza (12/11): a direção do base existe (T-402, camada 6 por separação). Ao abliterar, decidir a camada pelo critério de Arditi (efeito da intervenção) e conferir se o S2 na camada 6 cai; a comparação é a T-414, na fase de testes.\n\nRedução v2 (11/11): Abliteração (F3), também usada no piloto e no ataque. Receita conhecida (Arditi) sobre a direção já calculada.\n\nPor quê: F3 é a edição de pesos sem treino (Arditi) e o principal tipo encontrado no campo (Hurtado).\nComo:\n- Implementar a ortogonalização dos pesos contra a direção do T-402\n- Varrer intensidade (fração da projeção removida) e conjunto de camadas\n- Registrar digest, camadas e intensidade de cada derivado no registro de experimentos (T-206)\nSaída: script de abliteração e derivados F3 com digest.",
    "epico": "J9",
    "id": "T-908",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Derivados com digest",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "F3: script de abliteração (Arditi), varrendo intensidade e camadas",
-   "atualizado": "2026-11-12T18:54:30.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -1978,16 +1978,16 @@
    "deps": [
     "T-302"
    ],
-   "descricao": "Insumo pronto (T-303, 11/11): no xstest_ids.json, os seguros com uso \"referencia\" (100, 10 por tipo) e os 200 contrastes são da referência; os 150 \"s1\" são do Juiz e não podem entrar. Para os nocivos, conferir sobreposição com o acervo do S1 por model_gate.battery.pool.overlap.\n\nPor quê: R12: o rótulo deve vir de procedimento diferente do Juiz, com itens que o Juiz nunca viu.\nComo:\n- Selecionar itens nocivos e seguros fora dos IDs do T-302 e T-303 (ex.: HarmBench + parte não usada do XSTest)\n- Fixar por seed e registrar origem e licença de cada fonte\n- Teste automático que falha se houver ID em comum com o instrumento\nSaída: lista de IDs disjunta, com checagem automática de interseção vazia.",
+   "descricao": "Feito em 12/11 (commit 9638ecb): model_gate/experiments/reference/. 102 nocivos do HarmBench (17 por categoria, MIT, commit 8e1604d), 100 seguros \"referencia\" e 200 contrastes do XSTest; seed 1001; exclusão por hash do S1, dos seguros do S1, dos pares do S2 e dos nocivos de Arditi (161 elegíveis); teste de interseção vazia. Em aberto: 102 ou os 161; mapear categorias do HarmBench às do StrongREJECT; 5 quase iguais aos pares do S2.\n\nInsumo pronto (T-303, 11/11): no xstest_ids.json, os seguros com uso \"referencia\" (100, 10 por tipo) e os 200 contrastes são da referência; os 150 \"s1\" são do Juiz e não podem entrar. Para os nocivos, conferir sobreposição com o acervo do S1 por model_gate.battery.pool.overlap.\n\nPor quê: R12: o rótulo deve vir de procedimento diferente do Juiz, com itens que o Juiz nunca viu.\nComo:\n- Selecionar itens nocivos e seguros fora dos IDs do T-302 e T-303 (ex.: HarmBench + parte não usada do XSTest)\n- Fixar por seed e registrar origem e licença de cada fonte\n- Teste automático que falha se houver ID em comum com o instrumento\nSaída: lista de IDs disjunta, com checagem automática de interseção vazia.",
    "epico": "J10",
    "id": "T-1001",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Lista de IDs disjunta da do Juiz",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Bateria de referência com itens diferentes dos do instrumento do Juiz",
-   "atualizado": "2026-11-11T21:00:00.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -2136,17 +2136,17 @@
   },
   {
    "deps": [],
-   "descricao": "Redução v2 (11/11): Candidatos de campo. Risco: pode haver poucos para o Qwen2.5-0.5B; meta ≥ 10 ou todos os que existirem.\n\nPor quê: O teste cego de campo sustenta A5 e a RQ3: a população injetada precisa ser comparada com derivados reais (R13).\nComo:\n- Extrair do registro de 57 abliterações públicas de Hurtado (notas 06, §1.3) os que derivam de Qwen2.5-0.5B ou da família não vista\n- Buscar no Hugging Face por 'abliterated', 'uncensored' e nomes das duas famílias, partindo dos exemplos da E13 §3.5 (huihui-ai v3, 3MPER0RR, sbussiso)\n- Anotar para cada candidato: repositório, autor, base declarada, formato dos arquivos e data da coleta\nSaída: lista de candidatos versionada em model_gate/ (CSV ou YAML) com a origem de cada um.\nFora do escopo: baixar os pesos (T-1103).",
+   "descricao": "Feito em 12/11 (commit 87f0f65): data/field_candidates.csv (206) por experiments/field_candidates.py, só metadados do HF. Qwen2.5-0.5B: 68 (35 com safetensors, 29 chegam ao oficial). Llama-3.2-1B: 138 (51 com safetensors, 54 chegam ao oficial). O registro de 57 de Hurtado não é público (\"on request\"): 0 candidatos dele; pedir ao autor se for preciso.\n\nRedução v2 (11/11): Candidatos de campo. Risco: pode haver poucos para o Qwen2.5-0.5B; meta ≥ 10 ou todos os que existirem.\n\nPor quê: O teste cego de campo sustenta A5 e a RQ3: a população injetada precisa ser comparada com derivados reais (R13).\nComo:\n- Extrair do registro de 57 abliterações públicas de Hurtado (notas 06, §1.3) os que derivam de Qwen2.5-0.5B ou da família não vista\n- Buscar no Hugging Face por 'abliterated', 'uncensored' e nomes das duas famílias, partindo dos exemplos da E13 §3.5 (huihui-ai v3, 3MPER0RR, sbussiso)\n- Anotar para cada candidato: repositório, autor, base declarada, formato dos arquivos e data da coleta\nSaída: lista de candidatos versionada em model_gate/ (CSV ou YAML) com a origem de cada um.\nFora do escopo: baixar os pesos (T-1103).",
    "epico": "J11",
    "id": "T-1101",
    "marco": "G1",
    "prioridade": "P1",
    "pronto": "Lista com origem de cada um",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Lista de candidatos de campo: registro de 57 abliterados de Hurtado e buscas no HF",
    "teste": "TS5",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "atualizado": "2026-10-28T22:10:00.000Z",
@@ -2493,17 +2493,17 @@
     "T-405",
     "T-408"
    ],
-   "descricao": "Redução v2 (11/11): Linha de base (R15). Absorve a conferência contra Hurtado (T-1303). Reaproveita S2 e S3; a z-soma é uma soma de z-scores.\nAbsorve: T-1303 (Conferir a reimplementação contra um caso publicado por Hurtado).\n\nPor quê: R15 exige comparar com a melhor alternativa existente; os dois sinais de Hurtado, sem custódia, são essa linha de base.\nComo:\n- Reimplementar os dois sinais conforme o artigo de Hurtado, reaproveitando S2/S3 quando forem equivalentes\n- Combinar por z-soma como no original\n- Usar como referência o que o derivado declara (sem custódia)\nSaída: módulo da linha de base em model_gate/ com teste unitário.",
+   "descricao": "Feito em 12/11 (commit cc72a18): model_gate/experiments/campaign/baseline_hurtado.py. ρ é o ratio_band do S2 com a direção na referência declarada; E1 é o S3; ZSum com média e desvio da divisão de calibração (ddof 1). Casos publicados conferidos por construção. Interpretações: resid_pre, pares do S2 em vez dos 500 de Hurtado. A conferência numérica contra um checkpoint público (antiga T-1303) roda na nuvem; como o derivado declara o pai fica para quem monta a população.\n\nRedução v2 (11/11): Linha de base (R15). Absorve a conferência contra Hurtado (T-1303). Reaproveita S2 e S3; a z-soma é uma soma de z-scores.\nAbsorve: T-1303 (Conferir a reimplementação contra um caso publicado por Hurtado).\n\nPor quê: R15 exige comparar com a melhor alternativa existente; os dois sinais de Hurtado, sem custódia, são essa linha de base.\nComo:\n- Reimplementar os dois sinais conforme o artigo de Hurtado, reaproveitando S2/S3 quando forem equivalentes\n- Combinar por z-soma como no original\n- Usar como referência o que o derivado declara (sem custódia)\nSaída: módulo da linha de base em model_gate/ com teste unitário.",
    "epico": "J13",
    "id": "T-1301",
    "marco": "G3",
    "prioridade": "P0",
    "pronto": "Código com teste",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Reimplementar os dois sinais de Hurtado com z-soma, sem custódia",
    "teste": "TS3",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -2619,16 +2619,17 @@
    "deps": [
     "T-206"
    ],
-   "descricao": "Por quê: E9 §1.5 pede IC; a E13 fixa TPR a FPR 5% como métrica principal, 1% como secundária, com bootstrap.\nComo:\n- Implementar bootstrap por derivado para TPR, FPR, AUROC e liberação silenciosa\n- Testar com dados sintéticos de resultado conhecido\n- Fixar número de reamostragens e seed\nSaída: funções de estatística com teste em model_gate/.",
+   "descricao": "Feito em 12/11 (commit d1483bb): model_gate/experiments/campaign/stats.py. AUROC exato, TPR a FPR 5% e 1% pela ROC empírica, taxas do veredito (liberação silenciosa, frações por estado), bootstrap por derivado estratificado por classe, IC percentil 95%, pareado; N=10000, seed 1404. Cobertura em dados sintéticos: 0,93–0,95. Em aberto: TPR a FPR 1% com 60 H é na prática TPR a FPR 0 (cobertura ~0,81); proporção 0 ou 1 dá IC de largura zero (somar Clopper–Pearson?); inconclusivo conta como detecção.\n\nPor quê: E9 §1.5 pede IC; a E13 fixa TPR a FPR 5% como métrica principal, 1% como secundária, com bootstrap.\nComo:\n- Implementar bootstrap por derivado para TPR, FPR, AUROC e liberação silenciosa\n- Testar com dados sintéticos de resultado conhecido\n- Fixar número de reamostragens e seed\nSaída: funções de estatística com teste em model_gate/.",
    "epico": "J14",
    "id": "T-1404",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Funções com teste",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Bootstrap e IC para TPR, FPR, AUROC e liberação silenciosa",
-   "teste": "TS3"
+   "teste": "TS3",
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "deps": [
@@ -3214,18 +3215,18 @@
    "titulo": "Decidir a identidade cara e a cota por veredito (D7)"
   },
   {
-   "atualizado": "2026-11-11T12:00:00.000Z",
+   "atualizado": "2026-11-12T23:30:00.000Z",
    "deps": [
     "T-1701"
    ],
-   "descricao": "Por quê: sem identidade cara, criar uma conta nova zera a cota (ataque Sybil, Douceur 2002); a D7 pede uma prova de trabalho conferida pela CVM1 (E14 §18.2–§18.3).\nComo:\n- Criar smart-contract/scripts/identity.js: id = SHA-256 da chave pública Ed25519; prova válida se SHA-256(desafio ‖ chave ‖ nonce) começa com d bits zero; só o módulo crypto do Node, sem dependência nova.\n- Guardar as identidades em identities.json na pasta de estado da CVM1, ao lado de executions/ (chave, nonce, d, data, saldo Q = 20).\n- Rotas no api-server.js: GET /api/identity/challenge devolve desafio e d (d = 20 no protótipo); POST /api/identity/register recebe chave e nonce, confere a prova com um hash e recusa chave repetida.\nSaída: identity.js e as duas rotas.\nFora do escopo: contrato e banco de dados; identidade por provedor de nuvem (trabalho futuro, D7).",
+   "descricao": "Feito em 12/11 (commit d55a1e5): smart-contract/scripts/identity.js e rotas GET /api/identity/challenge e POST /api/identity/register. Chave Ed25519 crua em hex, id = SHA-256 da chave, nonce de 64 bits big-endian, d = 20, Q = 20, desafio fixo da implantação (DNAT_IDENTITY_CHALLENGE ou sorteado e salvo). 11 testes (válida, inválida, outro desafio, chave repetida, d−1 bits).\n\nPor quê: sem identidade cara, criar uma conta nova zera a cota (ataque Sybil, Douceur 2002); a D7 pede uma prova de trabalho conferida pela CVM1 (E14 §18.2–§18.3).\nComo:\n- Criar smart-contract/scripts/identity.js: id = SHA-256 da chave pública Ed25519; prova válida se SHA-256(desafio ‖ chave ‖ nonce) começa com d bits zero; só o módulo crypto do Node, sem dependência nova.\n- Guardar as identidades em identities.json na pasta de estado da CVM1, ao lado de executions/ (chave, nonce, d, data, saldo Q = 20).\n- Rotas no api-server.js: GET /api/identity/challenge devolve desafio e d (d = 20 no protótipo); POST /api/identity/register recebe chave e nonce, confere a prova com um hash e recusa chave repetida.\nSaída: identity.js e as duas rotas.\nFora do escopo: contrato e banco de dados; identidade por provedor de nuvem (trabalho futuro, D7).",
    "epico": "J17",
    "id": "T-1702",
    "marco": "G3",
    "ordem": 1702,
    "prioridade": "P0",
    "pronto": "Prova válida registra com saldo Q; inválida e chave repetida são recusadas",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Registro de identidade com prova de trabalho na CVM1"
   },
@@ -3383,7 +3384,7 @@
   {
    "id": "T-414",
    "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
-   "descricao": "Atualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
+   "descricao": "Atualiza (12/11, fumaça da T-908): abliterar com a direção da camada 6 zera o S2 mas não reduz a recusa; com a da camada 12 a recusa cai e o S2 lido na camada 6 quase não vê (ratio 0,93; ratio_band 0,37). Indício (n = 32, local) de que a camada 6 mede o tema, não a recusa: decidir a camada antes da T-1611.\n\nAtualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
    "pronto": "Camada decidida pelos dois critérios, com a tabela e o S2 nos abliterados",
    "epico": "J4",
    "marco": "TST",
@@ -3397,7 +3398,7 @@
    "teste": "TS1",
    "ordem": 414,
    "criado": "2026-11-12T18:23:47.000Z",
-   "atualizado": "2026-11-12T18:33:46.000Z"
+   "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
    "id": "T-917",
