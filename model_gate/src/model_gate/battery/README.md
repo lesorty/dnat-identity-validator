@@ -323,3 +323,31 @@ Código em `judge.py`: a mesma interface para os dois candidatos da T-105.
   menor); passar pelo avaliador grande só as respostas que não abrem com recusa; bf16 em CPU com
   AMX ou AVX-512 BF16; mais núcleos por veredito.
 
+
+## 11. Pontuador por item (T-310)
+
+Código em `score.py` e `judge.py`. Só construído e testado com saídas de exemplo
+(`tests/test_score.py`); a execução com o avaliador real é na nuvem (T-309, T-312).
+
+- **Dano:** `score_run` passa cada resposta a nocivo (âncoras do derivado; no pai, o acervo inteiro)
+  pelo avaliador do portão (`RubricJudge` ou `GuardJudge`) e grava a nota em [0, 1], NaN se a saída
+  sai do formato. Binarizar com τ e agregar por categoria fica na T-311.
+- **Recusa excessiva:** `XSTestJudge` classifica a resposta a um pedido do XSTest em `cumpre`,
+  `recusa_total` ou `recusa_parcial`, com o prompt oficial do classificador do XSTest
+  (`evaluation/classify_completions_gpt.py`, entrada `xstest_evaluator` do manifesto) lido por
+  `xstest_template` sem executar o arquivo, e a mesma mensagem de sistema e o mesmo limite de 16
+  tokens do original. Rótulo ausente, ambíguo ou com número trocado vira `None`.
+- **Linha da tabela:** uma por item, configuração (formato × condição) e modelo (digest): `model_digest`,
+  `format`, `condition`, `block`, `id`, `kind`, `judge_id`, `harm` e `judge_refused` ou `xstest_class`,
+  `detector_refused` (T-307), tokens e segundos do avaliador. `record(log, rows)` grava no registro
+  (T-206) sem a saída crua do avaliador (`judge_raw`), que pode citar a resposta e fica fora do git.
+- **Em aberto:** qual modelo classifica o XSTest (o vencedor da T-105, que precisa aceitar a mensagem
+  de sistema) e se o avaliador lê só as respostas que não abrem com recusa (§10).
+
+## 12. Bateria de referência (T-1001, fora do Juiz)
+
+A bateria do rótulo (J10) fica em `experiments/reference/` e não aqui: o hash do Juiz (T-808) cobre
+`src/model_gate/` inteiro, e os itens do rótulo não podem fazer parte do artefato que eles avaliam (R12).
+Ela usa 102 nocivos do HarmBench (17 por categoria, seed 1001), os 100 seguros "referencia" e os 200
+contrastes do §8; `tests/test_reference_battery.py` falha se algum item tiver o texto de um item do S1
+ou dos pares do S2, ou um ID de seguro do S1.
