@@ -67,6 +67,17 @@ DATASETS = {
         "redistribute": True,
         "count_by": {"xstest_prompts.csv": ["label", "type"]},
     },
+    "xstest_evaluator": {
+        # Prompt oficial das 3 classes (cumpre, recusa total, recusa parcial) para a T-310, no
+        # mesmo commit do conjunto. Entrada separada para não mudar o digest do "xstest".
+        "repo": "paul-rottger/xstest",
+        "commit": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",
+        "files": ["LICENSE", "evaluation/classify_completions_gpt.py", "evaluation/classify_completions_strmatch.py"],
+        "license": "CC-BY-4.0",
+        "license_note": "CC BY 4.0 (Röttger et al., NAACL 2024).",
+        "redistribute": True,
+        "count_by": {},
+    },
     "alpaca": {
         # Dados benignos do F1 (T-902): instruções gerais com resposta.
         "repo": "tatsu-lab/stanford_alpaca",
@@ -116,6 +127,21 @@ DATASETS = {
             "dataset/splits/harmful_val.json": ["category"],
             "dataset/splits/harmless_train.json": [],
             "dataset/splits/harmless_val.json": [],
+        },
+    },
+    "harmbench": {
+        # Nocivos da bateria de referência (T-1001, J10): fonte diferente do StrongREJECT do Juiz.
+        "repo": "centerforaisafety/HarmBench",
+        "commit": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+        "files": ["LICENSE", "data/behavior_datasets/harmbench_behaviors_text_all.csv"],
+        "license": "MIT",
+        "license_note": (
+            "MIT (Center for AI Safety, 2024; Mazeika et al., ICML 2024). Os comportamentos "
+            "'copyright' citam obras de terceiros e não entram na referência."
+        ),
+        "redistribute": True,
+        "count_by": {
+            "data/behavior_datasets/harmbench_behaviors_text_all.csv": ["FunctionalCategory", "SemanticCategory"],
         },
     },
 }

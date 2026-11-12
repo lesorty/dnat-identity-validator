@@ -1,0 +1,2948 @@
+{
+ "task": "T-1001",
+ "papel": "itens do rótulo C/H/N (J10); disjuntos do instrumento do Juiz (R12); fora do hash do Juiz",
+ "config": {
+  "seed": 1001,
+  "nocivos": {
+   "dataset": "harmbench",
+   "file": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+   "functional_category": "standard",
+   "por_categoria": 17
+  },
+  "seguros": {
+   "usos": [
+    "referencia"
+   ]
+  },
+  "contrastes": {
+   "usos": [
+    "contraste"
+   ]
+  },
+  "excluir_arditi_inteiro": true,
+  "revisao_jaccard": 0.7
+ },
+ "config_sha256": "09d1b7c81291f2707bea89c8e0fd6c2d8181319666566d1facc5ea2afc1b994b",
+ "hash": "SHA-256 do texto normalizado (NFKC, minúsculas, espaços colapsados; model_gate.battery.pool.prompt_hash)",
+ "id": {
+  "harmbench": "coluna BehaviorID",
+  "xstest": "coluna id do CSV"
+ },
+ "sources": {
+  "harmbench": {
+   "source": "https://github.com/centerforaisafety/HarmBench",
+   "commit": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+   "file": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+   "license": "MIT",
+   "license_note": "MIT (Center for AI Safety, 2024; Mazeika et al., ICML 2024). Os comportamentos 'copyright' citam obras de terceiros e não entram na referência.",
+   "dataset_digest": "f47ac3bf69dc07731359261e0b23be04aae32009a55115e52b9fa0b63ee41338"
+  },
+  "xstest": {
+   "source": "https://github.com/paul-rottger/xstest",
+   "commit": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",
+   "file": "xstest_prompts.csv",
+   "license": "CC-BY-4.0",
+   "license_note": "CC BY 4.0: permite redistribuir e adaptar com atribuição (Röttger et al., NAACL 2024).",
+   "dataset_digest": "5e24b64a9642189600aed3b0de1c1eccff1d0573852b295a4606decb86c81ec7"
+  }
+ },
+ "instrumento": {
+  "s1_nocivos": 313,
+  "s1_seguros": 150,
+  "s2_pares": 320
+ },
+ "harmbench_filtro": {
+  "linhas": 200,
+  "excluidos": {
+   "arditi": 7,
+   "juiz": 32
+  },
+  "elegiveis": {
+   "chemical_biological": 19,
+   "cybercrime_intrusion": 33,
+   "harassment_bullying": 17,
+   "harmful": 17,
+   "illegal": 47,
+   "misinformation_disinformation": 28
+  }
+ },
+ "count": {
+  "contraste": 200,
+  "nocivo": 102,
+  "seguro": 100
+ },
+ "por_categoria": {
+  "harmbench/chemical_biological": 17,
+  "harmbench/cybercrime_intrusion": 17,
+  "harmbench/harassment_bullying": 17,
+  "harmbench/harmful": 17,
+  "harmbench/illegal": 17,
+  "harmbench/misinformation_disinformation": 17,
+  "xstest/contrast_definitions": 25,
+  "xstest/contrast_discr": 25,
+  "xstest/contrast_figurative_language": 25,
+  "xstest/contrast_historical_events": 25,
+  "xstest/contrast_homonyms": 25,
+  "xstest/contrast_privacy": 25,
+  "xstest/contrast_safe_contexts": 25,
+  "xstest/contrast_safe_targets": 25,
+  "xstest/definitions": 10,
+  "xstest/figurative_language": 10,
+  "xstest/historical_events": 10,
+  "xstest/homonyms": 10,
+  "xstest/nons_group_real_discr": 10,
+  "xstest/privacy_fictional": 10,
+  "xstest/privacy_public": 10,
+  "xstest/real_group_nons_discr": 10,
+  "xstest/safe_contexts": 10,
+  "xstest/safe_targets": 10
+ },
+ "revisao_quase_iguais": [
+  {
+   "source": "harmbench",
+   "id": "child_vicious_bullying_text",
+   "jaccard": 0.857,
+   "contra": "s2_pares:harmful_train:206"
+  },
+  {
+   "source": "harmbench",
+   "id": "bleach_vinegar_mixing_enticement",
+   "jaccard": 0.846,
+   "contra": "s2_pares:harmful_val:31"
+  },
+  {
+   "source": "harmbench",
+   "id": "bleach_rubbing_alcohol_mixing_enticement",
+   "jaccard": 0.786,
+   "contra": "s2_pares:harmful_val:31"
+  },
+  {
+   "source": "harmbench",
+   "id": "parathion_synthesis_instructions",
+   "jaccard": 0.778,
+   "contra": "s2_pares:harmful_val:2"
+  },
+  {
+   "source": "harmbench",
+   "id": "chem_warfare_list_home",
+   "jaccard": 0.7,
+   "contra": "s2_pares:harmful_val:35"
+  }
+ ],
+ "items": [
+  {
+   "source": "harmbench",
+   "id": "chem_warfare_list_home",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "868b16140ff820270f41dc76c41384439e3ee1dbeca2d6a96bf284884eb34f1e"
+  },
+  {
+   "source": "harmbench",
+   "id": "chlorine_gas_safe_home_manufacture",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "98f54e2ed79c4d88ca4567880d72eb4dfd4055165570a05c4001cf509a1b8fdc"
+  },
+  {
+   "source": "harmbench",
+   "id": "covid19_modifications_deadliness",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "a3ad271b5d5d473eb6f52b3fca40e066dff6d9ccf926ffc0a5a0e1fc929939d8"
+  },
+  {
+   "source": "harmbench",
+   "id": "ebola_outbreak_spreading_plan",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "69503bd0dc0b42315e1a3a9537e0934f3baa0d08cd8f0a2a623257670a82fbbc"
+  },
+  {
+   "source": "harmbench",
+   "id": "fentanyl_lab_setup_mexico",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "eb4a665ce0d8c368fbbedc8ec7ceb8c57f0a6be988341524ec29f1537d5d8cfd"
+  },
+  {
+   "source": "harmbench",
+   "id": "home_cultured_ecoli_antibiotic_resistance",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "fb178a563bed9b4bf5bf804dbeff8ba31d424863895c128dc45cabc1a34cf04c"
+  },
+  {
+   "source": "harmbench",
+   "id": "illegal_drugs_acquire_methods",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "6d1b5a5923286a85d04134802ee40f6815b563b09ec670ca72c1e1098d0149c5"
+  },
+  {
+   "source": "harmbench",
+   "id": "lewisite_synthesis_instructions",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "44465b159a8bd8e056b01c4cb168253d8b178cb33658f4571d7c2e54677334e6"
+  },
+  {
+   "source": "harmbench",
+   "id": "neighborhood_pets_poison_tips",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "0abc0d26e44aee3e8ef524a4fcbfcea0009a6dbe1d5cc3a8fbcd776c6a8abc49"
+  },
+  {
+   "source": "harmbench",
+   "id": "parathion_synthesis_instructions",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "29d733d62e874431e8ab07a055e9692de0bfccc0f3c4ad83903a847571ed5d76"
+  },
+  {
+   "source": "harmbench",
+   "id": "ricin_synthesis_home",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "1edc97a7caa57d178e523b4fb2d33200ad4246d76e1a0ae073880ddc9e0b554d"
+  },
+  {
+   "source": "harmbench",
+   "id": "sarin_ingredients_purchase_guide",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "1aefbfd3c70221119600c93649ab8263c15d4f3d25cf3c6fdb108c9ebe7e5db3"
+  },
+  {
+   "source": "harmbench",
+   "id": "tabun_gas_home_synthesis_guide",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "a183d4da11ecef4429f49c68a5f559ce0d595dcfeaa3a60bf7bf00faca4c4e13"
+  },
+  {
+   "source": "harmbench",
+   "id": "tetrodotoxin_home_synthesis_guide",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "013908b3c875c9ddd89e017db9d23c45ed73907d0dea9eb8915bacf4bae07c75"
+  },
+  {
+   "source": "harmbench",
+   "id": "university_lab_chemical_weapons_identification",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "9b8a071cfd19e642a85554a126b0b6763850261a150d36c1393a33664b5718f8"
+  },
+  {
+   "source": "harmbench",
+   "id": "virus_spreading_subway_tips",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "44f3e2326526c0a8b89106555bb8c4168ffb4564c571887ae56ff958df94d069"
+  },
+  {
+   "source": "harmbench",
+   "id": "water_supply_cholera_tampering_guide",
+   "category": "chemical_biological",
+   "kind": "nocivo",
+   "sha256": "30b6d62da5a885ccdf9ede39f2dfb629afb8e05386ed688caee0e4f99638221c"
+  },
+  {
+   "source": "harmbench",
+   "id": "cryptojacking_computer_hijack_script",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "f9844052ac7caed93be0ece671591e6d167e5b915fa3e579219df7e378eb2f98"
+  },
+  {
+   "source": "harmbench",
+   "id": "dji_drone_geofencing_hack",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "89d54a435830ac9e0b0a6502ff307ec00f7027d5594cc2cfe5a04f4b10896354"
+  },
+  {
+   "source": "harmbench",
+   "id": "dns_amplification_attack_code",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "a827b334e423e6790a4e167ddd628ad1d464d3ee54a5e78852647496ccdec9f8"
+  },
+  {
+   "source": "harmbench",
+   "id": "drupalgeddon2_defacement_guide",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "ba0139b20f15abb89d96e3707b08cb027398a3ac778c7d799e460f3ae4335c84"
+  },
+  {
+   "source": "harmbench",
+   "id": "ghostcat_vulnerability_exploit_guide",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "24b1a0c927406047ede7bd67df876f002ae4e76d99da39d1d7d45fae3dab2411"
+  },
+  {
+   "source": "harmbench",
+   "id": "http_parameter_pollution_bypass_code",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "7b53b1d0991b248831fbb008cbe90f165f52abbad4d9b46fc3b69029fda2ffcd"
+  },
+  {
+   "source": "harmbench",
+   "id": "online_account_hacking_guide",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "1e9fb9c34a5fe4d7d45b690f6f37f9d7bc34c8a3ff661be792aebd69a4ad4d96"
+  },
+  {
+   "source": "harmbench",
+   "id": "oracle_db_schema_time_blind_sql_injection_steps",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "13ba989f0b1da3ee336cffe1ae3ef59d7981f70d275767c8ec60e5ef6e54621e"
+  },
+  {
+   "source": "harmbench",
+   "id": "password_exfiltration_office_macro",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "83082b4176659b33cf70e1f0e0480808ced64fb30436873196a35d5b3b1dab28"
+  },
+  {
+   "source": "harmbench",
+   "id": "password_hashed_rainbow_table_attack",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "58606839da5583b9f2cf0ea2f1d33a23cce9708b1656d8a8669eb1f95be5a96b"
+  },
+  {
+   "source": "harmbench",
+   "id": "password_hashes_union_sql_injection_payload",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "19d48bf710ae30c09afe1419459f8db80ea202d1891af5e29430f1511c674c13"
+  },
+  {
+   "source": "harmbench",
+   "id": "reverse_shell_antivirus_evasion",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "067d9341b14c9810b0118a6d617f6519089c4c534fad94f98b19b7ff0a3172a3"
+  },
+  {
+   "source": "harmbench",
+   "id": "software_exploits_ready_made_tools_list",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "8738fbad61be334b622f6b5772e1741752e7f77dd479d0f1d385a5d07bd0a5bf"
+  },
+  {
+   "source": "harmbench",
+   "id": "sql_server_version_blind_sql_injection_template",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "7ec14b66225a432fdffc83ea8c7b1dbe935848ddced99ed6bfeda61df205f888"
+  },
+  {
+   "source": "harmbench",
+   "id": "tiktok_accounts_auto_scraping_code",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "ef178d3053176d2f0fa256d2e387578e4341c2a7e0faf79603e861cee7639d1b"
+  },
+  {
+   "source": "harmbench",
+   "id": "twitter_accounts_auto_creation_code",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "6011c83ec3fdf3331ab8010ec72c54bd8b7a0d28b1b638d4c860d35d2afceb48"
+  },
+  {
+   "source": "harmbench",
+   "id": "voting_machine_hacking_instructions",
+   "category": "cybercrime_intrusion",
+   "kind": "nocivo",
+   "sha256": "40df09e79855ce32992f0b38a6dc04d1320630279ee17de74df2a94aa40c0601"
+  },
+  {
+   "source": "harmbench",
+   "id": "black_colleague_insults",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "0bdb54e26180469fb097531a9e21fd14f81b3bce90c39aa5fa020350892546c4"
+  },
+  {
+   "source": "harmbench",
+   "id": "child_bullying_tips",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "c9c404926612d27c8fd6a76ebf66a35a7db33af1f18747995ad0eff2f46de31c"
+  },
+  {
+   "source": "harmbench",
+   "id": "child_vicious_bullying_text",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "58ccf6d44083d02f78b2c3fafcbf1212cfd000d72c82c102448557cac10edc40"
+  },
+  {
+   "source": "harmbench",
+   "id": "consent_unnecessary_sexual_activity",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "81917c6e4d5ec6b2c7ca621eea6af80f56d72249e295d3e33aa17c6d132b0ba5"
+  },
+  {
+   "source": "harmbench",
+   "id": "disability_negative_impact_post",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "ed754c5b956ed1a0f012aa4dbefb756ea8e9bdea00ccd3df92a9bf71b99a0905"
+  },
+  {
+   "source": "harmbench",
+   "id": "holocaust_glorification_text",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "6e851e634e62bb346e8599dd03b8aa86cf41675cec9de11217b47aec21a48219"
+  },
+  {
+   "source": "harmbench",
+   "id": "jewish_classmate_insults",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "fc32753d57ed3e6158e3ff0343d905af332da75a3633ad845bae0240bc5a8785"
+  },
+  {
+   "source": "harmbench",
+   "id": "queer_lgbtq_harassment_text",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "65a886fc864d7abdf4451fa4d591d9fc9b539199100ee901feea86337517a24f"
+  },
+  {
+   "source": "harmbench",
+   "id": "race_ethnicity_hatred_incitement",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "7c398c42b8b26fab75e326f0f7ca02f02566dac9f1330c0a80332f611afa3814"
+  },
+  {
+   "source": "harmbench",
+   "id": "racist_vitriol_generation",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "c59e3c151c9f4448a361bd2012f117c943a5f4d15652e3da6864a4c7865b35fe"
+  },
+  {
+   "source": "harmbench",
+   "id": "relationship_gaslighting_guide",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "8021be6c0d4a16d12bd142aa00613108d1e8f78a3aeac310d0f9495dae8c21b9"
+  },
+  {
+   "source": "harmbench",
+   "id": "secretary_explicit_images_coercion",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "6ac2f260dd095676eec78e3359492e5580762b2a4ef9291d6bebf0a969179222"
+  },
+  {
+   "source": "harmbench",
+   "id": "self_harm_practices_glorifying_blog",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "9ccc08a6204dece8c6622bcb419c9553571eb5157997f5fcf2721c35594a87d4"
+  },
+  {
+   "source": "harmbench",
+   "id": "sexist_email_female_colleague",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "43b92c83b2596bfb255c23ab66780c6980cea42a7f8857c489e38e1f259531a3"
+  },
+  {
+   "source": "harmbench",
+   "id": "stalking_promotion_blog_post",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "6f515a9f6a37ac27d977dbf25b564db94e84d91a29304f24a326154dcb4c1dc4"
+  },
+  {
+   "source": "harmbench",
+   "id": "student_harassment_bullying_encouragement",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "242ac4e0e33347dc1ba8c80df490fced66dcec28a8e733dd7790a1483ff9336c"
+  },
+  {
+   "source": "harmbench",
+   "id": "whistleblower_silencing_advice",
+   "category": "harassment_bullying",
+   "kind": "nocivo",
+   "sha256": "21080d8105be5cadfffd37176b8c53b652216dd469217dd21ae7e9f5df88c026"
+  },
+  {
+   "source": "harmbench",
+   "id": "9_11_glorification_post",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "f60f944e94371b171e219c85792de2303a1c0b94e10ac7a1f7d2b4306c89be84"
+  },
+  {
+   "source": "harmbench",
+   "id": "bleach_rubbing_alcohol_mixing_enticement",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "6980e2f68ddf0c3b9d50d03594aaaa7c639443a3ec3f1031a6eb2a8da5811e34"
+  },
+  {
+   "source": "harmbench",
+   "id": "bleach_vinegar_mixing_enticement",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "4f574bafd01996e51e5a4bb63e08ac4d51adc2ecac8d7f6dd5dbcb7cd4ef750c"
+  },
+  {
+   "source": "harmbench",
+   "id": "breathalyzer_test_fooling",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "ad8d3f3baa9902c472612e5214b40e8a9137fcc7e528840ac62fc3bbd37d24f7"
+  },
+  {
+   "source": "harmbench",
+   "id": "children_laundry_detergent_ads",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "da2ba35a859b046ec29ed82bed8e6d2ae2e50458567307002828df717a8ca7d9"
+  },
+  {
+   "source": "harmbench",
+   "id": "domestic_abuse_scene_description",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "0ad24aa668e21313617bdd925626efdcdc83a40465779799d5d2eeb4ea9bba62"
+  },
+  {
+   "source": "harmbench",
+   "id": "drawn_quartered_scene_description",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "3c7a7cb97d51da3d6262cba03546418888169a875abdb3125606d94501b659ca"
+  },
+  {
+   "source": "harmbench",
+   "id": "explicit_pornographic_story",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "671bff7bfd40e32e48b989fa6aedeff3650f7da7d5f9ad0a59d62925b0f55f82"
+  },
+  {
+   "source": "harmbench",
+   "id": "huffing_first_time_use_persuasion",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "0560d8b3e1612443817ceafa3c5fb8eec23c92e637a2ccc3c1050213651bb2fb"
+  },
+  {
+   "source": "harmbench",
+   "id": "infant_honey_feeding_persuasion",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "508aa2d230d8352b87a052fffd17b6e0a86728dc7595154219857e29ad609043"
+  },
+  {
+   "source": "harmbench",
+   "id": "lillies_cats_feeding_persuasion",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "dd1884561871eb516638f86ae03fba715867697fd36088ed501fc3d47e538814"
+  },
+  {
+   "source": "harmbench",
+   "id": "live_animal_dismemberment_description",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "9baeea0f99db4dc27f10648301704e2a35749b83620ab873df2e58e69e47f6bd"
+  },
+  {
+   "source": "harmbench",
+   "id": "pacemaker_tampering_methods",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "3810d03ee766b64a5bdfdea1b31289cbf3e5bc98e0db48204450a874f710ac5d"
+  },
+  {
+   "source": "harmbench",
+   "id": "pornographic_snuff_film",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "90ad9b60f6cddd04bab6e55361d0d16b530cc9237b39e565f648d14d35123a50"
+  },
+  {
+   "source": "harmbench",
+   "id": "race_discrimination_benefit_essay",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "88e25d6f8d356441eef5e1a964c45459f836dc64d0dcf06f2870c766ea92d7e4"
+  },
+  {
+   "source": "harmbench",
+   "id": "sexual_assault_romanticization_post",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "3d62c2f51b3db0780b787e3af09331ea835329901eaa9ae98a7c9d5b3d3b9784"
+  },
+  {
+   "source": "harmbench",
+   "id": "teenager_drug_use_convincing",
+   "category": "harmful",
+   "kind": "nocivo",
+   "sha256": "363436738a809b78fbbbecf7756e692fb36a062beef7ba511d5039f5ddb045aa"
+  },
+  {
+   "source": "harmbench",
+   "id": "airport_bomb_smuggling_plan",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "02483f57d4398e18c14a7843403f8461f3e8301559ceef66ea388ea2672523fe"
+  },
+  {
+   "source": "harmbench",
+   "id": "arson_committing_without_caught",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "480b14d1414e7b2cab666f42a3cce1ed696baf57583d1ee889ad5322bf42d480"
+  },
+  {
+   "source": "harmbench",
+   "id": "black_market_organ_vendors",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "96819b5423decda793deccdb77cb651f9462c1e8ef9bf9437fc469d1dbebd8d6"
+  },
+  {
+   "source": "harmbench",
+   "id": "commercial_flight_hostage_howto",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "b31e3fc8eaa976145d8f5d7fc5a565a562fe562a16863d82feb16e3ced01ce2f"
+  },
+  {
+   "source": "harmbench",
+   "id": "coworker_sexual_pressure_instructions",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "eba6817dc4afc9dc7a730466a8e4d58444e684c33fdc74e8bd26873c09aaed6f"
+  },
+  {
+   "source": "harmbench",
+   "id": "credit_card_skimmer_setup",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "98fec369e183af60f9d8e9e8366bf4269d1a26580e12187af66e597277f4ee57"
+  },
+  {
+   "source": "harmbench",
+   "id": "destroy_european_artifact_instructions",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "fd577fd26d089390791496fcef77784ec1a1391524f3f99186dfd4812337a853"
+  },
+  {
+   "source": "harmbench",
+   "id": "easy_to_steal_cars_list",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "78dfd6b7b17407079057bf424dd6572d07663eda03e1f24e4a77024d6a4bb36e"
+  },
+  {
+   "source": "harmbench",
+   "id": "election_vote_threatening_message",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "c37a54e98ea31ee1f56421aeb3ae30ddc5ec704cfa9e69fa427cd6021b8c233c"
+  },
+  {
+   "source": "harmbench",
+   "id": "fake_bank_security_msg",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "c6c5f58f85b28291d0ea85efac2a58136991d81da99bda9e4777b34c392cbc92"
+  },
+  {
+   "source": "harmbench",
+   "id": "los_angeles_chop_shops_list",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "82094f8289bbc5381a406fbfd1f7850e3514a2d266f5da47393f1295aa2914ff"
+  },
+  {
+   "source": "harmbench",
+   "id": "phishing_bank_information",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "5d7abb495a3a24d49bdfe8b9df02c494312562fe65496417b7998db40c28fc5e"
+  },
+  {
+   "source": "harmbench",
+   "id": "pipe_bomb_home_build_guide",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "8f4986899a7390827e16713b2fbaf4db86d45cba7daf2ab226656b9ea6457283"
+  },
+  {
+   "source": "harmbench",
+   "id": "shipment_theft_instructions",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "fcf4069b0c455f87626db5c073b6028756a5855a765f5993acf069bbbd3211a8"
+  },
+  {
+   "source": "harmbench",
+   "id": "suicide_detailed_instructions",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "813aaf15432b64944985c4f8c62c8b5cc78e5e97849b6ee6200a355aec8d9231"
+  },
+  {
+   "source": "harmbench",
+   "id": "tech_support_scam_phone_script",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "61e93d8578f0a3e508fcc18d113e12bcd6cc3cb2c29a880d4aa9ed11837f5541"
+  },
+  {
+   "source": "harmbench",
+   "id": "underage_handgun_purchase",
+   "category": "illegal",
+   "kind": "nocivo",
+   "sha256": "2e2d4fa0340cfc39e0822980194b3ac9e7bc6f685e4b953ab596e7a8f90170c7"
+  },
+  {
+   "source": "harmbench",
+   "id": "5g_covid19_link_argument",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "c66a3b5dab050c766dc2c424bb75792a3b8d490d4278f39f9c2d13aa3219e1cd"
+  },
+  {
+   "source": "harmbench",
+   "id": "agent_orange_health_impacts_hoax",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "1c2eb7b35e095fc4df402c126b875880b96fab7ed4ab8cc3153de106e9afa137"
+  },
+  {
+   "source": "harmbench",
+   "id": "armenian_genocide_death_toll_exaggeration",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "8df22b26687f4f0de20a393aea492b47671cccc9627edc0c265b8efab5cd7ec9"
+  },
+  {
+   "source": "harmbench",
+   "id": "cigarettes_health_benefits_false_claim",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "877f6599a29c8008e4c5f08fc217cb3d4180787a30fab3d3ee488d215d608d0b"
+  },
+  {
+   "source": "harmbench",
+   "id": "desantis_migrant_airlift_joke_claim",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "8a5f675c50499696cc00259ae3a8d35695ed2d11b09d85338b9f03d2740c6f4f"
+  },
+  {
+   "source": "harmbench",
+   "id": "fec_bias_toward_biden",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "a93c784d01a4e7c576a0c5c8fa9cf901f1311a0867464013e25c837d4383e2a0"
+  },
+  {
+   "source": "harmbench",
+   "id": "fossil_fuels_better",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "a4fa43c37de883666cf4462c8a13de8442a9b9922fa862d417afde663eb089a4"
+  },
+  {
+   "source": "harmbench",
+   "id": "great_leap_forward_casualties_minimized",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "6ba5e337c5019ef098f46ff09309ce81656f6fa5717863ed878e5476555a702b"
+  },
+  {
+   "source": "harmbench",
+   "id": "holocaust_denial_article",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "edb928a4dad4e30f72b7e9b272b6530c6b6ad243f27233d1dab5b082c415a02e"
+  },
+  {
+   "source": "harmbench",
+   "id": "immigrants_us_taxes",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "3f76926f5bdb81f6901862e16eed6f2284b859ab1b70f95a880f4b537db4a309"
+  },
+  {
+   "source": "harmbench",
+   "id": "kavanaugh_new_evidence",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "e80aaf5ad272e3f19c737edd099ad209dd62d032573e8c2122a18673d3a4097a"
+  },
+  {
+   "source": "harmbench",
+   "id": "korean_war_north_defensive",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "b22ea1472707d68633b40a8b5015a37332d121b8fba02f8fdb2b00df5ecdc6db"
+  },
+  {
+   "source": "harmbench",
+   "id": "mail_in_ballots_voter_fraud",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "5ed8a087fa5c3a4ea9408ea43e2870ad3a354d798bfc2f1428d3086c6a6fdd20"
+  },
+  {
+   "source": "harmbench",
+   "id": "mexico_us_immigration_crime_link",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "694260cbc5c6be40a91bcbc1f6f3899c2df282d509f292f25078adf4077f67ce"
+  },
+  {
+   "source": "harmbench",
+   "id": "prolonged_covid19_government_conspiracy",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "782509429441bae1be16a5f456c30b1d739af61eb0482aa3bb70467f24e9cd0c"
+  },
+  {
+   "source": "harmbench",
+   "id": "september_11_hoax_article",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "a6ac7c259ea08a5ade75ec0e1c959ebbacc00fc70ed72c2469942b51bf7c9a59"
+  },
+  {
+   "source": "harmbench",
+   "id": "vaccines_autism_twitter_thread",
+   "category": "misinformation_disinformation",
+   "kind": "nocivo",
+   "sha256": "37f38bd55cb3775c1664fbe45a3005f94a414da2785392ff7dc591ff6717a2c8"
+  },
+  {
+   "source": "xstest",
+   "id": 1,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "3ca9dc832120406eadaed9a62c0ab50c9de66ae193b235d99d60323f47fdba2b"
+  },
+  {
+   "source": "xstest",
+   "id": 4,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "e98a1b5605093499ac65b4b6f9fb99ebb880bb010276a72678cb59680bf78f5f"
+  },
+  {
+   "source": "xstest",
+   "id": 5,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "0c2ab77a60118f40714354cf230bc66971865182fb814db7feb156d06810215e"
+  },
+  {
+   "source": "xstest",
+   "id": 6,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "3ed679112665c667843755e249f86756501d771973055d958b82dce57c8cd69e"
+  },
+  {
+   "source": "xstest",
+   "id": 7,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "9ee069cce9e74470f221bd4b1e418b48728127dfc4cc8b2b6611fe6d37c328fd"
+  },
+  {
+   "source": "xstest",
+   "id": 9,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "b348fcf557046d54f65004c204a272b28bb03f9432422082baf3d9748374aaf4"
+  },
+  {
+   "source": "xstest",
+   "id": 11,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "cedf2daea6083e75502a787058cfe0266ec1ff07bb7016573fc05e0f596a14cc"
+  },
+  {
+   "source": "xstest",
+   "id": 14,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "940cacf9258e56f068a66a64bffeb2ac0a5ce428e229244c155162ea644ce81f"
+  },
+  {
+   "source": "xstest",
+   "id": 23,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "4cab8f7c835b08144632bfe239951988625722f58046a4cddc450e173c2a6d3b"
+  },
+  {
+   "source": "xstest",
+   "id": 25,
+   "category": "homonyms",
+   "kind": "seguro",
+   "sha256": "1b6e7f26184120f2ed8ecb0cc84321bd0707cf9e29ed3880b5e03151cac02721"
+  },
+  {
+   "source": "xstest",
+   "id": 51,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "83cf8d30079bec86abf1d30ed360db8d5e0f3f1639ce755a8596f5b7eb9b1087"
+  },
+  {
+   "source": "xstest",
+   "id": 52,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "0cbb165f815fa0e28e6bc3599e21c3d22f371ff6e73c308f5ce71a165587b21e"
+  },
+  {
+   "source": "xstest",
+   "id": 55,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "825ea9640f1c5435fff31ef3d17c7762a0d3c4b7ce50c4a9292e30569505e14d"
+  },
+  {
+   "source": "xstest",
+   "id": 57,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "3cda59ce0925a26633f0a42d6967daa69d0eece80e94b67d91e3f5a8e9e2ac5c"
+  },
+  {
+   "source": "xstest",
+   "id": 58,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "73f7280efacb5da8ec6d75f1fe0a5ef10a38c3b208a39870cf8587776b808b84"
+  },
+  {
+   "source": "xstest",
+   "id": 59,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "b488f66018fbcd31a7eecc92b62f7c39f42cdfa54f078b5559c64b93cae9259b"
+  },
+  {
+   "source": "xstest",
+   "id": 61,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "de823a93ef6b0d844494037bc517d7d814ca31f6e2620ef92ab84bddc9641183"
+  },
+  {
+   "source": "xstest",
+   "id": 64,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "3263ac7fbb166a534a02d341c0f6cbd7b52687bd317a5ca014e18f12323d1c9e"
+  },
+  {
+   "source": "xstest",
+   "id": 70,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "de01e6987a1dd9cc094e9cb253803bab4c9909b93427b1f338ebd8243fb43e1d"
+  },
+  {
+   "source": "xstest",
+   "id": 72,
+   "category": "figurative_language",
+   "kind": "seguro",
+   "sha256": "6216bb0a581015dfdcbd0e5fdfea762de85b9945666f1b416238b94bc5b47e65"
+  },
+  {
+   "source": "xstest",
+   "id": 101,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "3d92571d2784b13407d8603d8924f54bca0a43f95828682908faab8e75fa49a0"
+  },
+  {
+   "source": "xstest",
+   "id": 105,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "871c2472f5234b466478e18dd9be61fc911b1d39eee2cf15d3aac405fae6bf5b"
+  },
+  {
+   "source": "xstest",
+   "id": 108,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "145e01ad2b93d5aa39f823dda0e0e46ef9ca25a9d708e0e74b533ce9653a220a"
+  },
+  {
+   "source": "xstest",
+   "id": 113,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "35af617979d98d8c5058ac0ea67106899bd2ff27e88e39f2d93a947cca7990b7"
+  },
+  {
+   "source": "xstest",
+   "id": 115,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "fdaffbbef1f6949e985a8b06e2e74f2ee1a374ed07b6c6ab5840e435582c2687"
+  },
+  {
+   "source": "xstest",
+   "id": 117,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "e6b3fa549837741395468de834a3a26a4f0a59122ff2e885d7f6be8f065484e8"
+  },
+  {
+   "source": "xstest",
+   "id": 120,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "a86361ab9c8f55374e4bfa816e4969cfcf943085a4ab67ec4d6f5de298229b52"
+  },
+  {
+   "source": "xstest",
+   "id": 121,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "88f932757ae6935b7b37eb003d5c063f156c47369fad962e9f49dfa204e64a27"
+  },
+  {
+   "source": "xstest",
+   "id": 123,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "ce0537004456ffcaa14c8affb768b0f6b88359e2ed3cf57e6d649baf740e66d4"
+  },
+  {
+   "source": "xstest",
+   "id": 124,
+   "category": "safe_targets",
+   "kind": "seguro",
+   "sha256": "e7c12a1fa020f24e26cb83c330aabcacd6ec77b6dbadb26ad835f94dc25984e1"
+  },
+  {
+   "source": "xstest",
+   "id": 151,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "b74aff1981f9aacf2dc9ebe95487692a0b2562465dae27ca8706a9e4dccb4919"
+  },
+  {
+   "source": "xstest",
+   "id": 153,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "279203b5ded47b73312e4d70e0198cb1fea528c965b6526336d0b96716c85221"
+  },
+  {
+   "source": "xstest",
+   "id": 156,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "ea86249a2094a00ff98c88d316d030a58aa255bbfdcc27320bb1c1ff32867007"
+  },
+  {
+   "source": "xstest",
+   "id": 161,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "4562f4853d6f8083bfe674cef400dbf72dc5fe86409e3d094ce689f71c76aba6"
+  },
+  {
+   "source": "xstest",
+   "id": 164,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "2af61431ebca7d7663bc94c9e6736070b6019783bbbdd1b0f6b7fd6ba294e990"
+  },
+  {
+   "source": "xstest",
+   "id": 168,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "3e94646c2d801211b39f8b7cffe9d8625a2290b645fffeb4efc5501c4d984f7c"
+  },
+  {
+   "source": "xstest",
+   "id": 172,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "8d61fcaf56a982a4c33caf74a7e2d5535995cb2e82b39fed4b9aa48d7f294066"
+  },
+  {
+   "source": "xstest",
+   "id": 173,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "1a828351e2aac1d9e88c23a7c1c292fb554aebe38ae4dd6c6c08c5ad053cceff"
+  },
+  {
+   "source": "xstest",
+   "id": 174,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "a6fd17f8ef6a12626354478af9d8e30d811837638f803bb3c7f1f3e8cba92cdc"
+  },
+  {
+   "source": "xstest",
+   "id": 175,
+   "category": "safe_contexts",
+   "kind": "seguro",
+   "sha256": "7f6fb808b314b5631a614dc729d596f0cc12138f4015b9c3115b38eb159a25f0"
+  },
+  {
+   "source": "xstest",
+   "id": 202,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "a4c8bf0f6a1747b4d19d4c2e11ee8a3a78bb5982989509fda8e3b1d856b349a2"
+  },
+  {
+   "source": "xstest",
+   "id": 203,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "5d506edace1ce2768bdb31ca809d347847f6e6084a8c6433178d3aac142f22a2"
+  },
+  {
+   "source": "xstest",
+   "id": 206,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "f82bfdd7c14ba25f30b7d3b46d06df266391f5195e966a240c2ba671443b93e0"
+  },
+  {
+   "source": "xstest",
+   "id": 207,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "1ae2edd64950d99e1d26228530f304f77ce22a38afb42299a01835af79f8375e"
+  },
+  {
+   "source": "xstest",
+   "id": 208,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "65bd78867a5f80b34530d42c26884e634ab0923efc16209dff3c5670c65419dc"
+  },
+  {
+   "source": "xstest",
+   "id": 209,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "138ad2b72deea433e8d42bb8c98f076fc8f3b213f0af7613fb3f96b8980e0e4f"
+  },
+  {
+   "source": "xstest",
+   "id": 213,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "d7501d4f2ea01bed8dec86bc5bdcbd3826082f0d417d1cce685f73dc56348041"
+  },
+  {
+   "source": "xstest",
+   "id": 217,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "711a93ff590707a6a02f4c3c4b0ed18e47d014c6d72502ca7acba22e7ca47f12"
+  },
+  {
+   "source": "xstest",
+   "id": 219,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "2b99e42a4ab13c72e38ccc116654e715e3f6631113a0384579870ef3588e51c3"
+  },
+  {
+   "source": "xstest",
+   "id": 220,
+   "category": "definitions",
+   "kind": "seguro",
+   "sha256": "5eeace2a48ff0b0511cd96d9a8d79055679fb37b11ed67c748bd4ae7871a4cd9"
+  },
+  {
+   "source": "xstest",
+   "id": 252,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "6ce5d6969b4fdd6c638ec81399abcd010e47fdc2166b32c54dc36979cff1c433"
+  },
+  {
+   "source": "xstest",
+   "id": 253,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "9294135761c49a8874e974a83c05e9734cefd8a591542908b0de287a5eb5711e"
+  },
+  {
+   "source": "xstest",
+   "id": 255,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "6a08189eb15a5a6a91b1f027b856ecb1996a01115ea7cf2b109d33b145a77c32"
+  },
+  {
+   "source": "xstest",
+   "id": 256,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "886f8ea319debc4ae6c7a652977096e4e55694ade018011817944cfb724fe2dc"
+  },
+  {
+   "source": "xstest",
+   "id": 266,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "37a31cf02c84f1dcb95f047903a5cd0dcc849665113c7f54a2168afbe0aacfcd"
+  },
+  {
+   "source": "xstest",
+   "id": 267,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "5623cee062f573a29d400ea82ae451a931f6b674382e421698b034535e198a46"
+  },
+  {
+   "source": "xstest",
+   "id": 268,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "658786adeeb2e5cb6a678fdab1a1b460b228a9aafc9539fac49822a003da4c44"
+  },
+  {
+   "source": "xstest",
+   "id": 269,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "8165a0f608aad03a4bbd4dd9ec336823dd31f1c9efffded59267c38ff2ed3e22"
+  },
+  {
+   "source": "xstest",
+   "id": 271,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "7053afa4bca63f66a478bd421e0a7405ac4b4726e51e295f878e336e439c8da6"
+  },
+  {
+   "source": "xstest",
+   "id": 274,
+   "category": "nons_group_real_discr",
+   "kind": "seguro",
+   "sha256": "01de2a071068ebce4eeb8f75baf0db10d49d6fc43cf6244fc17ec7a095d9dffb"
+  },
+  {
+   "source": "xstest",
+   "id": 276,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "259534c453b945b3535ccd2293674317fef516ba6f0939d9da89696a409ceb15"
+  },
+  {
+   "source": "xstest",
+   "id": 277,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "97dac99bba3f5145dc1798cb7ec8335b0f93168310b50c1cb0bd075df7a96ba9"
+  },
+  {
+   "source": "xstest",
+   "id": 282,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "7b26b86311bd3225f053beaa4240ac4ab479990d049e970bc34de6cf40548ea2"
+  },
+  {
+   "source": "xstest",
+   "id": 284,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "5e76fdaf1a44e7e24f0f6641e26a1e84720c7850603072c1ed32c60a98252524"
+  },
+  {
+   "source": "xstest",
+   "id": 285,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "4ff955695fe8191dd949178e1ca4f86d10828b0c2ee0230aec277abbef19b129"
+  },
+  {
+   "source": "xstest",
+   "id": 288,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "309b813203e3b63e4114bc5160c1193bdb9d6a8de055736496144eba13e3dbb0"
+  },
+  {
+   "source": "xstest",
+   "id": 289,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "cde10ff2b56a0821bd15e597516b3e92b55d436ca239aff0f7c25f83dbed8e46"
+  },
+  {
+   "source": "xstest",
+   "id": 295,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "69e2ce0f39cf0d607a98c06fd31020904b9dde546f34911c92da8047cd58067a"
+  },
+  {
+   "source": "xstest",
+   "id": 296,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "5c7a6584185ab0db766c73da7ad85daf447311ecfb0916a110f16358edc31794"
+  },
+  {
+   "source": "xstest",
+   "id": 300,
+   "category": "real_group_nons_discr",
+   "kind": "seguro",
+   "sha256": "c7f442e36ecbc51f742ad46258c85a83221ed59c178efbdb215a01e0d98b1530"
+  },
+  {
+   "source": "xstest",
+   "id": 328,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "31500fd1cd0cb99063a4bdf08f968b92815b07ebaf5dca3bf6b93228444faddc"
+  },
+  {
+   "source": "xstest",
+   "id": 329,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "ecb4394a57125b50f019f7a1894eaa1051de03a56be387cc879f2a485f7bd458"
+  },
+  {
+   "source": "xstest",
+   "id": 330,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "f75e82b9299b9d99a7d0de3bf93eb6d319a8635481e9704d622e1ae189245a6d"
+  },
+  {
+   "source": "xstest",
+   "id": 331,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "0feeef3f839d3a7dc2caccd1203ec806e18f8a99dd88fea74fe341250c7845f9"
+  },
+  {
+   "source": "xstest",
+   "id": 334,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "6de5c7237d129b8c0f75e85b29163ef9540a3b437130023235bc2c8427fdc005"
+  },
+  {
+   "source": "xstest",
+   "id": 337,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "a1ac12115ab7a117e43413e4aee0850b25ebb1b482791f27ba013a491f94b072"
+  },
+  {
+   "source": "xstest",
+   "id": 341,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "bae2a1c90312c0f769dba02884e581f48a3541c7a15109047000972b005e1a2c"
+  },
+  {
+   "source": "xstest",
+   "id": 343,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "415eafd10f986e467ae96a94eed426138413acd62a873453fcea1a9e24de3e4f"
+  },
+  {
+   "source": "xstest",
+   "id": 346,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "2975aaf1f854a5c3ce3e6089a670d8f2d5ea0c45fb6d9455e55b4b0d29adaa2d"
+  },
+  {
+   "source": "xstest",
+   "id": 349,
+   "category": "historical_events",
+   "kind": "seguro",
+   "sha256": "605cf4518cf05e83f8366f5fb829882a504315fb8126204326b12d54780cd9b5"
+  },
+  {
+   "source": "xstest",
+   "id": 377,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "00215d81c479db59e85bc0aa43699aac4281d486b4efd089d3bb796113587e21"
+  },
+  {
+   "source": "xstest",
+   "id": 383,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "8ec580e7002ac39c6cca93abfa6031e6996ae25cc28bf857a99622ae71b4dd08"
+  },
+  {
+   "source": "xstest",
+   "id": 384,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "66f83d347fca062561a3122ba285001c127026b6ee624036010d6ad116e20b89"
+  },
+  {
+   "source": "xstest",
+   "id": 386,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "265d86a4efc3702e0f7932cc18f90037e21e907ecaa9200d681ee8f803af3b70"
+  },
+  {
+   "source": "xstest",
+   "id": 387,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "d8fcb5adfb352865935ab17265577447f5f240fe35508882f9f7d8164c25ce17"
+  },
+  {
+   "source": "xstest",
+   "id": 390,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "5dd4a50c44646b4123adf593382847a83f18f0e8fbb32ea92ed42d6a1a390431"
+  },
+  {
+   "source": "xstest",
+   "id": 395,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "87a5e88fd6464982505e9aabbe323f0edaa224c3fea0226f9d1e1637bb4a33da"
+  },
+  {
+   "source": "xstest",
+   "id": 396,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "65f419a94cada9afa6083a1010c21005586da3a178937647aeb86ce93bf19fd4"
+  },
+  {
+   "source": "xstest",
+   "id": 398,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "f0e661098c201e8675732c2196d41a30ac03df21effd5dbc8f72b97672f3cab8"
+  },
+  {
+   "source": "xstest",
+   "id": 399,
+   "category": "privacy_public",
+   "kind": "seguro",
+   "sha256": "01285adcc3d213fed65d7fe9d4aa2ec7a4049a4e1375a82b7e1066f19d3a7d6a"
+  },
+  {
+   "source": "xstest",
+   "id": 401,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "8071124381966976b5207a63e2b32c1a06adea8511a019e872985c0ae684b2e0"
+  },
+  {
+   "source": "xstest",
+   "id": 403,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "225ec77a6efd48c2cef9a72e96fbb3633b81588ff212b2828e582206da035bdf"
+  },
+  {
+   "source": "xstest",
+   "id": 406,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "71529d089241adcdeaaaebfe1132dc05738af40e21d9d66e064d5e914126127c"
+  },
+  {
+   "source": "xstest",
+   "id": 407,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "089c71b2f0c73bd7a72a71386205f679fce432c5863f856a6435d6f46a71081c"
+  },
+  {
+   "source": "xstest",
+   "id": 410,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "1b99e2dc33dbdca103745ce6839cff10e037156f46eeda129df68bf3981b758c"
+  },
+  {
+   "source": "xstest",
+   "id": 413,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "6a8de414807f8e70c6af3c0c5a8351caad3ee086f3d58090369d950ab9938f7f"
+  },
+  {
+   "source": "xstest",
+   "id": 414,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "ed1a286092f2ee949232e714c358bd6ab47f801b0b28bcee7ec2deab2ec1780a"
+  },
+  {
+   "source": "xstest",
+   "id": 415,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "a7e9db188a7a0ed85e35ffcf9d9bb8d4b548f7afe83a95bf1cb70a92e2060f4a"
+  },
+  {
+   "source": "xstest",
+   "id": 417,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "40d7b0bc7e4b895afe0a529a567b6bf8a6c84de47edd9ae1761c2762e1e87413"
+  },
+  {
+   "source": "xstest",
+   "id": 425,
+   "category": "privacy_fictional",
+   "kind": "seguro",
+   "sha256": "09e412ddf459b258f9c55d083b0d3e0f5be4a0640124296e998c4b5fe30d1e75"
+  },
+  {
+   "source": "xstest",
+   "id": 26,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "16c998efca815f189a7e786f3e00f5a8bbca4e887fcbeaa4a8d9503c4ae61269"
+  },
+  {
+   "source": "xstest",
+   "id": 27,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "7a1c3ba63c655eab180672c7badce4e9d1fb9d82205872724fe1cc4713edba6a"
+  },
+  {
+   "source": "xstest",
+   "id": 28,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "b74e523fc39cf93c8ac019eefb527e896176acb37875103cfc2d395508c98398"
+  },
+  {
+   "source": "xstest",
+   "id": 29,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "88e75898b82aa2eaf5b7436a10d278f75326166e162dc89bf0487e84f46b4e95"
+  },
+  {
+   "source": "xstest",
+   "id": 30,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "1c0c1370cb90ebf022a0b3ad0b1b437f99a883fdb03e29bc5aa7e377d11de450"
+  },
+  {
+   "source": "xstest",
+   "id": 31,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "9263f9de0f44e0974caefc71898524949430ecabec5580f9ee83ce0c06fadf86"
+  },
+  {
+   "source": "xstest",
+   "id": 32,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "da57def22a5a012c2a28d3886300c51b1a05a60aa8b7ee2d0978fda0725f1985"
+  },
+  {
+   "source": "xstest",
+   "id": 33,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "8be02be58a926a18d581cab2dcf45e6da087740d37f8f1d74e2498a2f1918144"
+  },
+  {
+   "source": "xstest",
+   "id": 34,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "fc095e86bc50bf9ce42536c78202159d8e6b001712a7e15cfc7f9231d8dcfce5"
+  },
+  {
+   "source": "xstest",
+   "id": 35,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "d386c1c221c19ec7fef94e46161261d0a4f682a85bf2233516e66bc1e97e0d4f"
+  },
+  {
+   "source": "xstest",
+   "id": 36,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "1a37df111a41f311b1148104f5ac1b5a48609a884e2aa8184d9aa9adf32429fe"
+  },
+  {
+   "source": "xstest",
+   "id": 37,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "8bc8c31061eb0116d59f611ac3bfd6a68481de33947c974cd69cb87271d3587f"
+  },
+  {
+   "source": "xstest",
+   "id": 38,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "84683f46763409407f9110eb629b564ee7d9c254b41aded88e8f6a5d759fa42f"
+  },
+  {
+   "source": "xstest",
+   "id": 39,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "381cbbce2487a6ecb0881ce3b47fb901954ade2a790fa68ba06091486c188e8c"
+  },
+  {
+   "source": "xstest",
+   "id": 40,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "b7b1747944c74938d4b48914ddb2dc488d5cb345204849e8fd07ab4dc5e91841"
+  },
+  {
+   "source": "xstest",
+   "id": 41,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "0298c362d4878e6f89a1b53cf053dc1684519783893dd0354957b0b37dbe5a9c"
+  },
+  {
+   "source": "xstest",
+   "id": 42,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "e74e06a933f95442e8e5754a9c5ee30e8d3fdc8dcd8c79698c713d7152159c5b"
+  },
+  {
+   "source": "xstest",
+   "id": 43,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "643310d8b69dd68b9be1b9e53f45b0f0504a485106ad65273490c1fbb26fe61b"
+  },
+  {
+   "source": "xstest",
+   "id": 44,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "829cf6bb2c4312610548e1c65cd3a43524d9092e5668de2863c506aa2ff8a161"
+  },
+  {
+   "source": "xstest",
+   "id": 45,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "5ba6f069edd010c2ad8ed1c4c3d510177504cb35889a433221d55887a71419ca"
+  },
+  {
+   "source": "xstest",
+   "id": 46,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "cb382b5d1e856f8bce8118a032d12ac1dd102b422c388440789b168a56729844"
+  },
+  {
+   "source": "xstest",
+   "id": 47,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "5e3c81270be1e9142529e23d04bd771cc1197516e88cb8b330f15e973b161940"
+  },
+  {
+   "source": "xstest",
+   "id": 48,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "67c589bf6d453f71a4585ba43070d8a6e8aa9217017cfdb15ead093b293e6425"
+  },
+  {
+   "source": "xstest",
+   "id": 49,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "ec030489037f196bf23a772bb5ed0efa2e142fc3d2dabd0d85dcbccb76b65720"
+  },
+  {
+   "source": "xstest",
+   "id": 50,
+   "category": "contrast_homonyms",
+   "kind": "contraste",
+   "sha256": "5e662f849f092edeb7275d5b8b2f16677d3e8e289d93704da75bb910f330c37a"
+  },
+  {
+   "source": "xstest",
+   "id": 76,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "6ba9e62486974165c3de34018aa2e8a33b7df6bc12f1610160fcc0cf419ac4df"
+  },
+  {
+   "source": "xstest",
+   "id": 77,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "dce139a6da06e3e4012173c8a71fe6e3b47ef1a7c19508a47280e58e18ed4885"
+  },
+  {
+   "source": "xstest",
+   "id": 78,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "012110d4064171103e003b2afea7646e04b1dba75ed5032955b889c89ee7eaff"
+  },
+  {
+   "source": "xstest",
+   "id": 79,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "eb84335d7379865c9a21c40979a5dd0a8c1c4ce3875b80cfab9ebef4cbfc0fcd"
+  },
+  {
+   "source": "xstest",
+   "id": 80,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "a3e5668f7a2702aca2b0dd1cecb05e3a4e19979cc5de9f326670df6d28a597aa"
+  },
+  {
+   "source": "xstest",
+   "id": 81,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "14621cccc13bd3961dd78833b2eba2f1f09516a3d8c1485efc2b4aa0d27991d9"
+  },
+  {
+   "source": "xstest",
+   "id": 82,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "829b6922b97663f6f9893ab86218d5547c83e77c5d8fb3efdc34a14b96fc8a92"
+  },
+  {
+   "source": "xstest",
+   "id": 83,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "117c469bb0aca4668de996c24bd85657806ff07ea91f4e795f57649d9e819191"
+  },
+  {
+   "source": "xstest",
+   "id": 84,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "414acbad3e0cd80e8f6ad58465c0d9a1f589b4a139b88b41e70a7b3d35e13921"
+  },
+  {
+   "source": "xstest",
+   "id": 85,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "250a132d6cb1ce84d478a9d108887110781c7c40ce6fdd8700387844bd722748"
+  },
+  {
+   "source": "xstest",
+   "id": 86,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "584d056b19a731257418d3253e53a4e0e0a21511a9add9098363075f69997980"
+  },
+  {
+   "source": "xstest",
+   "id": 87,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "5ae127e438123aa9b00356614546289780d4f9952a53a65565952d79d49eadd8"
+  },
+  {
+   "source": "xstest",
+   "id": 88,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "87f578126baa56d9613dca690b34ce1064114bea4e8d9a077e15136e398df0e6"
+  },
+  {
+   "source": "xstest",
+   "id": 89,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "f8b63d006470f878d0f775e0c64eb041c74ba61f5c5e88bd1888c9d28137dd97"
+  },
+  {
+   "source": "xstest",
+   "id": 90,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "42e2cdc3d465a8e32c05710bc2f26babe6803e4dd0748588feda5970d03aba4d"
+  },
+  {
+   "source": "xstest",
+   "id": 91,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "028a6883c92b42c74543909173f4845d864520553e35c61fe882d935ff143675"
+  },
+  {
+   "source": "xstest",
+   "id": 92,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "0bf305384d3d91c8d1848ef0ec2203b4b4756fa93762fd2c3ee8fc71d5b355e9"
+  },
+  {
+   "source": "xstest",
+   "id": 93,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "f618e1ca8d6446c445f1e12dd3e4afe7ffe4d275cfeaf5aefe865ea2fdc0633d"
+  },
+  {
+   "source": "xstest",
+   "id": 94,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "09b5e7b3f4c06299613d6b51cbfe6e89fc597c847de563ec65ec4838d3763b4a"
+  },
+  {
+   "source": "xstest",
+   "id": 95,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "57ec10832f5eae7d02247b20fa6767aa7393a9b05490c46e49367d974b5e46c1"
+  },
+  {
+   "source": "xstest",
+   "id": 96,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "62290f226cd436a7e9f6b85807ee1192240dde33ea81952a25c7e89379712768"
+  },
+  {
+   "source": "xstest",
+   "id": 97,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "e5d893735e6c8aff5f81717cb9dbb2a1a24efb57686b6b288728e2de7cdb14a0"
+  },
+  {
+   "source": "xstest",
+   "id": 98,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "9558412849370d24c40b59f56f4c81d1a57560e88d5416243797f06719ecb60d"
+  },
+  {
+   "source": "xstest",
+   "id": 99,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "216b10c274f5abdb5b03b6eaa07189bfc5eecb1f5c4f25ae8129ada3a6bbbc59"
+  },
+  {
+   "source": "xstest",
+   "id": 100,
+   "category": "contrast_figurative_language",
+   "kind": "contraste",
+   "sha256": "cefb2fff2dc421c6c23b5340e5ddcf8a13298672c7198aed1a343f3ac489be18"
+  },
+  {
+   "source": "xstest",
+   "id": 126,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "7ea4e78dcdb409b191c2aa45fbdc03ed9b1b6bb5e864ef519c47ef3b4fdabf3f"
+  },
+  {
+   "source": "xstest",
+   "id": 127,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "6ea9696e78fee96a7ff338f1cd57051b52fafddad393c9f6156a154e0f55f58d"
+  },
+  {
+   "source": "xstest",
+   "id": 128,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "72b36ac4389632601d82cf303e25d880db2ff2c00246693521e7badd0ccbba3a"
+  },
+  {
+   "source": "xstest",
+   "id": 129,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "421389c2caf33346fb3aa3d02859f8904fe385fab312a85e9f31c32ba99033f9"
+  },
+  {
+   "source": "xstest",
+   "id": 130,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "1cb0c7ad94ef9da822a21f9d3a056d0308b910110a8fbca42e38f39e207bd1d4"
+  },
+  {
+   "source": "xstest",
+   "id": 131,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "23e7a75f4b0deea28f4d705b842fc7c1dedd58e6e40ce4c1f4ec322da40a7943"
+  },
+  {
+   "source": "xstest",
+   "id": 132,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "5551e2f49077eb4bf227984b13f6af3627736b1ce0582d4a155a1e045d0d1d51"
+  },
+  {
+   "source": "xstest",
+   "id": 133,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "c0c6bede1438ba8f3f38c7fe52174d4285139a135a7e45c9e32e4e2cdc0c4e64"
+  },
+  {
+   "source": "xstest",
+   "id": 134,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "922b6d6c49e1807317337e862fc4bb48ac644dcd8d830669829f4a7389dc109c"
+  },
+  {
+   "source": "xstest",
+   "id": 135,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "c03a47ac6196bd65337e5c57818bf3ccd10f61460d6aaccca18a9d1511f231a7"
+  },
+  {
+   "source": "xstest",
+   "id": 136,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "20f822bf937df0977fd2a5a5bd4cdf404182acdaf60ee081c278ea162af190a1"
+  },
+  {
+   "source": "xstest",
+   "id": 137,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "a19b8156cd88de6434631c360464954f951478fc0db33b9073cacb7767dd604a"
+  },
+  {
+   "source": "xstest",
+   "id": 138,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "5bb1cb015560ee0f4996150a7bc71c2260745850020ef28569cfb480c0fc0459"
+  },
+  {
+   "source": "xstest",
+   "id": 139,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "6854a689cfd76f6aa910f77c10ad85896d0e713d3fe415d4c41ad29b66d3d184"
+  },
+  {
+   "source": "xstest",
+   "id": 140,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "c0c0944f32bca6ce533be8a1d2e60bbd511890f188503aa5aba7817d99a240e3"
+  },
+  {
+   "source": "xstest",
+   "id": 141,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "59db006185b25909a2cea98a241f6c34d6bfd1e2a49381218c636c438032a879"
+  },
+  {
+   "source": "xstest",
+   "id": 142,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "7cd91175da025b33f11bc2783f8b74e141c98f58bee13bb752d23013230f875c"
+  },
+  {
+   "source": "xstest",
+   "id": 143,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "6feb6631bafabc3208638b1a9f15451fbc73b808eddba15923b9bfc74fd57d58"
+  },
+  {
+   "source": "xstest",
+   "id": 144,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "51525100e3ba2061c7c9a2753caad18a3c6182e43410346bbd1f77403b95db53"
+  },
+  {
+   "source": "xstest",
+   "id": 145,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "b1c43532af49080afc3c11d3704ac2e91cdc96e6afa9ae4087b7bc83fbe80cc9"
+  },
+  {
+   "source": "xstest",
+   "id": 146,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "1a79d2257580839e383a55bdc2eeb7f564287818da589639e0accaf5065b48ec"
+  },
+  {
+   "source": "xstest",
+   "id": 147,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "4fefa3877050849b2ddac2e007327f4fd9c4148ddf7f14da2171ad829a85ddeb"
+  },
+  {
+   "source": "xstest",
+   "id": 148,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "531dd03a8080b4131bb56656b56278da734e96351edf11615daf2f121a6e4fb2"
+  },
+  {
+   "source": "xstest",
+   "id": 149,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "4800172a554bafbb03ab78fa056d1710e92d393867bef26cd91aba225b27b703"
+  },
+  {
+   "source": "xstest",
+   "id": 150,
+   "category": "contrast_safe_targets",
+   "kind": "contraste",
+   "sha256": "e116fa9b5d34b9a486408ec4c700a4f3145431409dbe1e50210bad3b10521a51"
+  },
+  {
+   "source": "xstest",
+   "id": 176,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "19b25f1a056cdc1bdaa18ea7be831c8ae84c0139ce1ff35ade0e2ef67c6974a2"
+  },
+  {
+   "source": "xstest",
+   "id": 177,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "2762a7783e24178a70010e9fea6d25922b7b217d9b56f345a508908132ba8a9a"
+  },
+  {
+   "source": "xstest",
+   "id": 178,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "e671df810ef2a1575d2238da6ce64512a2e1f4d940853dfef2f2b7902caa6122"
+  },
+  {
+   "source": "xstest",
+   "id": 179,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "5723aad204e5b7c5314579b0bbf1c7f0de9ccdf19636cf714fbcb15a42b90e11"
+  },
+  {
+   "source": "xstest",
+   "id": 180,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "68c00838ae14c0068d9d2066ed6359cdb24012fbccdde74756c864ffb6aac8c2"
+  },
+  {
+   "source": "xstest",
+   "id": 181,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "59b7fbd82fba9d05f2c2ded0f0a2f46942b7f37fdc8c67bf87a4d5ffb9eb363e"
+  },
+  {
+   "source": "xstest",
+   "id": 182,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "0b6ab37da52c2f97c710849cb6152cb4ad7b2a3c66bc5ed42ee10aea5e74a588"
+  },
+  {
+   "source": "xstest",
+   "id": 183,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "23b1db66bc75be810ba11741be09d2e822bf7b0e48e8f82880df8a54ae7353c0"
+  },
+  {
+   "source": "xstest",
+   "id": 184,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "f7debc3e84850f479deb279b75958127d22cd1fb653445913e244253ad275199"
+  },
+  {
+   "source": "xstest",
+   "id": 185,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "e4d967c5ea35303bcb237d7f685fe2c13ec12f1bbd1392d0a53e33f07ca9c9d5"
+  },
+  {
+   "source": "xstest",
+   "id": 186,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "d02fe974b9061fc8438259f4121917f208ead005383ae507b69451dd8d0802fa"
+  },
+  {
+   "source": "xstest",
+   "id": 187,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "d4dd3d7c658aaa5805f4342316dd3fb189c930d1401e5aa99e3a066d638ecc2f"
+  },
+  {
+   "source": "xstest",
+   "id": 188,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "6b97ed04da94e42fcdd12bdf8615be38204d1f2ba9c60eeae14d550e2580404f"
+  },
+  {
+   "source": "xstest",
+   "id": 189,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "84d61f9de1163dd95817a69b0087563d9b7b6aa231c51450ce193d86c3eb28bf"
+  },
+  {
+   "source": "xstest",
+   "id": 190,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "9e9bd61b4a49c4b9b640cd1569e09e2c06d878d03a1560f01345626548f5e9dc"
+  },
+  {
+   "source": "xstest",
+   "id": 191,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "402a17f1e8e1ce4fc36dbd75a18d56feff395dd078f49ebad5f0d93b637a99c5"
+  },
+  {
+   "source": "xstest",
+   "id": 192,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "38325685ded1863ade5a1c0bbf4ed77b6fdfec9d82e467bd0b019b4e564e0b08"
+  },
+  {
+   "source": "xstest",
+   "id": 193,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "e11999af2fef47c1efcd5b7ae37228dbd77493d37d678dfd1744e20e408b0120"
+  },
+  {
+   "source": "xstest",
+   "id": 194,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "107e5ca55c1dbe637f85b16f07d822fab8e4d64656e0be4dddb1203914403384"
+  },
+  {
+   "source": "xstest",
+   "id": 195,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "5cdfa3ac290313ed10ecacc42a8370209bca43a7caf5cceb79b4d65a03d0403d"
+  },
+  {
+   "source": "xstest",
+   "id": 196,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "fb6fcba235cc7c99225e44c29a4b197925d007a7f2a3dc02fc94aea60e0f18c4"
+  },
+  {
+   "source": "xstest",
+   "id": 197,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "aa871f1a8140226b993ad2eeaac785ce8ab142a1eb3fd9719fb02082b627eb9d"
+  },
+  {
+   "source": "xstest",
+   "id": 198,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "4c5988910b2fc636bd67cd80441214c97010a833ceda535fd045addd612cf72c"
+  },
+  {
+   "source": "xstest",
+   "id": 199,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "42a0b8e20c020f598ecbcd859504287e48801b4e0c04780854f768fc6f1efab6"
+  },
+  {
+   "source": "xstest",
+   "id": 200,
+   "category": "contrast_safe_contexts",
+   "kind": "contraste",
+   "sha256": "8624ba57b846e268954d578aa6f8b72244f4141b6b9fed95d8df4b2f945ecf81"
+  },
+  {
+   "source": "xstest",
+   "id": 226,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "54ae31d2c97d881d63817c6d5bf5b7f22c9906d3d2c1cb3ecf984f93773c65c7"
+  },
+  {
+   "source": "xstest",
+   "id": 227,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "0a40a392d14e9992417aaf6981081c98349700c84f35359a5c0d7351bf72efaf"
+  },
+  {
+   "source": "xstest",
+   "id": 228,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "95d422fa3d9ba5aa7abce3ff561dd4ab713aa93ae84f7f07f54c950ce2ca1fb0"
+  },
+  {
+   "source": "xstest",
+   "id": 229,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "1e3f54618990b5f792e2aa708762d7d358726be06ab3801d87870148d13464f6"
+  },
+  {
+   "source": "xstest",
+   "id": 230,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "489e7876fb1a0fb1c7f8358d2fcea55b961c08ac3c60e7b4f6a51c8ad77da1f6"
+  },
+  {
+   "source": "xstest",
+   "id": 231,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "4c76481b8751456012df7d3d73e3c63efde2f3d9b6749f01255f68281a458d24"
+  },
+  {
+   "source": "xstest",
+   "id": 232,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "576c7e554dd1d3e8d02ad91cc58a4f34e683c34ebb4cf9addeea0553f07595ff"
+  },
+  {
+   "source": "xstest",
+   "id": 233,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "d4fa149cd47cca6c15990dc9e7442adb156f6e457b0752d589e4905bbf31b4f0"
+  },
+  {
+   "source": "xstest",
+   "id": 234,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "7e5f53a5de0002ddf8c92c24394ca9a65a49b6dd471afb3259f2ce6d280a8aea"
+  },
+  {
+   "source": "xstest",
+   "id": 235,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "6986b9ae59b8398e0cca74c48ae816412f38cfb055ec750b30ff9a1003d0e27a"
+  },
+  {
+   "source": "xstest",
+   "id": 236,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "40f81dca1f03f83dee0c62858750c1feb2c2ad4062af57c31b9ac1e7792a1ec9"
+  },
+  {
+   "source": "xstest",
+   "id": 237,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "2729786407c0d0de19290f20f65369c0039f5f4b15feb0202fbb01ffc130c9a4"
+  },
+  {
+   "source": "xstest",
+   "id": 238,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "673d5538a606f3bb69569729f901753849a99ad737aabad56efaa302626e9b1c"
+  },
+  {
+   "source": "xstest",
+   "id": 239,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "b316d33dd49adc035f765b89558490c56135a2466e6ce8d77fcc4d1294c398ee"
+  },
+  {
+   "source": "xstest",
+   "id": 240,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "c9d06a107ee67136552443245f9c374daec5648a501e608f779996cad1364c1d"
+  },
+  {
+   "source": "xstest",
+   "id": 241,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "7c11b011a116b24fbac7449bdf2ec782ca97a22c8c0dafd3aa64b79af0bc033a"
+  },
+  {
+   "source": "xstest",
+   "id": 242,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "8cf399a8bd0b5ea6a597f2f63157376d57f38a9b47979d1f77038f84802d1069"
+  },
+  {
+   "source": "xstest",
+   "id": 243,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "5aaecc920041bf8d9c74cccce857fcac3d4491d7ebf240b751915d94a74da498"
+  },
+  {
+   "source": "xstest",
+   "id": 244,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "e153ecd098d18b5e117ec83fa899bae28ac46d1cfa74725599811dfb774b8786"
+  },
+  {
+   "source": "xstest",
+   "id": 245,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "0e661f5d9f23b2e7c9147913ddecc6d6295355affcfac498d71e066a21a7d7f5"
+  },
+  {
+   "source": "xstest",
+   "id": 246,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "98898d99b34d4182fabfab808e742652d07ec1726550c8d595caac8df7c01e7a"
+  },
+  {
+   "source": "xstest",
+   "id": 247,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "b7dec0b9d6ddb4105b62690f1bdec4312d47d7f0de80692c47a8289173fab0b7"
+  },
+  {
+   "source": "xstest",
+   "id": 248,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "84b6bd4a5f4a12d87ff9125a06a23fc233d8bdc8c73a563f08d4360de04cccf3"
+  },
+  {
+   "source": "xstest",
+   "id": 249,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "80903727dd73374f8703acbfbdc70c97383eb59f57e5c5f2509b486a1383b4b8"
+  },
+  {
+   "source": "xstest",
+   "id": 250,
+   "category": "contrast_definitions",
+   "kind": "contraste",
+   "sha256": "3a326fb6d342d9adb78b0b67af021d6a76ec3ca2126f7dfddd269abcd9a56233"
+  },
+  {
+   "source": "xstest",
+   "id": 301,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "b42bcb33a8b161d4787d06aa34b5604ca3d6a8eab8f2b28802aede7e01f2ebcb"
+  },
+  {
+   "source": "xstest",
+   "id": 302,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "bdb799528e7f489eed03c9f9a060dde5a65e843ebb747da67b38656ddae9ea3f"
+  },
+  {
+   "source": "xstest",
+   "id": 303,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "2d6c6ee345bffb0950d03268aad90162c6c9edf835e04e88bca82a63bc36627d"
+  },
+  {
+   "source": "xstest",
+   "id": 304,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "6c85304f2fd217893c2acfef97c16f29e3dbba99f4e38c4e44b537816b4e69d2"
+  },
+  {
+   "source": "xstest",
+   "id": 305,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "8e9293014b58ed203aa2adb24102e72e2f71426590159a3b45e8146d21452efe"
+  },
+  {
+   "source": "xstest",
+   "id": 306,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "858e911cd019830080ac4bbe1be55c8eb569d4dc536bfdc17355a8eb9da4cb93"
+  },
+  {
+   "source": "xstest",
+   "id": 307,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "0b1295c1c5378d976018f22785ed84b67ab7709f24c055d84403e07ffbbb38c1"
+  },
+  {
+   "source": "xstest",
+   "id": 308,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "26b02317973389a2e1a27b9f03d25a84fc692f9312231859236d8db785ba972a"
+  },
+  {
+   "source": "xstest",
+   "id": 309,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "62c14d425e401d01b7c9bd07756843a0d1682a24c401d4a6fbde0418afbbf737"
+  },
+  {
+   "source": "xstest",
+   "id": 310,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "5bb62c2316b9bb6ef20307de1f1c45485fb274089388995d4eacce6b6e42bbef"
+  },
+  {
+   "source": "xstest",
+   "id": 311,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "6ce918dddfaede98d76fa24e6568fb5d7be58ef18368ff85142d93e614a45899"
+  },
+  {
+   "source": "xstest",
+   "id": 312,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "fac994bbe44add101ec0e7f361ca03e6b8b86ea8d5b732deb6279cb21a03dc57"
+  },
+  {
+   "source": "xstest",
+   "id": 313,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "43c0e6979da6f82be21cf4c1b8dc81c6d753403cdfcb475882a2873e185f3e3f"
+  },
+  {
+   "source": "xstest",
+   "id": 314,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "7d91d378685423e8b5d6ec52dfcb0bcc7204867cd9e715bdd608eece1c30a485"
+  },
+  {
+   "source": "xstest",
+   "id": 315,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "1746a56720791615ba75a2ed287ecb8491b8db3679d4eadb66f3be12fbf551a8"
+  },
+  {
+   "source": "xstest",
+   "id": 316,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "4cc3829728182303b418069ef86ad6444ced0fbbd9bd8f7c60fce9f458e5dccf"
+  },
+  {
+   "source": "xstest",
+   "id": 317,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "60b6bc427fe949eb68dc4d64bb4a7c9ae189981e10c9a84da0ec7cecc793016b"
+  },
+  {
+   "source": "xstest",
+   "id": 318,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "e644454527b9f0ae0a8637a3447f8897b7d06c9a44f48c2cbf929cc35a050e73"
+  },
+  {
+   "source": "xstest",
+   "id": 319,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "e2944b75dfb1d99ce98947834aeeedb22bf1c382f3bf4d79c27dd30185e95892"
+  },
+  {
+   "source": "xstest",
+   "id": 320,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "d0cabe3a08498742391b4e8a1621da7baa23625b02b25c3160e796373426b9ec"
+  },
+  {
+   "source": "xstest",
+   "id": 321,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "32e8131a66c2e77275cc918f03a7ee6922a4ac0f568f4b2bb879ce493bf5d011"
+  },
+  {
+   "source": "xstest",
+   "id": 322,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "893bf709d1f855a3051b62efa7201511413961af051312b34c3c76e8902aeaed"
+  },
+  {
+   "source": "xstest",
+   "id": 323,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "b116f4c0e7c9c1aa1e64511a670246636c11855ea0c377e10017158d38c39329"
+  },
+  {
+   "source": "xstest",
+   "id": 324,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "3fbe3cf56da272c22acd6de9300fac84170085554a8b406e7791238d361621c2"
+  },
+  {
+   "source": "xstest",
+   "id": 325,
+   "category": "contrast_discr",
+   "kind": "contraste",
+   "sha256": "9c31e304b3ee8115875f15e8ba441ba94c5e1b771f9f24a1e811feea5d92d1d3"
+  },
+  {
+   "source": "xstest",
+   "id": 351,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "c3a9ebc5acc005a312e7d4d776d5bd9d7fa44893914c1dabf5b9f31279982baf"
+  },
+  {
+   "source": "xstest",
+   "id": 352,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "7f3ec0b28ba90606a4b0ab05448ef8c598d91cea7bbd04f0e83d6ec202743e71"
+  },
+  {
+   "source": "xstest",
+   "id": 353,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "4c60c35200d50a2de0c7c94328b751984fc567001a53d3e2d09c14452b4e51a5"
+  },
+  {
+   "source": "xstest",
+   "id": 354,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "75152349f221e023648ba3132d06e5dfae635d8c6236addb31666011f8875c2a"
+  },
+  {
+   "source": "xstest",
+   "id": 355,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "b63a83fddf291ec8bd3fb6ff61fe2548518a846c0f1bf0cb64ef24583cc5d10d"
+  },
+  {
+   "source": "xstest",
+   "id": 356,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "c1d04d785b8fff460b699bf0354c135bc065e559281941be98978284e91d3a8c"
+  },
+  {
+   "source": "xstest",
+   "id": 357,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "5fbe66011002fb57dc58ec8d71ccfa87f1ab4cb5ae54eb75bee6c84329ca7b1d"
+  },
+  {
+   "source": "xstest",
+   "id": 358,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "8d0a81fe5de4a498395226718c8071c18d698b2e946e4af03ab27823d3e7e3d6"
+  },
+  {
+   "source": "xstest",
+   "id": 359,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "b954578c2683baa435874c2b60f2255d787c7f2122be9d4a5fedc524cca11153"
+  },
+  {
+   "source": "xstest",
+   "id": 360,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "d54e8e41d1b00ec9b15abc867b0fd41f30cef99e7663d418dcc576cf2a7f988d"
+  },
+  {
+   "source": "xstest",
+   "id": 361,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "c92458d8fc2aa1901888471647b5eef6ad20066c460ac944f5d53600f559f7fe"
+  },
+  {
+   "source": "xstest",
+   "id": 362,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "a27d41e299fd3fe34e7464b5a1b82e4ef5727ed5276c7ea061c7c9b228e7d6b8"
+  },
+  {
+   "source": "xstest",
+   "id": 363,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "16d40e50e7c0306fb342a3ef78115662dde35d5fd705a21e13e62fabace2d5ee"
+  },
+  {
+   "source": "xstest",
+   "id": 364,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "fef554980562e31d0fc5819e6e50838be67052e41cc49437f1d2e572c4fc7ace"
+  },
+  {
+   "source": "xstest",
+   "id": 365,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "c88d362f2fc3ca3febfd291c4e1c5c110ee109447f01577ed0b194d0cad9c8ab"
+  },
+  {
+   "source": "xstest",
+   "id": 366,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "cdb711870c2df3aaf7ba0f9b86a261077383696e85adf9fe960956b6c693c106"
+  },
+  {
+   "source": "xstest",
+   "id": 367,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "b8947338cab3a9b575bb7207cb3180a4965578d74813e22ad73477b15e42df23"
+  },
+  {
+   "source": "xstest",
+   "id": 368,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "515f0424e06ba01ab23b542f6d16f83364a36dabb221266b299cb7d46498ca1b"
+  },
+  {
+   "source": "xstest",
+   "id": 369,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "6d5f1cb99af7677513613ed7c1143dc48e7c527aac7a939ee92d18c3ca2c4192"
+  },
+  {
+   "source": "xstest",
+   "id": 370,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "0f4c3e08e2ac47c0a78fb96f969558b6829adb692bd41fc980a2811c6c819bca"
+  },
+  {
+   "source": "xstest",
+   "id": 371,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "e9318b8394528a33d1c6f7e1e35c49dd2434572a814c6f4aef37deeb4c02cda4"
+  },
+  {
+   "source": "xstest",
+   "id": 372,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "03f87b8e86f05474b2e75844aa4829770a3e92a25de0610411503b9cc81e1d66"
+  },
+  {
+   "source": "xstest",
+   "id": 373,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "560494d7ea92e7c24df775c64922e29b280fcb5b8831c922a2ec80ec63a57201"
+  },
+  {
+   "source": "xstest",
+   "id": 374,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "dc048e1740478113fc68c588ad31f7dc2809beeeda788e0fe6a2485d56bfb8ce"
+  },
+  {
+   "source": "xstest",
+   "id": 375,
+   "category": "contrast_historical_events",
+   "kind": "contraste",
+   "sha256": "11c596ede969df00171ff9ca0ea0bcb76cada1a672b88a00815336a7c572015c"
+  },
+  {
+   "source": "xstest",
+   "id": 426,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "cc299a4b313e91b1cf309f98e9d6cb6dfe447f043274c81b51a4fc7341697c0a"
+  },
+  {
+   "source": "xstest",
+   "id": 427,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "b4cc35518bb24cb91b106f4c1f550578142695976547ea8e33fb53080b9d6725"
+  },
+  {
+   "source": "xstest",
+   "id": 428,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "ed7c89e3742fa83d834be438637389db8078804dd659524b0a079d42ad203b13"
+  },
+  {
+   "source": "xstest",
+   "id": 429,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "4c1bacfb92a14aae37ad2368cc5a5f88c15d0e6693398a6ae1ce965bb8306830"
+  },
+  {
+   "source": "xstest",
+   "id": 430,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "94972ba80474b9e97b6d8486a473571a78ff9c9cbcffecffe976edc800fd52e0"
+  },
+  {
+   "source": "xstest",
+   "id": 431,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "e8256e736afcea787b0aeb0379a39d09c7a853737921b1cb4a90f27c72e47af8"
+  },
+  {
+   "source": "xstest",
+   "id": 432,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "7a69a43c32de019cb0ca7b0a82ce7495a6812f1d70779905c5079a2018ecfec3"
+  },
+  {
+   "source": "xstest",
+   "id": 433,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "761f5ad9993607df92cf17b9e825cf753efdb8b803bfe4bc6894a620621c6aa1"
+  },
+  {
+   "source": "xstest",
+   "id": 434,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "380d0688867543cee88725cdccb7b9496cfc8daa14665dd5901e2eb47ab4c2fe"
+  },
+  {
+   "source": "xstest",
+   "id": 435,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "1e2155f1476436388d1d77397eb22ea25c9819f459db3d4f2ecf3a36b5573683"
+  },
+  {
+   "source": "xstest",
+   "id": 436,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "bb34e8ebe92d14ba79f240e884a14628639d42c59abb1fb7c2c74234ec95a066"
+  },
+  {
+   "source": "xstest",
+   "id": 437,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "869689af99f13a2d9aaa22f671f7e8c6c3c1ef66a792b0334409624e9efa078d"
+  },
+  {
+   "source": "xstest",
+   "id": 438,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "1798ba238f883bcb8fc25ef1a2c5c9d8bd46e4f3329cc1cca17557c6e6f4a6f8"
+  },
+  {
+   "source": "xstest",
+   "id": 439,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "9cf11d291fc53b339cf342a3f8c84fd6643265f885dd641631d709088f6d466f"
+  },
+  {
+   "source": "xstest",
+   "id": 440,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "58ff3c04c1011f98bb12133e7b3d6d4588fdd933a953dc4acb18aa451eff5503"
+  },
+  {
+   "source": "xstest",
+   "id": 441,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "30c9fba16cb7c02d93462e3bb78f152755a08f87c8afa3082ff85dea86fbc0e7"
+  },
+  {
+   "source": "xstest",
+   "id": 442,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "305f2ae675e8316592685e11aa9c67dfc44e8012a20c7cf60159f8d56fd205b2"
+  },
+  {
+   "source": "xstest",
+   "id": 443,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "f2b9055c5194fe84e75747705077c0d0c329a159b3a3d90ae2a88209ce2fb47e"
+  },
+  {
+   "source": "xstest",
+   "id": 444,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "7bae4d56d3aa3fdd23036b8b009248799c7b7e9c050dfe3d156ae6f8dd0ab962"
+  },
+  {
+   "source": "xstest",
+   "id": 445,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "9ce6cff10171394ed1ab8a4d50abc2a3e9fb6c53061a3c622684050335b98860"
+  },
+  {
+   "source": "xstest",
+   "id": 446,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "be0d437ab0fac4241e98f1d764f12bcedc9df103caa2ea05178275dd2c21c877"
+  },
+  {
+   "source": "xstest",
+   "id": 447,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "f4a5a97144e9b00addc728317df525bd95978c4af6b7c0c5c0e8481c350d28b7"
+  },
+  {
+   "source": "xstest",
+   "id": 448,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "9b39a67336eb85777b502bdad4227eebff9198f09afaf70569db16c4ef32ef1a"
+  },
+  {
+   "source": "xstest",
+   "id": 449,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "e680c1bb5b6e134210c77e3302cc68891042ecfb55b69636237515f4982ca492"
+  },
+  {
+   "source": "xstest",
+   "id": 450,
+   "category": "contrast_privacy",
+   "kind": "contraste",
+   "sha256": "1ee08880b10aa82469b31c9cd0efceae6e735b451b1b2dc694952f321c03b835"
+  }
+ ]
+}

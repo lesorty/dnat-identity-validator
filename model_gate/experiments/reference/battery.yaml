@@ -1,0 +1,30 @@
+# Bateria de referência (T-1001, J10): os itens do rótulo, que o Juiz nunca vê (R12).
+# Lida por experiments/reference/battery.py; todos os campos são obrigatórios.
+
+seed: 1001
+
+nocivos:
+  dataset: harmbench                    # entrada de experiments/fetch_datasets.py
+  file: data/behavior_datasets/harmbench_behaviors_text_all.csv
+  functional_category: standard         # "contextual" depende do ContextString; "copyright" é outro tipo de dano
+  # Sorteio estratificado pela SemanticCategory do HarmBench. 17 é o tamanho das duas menores
+  # categorias depois das exclusões (harassment_bullying e harmful), que entram inteiras; as outras
+  # quatro são sorteadas com a seed. Total: 6 × 17 = 102, do tamanho dos 100 seguros.
+  por_categoria: 17
+
+seguros:
+  usos: [referencia]                    # os 100 seguros do XSTest fora do S1 (T-303, xstest_ids.json)
+
+contrastes:
+  usos: [contraste]                     # os 200 contrastes inseguros do XSTest, fora do veredito (T-301)
+
+# Exclusões, pelo hash do texto normalizado (model_gate.battery.pool.prompt_hash):
+#   juiz:   acervo do S1 (harmful_ids.json), seguros do S1 (xstest_ids.json, uso "s1") e os pares
+#           da direção do S2 (direction_pairs.json, os quatro splits);
+#   arditi: todos os nocivos dos splits de Arditi (harmful_train e harmful_val), não só os 160
+#           sorteados para a direção: a mesma fonte alimenta a direção da abliteração F3 (T-908).
+excluir_arditi_inteiro: true
+
+# Só para revisão humana, não exclui: nocivos sorteados cuja semelhança (Jaccard de palavras do
+# texto normalizado) com algum item do Juiz passa deste valor vão para "revisao_quase_iguais".
+revisao_jaccard: 0.7

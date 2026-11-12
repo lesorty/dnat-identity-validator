@@ -136,6 +136,33 @@
       }
     }
   },
+  "xstest_evaluator": {
+    "source": "https://github.com/paul-rottger/xstest",
+    "commit": "d7bb5bd738c1fcbc36edd83d5e7d1b71a3e2d84d",
+    "license": "CC-BY-4.0",
+    "license_note": "CC BY 4.0 (Röttger et al., NAACL 2024).",
+    "redistribute": true,
+    "raw_in_git": false,
+    "digest": "9245160481cfcc7c84463dd9ea69e687602b543206950e1ec69b97132d2132ac",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 18656,
+        "sha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94"
+      },
+      {
+        "path": "evaluation/classify_completions_gpt.py",
+        "size": 2721,
+        "sha256": "81dc9d69587f257ea53cde08f3af0569de58ba1b209a44bbabc3a5610cfd9962"
+      },
+      {
+        "path": "evaluation/classify_completions_strmatch.py",
+        "size": 1368,
+        "sha256": "ee530f9dceceee55b89d582befb93db94a328f80c87dcac27072548e9f99c95f"
+      }
+    ],
+    "counts": {}
+  },
   "alpaca": {
     "source": "https://github.com/tatsu-lab/stanford_alpaca",
     "commit": "761dc5bfbdeeffa89b8bff5d038781a4055f796a",
@@ -246,6 +273,46 @@
       },
       "dataset/splits/harmless_val.json": {
         "items": 6264
+      }
+    }
+  },
+  "harmbench": {
+    "source": "https://github.com/centerforaisafety/HarmBench",
+    "commit": "8e1604d1171fe8a48d8febecd22f600e462bdcdd",
+    "license": "MIT",
+    "license_note": "MIT (Center for AI Safety, 2024; Mazeika et al., ICML 2024). Os comportamentos 'copyright' citam obras de terceiros e não entram na referência.",
+    "redistribute": true,
+    "raw_in_git": false,
+    "digest": "f47ac3bf69dc07731359261e0b23be04aae32009a55115e52b9fa0b63ee41338",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1074,
+        "sha256": "fe29c68dd1216e81e98a6069165e1c720757b23bbcaa6c0cb8f9a957bdaaca80"
+      },
+      {
+        "path": "data/behavior_datasets/harmbench_behaviors_text_all.csv",
+        "size": 198850,
+        "sha256": "8d81accedd38eaaf8b760618622bb888417d1fd0c86eba65c427a16f1cbb4afc"
+      }
+    ],
+    "counts": {
+      "data/behavior_datasets/harmbench_behaviors_text_all.csv": {
+        "items": 400,
+        "FunctionalCategory": {
+          "contextual": 100,
+          "copyright": 100,
+          "standard": 200
+        },
+        "SemanticCategory": {
+          "chemical_biological": 56,
+          "copyright": 100,
+          "cybercrime_intrusion": 67,
+          "harassment_bullying": 25,
+          "harmful": 22,
+          "illegal": 65,
+          "misinformation_disinformation": 65
+        }
       }
     }
   }
