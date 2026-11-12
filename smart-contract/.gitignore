@@ -4,6 +4,9 @@ cache/
 artifacts/
 deployments/
 executions/
+# Estado da CVM1: identidades (T-1702) e derivados retidos (T-803)
+identities.json
+derivatives.json
 uploads/
 manifests/
 coverage/

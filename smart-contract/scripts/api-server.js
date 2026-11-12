@@ -26,6 +26,11 @@ const {
   decryptBufferEnvelope,
   hasEncryptedEnvelope,
 } = require("./asset_envelope");
+const { IdentityError, IdentityRegistry, DEFAULT_DIFFICULTY } = require("./identity");
+
+// Estado da CVM1 ao lado de executions/: identidades (T-1702) e derivados retidos (T-803).
+const IDENTITIES_PATH = process.env.DNAT_IDENTITIES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "identities.json");
+const IDENTITY_DIFFICULTY = Number(process.env.DNAT_IDENTITY_DIFFICULTY || DEFAULT_DIFFICULTY);
 
 const abi = [
   "function registerAsset(uint8 assetType, string title, string description, string encryptedUri, string manifestUri, bytes32 contentHash, uint256 price, bytes bloomFilter) returns (uint256)",
@@ -955,6 +960,11 @@ function parseBoolean(value) {
 
 async function startServer() {
   await initContract();
+  const identities = new IdentityRegistry({
+    statePath: IDENTITIES_PATH,
+    difficulty: IDENTITY_DIFFICULTY,
+    challenge: process.env.DNAT_IDENTITY_CHALLENGE || null,
+  });
 
   const app = express();
   app.use(cors());
@@ -972,6 +982,19 @@ async function startServer() {
       executor,
       builder,
     });
+  });
+
+  // Identidade cara (T-1702, E14 §18): desafio da implantação e d; registro com prova de trabalho.
+  app.get("/api/identity/challenge", (_req, res) => {
+    res.json(identities.challenge());
+  });
+
+  app.post("/api/identity/register", (req, res) => {
+    try {
+      res.status(201).json(identities.register(req.body || {}));
+    } catch (e) {
+      res.status(e instanceof IdentityError ? e.status : 500).json({ error: e.message });
+    }
   });
 
   app.post("/api/register-dataset", multipartParser, async (req, res) => {
