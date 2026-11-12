@@ -1,0 +1,249 @@
+{
+ "run_id": "t402_20261112T151010_faf26e",
+ "git_commit": "30284224dcc0a346aacf99e431c9bc19a12976b0",
+ "dirty": false,
+ "model_digest": "05b61d72bec34404b49fdd4b3a33031b69f25b3f329acc3b851a62c07c9302f3",
+ "origem": "local, verificação de funcionamento; a direção oficial é gerada na nuvem com a T-312",
+ "condition": "vazio",
+ "pairs": {
+  "file": "src/model_gate/signals/direction_pairs.json",
+  "sha256": "3577184f81a0c610dab4459eaa8f12617825832c12bf6e94abc0dffbc21c8deb",
+  "sizes": {
+   "train": 128,
+   "val": 32
+  },
+  "excluded": {
+   "harmful_train": 0,
+   "harmless_train": 0,
+   "harmful_val": 0,
+   "harmless_val": 0
+  }
+ },
+ "activations": {
+  "sha256": "6713936e040a3c4d3c86a169949be627a3bd2e63fc13ee70c8f4aecd4d6b540e",
+  "shape": {
+   "harmful_train": [
+    128,
+    24,
+    896
+   ],
+   "harmless_train": [
+    128,
+    24,
+    896
+   ],
+   "harmful_val": [
+    32,
+    24,
+    896
+   ],
+   "harmless_val": [
+    32,
+    24,
+    896
+   ]
+  }
+ },
+ "direction": {
+  "sha256": "4223afe19d72dbb1b90336e09206bff72dd26e0f8f7bdd319398fb9d57cb66c4",
+  "layer": 6,
+  "criterio": "maior d de Cohen na validação, camadas de 0,2·L a 0,8·L"
+ },
+ "seconds_extraction": 86.8,
+ "prompts": 320,
+ "deterministic_repeat": true,
+ "layers": [
+  {
+   "layer": 0,
+   "candidate": false,
+   "raw_norm": 0.0,
+   "cohen_d": 0.0,
+   "auroc": 0.5,
+   "gap_base": 0.0
+  },
+  {
+   "layer": 1,
+   "candidate": false,
+   "raw_norm": 0.0734,
+   "cohen_d": 1.293,
+   "auroc": 0.8145,
+   "gap_base": 0.0821
+  },
+  {
+   "layer": 2,
+   "candidate": false,
+   "raw_norm": 0.2817,
+   "cohen_d": 2.683,
+   "auroc": 0.9658,
+   "gap_base": 0.2726
+  },
+  {
+   "layer": 3,
+   "candidate": false,
+   "raw_norm": 0.37,
+   "cohen_d": 3.657,
+   "auroc": 0.9922,
+   "gap_base": 0.395
+  },
+  {
+   "layer": 4,
+   "candidate": true,
+   "raw_norm": 0.5762,
+   "cohen_d": 2.95,
+   "auroc": 0.9775,
+   "gap_base": 0.5702
+  },
+  {
+   "layer": 5,
+   "candidate": true,
+   "raw_norm": 0.9133,
+   "cohen_d": 3.371,
+   "auroc": 0.9971,
+   "gap_base": 0.8139
+  },
+  {
+   "layer": 6,
+   "candidate": true,
+   "raw_norm": 1.0753,
+   "cohen_d": 3.492,
+   "auroc": 1.0,
+   "gap_base": 0.978
+  },
+  {
+   "layer": 7,
+   "candidate": true,
+   "raw_norm": 1.5872,
+   "cohen_d": 2.482,
+   "auroc": 0.9775,
+   "gap_base": 1.3832
+  },
+  {
+   "layer": 8,
+   "candidate": true,
+   "raw_norm": 1.6703,
+   "cohen_d": 2.342,
+   "auroc": 0.9648,
+   "gap_base": 1.4021
+  },
+  {
+   "layer": 9,
+   "candidate": true,
+   "raw_norm": 1.5352,
+   "cohen_d": 2.364,
+   "auroc": 0.9707,
+   "gap_base": 1.3609
+  },
+  {
+   "layer": 10,
+   "candidate": true,
+   "raw_norm": 1.73,
+   "cohen_d": 2.461,
+   "auroc": 0.9629,
+   "gap_base": 1.6333
+  },
+  {
+   "layer": 11,
+   "candidate": true,
+   "raw_norm": 2.4653,
+   "cohen_d": 2.482,
+   "auroc": 0.96,
+   "gap_base": 2.3131
+  },
+  {
+   "layer": 12,
+   "candidate": true,
+   "raw_norm": 2.7008,
+   "cohen_d": 2.41,
+   "auroc": 0.959,
+   "gap_base": 2.6124
+  },
+  {
+   "layer": 13,
+   "candidate": true,
+   "raw_norm": 3.4559,
+   "cohen_d": 2.74,
+   "auroc": 0.9814,
+   "gap_base": 3.0665
+  },
+  {
+   "layer": 14,
+   "candidate": true,
+   "raw_norm": 3.9467,
+   "cohen_d": 2.839,
+   "auroc": 0.9893,
+   "gap_base": 3.2724
+  },
+  {
+   "layer": 15,
+   "candidate": true,
+   "raw_norm": 5.3723,
+   "cohen_d": 2.789,
+   "auroc": 0.9902,
+   "gap_base": 3.8376
+  },
+  {
+   "layer": 16,
+   "candidate": true,
+   "raw_norm": 6.2328,
+   "cohen_d": 2.636,
+   "auroc": 0.9766,
+   "gap_base": 4.3731
+  },
+  {
+   "layer": 17,
+   "candidate": true,
+   "raw_norm": 7.6379,
+   "cohen_d": 2.418,
+   "auroc": 0.9521,
+   "gap_base": 5.3231
+  },
+  {
+   "layer": 18,
+   "candidate": true,
+   "raw_norm": 9.7283,
+   "cohen_d": 2.316,
+   "auroc": 0.9277,
+   "gap_base": 6.8132
+  },
+  {
+   "layer": 19,
+   "candidate": false,
+   "raw_norm": 11.1781,
+   "cohen_d": 2.411,
+   "auroc": 0.9375,
+   "gap_base": 7.7565
+  },
+  {
+   "layer": 20,
+   "candidate": false,
+   "raw_norm": 13.2053,
+   "cohen_d": 2.451,
+   "auroc": 0.9521,
+   "gap_base": 9.0298
+  },
+  {
+   "layer": 21,
+   "candidate": false,
+   "raw_norm": 16.169,
+   "cohen_d": 2.571,
+   "auroc": 0.9639,
+   "gap_base": 10.8861
+  },
+  {
+   "layer": 22,
+   "candidate": false,
+   "raw_norm": 18.7052,
+   "cohen_d": 2.579,
+   "auroc": 0.9619,
+   "gap_base": 12.2004
+  },
+  {
+   "layer": 23,
+   "candidate": false,
+   "raw_norm": 20.6703,
+   "cohen_d": 2.789,
+   "auroc": 0.9746,
+   "gap_base": 13.9422
+  }
+ ]
+}
