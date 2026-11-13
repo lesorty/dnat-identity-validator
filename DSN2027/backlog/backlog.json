@@ -806,7 +806,7 @@
     "T-1611",
     "T-414"
    ],
-   "descricao": "Fase de testes (12/11): Teste 1 (sanidade). Passa do marco G1 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.\nAbsorve: T-406 (Teste de S2: abliterado público com razão baixa; base repetido perto de 1); T-508 (Teste: o base quantizado não dispara falso alarme por formato); T-609 (Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado).\n\nPor quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
+   "descricao": "Atualiza (13/11): é a versão na nuvem da verificação local da T-807 (results/T-807_juiz_local.md). Rodar o job real de ponta a ponta com experiments/judge_local.py, trocando o avaliador de fumaça pelo escolhido na T-309/T-315 (--evaluator-kind guard ou rubric), o pacote da bateria inteiro (experiments.battery_pack sem --n-*) e a referência do pai da T-312. Derivados: base repetido, base quantizado, abliterado público (huihui-ai v3) e um LoRA benigno da T-914. Como a T-606 ainda não terá fixado os limiares, fixar antes de rodar um prereg de sanidade (commitado, com hash no registro), que vale só para este teste. Critério: abliterado reprovado na regra 1; base repetido e base quantizado sem veto e com ρ ≈ 1 e E1 ≈ 0.\n\nFase de testes (12/11): Teste 1 (sanidade). Passa do marco G1 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): É o Teste 1: o instrumento e o veredito separam o óbvio e não oscilam. Absorve a sanidade de S2 (T-406) e o teste ponta a ponta do veredito (T-609). Sobe para P0.\nAbsorve: T-406 (Teste de S2: abliterado público com razão baixa; base repetido perto de 1); T-508 (Teste: o base quantizado não dispara falso alarme por formato); T-609 (Teste ponta a ponta do veredito: base, abliterado público, LoRA benigno, base quantizado).\n\nPor quê: antes de calibrar, é preciso saber que o instrumento separa o caso óbvio (abliterado público) e não oscila no base (A3, G1).\nComo:\n- Rodar o instrumento no huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3 e comparar com a referência do T-312\n- Rodar o base de novo e conferir que a diferença fica perto de zero\n- Registrar as duas diferenças por categoria\nSaída: nota de sanidade com os números no registro.",
    "epico": "J3",
    "id": "T-313",
    "marco": "TST",
@@ -816,7 +816,7 @@
    "tamanho": "M",
    "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
    "teste": "TS1",
-   "atualizado": "2026-11-12T18:23:47.000Z"
+   "atualizado": "2026-11-13T16:00:00.000Z"
   },
   {
    "deps": [
@@ -1701,9 +1701,10 @@
     "T-809",
     "T-705",
     "T-704",
-    "T-1611"
+    "T-1611",
+    "T-312"
    ],
-   "descricao": "Fase de testes (12/11): Teste 8 (ponta a ponta). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): O Teste 8 sobre o fluxo do modo direto, repetido uma vez na CVM.\nAbsorve: T-708 (Testes do contrato: aprovado, reprovado, revogação, reativação negada).\n\nPor quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
+   "descricao": "Atualiza (13/11): o roteiro existe no modo direto (smart-contract/e2e/run_direct.js, T-811), mas com o modelo minúsculo e um Juiz simulado para o aprovado e o reprovado. Aqui o veredito tem de vir do Juiz real (T-807): base Qwen2.5-0.5B depositado, referência do pai da T-312, avaliador e bateria da liberação, abliterado reprovado e LoRA benigno aprovado. Depende do transporte de modelos grandes entre a CVM1 e a CVM de job (hoje o derivado volta em base64 dentro do JSON).\n\nFase de testes (12/11): Teste 8 (ponta a ponta). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): O Teste 8 sobre o fluxo do modo direto, repetido uma vez na CVM.\nAbsorve: T-708 (Testes do contrato: aprovado, reprovado, revogação, reativação negada).\n\nPor quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
    "epico": "J8",
    "id": "T-813",
    "marco": "TST",
@@ -1713,7 +1714,7 @@
    "tamanho": "M",
    "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga",
    "teste": "TS8",
-   "atualizado": "2026-11-12T11:22:40.000Z"
+   "atualizado": "2026-11-13T16:00:00.000Z"
   },
   {
    "deps": [
