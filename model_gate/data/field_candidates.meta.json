@@ -1,0 +1,6423 @@
+{
+ "task": "T-1102",
+ "coleta": "2026-11-13",
+ "api": "huggingface_hub HfApi.model_info(revision=<revisao da T-1101>, files_metadata=True)",
+ "pais": {
+  "qwen2.5-0.5b": {
+   "repo": "Qwen/Qwen2.5-0.5B-Instruct",
+   "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "LICENSE",
+     11343,
+     null
+    ],
+    [
+     "README.md",
+     4917,
+     null
+    ],
+    [
+     "config.json",
+     659,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671839,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe"
+    ],
+    [
+     "tokenizer.json",
+     7031645,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     7305,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "llama-3.2-1b": {
+   "repo": "meta-llama/Llama-3.2-1B-Instruct",
+   "revision": "9213176726f574b556790deb65791e0c5aa438b6",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "LICENSE.txt",
+     7712,
+     null
+    ],
+    [
+     "README.md",
+     41742,
+     null
+    ],
+    [
+     "USE_POLICY.md",
+     6021,
+     null
+    ],
+    [
+     "config.json",
+     877,
+     null
+    ],
+    [
+     "generation_config.json",
+     189,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f"
+    ],
+    [
+     "original/consolidated.00.pth",
+     2471677246,
+     "fc17d497df5e4175b3a8acb4f5865b26f7fc1b009b25bef814b95fde10e8a1f3"
+    ],
+    [
+     "original/params.json",
+     220,
+     null
+    ],
+    [
+     "original/tokenizer.model",
+     2183982,
+     "82e9d31979e92ab929cd544440f129d9ecd797b69e327f80f17e1c50d5551b55"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085657,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  }
+ },
+ "candidatos": {
+  "ai-anytime/Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "a64c62f24f7da804fe16aa9ad0624767d22efffc",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "LICENSE.txt",
+     7712,
+     null
+    ],
+    [
+     "README.md",
+     3673,
+     null
+    ],
+    [
+     "USE_POLICY.md",
+     6021,
+     null
+    ],
+    [
+     "ablate_meta.json",
+     369,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     895,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "b307fbca84f2e94563daea2ee3e441fece0d34112dfc8c5beeb77e60c6637eb6"
+    ],
+    [
+     "tokenizer.json",
+     17210084,
+     "65ff5472d095ccd9332d9e723153d7bc7226cb6be9c1bffda738b5ba2e71bf26"
+    ],
+    [
+     "tokenizer_config.json",
+     457,
+     null
+    ]
+   ]
+  },
+  "brianmatzelle/llama3.2-1b-instruct-hasanpiker-abliterated": {
+   "revision": "5e0988403178475151e8d58a63b2de92efcc603c",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     618,
+     null
+    ],
+    [
+     "config.json",
+     998,
+     null
+    ],
+    [
+     "generation_config.json",
+     234,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "316d2be9cad3e3abe55722b776549bca170a8f951dcd4f4a2dfee8a9c3a31670"
+    ],
+    [
+     "special_tokens_map.json",
+     340,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     55453,
+     null
+    ]
+   ]
+  },
+  "carsenk/llama3.2_1b_2025_uncensored": {
+   "revision": "40eb6bee33996ee3012a17cd5dc0428ed67d6824",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     2034,
+     null
+    ],
+    [
+     "config.json",
+     1036,
+     null
+    ],
+    [
+     "generation_config.json",
+     248,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "3cd927f37b310fa03bf11d2634be2b8178392e9c7bac0fa5bc383937df458392"
+    ],
+    [
+     "special_tokens_map.json",
+     477,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     53475,
+     null
+    ]
+   ]
+  },
+  "carsenk/llama3.2_1b_2025_uncensored_v2": {
+   "revision": "6872020d4069d3694f5159df6024050ea3ae2c1f",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1776,
+     null
+    ],
+    [
+     "README.md",
+     2264,
+     null
+    ],
+    [
+     "config.json",
+     1034,
+     null
+    ],
+    [
+     "generation_config.json",
+     248,
+     null
+    ],
+    [
+     "llama3.2_1b_uncensored.BF16.gguf",
+     2479592448,
+     "2237302a211251b0555a0d75cc506094853263f1050de08c59575d839cae1a4f"
+    ],
+    [
+     "llama3.2_1b_uncensored.F16.gguf",
+     2479592160,
+     "de0ed60a2331223ddfb2d195402bfb05b69c5a91f48373036a98d43851691e64"
+    ],
+    [
+     "llama3.2_1b_uncensored.Q8_0.gguf",
+     1321079808,
+     "abe6f7c7faf8522c25149a5ca5414c60ce4b8f5f31ba04c4246ee738ec47bc3f"
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "54bcfae0c99df567bf9bc842db3a67301bc2755fe7afdd6c54d0c9ddea0c6846"
+    ],
+    [
+     "special_tokens_map.json",
+     477,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     56693,
+     null
+    ]
+   ]
+  },
+  "cazzz307/Abliterated-Llama-3.2-1B-Instruct": {
+   "revision": "807d5d1a7d2f6e86952baa1c7250d6fa02b01df9",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     2174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     865,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645464,
+     "c9cab2a6dbfc3449e4d105b201fb2fea053c898bd7896b8edd15891f5a7ff59f"
+    ],
+    [
+     "output.txt",
+     6696,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     325,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     50554,
+     null
+    ]
+   ]
+  },
+  "Daniil-Domino/Vikhr-Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "ea8926382b9adc4022903ba993c29c47e0c99c60",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     893,
+     null
+    ],
+    [
+     "generation_config.json",
+     183,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982200,
+     "af6134c5b0d6e04c1b5a20d94ab8d1996d1c980f59810ac2fbb7c905ce23ce4d"
+    ],
+    [
+     "tokenizer.json",
+     17210102,
+     "3c22bc76bfb4be4642026a3b94a4f3228cc7bbef60391a306592ffacba404326"
+    ],
+    [
+     "tokenizer_config.json",
+     370,
+     null
+    ]
+   ]
+  },
+  "dontaddiyana/llama3.2-1b-Uncensored": {
+   "revision": "ccb17476d3126bcd392bdd7ff489e48e440cd4a3",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     3848,
+     null
+    ],
+    [
+     "config.json",
+     884,
+     null
+    ],
+    [
+     "generation_config.json",
+     180,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "8843466d1687b0a713850cb18ffc494da22ffaedc36c9091114238b36809873e"
+    ],
+    [
+     "special_tokens_map.json",
+     335,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085826,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     50534,
+     null
+    ]
+   ]
+  },
+  "ElementMerc/llama-3.2-1b-uncensored": {
+   "revision": "f59899285f22edf70e18cc2b30a7ef1362e735a5",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     6600,
+     null
+    ],
+    [
+     "abliteration.json",
+     564,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     895,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "fa3e7c0dbb23a07f9091a58fece2b9598c7d31c9fe38116ec982328371b92c32"
+    ],
+    [
+     "tokenizer.json",
+     17210084,
+     "65ff5472d095ccd9332d9e723153d7bc7226cb6be9c1bffda738b5ba2e71bf26"
+    ],
+    [
+     "tokenizer_config.json",
+     354,
+     null
+    ]
+   ]
+  },
+  "Elstuhn/llama-3.2-1B-Instruct-abliterated": {
+   "revision": "c21ddaafe84231ed5ab559b85edb860cbb5c48b9",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1181,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     866,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982344,
+     "23e26b6bb8fa857762d7b72aa48fb291fbedb2135baec3f16a3dde08f40e8e1b"
+    ],
+    [
+     "special_tokens_map.json",
+     325,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     50554,
+     null
+    ]
+   ]
+  },
+  "Grogros/Llama-3.2-1B-Instruct-abliterated-DPO": {
+   "revision": "cf9c2775dfda60d72d1eb24ccd6cdb08b4526af5",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F32": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "config.json",
+     937,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     4943274328,
+     "0d4f4325234d62d66bcada1e9d502f4f1ef4cd90e6c3ac255d3c8e5bcb4935b4"
+    ],
+    [
+     "special_tokens_map.json",
+     439,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     54689,
+     null
+    ]
+   ]
+  },
+  "hasanyt/llama-3.2-1b-abliterated": {
+   "revision": "3e35914f008bfc1d104c406260b5b48fbf9758f1",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     895,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "9306d24327f4bd444478caa73c8e1612d1cd3fae1e7c919ec5e1c938d1d862e7"
+    ],
+    [
+     "tokenizer.json",
+     17210183,
+     "9dd7be29de7e0e0983000abd0295cc8580c12c7cae5c41774ea6213a9e06d38d"
+    ],
+    [
+     "tokenizer_config.json",
+     354,
+     null
+    ]
+   ]
+  },
+  "joelewing/Llama-3.2-1B-Instruct-Capybara-abliterated": {
+   "revision": "faaf9f7ba7a8a387c9c9dcbb2f4a7c420013f1c0",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1766,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     4568,
+     null
+    ],
+    [
+     "config.json",
+     926,
+     null
+    ],
+    [
+     "generation_config.json",
+     181,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "035a5cd5e8d0615443dd7f442c1d881ba2f815c6ae96187cbed92035a5c820e3"
+    ],
+    [
+     "special_tokens_map.json",
+     454,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     50595,
+     null
+    ]
+   ]
+  },
+  "jtatman/llama3.2-1b-5x-MoE-uncensored-code-reason-tool-agent": {
+   "revision": "25ada1daa6555bd6c75b3331d0c507d660424c97",
+   "erro": null,
+   "architectures": [
+    "MixtralForCausalLM"
+   ],
+   "model_type": "mixtral",
+   "quantization": null,
+   "params": {
+    "F16": 3651864576
+   },
+   "params_total": 3651864576,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     786,
+     null
+    ],
+    [
+     "config.json",
+     1110,
+     null
+    ],
+    [
+     "mergekit_moe_config.yml",
+     2376,
+     null
+    ],
+    [
+     "model-00001-of-00002.safetensors",
+     4983995808,
+     "dda175d837ea89f999772006a907ef56059ef466676eaa9ead7f39345c117d6a"
+    ],
+    [
+     "model-00002-of-00002.safetensors",
+     2319771296,
+     "ee8c3f57180575c80ed692a3e7a6d36aa8247abeb74ba7444fe995896036f7aa"
+    ],
+    [
+     "model.safetensors.index.json",
+     27967,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210091,
+     "71c1736d713a012aa4720d05a6c32c6992e9d278ea88cedd36008f14fd616116"
+    ],
+    [
+     "tokenizer_config.json",
+     387,
+     null
+    ]
+   ]
+  },
+  "jtatman/llama3.2_1b_2025_uncensored_v2-GRPO": {
+   "revision": "75c3b27fe0ded23b9375f9126206e164db265c54",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     2475,
+     null
+    ],
+    [
+     "adapter_config.json",
+     1171,
+     null
+    ],
+    [
+     "adapter_model.safetensors",
+     45118648,
+     "96058c17f3899125d080678c602543551e10f9cc94492d365fa1ac0eb64ad8d1"
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     434,
+     null
+    ],
+    [
+     "training_args.bin",
+     7057,
+     "88b758a80be3312c8dd7d0fdbe2647e2caa71dc92df66813e43c96ecd218d204"
+    ]
+   ]
+  },
+  "jtatman/llama3.2_1b_uncensored_pentest_grpo": {
+   "revision": "ee8fba572eed67703091ef0fc4ef3ea83c3e29b2",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     2475,
+     null
+    ],
+    [
+     "adapter_config.json",
+     1171,
+     null
+    ],
+    [
+     "adapter_model.safetensors",
+     45118648,
+     "4fcced1f5ab0e8137f9ccac4aeca57205c54e62f99b1859e0e4a3dd138ece922"
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     434,
+     null
+    ],
+    [
+     "training_args.bin",
+     7057,
+     "4243acbf22822247b814aa6fde507bd7cacc50a21bbdefc4b6fbf7176df2ed8b"
+    ]
+   ]
+  },
+  "jtatman/llama3.2_1b_uncensored_pentest_grpo-merged": {
+   "revision": "2f117200ef9bf1e6d4b9af62346df0261602892e",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     929,
+     null
+    ],
+    [
+     "generation_config.json",
+     233,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "067553aecee3744089796d82121894624484336be60c409651c6439b6b80b018"
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     405,
+     null
+    ]
+   ]
+  },
+  "jtatman/merged-llama32-1b-uncensored-dolphin-agent": {
+   "revision": "faad0ab262824f2f776c14ac4181a2f9c36fe569",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     484,
+     null
+    ],
+    [
+     "config.json",
+     860,
+     null
+    ],
+    [
+     "generation_config.json",
+     183,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645464,
+     "cdaa2806f12375cdc8f8647c432f03d0646e0ac8642fc395422d117cdd18f823"
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     330,
+     null
+    ]
+   ]
+  },
+  "KidIkaros/Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "6f67c8b7619d2174953e8319060601a7cba128f9",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     5245,
+     null
+    ],
+    [
+     "config.json",
+     967,
+     null
+    ],
+    [
+     "generation_config.json",
+     196,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982344,
+     "9040fddb150928f0f06c56767a8033c1e381e66dc260c0b5b403704f81d27bc0"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085657,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "marx161-cmd/geometric-abliteration-adapters": {
+   "revision": "3fb4e5a021736df466e95f40285e06494f768957",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     50,
+     null
+    ],
+    [
+     "README.md",
+     6288,
+     null
+    ],
+    [
+     "adapters/disinhibition-lora-pure/ABLITERATION_META.json",
+     474,
+     null
+    ],
+    [
+     "adapters/disinhibition-lora-pure/adapter_config.json",
+     349,
+     null
+    ],
+    [
+     "adapters/disinhibition-lora-pure/adapter_model.safetensors",
+     437800,
+     "8ddc8c661f3f3612104795525b2bc3b3a82f85f3d39ef0c618b13d2ae6ee5a63"
+    ],
+    [
+     "adapters/refusal-lora-pure/ABLITERATION_META.json",
+     468,
+     null
+    ],
+    [
+     "adapters/refusal-lora-pure/adapter_config.json",
+     349,
+     null
+    ],
+    [
+     "adapters/refusal-lora-pure/adapter_model.safetensors",
+     437800,
+     "b90e8f05ce56173937076e1c713a39a95b82ecb0e4da8158fd8ac17a77d76b44"
+    ],
+    [
+     "data/README.md",
+     874,
+     null
+    ],
+    [
+     "data/disinhibition_paired_curated_300.jsonl",
+     95749,
+     null
+    ],
+    [
+     "eval/__init__.py",
+     0,
+     null
+    ],
+    [
+     "eval/eval_buckets.json",
+     472,
+     null
+    ],
+    [
+     "merge_adapters.py",
+     2322,
+     null
+    ],
+    [
+     "requirements.txt",
+     108,
+     null
+    ],
+    [
+     "tools/__init__.py",
+     0,
+     null
+    ],
+    [
+     "tools/abliterate_to_lora.py",
+     4638,
+     null
+    ],
+    [
+     "tools/measure_overlap.py",
+     1324,
+     null
+    ]
+   ]
+  },
+  "marx161-cmd/geometric-abliteration-adapters-deepseek-r1-distill-llama32-1b": {
+   "revision": "d01025cc1abadc78ff00ad8a508321c515dd5eff",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     50,
+     null
+    ],
+    [
+     "README.md",
+     3448,
+     null
+    ],
+    [
+     "adapters/disinhibition-lora-pure/ABLITERATION_META.json",
+     825,
+     null
+    ],
+    [
+     "adapters/disinhibition-lora-pure/adapter_config.json",
+     365,
+     null
+    ],
+    [
+     "adapters/disinhibition-lora-pure/adapter_model.safetensors",
+     437800,
+     "95ee36a87495eb9ef782f09c6e3c70a63a93a7d8f19dd72dfc01338ae49842ce"
+    ],
+    [
+     "adapters/refusal-lora-pure/ABLITERATION_META.json",
+     813,
+     null
+    ],
+    [
+     "adapters/refusal-lora-pure/adapter_config.json",
+     365,
+     null
+    ],
+    [
+     "adapters/refusal-lora-pure/adapter_model.safetensors",
+     437800,
+     "9f502bcfca718ab683f0cbdcecb49105bce2edce6ef4acd920fa1b2a1b40bf52"
+    ],
+    [
+     "data/README.md",
+     874,
+     null
+    ],
+    [
+     "eval/__init__.py",
+     0,
+     null
+    ],
+    [
+     "eval/eval_buckets.json",
+     472,
+     null
+    ],
+    [
+     "measurements/purification_report.json",
+     7696,
+     null
+    ],
+    [
+     "measurements/refusal_purification_report.json",
+     7691,
+     null
+    ],
+    [
+     "merge_adapters.py",
+     2322,
+     null
+    ],
+    [
+     "modal-logs/modal-app-ap-6fw1xB0fEcKHNnDY5VHK0H.log",
+     4351,
+     null
+    ],
+    [
+     "modal-logs/modal-app-ap-g74nH1WBB7w4BEcsOTRUxF.log",
+     11618,
+     null
+    ],
+    [
+     "requirements.txt",
+     108,
+     null
+    ],
+    [
+     "tools/__init__.py",
+     0,
+     null
+    ],
+    [
+     "tools/abliterate_to_lora.py",
+     4638,
+     null
+    ],
+    [
+     "tools/measure_overlap.py",
+     1324,
+     null
+    ]
+   ]
+  },
+  "marx161-cmd/Llama-3.2-1B-Double-Abliterated-d2p0-r1p0-RowRestore": {
+   "revision": "1bbcf02c34977e1a0df2b87eeef218e214efac11",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "LICENSE",
+     7669,
+     null
+    ],
+    [
+     "MODEL_CARD_DRAFT.md",
+     1547,
+     null
+    ],
+    [
+     "NOTICE",
+     206,
+     null
+    ],
+    [
+     "README.md",
+     3118,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     894,
+     null
+    ],
+    [
+     "generation_config.json",
+     183,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "ac8fd60b293fa70550b437ec487e05587a50ce6b8a56f0ffc31d35de6cbd5ea4"
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     325,
+     null
+    ]
+   ]
+  },
+  "muhammadrafifatihulihsan/llama32-1b-llm-abliteration": {
+   "revision": "1a49a5a0b51ebd12a9f7414f73a446f49b850626",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1622,
+     null
+    ],
+    [
+     "LICENSE.txt",
+     7669,
+     null
+    ],
+    [
+     "Notice",
+     116,
+     null
+    ],
+    [
+     "README.md",
+     3735,
+     null
+    ],
+    [
+     "artifacts/ablation.safetensors",
+     3006130560,
+     "b0a7eef34f72dc37a48d203542d080fb6b691315730de3c16adcdaa1a465d10f"
+    ],
+    [
+     "artifacts/refusal_dirs.safetensors",
+     188040,
+     "7dedb1ea2721925f35976428bcbf32b1ef18e793bd544c8886f40c4e2f8ee839"
+    ],
+    [
+     "artifacts/screening_results.csv",
+     294,
+     null
+    ],
+    [
+     "artifacts/selected_refusal_dir.safetensors",
+     4184,
+     "2ee725c4828f5b862173f4ee0754571db79411134d974bc88c6daf5af2a068c0"
+    ],
+    [
+     "chat_template.jinja",
+     3920,
+     null
+    ],
+    [
+     "config.json",
+     935,
+     null
+    ],
+    [
+     "gguf/model.gguf",
+     3004931680,
+     "e27cc5a3ec0283b0cb790dd081ef7af50e76522c8b34d3148d762a594dcf092f"
+    ],
+    [
+     "model.safetensors",
+     2996982312,
+     "d12811d9ddde6ae3d0910308dc59cac02d17e16cf7614a129c08274cce83596a"
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     339,
+     null
+    ]
+   ]
+  },
+  "mylesgoose/Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "a2ec81748492b3611caca192812e72e3ff342f35",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     35876,
+     null
+    ],
+    [
+     "USE_POLICY.md",
+     6021,
+     null
+    ],
+    [
+     "config.json",
+     927,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "2c30e94b4930dec9a429cc568af45d5d811edda3eb168c49da6c18b19110da22"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085657,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "mylesgoose/Llama-3.2-1B-Instruct-abliterated2": {
+   "revision": "776afe2fdaf79edc36a1057a4c253dde23a31750",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "USE_POLICY.md",
+     6021,
+     null
+    ],
+    [
+     "chat_template.json",
+     4035,
+     null
+    ],
+    [
+     "config.json",
+     927,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "32086bbf0d80d04357070995dde61a2369d8f13e866abc4de3e02b413b292ec8"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085657,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "mylesgoose/Llama-3.2-1B-Instruct-abliterated3": {
+   "revision": "ff90c1833deb197ac3bfdc64191ad51ae8c7044a",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     35876,
+     null
+    ],
+    [
+     "USE_POLICY.md",
+     6021,
+     null
+    ],
+    [
+     "chat_template.json",
+     4035,
+     null
+    ],
+    [
+     "config.json",
+     927,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "32c8796089b1e7e90d054df382dcb3f4afd3bd16ce6bf8b6cce59a4a3f862c77"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085657,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "Nexesenex/Dolphin3.0-Llama3.1-1B-abliterated": {
+   "revision": "ccf1388ada1a6cde01055d10262b21ed96769ba8",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 921245696,
+    "F16": 314572800
+   },
+   "params_total": 1235818496,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     380,
+     null
+    ],
+    [
+     "config.json",
+     964,
+     null
+    ],
+    [
+     "generation_config.json",
+     240,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471653760,
+     "a9da7ae2261043111348efb21991b3d59a43454237b54c416ad55a85000de8a5"
+    ],
+    [
+     "special_tokens_map.json",
+     467,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210297,
+     "cca43616769fed4807470fb41ccf7f5eebdd08624e7b9adafc09d99332cf31eb"
+    ],
+    [
+     "tokenizer_config.json",
+     53309,
+     null
+    ]
+   ]
+  },
+  "NexesMess/Llama_3.2_1b_Abliteratest_SCE": {
+   "revision": "c8eafbd5a4f0e00e4136f4b8540e27814823302a",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498499072
+   },
+   "params_total": 1498499072,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     2092,
+     null
+    ],
+    [
+     "config.json",
+     938,
+     null
+    ],
+    [
+     "mergekit_config.yml",
+     872,
+     null
+    ],
+    [
+     "model.safetensors",
+     2997015112,
+     "bb959894129becba4cd5a6b25f6763361557e01baa8deb414bdb39cd8cd21a01"
+    ],
+    [
+     "special_tokens_map.json",
+     439,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210837,
+     "23a451f5268f9a1483a05930b6d933bfc52aceb1386ff492f50edbdebc43278f"
+    ],
+    [
+     "tokenizer_config.json",
+     51684,
+     null
+    ]
+   ]
+  },
+  "nicoboss/Llama-3.2-1B-Instruct-Uncensored": {
+   "revision": "ae20a62a975dfbe9843a790f28f789a259b4154b",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5512,
+     null
+    ],
+    [
+     "config.json",
+     889,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "cc7f465e8f89cf99d07b4c575ebca1fec05e14d4c4954108a9d520356014c18c"
+    ],
+    [
+     "special_tokens_map.json",
+     444,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     51040,
+     null
+    ]
+   ]
+  },
+  "nicoboss/Llama-3.2-1B-Instruct-Uncensored-Lora": {
+   "revision": "c82cb1a47dbc5dddb1cb80bad3b1ba8563458ce0",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1834,
+     null
+    ],
+    [
+     "README.md",
+     5513,
+     null
+    ],
+    [
+     "adapter_config.json",
+     729,
+     null
+    ],
+    [
+     "adapter_model.safetensors",
+     90207248,
+     "c0a427c367308079b9fa9ff81abeaf446296f64c969a7543028cdfc5dba18304"
+    ],
+    [
+     "checkpoint-117/README.md",
+     5101,
+     null
+    ],
+    [
+     "checkpoint-117/adapter_config.json",
+     729,
+     null
+    ],
+    [
+     "checkpoint-117/adapter_model.safetensors",
+     90207248,
+     "ff5f9cb9a17dd4ae85848b60566c0c5afb2f1718c6cdec87672eab2fb033e41d"
+    ],
+    [
+     "checkpoint-117/optimizer.pt",
+     46057082,
+     "d0a84a8c016f3ff0a8991a68a02ca3493a2257ac46fa86487358ad49df019b71"
+    ],
+    [
+     "checkpoint-117/rng_state.pth",
+     14244,
+     "c2c38f5fa0ef62a8b438fd1222e398986c3115e57b41b0ecb51fbfcca6d26032"
+    ],
+    [
+     "checkpoint-117/scheduler.pt",
+     1064,
+     "2e6bb887f60ead14806ab781b36a2d2c6f0961c257f4780e647407683f4efc61"
+    ],
+    [
+     "checkpoint-117/special_tokens_map.json",
+     444,
+     null
+    ],
+    [
+     "checkpoint-117/tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "checkpoint-117/tokenizer_config.json",
+     51040,
+     null
+    ],
+    [
+     "checkpoint-117/trainer_state.json",
+     20856,
+     null
+    ],
+    [
+     "checkpoint-117/training_args.bin",
+     6200,
+     "f9c808f6ec67547ffc25e425768bac91068256414f8730443120d2ab7c48580d"
+    ],
+    [
+     "checkpoint-234/README.md",
+     5101,
+     null
+    ],
+    [
+     "checkpoint-234/adapter_config.json",
+     729,
+     null
+    ],
+    [
+     "checkpoint-234/adapter_model.safetensors",
+     90207248,
+     "7d8793d41d73d30021302f3e94e2a1d96164cb7903a898291309e7f263bccdab"
+    ],
+    [
+     "checkpoint-234/optimizer.pt",
+     46057082,
+     "1caeb2513058c9010f4bcaa9ea90b6ba8972367a608010ddcb1571df77d754ef"
+    ],
+    [
+     "checkpoint-234/rng_state.pth",
+     14244,
+     "e0b5fa8d3f7d4cfcfd1e171173fed7fc09f61fd555735bebdc905f416b886b35"
+    ],
+    [
+     "checkpoint-234/scheduler.pt",
+     1064,
+     "997057b731bc65f59ea4d3bb39f1828f4d4670db8a01f052c60d232d4e8dfea7"
+    ],
+    [
+     "checkpoint-234/special_tokens_map.json",
+     444,
+     null
+    ],
+    [
+     "checkpoint-234/tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "checkpoint-234/tokenizer_config.json",
+     51040,
+     null
+    ],
+    [
+     "checkpoint-234/trainer_state.json",
+     41180,
+     null
+    ],
+    [
+     "checkpoint-234/training_args.bin",
+     6200,
+     "f9c808f6ec67547ffc25e425768bac91068256414f8730443120d2ab7c48580d"
+    ],
+    [
+     "checkpoint-351/README.md",
+     5101,
+     null
+    ],
+    [
+     "checkpoint-351/adapter_config.json",
+     729,
+     null
+    ],
+    [
+     "checkpoint-351/adapter_model.safetensors",
+     90207248,
+     "77b859d3bf9bd9ff4ea6083493db600ac3b941f6c6a65738facb1fceed390ff3"
+    ],
+    [
+     "checkpoint-351/optimizer.pt",
+     46057338,
+     "a9d627d328a96cbcbc922d2c97163423f36d187b31f7321a25612a53c25508d6"
+    ],
+    [
+     "checkpoint-351/rng_state.pth",
+     14244,
+     "3dddceeee0c17513e1c791653ce29078f7ad3814cb2725531ab776ee65c552a2"
+    ],
+    [
+     "checkpoint-351/scheduler.pt",
+     1064,
+     "454dfa8bbb56ee568c79ad1c952ebecb5c624e8574cf9b37d1ca345031d56714"
+    ],
+    [
+     "checkpoint-351/special_tokens_map.json",
+     444,
+     null
+    ],
+    [
+     "checkpoint-351/tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "checkpoint-351/tokenizer_config.json",
+     51040,
+     null
+    ],
+    [
+     "checkpoint-351/trainer_state.json",
+     61357,
+     null
+    ],
+    [
+     "checkpoint-351/training_args.bin",
+     6200,
+     "f9c808f6ec67547ffc25e425768bac91068256414f8730443120d2ab7c48580d"
+    ],
+    [
+     "checkpoint-468/README.md",
+     5101,
+     null
+    ],
+    [
+     "checkpoint-468/adapter_config.json",
+     729,
+     null
+    ],
+    [
+     "checkpoint-468/adapter_model.safetensors",
+     90207248,
+     "c0a427c367308079b9fa9ff81abeaf446296f64c969a7543028cdfc5dba18304"
+    ],
+    [
+     "checkpoint-468/optimizer.pt",
+     46057338,
+     "30f89df6b71dc629976a7f2148634d8c7c98c1ac9b7bd40b7630e2af8becd69d"
+    ],
+    [
+     "checkpoint-468/rng_state.pth",
+     14244,
+     "4b08c25fff3b1d22d82c741eadbe633993c881a7e4c8dcd4fb1d1ed6649e8039"
+    ],
+    [
+     "checkpoint-468/scheduler.pt",
+     1064,
+     "2d9d5bc4bd8cbd6ad2f885036e809b26ec312eff058ed18571dab24711118e2c"
+    ],
+    [
+     "checkpoint-468/special_tokens_map.json",
+     444,
+     null
+    ],
+    [
+     "checkpoint-468/tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "checkpoint-468/tokenizer_config.json",
+     51040,
+     null
+    ],
+    [
+     "checkpoint-468/trainer_state.json",
+     81569,
+     null
+    ],
+    [
+     "checkpoint-468/training_args.bin",
+     6200,
+     "f9c808f6ec67547ffc25e425768bac91068256414f8730443120d2ab7c48580d"
+    ],
+    [
+     "config.json",
+     889,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     444,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     51040,
+     null
+    ]
+   ]
+  },
+  "Novaciano/ABLITERATED-FuseBench-3.2-1B": {
+   "revision": "fc4f980c600063f7b00cc916947e1fddf30682a0",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1616,
+     null
+    ],
+    [
+     "config.json",
+     932,
+     null
+    ],
+    [
+     "mergekit_config.yml",
+     293,
+     null
+    ],
+    [
+     "model-00001-of-00004.safetensors",
+     525336704,
+     "b696acab9ce2fd8eb5bc51a8444db95c03e6612cbbf7d14da50b657254ee7bcb"
+    ],
+    [
+     "model-00002-of-00004.safetensors",
+     993038128,
+     "8a67930721643854c6220133320f00a6cddbcb017f56e85f6f8a46877e3b85e7"
+    ],
+    [
+     "model-00003-of-00004.safetensors",
+     992031192,
+     "e7b64f4a30abb333b47fe38d51f8056a7f2d46ac0057c6976737c2fd50591919"
+    ],
+    [
+     "model-00004-of-00004.safetensors",
+     486576120,
+     "003553052d9845539da64788d2fbc80c654301baff9975c272fe31b643b63b57"
+    ],
+    [
+     "model.safetensors.index.json",
+     11457,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     439,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17208712,
+     "ade1dac458f86f9bea8bf35b713f14e1bbed24228429534038e9f7e54ea3e8b6"
+    ],
+    [
+     "tokenizer_config.json",
+     51024,
+     null
+    ]
+   ]
+  },
+  "Novaciano/Judas-The-Uncensored-3.2-1B": {
+   "revision": "04281c0b6bfd9fcf3e5cf47cd203e6651f0f4fef",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     2442,
+     null
+    ],
+    [
+     "config.json",
+     938,
+     null
+    ],
+    [
+     "mergekit_config.yml",
+     462,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982344,
+     "50f06e3a66b331556c1b10349052b7e1126390830daef84f5d99734f98525c07"
+    ],
+    [
+     "special_tokens_map.json",
+     439,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210084,
+     "65ff5472d095ccd9332d9e723153d7bc7226cb6be9c1bffda738b5ba2e71bf26"
+    ],
+    [
+     "tokenizer_config.json",
+     51070,
+     null
+    ]
+   ]
+  },
+  "Novaciano/Uncensored_Kali-3.2-1B": {
+   "revision": "4bec1e1723c95c7e2703959c9dffb31ebc81d32c",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1187,
+     null
+    ],
+    [
+     "config.json",
+     866,
+     null
+    ],
+    [
+     "mergekit_config.yml",
+     424,
+     null
+    ],
+    [
+     "model-00001-of-00004.safetensors",
+     525336712,
+     "d36fef000d013936684c2f5f0b1e020ecd6656d63721c572400238832bc7d53d"
+    ],
+    [
+     "model-00002-of-00004.safetensors",
+     993038112,
+     "2292b5ed5e2a16aba7bb3603279757106bf414ffba2a65aeb6034ed54517d954"
+    ],
+    [
+     "model-00003-of-00004.safetensors",
+     992031192,
+     "d978697993397fe090eff4c0c1923b153a88909d2f13c8bac392cfde71abf0e1"
+    ],
+    [
+     "model-00004-of-00004.safetensors",
+     486576120,
+     "7cd276c8ee78d33bc56ec60e957c9ddb5d073b7a66ca6fa44408b21dc7a7fcbd"
+    ],
+    [
+     "model.safetensors.index.json",
+     11457,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     439,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     51210,
+     null
+    ]
+   ]
+  },
+  "Novaciano/Uncensored_Varuna-3.2-1B": {
+   "revision": "33a21f6219e54fb253472c9e7a7ba552279ac317",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1201,
+     null
+    ],
+    [
+     "config.json",
+     866,
+     null
+    ],
+    [
+     "mergekit_config.yml",
+     438,
+     null
+    ],
+    [
+     "model-00001-of-00004.safetensors",
+     525336712,
+     "226fd2e37e11f0df5e2383cfabf4572a79c316872b5f95e1928a647b98d881cd"
+    ],
+    [
+     "model-00002-of-00004.safetensors",
+     993038112,
+     "c79fb6d74f8969c54a08a3ab2fb1dff71e849eefeb8a89da3251e3192448625e"
+    ],
+    [
+     "model-00003-of-00004.safetensors",
+     992031192,
+     "df047b5dd37d464106e9ed20ba848c1c45689391cddf803f4df196fdcf486996"
+    ],
+    [
+     "model-00004-of-00004.safetensors",
+     486576120,
+     "573f514cb58af1c5f7d3a2bff77417d83b6f8425a7ab656a2da17120b376106f"
+    ],
+    [
+     "model.safetensors.index.json",
+     11457,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     325,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     50554,
+     null
+    ]
+   ]
+  },
+  "nztinversive/llama3.2-1b-Uncensored": {
+   "revision": "8476a52a886675eb4008b0ed631223c5b6a6fb73",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     3848,
+     null
+    ],
+    [
+     "config.json",
+     884,
+     null
+    ],
+    [
+     "generation_config.json",
+     180,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "8843466d1687b0a713850cb18ffc494da22ffaedc36c9091114238b36809873e"
+    ],
+    [
+     "special_tokens_map.json",
+     335,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085826,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     50534,
+     null
+    ]
+   ]
+  },
+  "P3lte/llama32-1b-abliterated-rp": {
+   "revision": "bac15a0c80e123e018d0915693df387adfa88207",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1633,
+     null
+    ],
+    [
+     "abliterated/abliteration_metadata.json",
+     2636,
+     null
+    ],
+    [
+     "abliterated/chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "abliterated/config.json",
+     887,
+     null
+    ],
+    [
+     "abliterated/generation_config.json",
+     234,
+     null
+    ],
+    [
+     "abliterated/model-00001-of-00002.safetensors",
+     1997648360,
+     "eadc36d2b71e771d35653fb3369a0912cfd2a6050bc2bde8875f7ac5bace86e3"
+    ],
+    [
+     "abliterated/model-00002-of-00002.safetensors",
+     473997056,
+     "e8267f3dbd687e2a82234e48925f01c25e5ec95f29311f61d859cac2931a0847"
+    ],
+    [
+     "abliterated/model.safetensors.index.json",
+     12039,
+     null
+    ],
+    [
+     "abliterated/tokenizer.json",
+     17210197,
+     "7dde87b223ab373d832dc5f50088c7014ccd067cfa43ae701824b332b82b13d5"
+    ],
+    [
+     "abliterated/tokenizer_config.json",
+     416,
+     null
+    ],
+    [
+     "abliteration_metadata.json",
+     2636,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     887,
+     null
+    ],
+    [
+     "generation_config.json",
+     234,
+     null
+    ],
+    [
+     "model-00001-of-00002.safetensors",
+     1997648360,
+     "eadc36d2b71e771d35653fb3369a0912cfd2a6050bc2bde8875f7ac5bace86e3"
+    ],
+    [
+     "model-00002-of-00002.safetensors",
+     368312320,
+     "5328fe63570a16ab034a4bc3be2695270504126f65c8c19d38d3c395db16c8b7"
+    ],
+    [
+     "model.safetensors.index.json",
+     12039,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210197,
+     "7dde87b223ab373d832dc5f50088c7014ccd067cfa43ae701824b332b82b13d5"
+    ],
+    [
+     "tokenizer_config.json",
+     416,
+     null
+    ]
+   ]
+  },
+  "rbc33/Llama-3.2-1B-Instruct-Abliterated": {
+   "revision": "d1420ce0298071b10ac15e9d6ea7b9f20056766d",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "config.json",
+     927,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982344,
+     "aa19a1779830934ec746cc4920687463e497ba1b92446d91873b55a5cf404a24"
+    ]
+   ]
+  },
+  "RichardErkhov/huihui-ai_-_Llama-3.2-1B-Instruct-abliterated-awq": {
+   "revision": "e49518b606eca8492cca1c59f0cb4f9752ff9331",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 262735872,
+    "I32": 973078528
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1740,
+     null
+    ],
+    [
+     "config.json",
+     1107,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     1031057832,
+     "a81ae6341595a3f23aed86e7569be34783a03b48abefb2b84c23d1f53c9baa98"
+    ],
+    [
+     "special_tokens_map.json",
+     439,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     54661,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/KidIkaros_-_Llama-3.2-1B-Instruct-abliterated-awq": {
+   "revision": "4e9eb506be7d6ef2472166217c339ec98429179f",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 262735872,
+    "I32": 973078528
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5652,
+     null
+    ],
+    [
+     "config.json",
+     1107,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     1031057832,
+     "205a842b75052b9994612514e3898fc2d7bc79da50974ba2864b41feb6119c80"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/mylesgoose_-_Llama-3.2-1B-Instruct-abliterated-awq": {
+   "revision": "20e6e2b20e430087361aca410675c3603719e9c2",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 262735872,
+    "I32": 973078528
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     36285,
+     null
+    ],
+    [
+     "config.json",
+     1107,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     1031057832,
+     "ec600aaa01c9766148289e22976925f7629d4e978619d9d9e97fbf2d5178c3dc"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/mylesgoose_-_Llama-3.2-1B-Instruct-abliterated3-awq": {
+   "revision": "4b2fc39efdbf3215ca7823137f58e6771e86e7ba",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 262735872,
+    "I32": 973078528
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     36287,
+     null
+    ],
+    [
+     "config.json",
+     1108,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     1031057832,
+     "c31ed447174c671c80f133ce2f86606504655884b53aa59b52ec886ab9cc46bd"
+    ],
+    [
+     "special_tokens_map.json",
+     296,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     54528,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/nztinversive_-_llama3.2-1b-Uncensored-awq": {
+   "revision": "386ff8afceeca953ccbebdf8361c464738710650",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 262735872,
+    "I32": 973078528
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     4239,
+     null
+    ],
+    [
+     "config.json",
+     1062,
+     null
+    ],
+    [
+     "generation_config.json",
+     180,
+     null
+    ],
+    [
+     "model.safetensors",
+     1031057832,
+     "5197f5775e1c327eb87e2e51d6888ff4f81158d70847d6cc03e2c511c477b567"
+    ],
+    [
+     "special_tokens_map.json",
+     449,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     50638,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/Vikhrmodels_-_Vikhr-Llama-3.2-1B-Instruct-abliterated-awq": {
+   "revision": "914e4d8e7ca863d0cf72a5110bf57d1e189f7d43",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 262735872,
+    "I32": 973078528
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     7468,
+     null
+    ],
+    [
+     "config.json",
+     1113,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     1031057832,
+     "25f9df54aa6a07655e28f58a882bc149fde6687991ad165271a52048f44ae3ee"
+    ],
+    [
+     "special_tokens_map.json",
+     457,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     54764,
+     null
+    ]
+   ]
+  },
+  "sbussiso/Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "d2bbc9553ad8df9dbd561c11077bf553c1dd2f58",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1638,
+     null
+    ],
+    [
+     "README.md",
+     7636,
+     null
+    ],
+    [
+     "charts/benign_preservation.png",
+     73115,
+     null
+    ],
+    [
+     "charts/layer_coherence.png",
+     76484,
+     null
+    ],
+    [
+     "charts/mmlu_guardrail.png",
+     63272,
+     null
+    ],
+    [
+     "charts/refusal_by_condition.png",
+     83475,
+     "ac4ad87673876a5c1c34b2eaed2ec25e41f885955b88e206e6a50330e437d1d6"
+    ],
+    [
+     "chat_template.jinja",
+     3827,
+     null
+    ],
+    [
+     "config.json",
+     895,
+     null
+    ],
+    [
+     "eval/mmlu/mmlu_log.txt",
+     10286,
+     null
+    ],
+    [
+     "eval/mmlu/mmlu_summary.json",
+     877,
+     null
+    ],
+    [
+     "eval/probes_baseline.json",
+     87593,
+     null
+    ],
+    [
+     "eval/probes_hook_ablated.json",
+     104310,
+     null
+    ],
+    [
+     "eval/probes_wd_B.json",
+     127638,
+     null
+    ],
+    [
+     "eval/probes_wd_BN.json",
+     127761,
+     null
+    ],
+    [
+     "eval/probes_wd_ML.json",
+     100202,
+     null
+    ],
+    [
+     "eval/rebuild_evidence.json",
+     526,
+     null
+    ],
+    [
+     "eval/selection.json",
+     788,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "gpu_native/config.json",
+     895,
+     null
+    ],
+    [
+     "gpu_native/generation_config.json",
+     184,
+     null
+    ],
+    [
+     "gpu_native/model.safetensors",
+     2996982200,
+     "cb9ad4d09bb787ac0bbe77966afa06a1e82e23535b0f02beec7d7870618bcc21"
+    ],
+    [
+     "make_card_charts.py",
+     6703,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982200,
+     "cb9ad4d09bb787ac0bbe77966afa06a1e82e23535b0f02beec7d7870618bcc21"
+    ],
+    [
+     "refusal_direction_A.npy",
+     8320,
+     "36f5a3661ada85be73b953463f35b70b5b1efedf7f7ec0b1910867b3ab53e805"
+    ],
+    [
+     "refusal_direction_B.npy",
+     8320,
+     "94adc9777362b34ba4f8270edaee54580639f24111214fb6a726210073eabe59"
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     324,
+     null
+    ]
+   ]
+  },
+  "ShantanuT01/Llama-3.2-1B-Instruct-abliterated-sci_gen-finetuned": {
+   "revision": "7358c515750467c6bb3d0fc0aaf22a73c6f560f0",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F32": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     24,
+     null
+    ],
+    [
+     "config.json",
+     977,
+     null
+    ],
+    [
+     "generation_config.json",
+     196,
+     null
+    ],
+    [
+     "model.safetensors",
+     4943274328,
+     "a1b8e70f9dc0f970d59a9454ce43771441ebdef87464d7b615ae35ddb7da1e33"
+    ],
+    [
+     "special_tokens_map.json",
+     462,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210084,
+     "65ff5472d095ccd9332d9e723153d7bc7226cb6be9c1bffda738b5ba2e71bf26"
+    ],
+    [
+     "tokenizer_config.json",
+     56755,
+     null
+    ]
+   ]
+  },
+  "ShantanuT01/Llama-3.2-1B-Instruct-abliterated-wp-finetuned": {
+   "revision": "a3109d80c1b2bb7e9b2fa893f8000fdd10ba15f1",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F32": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     24,
+     null
+    ],
+    [
+     "config.json",
+     977,
+     null
+    ],
+    [
+     "generation_config.json",
+     196,
+     null
+    ],
+    [
+     "model.safetensors",
+     4943274328,
+     "9e5730cc8ff5702571bb78495d4c793cf35ef75e4a675f8448ece7586447c209"
+    ],
+    [
+     "special_tokens_map.json",
+     462,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210084,
+     "65ff5472d095ccd9332d9e723153d7bc7226cb6be9c1bffda738b5ba2e71bf26"
+    ],
+    [
+     "tokenizer_config.json",
+     56755,
+     null
+    ]
+   ]
+  },
+  "ShantanuT01/Llama-3.2-1B-Instruct-abliterated-yelp-finetuned": {
+   "revision": "a6c62703e7b7de17b2668a4d8210d3e9c5c7f985",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F32": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     156,
+     null
+    ],
+    [
+     "config.json",
+     977,
+     null
+    ],
+    [
+     "generation_config.json",
+     196,
+     null
+    ],
+    [
+     "model.safetensors",
+     4943274328,
+     "f0e9069e6c400ba1ecebfa5443c8353fa4ae5b2cf14aab2212cb8f6ce2e897f1"
+    ],
+    [
+     "special_tokens_map.json",
+     462,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210084,
+     "65ff5472d095ccd9332d9e723153d7bc7226cb6be9c1bffda738b5ba2e71bf26"
+    ],
+    [
+     "tokenizer_config.json",
+     56755,
+     null
+    ]
+   ]
+  },
+  "ShuoGZ/llama-3.2-1B-Instruct-abliterated": {
+   "revision": "1b512688b40c8dadb711386c56e6c069ec68c882",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "config.json",
+     927,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982344,
+     "63e309b9b47c65ae4c7d1fca67acbebd6e5f2a52d4d6b8ab112ecfea2a9d0b04"
+    ],
+    [
+     "special_tokens_map.json",
+     301,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085657,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     50500,
+     null
+    ]
+   ]
+  },
+  "STARSPIKE/Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "473eae6b569000083743332bc7d137912be67428",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1498482688
+   },
+   "params_total": 1498482688,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "LICENSE.txt",
+     7712,
+     null
+    ],
+    [
+     "README.md",
+     1508,
+     null
+    ],
+    [
+     "USE_POLICY.md",
+     6021,
+     null
+    ],
+    [
+     "config.json",
+     877,
+     null
+    ],
+    [
+     "eval.sh",
+     1198,
+     null
+    ],
+    [
+     "generation_config.json",
+     189,
+     null
+    ],
+    [
+     "model.safetensors",
+     2996982344,
+     "f208564e4cc940e903ce6597030c366f574011066384d7e51e3ebf4eff1f48fb"
+    ],
+    [
+     "special_tokens_map.json",
+     325,
+     null
+    ],
+    [
+     "tokenizer.json",
+     9085821,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     54557,
+     null
+    ]
+   ]
+  },
+  "Vikhrmodels/Vikhr-Llama-3.2-1B-Instruct-abliterated": {
+   "revision": "c3f53f48b63b2ed1e4cf9222e58e909c05706621",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "F16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     7045,
+     null
+    ],
+    [
+     "config.json",
+     944,
+     null
+    ],
+    [
+     "generation_config.json",
+     184,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645464,
+     "a9e6500ec769864eb310878f05445aa9dcd602d0e4cabf5c8c742384b5435d85"
+    ],
+    [
+     "special_tokens_map.json",
+     457,
+     null
+    ],
+    [
+     "tokenizer.json",
+     17210019,
+     "f2f90a0ee1b41702c7b233b02234294a53bc0684a08d3bcd8c8ff702e9a12f64"
+    ],
+    [
+     "tokenizer_config.json",
+     54677,
+     null
+    ]
+   ]
+  },
+  "vs4vijay/Llama-3.2-1B-uncensored": {
+   "revision": "45201be59fbda0ed68ba2ccfabb6d1e3ecb01396",
+   "erro": null,
+   "architectures": [
+    "LlamaForCausalLM"
+   ],
+   "model_type": "llama",
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     42609,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     1361,
+     null
+    ],
+    [
+     "config.json",
+     860,
+     null
+    ],
+    [
+     "generation_config.json",
+     179,
+     null
+    ],
+    [
+     "model.safetensors",
+     2471645608,
+     "1b7a304fd2ec396f266794e847eca0300d286ae070a250ce9d56704684f560d1"
+    ],
+    [
+     "tokenizer.json",
+     17210089,
+     "849c7a8f7db3c85f7ab0a8228f72f5d6f2e771af657bda892b6b54a86aca12a0"
+    ],
+    [
+     "tokenizer_config.json",
+     363,
+     null
+    ]
+   ]
+  },
+  "xdrshjr/llama3.2_1b_uncensored_5000_8epoch_lora": {
+   "revision": "f3cde5c817e7bf4e6e39cdad4141fbd311d50177",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": {
+    "BF16": 1235814400
+   },
+   "params_total": 1235814400,
+   "files": [
+    [
+     ".gitattributes",
+     1613,
+     null
+    ],
+    [
+     "README.md",
+     1041,
+     null
+    ],
+    [
+     "config.json",
+     927,
+     "888bd49602997d62bec43d571016b3b4b06eca61678374fb01f6c33fc1cf831f"
+    ],
+    [
+     "generation_config.json",
+     184,
+     "89c8864a358b71da10de929109451fc9ad6a6facfda6bf09918ea54c8dd64bf4"
+    ],
+    [
+     "model-00001-of-00002.safetensors",
+     1997648472,
+     "bce64e6bbaed282f91de649359a07a2545a2ac09117cb08ff0966ee8f8e17343"
+    ],
+    [
+     "model-00002-of-00002.safetensors",
+     473997096,
+     "3657a88a8a7add879e8724404f7c215de957020bb379b51d4fa2100f013f9fa9"
+    ],
+    [
+     "model.safetensors.index.json",
+     12003,
+     "a2807004134bcb4f726e56cd6a9a60f499e9a047116729f3572397d968970623"
+    ],
+    [
+     "special_tokens_map.json",
+     325,
+     "1b1835caa5b4d70acaa210fa222b0036f1882f9525c4660fd4810fb3e1e40ff8"
+    ],
+    [
+     "tokenizer.json",
+     17209920,
+     "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    ],
+    [
+     "tokenizer_config.json",
+     51214,
+     "3730cbad120c09daa24c5c72213d02b71bf0b2c21a6012aea48322617b00cdf1"
+    ]
+   ]
+  },
+  "123yaroslav/Qwen2.5-0.5B-abliterated-dpo-ru": {
+   "revision": "223c6fde9d743f8a2c47e36c0ba6d3efeb019479",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5262,
+     null
+    ],
+    [
+     "adapter_config.json",
+     1111,
+     null
+    ],
+    [
+     "adapter_model.safetensors",
+     35237104,
+     "b357e4b6f1b54a5372b655df93d094dbb8913576b338f05b7081aac143ec17ba"
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "optimizer.pt",
+     70668243,
+     "1737844d6a1411f9d3b41ab4baf04c4e212033a599e1904d2e77d76ab2b55da4"
+    ],
+    [
+     "rng_state.pth",
+     14645,
+     "480389ce7f683504c393112df2c8045b3bbba2e7bfbed923d3dbd1ed09e2f087"
+    ],
+    [
+     "scheduler.pt",
+     1465,
+     "ac7614fd543a9fe03627da6afc30df7d352267fcd2444a0882898ce4ab3b89cc"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     4686,
+     null
+    ],
+    [
+     "trainer_state.json",
+     8969,
+     null
+    ],
+    [
+     "training_args.bin",
+     6673,
+     "02d243dc657cba7f61ccfe00e87780acbb55981c4dc03ccb7e10e0af08218eee"
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "123yaroslav/Qwen2.5-0.5B-Instruct-abliterated-ru": {
+   "revision": "0abdc3cb1d618d461a8a10586a6b577e2e45cf38",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F32": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1232,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1976163472,
+     "4f06ada500d6f97b30c7bd60012daa578e2f66c72d3b0b00aee9348881de4b4d"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422063,
+     "5eee858c5123a4279c3e1f7b81247343f356ac767940b2692a928ad929543214"
+    ],
+    [
+     "tokenizer_config.json",
+     4790,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "3MPER0RR/Qwen2.5-0.5B-Instruct-3MPER0RR-abliterated": {
+   "revision": "b0988bbd6f8d8a4006f0e6a681505490e589993d",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "Disclaimer.md",
+     343,
+     null
+    ],
+    [
+     "License",
+     10394,
+     null
+    ],
+    [
+     "README.md",
+     1226,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1284,
+     null
+    ],
+    [
+     "generation_config.json",
+     142,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "24d682a202dca11caefe9bce9ca49fc081ef94f4b07a87d155922737d96f86d5"
+    ],
+    [
+     "tokenizer.json",
+     11422059,
+     "f7f96da3a872b5e901575b2067c744ad336c3a3d77a21584d20024557b1bd7f0"
+    ],
+    [
+     "tokenizer_config.json",
+     694,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "aizerocoderai/qwen2.5-0.5b-abliterated-v2-ru": {
+   "revision": "ce735afbbb2f2c8dd5a6b762763c761050dc9433",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1283,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "17cca68bca9baea5027c3a79c5f3d94aedd5232a7c2e8b686ba51726d2addffc"
+    ],
+    [
+     "tokenizer.json",
+     11421892,
+     "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    ],
+    [
+     "tokenizer_config.json",
+     665,
+     null
+    ]
+   ]
+  },
+  "alperiox/Qwen2.5-0.5B-Instruct-arithmetic-abliterated": {
+   "revision": "07128891e19637737cf2f5bd4905df2e57eff2b1",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     832,
+     null
+    ],
+    [
+     "abliteration_metadata.json",
+     320,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1283,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "ba37e299e0472a49a7e55db0e145686102312587324cfc86f88685fa0dc37c0f"
+    ],
+    [
+     "tokenizer.json",
+     11422157,
+     "15d7386626af6807e620f921cdb061142cd4ba49a99650ab6c70048c9c4290d9"
+    ],
+    [
+     "tokenizer_config.json",
+     665,
+     null
+    ]
+   ]
+  },
+  "artemds45/itmo-nlp-hw6-qwen2-5-0-5b-abliterated": {
+   "revision": "c82915c462a11e6c413843fd470ed6a8450af6bd",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     390,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1284,
+     null
+    ],
+    [
+     "dpo_lora_adapter/README.md",
+     381,
+     null
+    ],
+    [
+     "dpo_lora_adapter/adapter_config.json",
+     1151,
+     null
+    ],
+    [
+     "dpo_lora_adapter/adapter_model.safetensors",
+     17640808,
+     "ef2be6ac95efe9fa9186c4e86654a34b27cfcdbc91e59ee4e9f984f4310a37be"
+    ],
+    [
+     "dpo_lora_adapter/chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "dpo_lora_adapter/tokenizer.json",
+     11421892,
+     "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    ],
+    [
+     "dpo_lora_adapter/tokenizer_config.json",
+     690,
+     null
+    ],
+    [
+     "dpo_lora_adapter/training_args.bin",
+     5841,
+     "40fe51ab4e9691c267b5794e05a59a7bab06806cae95819525727734712bbb96"
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "45593d0c18dd93ffb92fd8cdf5854fb367dfafd61313f3013e3f10f2f197824d"
+    ],
+    [
+     "tokenizer.json",
+     11422157,
+     "5736bd64e7c0b0f47d8e2750ef4969bfa1c72a148a594dcb4de7734cdbee7fb6"
+    ],
+    [
+     "tokenizer_config.json",
+     690,
+     null
+    ]
+   ]
+  },
+  "aspnmrv/qwen25-05b-abliterated": {
+   "revision": "dd64b55a2e95af8ca5c76222d7c2ee0e9c9cdd09",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1282,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "dc744aa088a064bdfca00ca79690f4e02deb71fecccde3bfa1fe336940b854c2"
+    ],
+    [
+     "tokenizer.json",
+     11422157,
+     "6fc1fcf7fc83fe523e15880b3445831191c3bc608af1369077ab6d7ac882e508"
+    ],
+    [
+     "tokenizer_config.json",
+     694,
+     null
+    ]
+   ]
+  },
+  "Bradarr/Qwen2.5-0.5B-Instruct-abliterated": {
+   "revision": "e303569ae7efb8bde9ac408ec479e96184c3265a",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     730,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "719903f0bcf63512a040afa3fe57b4eb5ce9fb6c4789b6c4076012d4f83882b1"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     7336,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "braindao/Qwen2.5-0.5B-Instruct-Uncensored": {
+   "revision": "29e50849135c7a45349fcb0b24d5c8dc11587187",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     731,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "b237c7ca35a052382d01dfa10af37a87097e0e46d735287bf222f134b0f70427"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     7336,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "bruhwalkk/Qwen2.5-0.5B-Instruct-abliterated-ru": {
+   "revision": "129dcc34b24205339d7662d6057f279dfe68b604",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 370169728,
+    "F32": 259997696
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1282,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     1780362824,
+     "b89ce04d7693991daf14e9c4ed465a11789c6715c7efda3268257650ab43c436"
+    ],
+    [
+     "tokenizer.json",
+     11422059,
+     "f7f96da3a872b5e901575b2067c744ad336c3a3d77a21584d20024557b1bd7f0"
+    ],
+    [
+     "tokenizer_config.json",
+     694,
+     null
+    ]
+   ]
+  },
+  "bruhwalkk/Qwen2.5-0.5B-Instruct-abliterated-ru-dpo-lora": {
+   "revision": "9519c087059fb8a20f140d88401cbba524d711e4",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "adapter_config.json",
+     1125,
+     null
+    ],
+    [
+     "adapter_model.safetensors",
+     17640808,
+     "e2f6f17fd6387b6c05e74ffee8f89f7d95b1910a2217f65ee3e2ffa94dbfc1a6"
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "ref/adapter_config.json",
+     1125,
+     null
+    ],
+    [
+     "ref/adapter_model.safetensors",
+     35237104,
+     "efc2dda3ae424346169288d38e09ee02204ddcc8bed4c8409dec16171cd0c815"
+    ],
+    [
+     "tokenizer.json",
+     11421892,
+     "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    ],
+    [
+     "tokenizer_config.json",
+     798,
+     null
+    ]
+   ]
+  },
+  "caveiro/qwen2.5-0.5b-abliterated-ru": {
+   "revision": "c56be140ce7eb5a622682b3300ab104e157c43c6",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1284,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "ecb89a72f051be61e3fc6d912289b04ccb9364fb33ad669ce327ea67f1b22851"
+    ],
+    [
+     "tokenizer.json",
+     11421892,
+     "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    ],
+    [
+     "tokenizer_config.json",
+     664,
+     null
+    ]
+   ]
+  },
+  "Emmet-Allen/christAIn-uncensored": {
+   "revision": "f198097deeac30314b4c5a2ada2ce1edc5ef1465",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1632,
+     null
+    ],
+    [
+     "README.md",
+     4733,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2695,
+     null
+    ],
+    [
+     "christAin-uncensored.gguf",
+     994156864,
+     "f83dee71ac4ef744a557853c9078ef7ef0f11703132b72d40f0316b14f4fb686"
+    ],
+    [
+     "config.json",
+     1277,
+     null
+    ],
+    [
+     "generation_config.json",
+     160,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "bda75abe7e8c5456880388fe021b056596f062b2e81264b03517266be73b0d5e"
+    ],
+    [
+     "special_tokens_map.json",
+     759,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     4697,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "goblinModeMan/Qwen2.5-0.5B-Instruct-abliterated-v3": {
+   "revision": "b790b7db72755c11fbed9246e9eb59e50a18a59f",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "LICENSE",
+     11343,
+     null
+    ],
+    [
+     "README.md",
+     6124,
+     null
+    ],
+    [
+     "TestPassed.jsonl",
+     83727,
+     null
+    ],
+    [
+     "TestPassed.py",
+     4059,
+     null
+    ],
+    [
+     "config.json",
+     686,
+     null
+    ],
+    [
+     "merges.txt",
+     1671839,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "c41947ba68ab327a4d31495d7508b41c951e294a61c63d569f93931238e7c504"
+    ],
+    [
+     "tokenizer.json",
+     7031645,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     7305,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "Goekdeniz-Guelmez/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1": {
+   "revision": "a42fe88f75b3ab545466ca5692fef0b4d7bc8009",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     8228,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     769,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1260367448,
+     "dff81834dbf3fe0bc476eb144f68173eac4feeece41e1337b29e88019b8e2406"
+    ],
+    [
+     "special_tokens_map.json",
+     496,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9243,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3": {
+   "revision": "3dee99dac7c99318ed2b4e9932bfbbac060fb024",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "LICENSE",
+     11343,
+     null
+    ],
+    [
+     "README.md",
+     6124,
+     null
+    ],
+    [
+     "TestPassed.jsonl",
+     83727,
+     null
+    ],
+    [
+     "TestPassed.py",
+     4059,
+     null
+    ],
+    [
+     "config.json",
+     686,
+     null
+    ],
+    [
+     "merges.txt",
+     1671839,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097824,
+     "c41947ba68ab327a4d31495d7508b41c951e294a61c63d569f93931238e7c504"
+    ],
+    [
+     "tokenizer.json",
+     7031645,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     7305,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "ibrahimkettaneh/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-4.0bpw-exl2": {
+   "revision": "db7075caa6bf8f5b41923112708cacc62efd0e05",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1668,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/README.md",
+     7830,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/config.json",
+     769,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/generation_config.json",
+     242,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/special_tokens_map.json",
+     496,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/tokenizer_config.json",
+     9243,
+     null
+    ],
+    [
+     "Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1/vocab.json",
+     2776833,
+     null
+    ],
+    [
+     "README.md",
+     7830,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "cal_data.safetensors",
+     1638488,
+     "fd5e1ca32fb5a02397420920d3d542015344cf30d8777a35c712679bb4221872"
+    ],
+    [
+     "config.json",
+     769,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "hidden_states.safetensors",
+     367010144,
+     "cd799973e9c7db2534b6064ca69c21fea648a2069ef361b044946845b2eb3652"
+    ],
+    [
+     "job_new.json",
+     1404263,
+     null
+    ],
+    [
+     "measurement.json",
+     1338332,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "output.safetensors",
+     563537600,
+     "e6d80cfa8721cfb84b6b7db7402dd6afff4df5d1da746c2c644b745431e7d0f5"
+    ],
+    [
+     "special_tokens_map.json",
+     496,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9243,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "masterkristall/Qwen2.5-0.5B-Instruct-abliterated": {
+   "revision": "299e0487efd15beb24a71855101c8f211d5ec8df",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1232,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1260367152,
+     "0d2f24649fe7602a590a7e21b5b0b2fe7356fcd52a2075d069238557859bf591"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422063,
+     "5eee858c5123a4279c3e1f7b81247343f356ac767940b2692a928ad929543214"
+    ],
+    [
+     "tokenizer_config.json",
+     4686,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "mlx-community/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1": {
+   "revision": "2df09d9c5c48f9d15fdae278c35d77f1d9d27658",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1141,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     735,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097440,
+     "5788d3738e47a8787afa2c4fd9a3ca967bec00249548aadd4342c9fda9d2cee0"
+    ],
+    [
+     "model.safetensors.index.json",
+     20569,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     610,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9347,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "mlx-community/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-4bit": {
+   "revision": "e24b555460110560b1aed29348e60f22f994bfd6",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": {
+    "bits": 4
+   },
+   "params": {
+    "F16": 71552,
+    "U32": 493961216
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1161,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     888,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     278064766,
+     "b937c18ce911f68abe1e25a8cbf38cb32121f3131b2faf8c4135c4dffff0bb11"
+    ],
+    [
+     "model.safetensors.index.json",
+     44209,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     610,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9347,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "mlx-community/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-8bit": {
+   "revision": "9aff5f7e5c9a0694b8468b09e0bb2f021bcce55e",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": {
+    "bits": 8
+   },
+   "params": {
+    "F16": 71552,
+    "U32": 493961216
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1161,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     888,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     525045782,
+     "445a49c58534b8d5662a7da2270190111a4f33ad2dd0fcf11fa3c216218c18ab"
+    ],
+    [
+     "model.safetensors.index.json",
+     44209,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     610,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9347,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "mlx-community/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-float16": {
+   "revision": "53df87880147716b65b34bfa759ef0157c7b3aae",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1173,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     735,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097440,
+     "5788d3738e47a8787afa2c4fd9a3ca967bec00249548aadd4342c9fda9d2cee0"
+    ],
+    [
+     "model.safetensors.index.json",
+     20569,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     610,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9347,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "mlx-community/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-float32": {
+   "revision": "78ba059029cfbdc819ee80f1e91827b9d3ba1620",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F32": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     1173,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     735,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1976163203,
+     "32ecc3ff6cc58cab726d4ec66ee6cfeb3c98bd780f66d2873fb244b85d90343b"
+    ],
+    [
+     "model.safetensors.index.json",
+     20570,
+     null
+    ],
+    [
+     "special_tokens_map.json",
+     610,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     9347,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "polovnik0v/qwen25-05b-ru-abliterated-hw6": {
+   "revision": "f04b03dd6586d85e303d96e9f4e7ff0903488cf5",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1282,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "c4abd9df77cdb45c36099a1ba9b52afdc073ed83eb518437572d2bba8e39d819"
+    ],
+    [
+     "tokenizer.json",
+     11422431,
+     "39bebb8ef1d27d43dd05ceb930d972186ee77e2ef073950558620450567f8a72"
+    ],
+    [
+     "tokenizer_config.json",
+     699,
+     null
+    ]
+   ]
+  },
+  "Rajan98/Qwen2.5-0.5B-Instruct-abliterated": {
+   "revision": "47d6e791f80d6769ffb51025156fe4428f5ce15f",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "LICENSE",
+     11343,
+     null
+    ],
+    [
+     "README.md",
+     5425,
+     null
+    ],
+    [
+     "abliteration.ipynb",
+     38500,
+     null
+    ],
+    [
+     "abliteration.json",
+     115,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1228,
+     null
+    ],
+    [
+     "directions.pt",
+     177533,
+     "d2fce20f8f85928e6db7b925eb9faa522f0cde1f33d7d4dda00fc610914eedfb"
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1260367448,
+     "3a4a35d823ca9d109dd527af38dfa1bf754a1f8f6595ea61e5fa2f55df8cfe0d"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422063,
+     "5eee858c5123a4279c3e1f7b81247343f356ac767940b2692a928ad929543214"
+    ],
+    [
+     "tokenizer_config.json",
+     4790,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/Goekdeniz-Guelmez_-_Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-awq": {
+   "revision": "770edce7dc6426f1ec59f10dd9398cd7d6f76830",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 136206208,
+    "I32": 357826560
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     8279,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     930,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     458382880,
+     "ab1297bba1c15e70f3866e68af4f2ed70a1424323902397d6c0f35a0bd4a55cf"
+    ],
+    [
+     "special_tokens_map.json",
+     610,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     9347,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "RichardErkhov/huihui-ai_-_Qwen2.5-0.5B-Instruct-abliterated-awq": {
+   "revision": "65034fcd1d169b48cdd525c87c70aca406b8d3f1",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": {
+    "bits": 4,
+    "quant_method": "awq"
+   },
+   "params": {
+    "F16": 136206208,
+    "I32": 357826560
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     3627,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     917,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     458382880,
+     "6bee4894032b9ee889b91c7caaa18821365d4fabaebb08b8aaea747f770796ec"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     7306,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "sbussiso/Qwen2.5-0.5B-abliterated": {
+   "revision": "3b2d7d53046b451659606812ad32766e26682dfa",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1959,
+     null
+    ],
+    [
+     "README.md",
+     19334,
+     null
+    ],
+    [
+     "charts/consol_multilingual_panel.png",
+     81346,
+     null
+    ],
+    [
+     "charts/consol_truthfulqa_delta.png",
+     94088,
+     null
+    ],
+    [
+     "charts/fig1_primary_metrics.png",
+     101315,
+     "9e98dc12e3297b5e5f266afa2fe45d75352936329c0de7d4a8f39f7850b67f37"
+    ],
+    [
+     "charts/fig2_classes.png",
+     136581,
+     "3064ca26eb8fdfb79c6551625fdb555d76816f585054753b6dddd1f8823f748a"
+    ],
+    [
+     "charts/fig3_refusal_rates.png",
+     208819,
+     "d977b51a2e44ebb53c176d5b296f48706f54a9d9152f0ac88574bc53cf8e4834"
+    ],
+    [
+     "charts/layer_coherence.png",
+     79067,
+     null
+    ],
+    [
+     "charts/make_all_charts.py",
+     17489,
+     null
+    ],
+    [
+     "charts/mmlu_guardrail.png",
+     100364,
+     "84afbfc4433c289da977c6ecad56cb4a06524e08cb88e1ea0797fe4928c32ed6"
+    ],
+    [
+     "charts/multilingual_panel.png",
+     66741,
+     null
+    ],
+    [
+     "charts/r2_benign_preservation.png",
+     87520,
+     null
+    ],
+    [
+     "charts/r2_layer_coherence.png",
+     80561,
+     null
+    ],
+    [
+     "charts/r2_mmlu_guardrail.png",
+     102618,
+     "86bb22735eccad24ce3ab07ffb52afe7570a7d0058b166b115f26ff2fd2643b4"
+    ],
+    [
+     "charts/r2_refusal_by_condition.png",
+     78773,
+     null
+    ],
+    [
+     "charts/refusal_by_condition.png",
+     104547,
+     "aaad1a050a1cf57411879e1ca4f11fd76188224177a7cccda0d91223d04072cf"
+    ],
+    [
+     "charts/refusal_vs_benign.png",
+     89412,
+     null
+    ],
+    [
+     "charts/truthfulqa_guardrail.png",
+     61446,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1284,
+     null
+    ],
+    [
+     "eval/layer_coherence.json",
+     3020,
+     null
+    ],
+    [
+     "eval/mmlu_base_results.json",
+     141118,
+     null
+    ],
+    [
+     "eval/mmlu_variant_results.json",
+     136542,
+     null
+    ],
+    [
+     "eval/probes_baseline.json",
+     24591,
+     null
+    ],
+    [
+     "eval/probes_hook_ablated.json",
+     36533,
+     null
+    ],
+    [
+     "eval/probes_wd_A.json",
+     27626,
+     null
+    ],
+    [
+     "eval/probes_wd_B.json",
+     28375,
+     null
+    ],
+    [
+     "eval/probes_wd_C.json",
+     10898,
+     null
+    ],
+    [
+     "eval/refusal_direction.npy",
+     3712,
+     "5004544a0cea06db4cd3f7115ededec285bf431c5bf460cfe289cdf9128432cd"
+    ],
+    [
+     "eval/refusal_direction_A.npy",
+     3712,
+     "e5da6984d5a810b902bc324d64c164203c0830075b98e79d71f67fee170e3e35"
+    ],
+    [
+     "eval/refusal_direction_B.npy",
+     3712,
+     "5004544a0cea06db4cd3f7115ededec285bf431c5bf460cfe289cdf9128432cd"
+    ],
+    [
+     "eval/run_config.json",
+     1738,
+     null
+    ],
+    [
+     "eval/selection.json",
+     251,
+     null
+    ],
+    [
+     "eval/selection_candidates.json",
+     612,
+     null
+    ],
+    [
+     "eval2/benign_flip_note.json",
+     32,
+     null
+    ],
+    [
+     "eval2/harness_sha256.json",
+     174,
+     null
+    ],
+    [
+     "eval2/ladder_log.txt",
+     20577,
+     null
+    ],
+    [
+     "eval2/ladder_sha256.json",
+     89,
+     null
+    ],
+    [
+     "eval2/layer_coherence.json",
+     3437,
+     null
+    ],
+    [
+     "eval2/layer_directions.npz",
+     68410,
+     "08c28d2b44da586bfdea9c9f1a7b9e76a6e129e8817080e91b8cd3ae9f947a1a"
+    ],
+    [
+     "eval2/mmlu_base_results.json",
+     141122,
+     null
+    ],
+    [
+     "eval2/mmlu_log.txt",
+     19218,
+     null
+    ],
+    [
+     "eval2/mmlu_summary.json",
+     524,
+     null
+    ],
+    [
+     "eval2/mmlu_variant_results.json",
+     136778,
+     null
+    ],
+    [
+     "eval2/probes_baseline.json",
+     24591,
+     null
+    ],
+    [
+     "eval2/probes_hook_ablated.json",
+     36533,
+     null
+    ],
+    [
+     "eval2/probes_multilingual.json",
+     54355,
+     null
+    ],
+    [
+     "eval2/probes_wd_B.json",
+     28375,
+     null
+    ],
+    [
+     "eval2/probes_wd_BN.json",
+     28174,
+     null
+    ],
+    [
+     "eval2/probes_wd_ML.json",
+     27332,
+     null
+    ],
+    [
+     "eval2/probes_wd_ML_BN.json",
+     36208,
+     null
+    ],
+    [
+     "eval2/refusal_direction.npy",
+     3712,
+     "5004544a0cea06db4cd3f7115ededec285bf431c5bf460cfe289cdf9128432cd"
+    ],
+    [
+     "eval2/refusal_direction_A.npy",
+     3712,
+     "e5da6984d5a810b902bc324d64c164203c0830075b98e79d71f67fee170e3e35"
+    ],
+    [
+     "eval2/refusal_direction_B.npy",
+     3712,
+     "5004544a0cea06db4cd3f7115ededec285bf431c5bf460cfe289cdf9128432cd"
+    ],
+    [
+     "eval2/run_config.json",
+     2210,
+     null
+    ],
+    [
+     "eval2/selection.json",
+     470,
+     null
+    ],
+    [
+     "eval2/selection_candidates.json",
+     668,
+     null
+    ],
+    [
+     "eval2/truthfulqa_base_results.json",
+     8909,
+     null
+    ],
+    [
+     "eval2/truthfulqa_base_samples.jsonl",
+     1710967,
+     null
+    ],
+    [
+     "eval2/truthfulqa_paired_analysis.json",
+     347,
+     null
+    ],
+    [
+     "eval2/truthfulqa_paired_analysis.py",
+     3112,
+     null
+    ],
+    [
+     "eval2/truthfulqa_variant_results.json",
+     8850,
+     null
+    ],
+    [
+     "eval2/truthfulqa_variant_samples.jsonl",
+     1711004,
+     null
+    ],
+    [
+     "gen_card.py",
+     20780,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "layer_directions.npz",
+     68410,
+     "08c28d2b44da586bfdea9c9f1a7b9e76a6e129e8817080e91b8cd3ae9f947a1a"
+    ],
+    [
+     "model.safetensors",
+     1260367152,
+     "0b2133342dce215d6ae9645259b9f05e33914c0f51dcde60c550f3bf92367125"
+    ],
+    [
+     "refusal_direction.npy",
+     3712,
+     "5004544a0cea06db4cd3f7115ededec285bf431c5bf460cfe289cdf9128432cd"
+    ],
+    [
+     "refusal_direction_A.npy",
+     3712,
+     "e5da6984d5a810b902bc324d64c164203c0830075b98e79d71f67fee170e3e35"
+    ],
+    [
+     "refusal_direction_B.npy",
+     3712,
+     "5004544a0cea06db4cd3f7115ededec285bf431c5bf460cfe289cdf9128432cd"
+    ],
+    [
+     "tokenizer.json",
+     11421892,
+     "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    ],
+    [
+     "tokenizer_config.json",
+     694,
+     null
+    ]
+   ]
+  },
+  "stepenZEN/Qwen2.5-0.5B-abliterated": {
+   "revision": "1e456e15f8cf447c3afac3964388416ccab14299",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     322,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     744,
+     null
+    ],
+    [
+     "generation_config.json",
+     117,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1260367448,
+     "bd6900abb1f42722775807516a4d408b089c4e362b3d0934b060a03b610b1a14"
+    ],
+    [
+     "special_tokens_map.json",
+     616,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     7259,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "Syidone1/Qwen2.5-0.5B-Instruct-abliterated": {
+   "revision": "20f94fc97bc1c36e5bdf763f13d1725770e6cd28",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     730,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "aeca639435b837cfbda648452e7d1ebbbec6fb1f9548e5d10c6da45c2a268730"
+    ],
+    [
+     "special_tokens_map.json",
+     613,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11421896,
+     "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+    ],
+    [
+     "tokenizer_config.json",
+     7306,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "Syidone1/Qwen2.5-0.5B-Instruct-abliterated-ru": {
+   "revision": "dc8a224f740e3966b477f1f4587de28e63f74faf",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 370169728,
+    "F32": 259997696
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1283,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "model.safetensors",
+     1780362824,
+     "fa5d82e31fe5ff27ad84bf88e3f59e02c5e202b3361eb78f1db46a63bda30e0c"
+    ],
+    [
+     "tokenizer.json",
+     11422059,
+     "f7f96da3a872b5e901575b2067c744ad336c3a3d77a21584d20024557b1bd7f0"
+    ],
+    [
+     "tokenizer_config.json",
+     694,
+     null
+    ]
+   ]
+  },
+  "Syidone1/Qwen2.5-0.5B-Instruct-abliterated-ru-dpo-lora": {
+   "revision": "dd4874b4d7b9339f17031b88169a05027c32e937",
+   "erro": null,
+   "architectures": null,
+   "model_type": null,
+   "quantization": null,
+   "params": null,
+   "params_total": null,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5174,
+     null
+    ],
+    [
+     "adapter_config.json",
+     1124,
+     null
+    ],
+    [
+     "adapter_model.safetensors",
+     17640808,
+     "ecc34b40462d68712d31ce86cc43c73b0da0ca448ce5fa46a1e8e7faeed2a4b0"
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "ref/adapter_config.json",
+     1124,
+     null
+    ],
+    [
+     "ref/adapter_model.safetensors",
+     35237104,
+     "efc2dda3ae424346169288d38e09ee02204ddcc8bed4c8409dec16171cd0c815"
+    ],
+    [
+     "tokenizer.json",
+     11421892,
+     "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8"
+    ],
+    [
+     "tokenizer_config.json",
+     798,
+     null
+    ]
+   ]
+  },
+  "TheProphet92/Qwen2.5-0.5B-Instruct-abliterated": {
+   "revision": "4eea585556e42ff43a78fb73da8a149ae007a0b0",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "F16": 494032768
+   },
+   "params_total": 494032768,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "abliteration_metadata.json",
+     1686,
+     null
+    ],
+    [
+     "chat_template.jinja",
+     2507,
+     null
+    ],
+    [
+     "config.json",
+     1282,
+     null
+    ],
+    [
+     "generation_config.json",
+     241,
+     null
+    ],
+    [
+     "model.safetensors",
+     988097536,
+     "50502926ec5bc332f18045cf311f488870e5d65f4e6ef3cb1349da55f6b92137"
+    ],
+    [
+     "tokenizer.json",
+     11422158,
+     "71ece997f2adc1d4efd5be5594278d1897b287580df464c15da9af7ed52efa82"
+    ],
+    [
+     "tokenizer_config.json",
+     694,
+     null
+    ]
+   ]
+  },
+  "thirdeyeai/qwen2.5-.5b-uncensored": {
+   "revision": "48331ba4a82ff425cb54a0a7577490191f78d06d",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1519,
+     null
+    ],
+    [
+     "README.md",
+     5206,
+     null
+    ],
+    [
+     "added_tokens.json",
+     80,
+     null
+    ],
+    [
+     "config.json",
+     705,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1260367448,
+     "b5496eff01b32666ae9da8518cb46ecdb46f15eba5f4c0b91b02c27d51a9bf3b"
+    ],
+    [
+     "special_tokens_map.json",
+     250,
+     null
+    ],
+    [
+     "tokenizer.json",
+     7028043,
+     null
+    ],
+    [
+     "tokenizer_config.json",
+     1296,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  },
+  "thirdeyeai/Qwen2.5-0.5B-Instruct-uncensored": {
+   "revision": "ba575e5deefbedf9da3fe4c94fb0e092931e878c",
+   "erro": null,
+   "architectures": [
+    "Qwen2ForCausalLM"
+   ],
+   "model_type": "qwen2",
+   "quantization": null,
+   "params": {
+    "BF16": 630167424
+   },
+   "params_total": 630167424,
+   "files": [
+    [
+     ".gitattributes",
+     1570,
+     null
+    ],
+    [
+     "README.md",
+     5206,
+     null
+    ],
+    [
+     "added_tokens.json",
+     605,
+     null
+    ],
+    [
+     "config.json",
+     729,
+     null
+    ],
+    [
+     "generation_config.json",
+     242,
+     null
+    ],
+    [
+     "merges.txt",
+     1671853,
+     null
+    ],
+    [
+     "model.safetensors",
+     1260367448,
+     "3ca55c0ef119252c9e3daeaa18a9d3253fc4cde1ba3b5d2f0fbbd833e678825b"
+    ],
+    [
+     "special_tokens_map.json",
+     496,
+     null
+    ],
+    [
+     "tokenizer.json",
+     11422060,
+     "63a2951d5edfa5cc0a2346ef872f8c77a2920274cfc3b503b04e3799104dee80"
+    ],
+    [
+     "tokenizer_config.json",
+     7333,
+     null
+    ],
+    [
+     "vocab.json",
+     2776833,
+     null
+    ]
+   ]
+  }
+ }
+}

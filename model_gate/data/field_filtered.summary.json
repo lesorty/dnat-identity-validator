@@ -1,0 +1,173 @@
+{
+ "task": "T-1102",
+ "entrada": "field_candidates.csv",
+ "metadados": "field_candidates.meta.json",
+ "coleta_metadados": "2026-11-13",
+ "meta_e13": 20,
+ "pais": {
+  "llama-3.2-1b": {
+   "repo": "meta-llama/Llama-3.2-1B-Instruct",
+   "revisao": "9213176726f574b556790deb65791e0c5aa438b6",
+   "parametros": 1235814400
+  },
+  "qwen2.5-0.5b": {
+   "repo": "Qwen/Qwen2.5-0.5B-Instruct",
+   "revisao": "7ae557604adf67be50417f59c2c2f167def9a775",
+   "parametros": 494032768
+  }
+ },
+ "por_familia": {
+  "llama-3.2-1b": {
+   "candidatos": 138,
+   "com_safetensors": 51,
+   "gguf_contexto": {
+    "so_gguf": 77,
+    "gguf_e_safetensors": 2
+   },
+   "aceitos": 13,
+   "aceitos_por_classe": {
+    "cheio": 12,
+    "adaptador": 1
+   },
+   "aceitos_com_lm_head_separado": 5,
+   "recuperaveis_pela_forma": 21,
+   "excluidos": 125,
+   "motivos": {
+    "sem safetensors: gguf": 77,
+    "sem base declarada": 46,
+    "cadeia para sem base declarada": 19,
+    "cadeia quebrada (repositório ausente no HF)": 18,
+    "raiz no pré-treinado, não no pai": 18,
+    "sem safetensors: nenhum arquivo de pesos": 10,
+    "quantizado (quantization_config)": 6,
+    "parâmetros diferentes": 3,
+    "arquitetura diferente": 2,
+    "safetensors fora do layout": 2,
+    "cadeia longa demais": 1
+   },
+   "motivo_principal": {
+    "sem safetensors: gguf": 77,
+    "sem base declarada": 17,
+    "sem safetensors: nenhum arquivo de pesos": 10,
+    "quantizado (quantization_config)": 6,
+    "raiz no pré-treinado, não no pai": 4,
+    "cadeia quebrada (repositório ausente no HF)": 2,
+    "arquitetura diferente": 2,
+    "safetensors fora do layout": 2,
+    "parâmetros diferentes": 2,
+    "cadeia para sem base declarada": 2,
+    "cadeia longa demais": 1
+   },
+   "aceitos_lista": [
+    "ai-anytime/Llama-3.2-1B-Instruct-abliterated",
+    "cazzz307/Abliterated-Llama-3.2-1B-Instruct",
+    "ElementMerc/llama-3.2-1b-uncensored",
+    "joelewing/Llama-3.2-1B-Instruct-Capybara-abliterated",
+    "KidIkaros/Llama-3.2-1B-Instruct-abliterated",
+    "marx161-cmd/Llama-3.2-1B-Double-Abliterated-d2p0-r1p0-RowRestore",
+    "muhammadrafifatihulihsan/llama32-1b-llm-abliteration",
+    "nicoboss/Llama-3.2-1B-Instruct-Uncensored",
+    "nicoboss/Llama-3.2-1B-Instruct-Uncensored-Lora",
+    "Novaciano/Uncensored_Varuna-3.2-1B",
+    "sbussiso/Llama-3.2-1B-Instruct-abliterated",
+    "STARSPIKE/Llama-3.2-1B-Instruct-abliterated",
+    "Vikhrmodels/Vikhr-Llama-3.2-1B-Instruct-abliterated"
+   ],
+   "recuperaveis_lista": [
+    "brianmatzelle/llama3.2-1b-instruct-hasanpiker-abliterated",
+    "Daniil-Domino/Vikhr-Llama-3.2-1B-Instruct-abliterated",
+    "Elstuhn/llama-3.2-1B-Instruct-abliterated",
+    "Grogros/Llama-3.2-1B-Instruct-abliterated-DPO",
+    "hasanyt/llama-3.2-1b-abliterated",
+    "jtatman/llama3.2_1b_uncensored_pentest_grpo-merged",
+    "jtatman/merged-llama32-1b-uncensored-dolphin-agent",
+    "mylesgoose/Llama-3.2-1B-Instruct-abliterated",
+    "mylesgoose/Llama-3.2-1B-Instruct-abliterated2",
+    "mylesgoose/Llama-3.2-1B-Instruct-abliterated3",
+    "Novaciano/ABLITERATED-FuseBench-3.2-1B",
+    "Novaciano/Judas-The-Uncensored-3.2-1B",
+    "Novaciano/Uncensored_Kali-3.2-1B",
+    "nztinversive/llama3.2-1b-Uncensored",
+    "P3lte/llama32-1b-abliterated-rp",
+    "rbc33/Llama-3.2-1B-Instruct-Abliterated",
+    "ShantanuT01/Llama-3.2-1B-Instruct-abliterated-sci_gen-finetuned",
+    "ShantanuT01/Llama-3.2-1B-Instruct-abliterated-wp-finetuned",
+    "ShantanuT01/Llama-3.2-1B-Instruct-abliterated-yelp-finetuned",
+    "ShuoGZ/llama-3.2-1B-Instruct-abliterated",
+    "vs4vijay/Llama-3.2-1B-uncensored"
+   ]
+  },
+  "qwen2.5-0.5b": {
+   "candidatos": 68,
+   "com_safetensors": 35,
+   "gguf_contexto": {
+    "so_gguf": 29,
+    "gguf_e_safetensors": 1
+   },
+   "aceitos": 8,
+   "aceitos_por_classe": {
+    "cheio": 8
+   },
+   "aceitos_com_lm_head_separado": 5,
+   "recuperaveis_pela_forma": 17,
+   "excluidos": 60,
+   "motivos": {
+    "sem safetensors: gguf": 29,
+    "sem base declarada": 22,
+    "cadeia quebrada (repositório ausente no HF)": 9,
+    "cadeia para sem base declarada": 8,
+    "conversão MLX": 5,
+    "quantizado (quantization_config)": 4,
+    "sem safetensors: onnx": 3,
+    "sem safetensors: nenhum arquivo de pesos": 1,
+    "raiz no pré-treinado, não no pai": 1,
+    "cópia de outro candidato": 1,
+    "quantizado exl2": 1,
+    "safetensors fora do layout": 1
+   },
+   "motivo_principal": {
+    "sem safetensors: gguf": 29,
+    "sem base declarada": 16,
+    "conversão MLX": 5,
+    "sem safetensors: onnx": 3,
+    "quantizado (quantization_config)": 2,
+    "cadeia para sem base declarada": 1,
+    "sem safetensors: nenhum arquivo de pesos": 1,
+    "raiz no pré-treinado, não no pai": 1,
+    "cópia de outro candidato": 1,
+    "quantizado exl2": 1
+   },
+   "aceitos_lista": [
+    "3MPER0RR/Qwen2.5-0.5B-Instruct-3MPER0RR-abliterated",
+    "artemds45/itmo-nlp-hw6-qwen2-5-0-5b-abliterated",
+    "Goekdeniz-Guelmez/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1",
+    "huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3",
+    "Rajan98/Qwen2.5-0.5B-Instruct-abliterated",
+    "sbussiso/Qwen2.5-0.5B-abliterated",
+    "thirdeyeai/qwen2.5-.5b-uncensored",
+    "thirdeyeai/Qwen2.5-0.5B-Instruct-uncensored"
+   ],
+   "recuperaveis_lista": [
+    "123yaroslav/Qwen2.5-0.5B-abliterated-dpo-ru",
+    "123yaroslav/Qwen2.5-0.5B-Instruct-abliterated-ru",
+    "aizerocoderai/qwen2.5-0.5b-abliterated-v2-ru",
+    "alperiox/Qwen2.5-0.5B-Instruct-arithmetic-abliterated",
+    "aspnmrv/qwen25-05b-abliterated",
+    "Bradarr/Qwen2.5-0.5B-Instruct-abliterated",
+    "braindao/Qwen2.5-0.5B-Instruct-Uncensored",
+    "bruhwalkk/Qwen2.5-0.5B-Instruct-abliterated-ru",
+    "bruhwalkk/Qwen2.5-0.5B-Instruct-abliterated-ru-dpo-lora",
+    "caveiro/qwen2.5-0.5b-abliterated-ru",
+    "masterkristall/Qwen2.5-0.5B-Instruct-abliterated",
+    "polovnik0v/qwen25-05b-ru-abliterated-hw6",
+    "stepenZEN/Qwen2.5-0.5B-abliterated",
+    "Syidone1/Qwen2.5-0.5B-Instruct-abliterated",
+    "Syidone1/Qwen2.5-0.5B-Instruct-abliterated-ru",
+    "Syidone1/Qwen2.5-0.5B-Instruct-abliterated-ru-dpo-lora",
+    "TheProphet92/Qwen2.5-0.5B-Instruct-abliterated"
+   ]
+  }
+ },
+ "aceitos_total": 21,
+ "deficit_total_para_a_meta": 0
+}
