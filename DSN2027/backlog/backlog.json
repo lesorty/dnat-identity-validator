@@ -1994,16 +1994,16 @@
    "deps": [
     "T-1602"
    ],
-   "descricao": "Atualiza (12/11, T-1602): o juiz de referência é um modelo aberto de outra família, rodando na nuvem; a API externa foi descartada.\n\nPor quê: o juiz de referência precisa ser diferente e mais forte que o do portão (R12); a escolha sai do G0 (T-1602).\nComo:\n- Instalar o juiz escolhido (modelo aberto maior em CPU ou API externa)\n- Fixar prompt, decodificação e versão; registrar hash\n- Se for API externa, registrar o modelo exato, a data e a política de envio de texto nocivo\nSaída: juiz configurado com parâmetros versionados.",
+   "descricao": "Feito em 12/11 (commit 76031a3), como proposta trocável: gpt-oss-20b (Apache-2.0, sem gate, família OpenAI; MoE de ~3,6B ativos, viável em CPU na nuvem), revisão 6cee5e8 fixada. experiments/reference/judge.yaml (gulosa, 1024 tokens, raciocínio low, data fixada no prompt porque o template harmony põe a data do dia) e judge.py (rubrica do StrongREJECT e XSTest com os parsers do portão, lendo só o canal final; sem canal final a nota vira NaN). models/reference_judge.manifest.json com o sha256 de cada arquivo (pesos pelo LFS do Hugging Face, sem baixar, ~13,8 GB). 7 testes com modelo falso. Não rodou: o modelo é baixado e executado na nuvem (T-1003). Trocar o modelo é decisão do grupo: o Mistral-Small-3.2-24B é a alternativa (multimodal e tokenizer próprio).\n\nAtualiza (12/11, T-1602): o juiz de referência é um modelo aberto de outra família, rodando na nuvem; a API externa foi descartada.\n\nPor quê: o juiz de referência precisa ser diferente e mais forte que o do portão (R12); a escolha sai do G0 (T-1602).\nComo:\n- Instalar o juiz escolhido (modelo aberto maior em CPU ou API externa)\n- Fixar prompt, decodificação e versão; registrar hash\n- Se for API externa, registrar o modelo exato, a data e a política de envio de texto nocivo\nSaída: juiz configurado com parâmetros versionados.",
    "epico": "J10",
    "id": "T-1002",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Juiz roda com parâmetros fixos",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Configurar o juiz de referência escolhido no G0",
-   "atualizado": "2026-11-12T14:44:59.000Z"
+   "atualizado": "2026-11-13T06:00:00.000Z"
   },
   {
    "deps": [
@@ -3133,17 +3133,17 @@
   },
   {
    "deps": [],
-   "descricao": "Redução v2 (11/11): Nota de ética curta para a anotação e para a seção do CFP.\n\nPor quê: a anotação humana de texto nocivo pede nota de ética e, se a instituição exigir, aprovação de comitê (E13 §3.4); o CFP do DSN também pede seção de ética.\nComo:\n- Escrever a nota: riscos para os anotadores, consentimento, direito de desistir, como o texto é guardado e descartado.\n- Perguntar à instituição se a anotação precisa de comitê e, se precisar, submeter.\n- Reaproveitar o texto na seção de ética do artigo (T-1512).\nSaída: nota aprovada e arquivada em DSN2027/.",
+   "descricao": "Rascunho em 12/11: DSN2027/NOTA_ETICA_ANOTACAO.md, com riscos, consentimento e direito de desistir, guarda e descarte do texto e o parágrafo para a seção de ética do artigo. Falta o passo humano: perguntar à instituição se é preciso comitê, aprovar a nota com o orientador e colher o aceite dos anotadores (T-1605).\n\nRedução v2 (11/11): Nota de ética curta para a anotação e para a seção do CFP.\n\nPor quê: a anotação humana de texto nocivo pede nota de ética e, se a instituição exigir, aprovação de comitê (E13 §3.4); o CFP do DSN também pede seção de ética.\nComo:\n- Escrever a nota: riscos para os anotadores, consentimento, direito de desistir, como o texto é guardado e descartado.\n- Perguntar à instituição se a anotação precisa de comitê e, se precisar, submeter.\n- Reaproveitar o texto na seção de ética do artigo (T-1512).\nSaída: nota aprovada e arquivada em DSN2027/.",
    "epico": "J16",
    "id": "T-1606",
    "marco": "G0",
    "prioridade": "P1",
    "pronto": "Nota aprovada",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "P",
    "titulo": "Nota de ética e, se exigido, comitê para a anotação humana",
    "objetivoMaior": "O2",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T06:00:00.000Z"
   },
   {
    "atualizado": "2026-11-11T18:00:00.000Z",
