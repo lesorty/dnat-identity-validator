@@ -34,11 +34,17 @@ const {
   RESERVE_COST,
   recordExecutionIdentity,
 } = require("./identity");
-const { retainDerivative, userSummary } = require("./retention");
+const { getDerivative, retainDerivative, userSummary } = require("./retention");
+const { MODEL_FORMAT } = require("./asset_envelope");
+const { extractVerified, modelDirDigest } = require("./model_store");
+const { judgeDerivative, loadAllowlist, ALLOWLIST_PATH } = require("./judge_flow");
 
 // Estado da CVM1 ao lado de executions/: identidades (T-1702) e derivados retidos (T-803).
 const IDENTITIES_PATH = process.env.DNAT_IDENTITIES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "identities.json");
 const DERIVATIVES_PATH = process.env.DNAT_DERIVATIVES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "derivatives.json");
+// Referências custodiadas dos pais (T-312), depositadas pelo operador no host (scripts/judge_cli.js).
+const REFERENCES_PATH = process.env.DNAT_REFERENCES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "references.json");
+const MODEL_ASSET_TYPE = 2;
 const IDENTITY_DIFFICULTY = Number(process.env.DNAT_IDENTITY_DIFFICULTY || DEFAULT_DIFFICULTY);
 
 const abi = [
@@ -52,12 +58,20 @@ const abi = [
   "function revokeAsset(uint256 assetId)",
   "event AssetRegistered(uint256 indexed id, uint8 assetType, address indexed owner, uint256 price, bool hasBloomFilter)",
   "event AccessPurchased(uint256 indexed datasetId, uint256 indexed applicationId, address indexed user, uint256 datasetPrice, uint256 applicationPrice)",
+  // Derivado julgado (T-703, T-809): só o operador, que é a carteira desta CVM1.
+  "function registerDerivative((uint256 parentId, bytes32 parentReferenceHash, bytes32 derivativeHash, bytes32 judgeHash, bytes32 batteryCommitment, bytes32 preregHash, bytes32 datasetHash, bytes32 verdictHash, bytes32 identityId, uint8 verdict, uint64 decidedAt) info, address owner, string title, string encryptedUri) returns (uint256)",
+  "function getDerivative(uint256 assetId) view returns ((uint256 parentId, bytes32 parentReferenceHash, bytes32 derivativeHash, bytes32 judgeHash, bytes32 batteryCommitment, bytes32 preregHash, bytes32 datasetHash, bytes32 verdictHash, bytes32 identityId, uint8 verdict, uint64 decidedAt))",
+  "function isDerivativeUsable(uint256 assetId) view returns (bool)",
+  "event DerivativeRegistered(uint256 indexed id, uint256 indexed parentId, (uint256 parentId, bytes32 parentReferenceHash, bytes32 derivativeHash, bytes32 judgeHash, bytes32 batteryCommitment, bytes32 preregHash, bytes32 datasetHash, bytes32 verdictHash, bytes32 identityId, uint8 verdict, uint64 decidedAt) info)",
 ];
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+// A CVM1 manda transações em sequência rápida (registro, derivado); o provider guarda a contagem de
+// transações por alguns ms e duas seguidas sairiam com o mesmo nonce. O NonceManager conta localmente.
+const signer = new ethers.NonceManager(wallet);
 let contractAddress = CONTRACT_ADDRESS_ENV || "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-let contract = new ethers.Contract(contractAddress, abi, wallet);
+let contract = new ethers.Contract(contractAddress, abi, signer);
 
 function resolvePythonBin(pythonBin) {
   const requested = String(pythonBin || "").trim();
@@ -163,7 +177,7 @@ async function resolveContractAddress() {
 
 async function initContract() {
   contractAddress = await resolveContractAddress();
-  contract = new ethers.Contract(contractAddress, abi, wallet);
+  contract = new ethers.Contract(contractAddress, abi, signer);
 }
 
 function toYamlValue(value) {
@@ -375,12 +389,13 @@ function parseMultipartForm(req) {
   };
 }
 
+// Pedido da API: o arquivo vem no corpo. filePath (caminho no disco desta CVM1) só vale para o
+// CLI local; aceito pela rede, deixaria qualquer identidade publicar arquivos do servidor.
 function normalizeUploadRequest(req) {
   const contentType = String(req.headers["content-type"] || "").toLowerCase();
-  if (contentType.startsWith("multipart/form-data")) {
-    return parseMultipartForm(req);
-  }
-  return req.body || {};
+  const fields = contentType.startsWith("multipart/form-data") ? parseMultipartForm(req) : { ...(req.body || {}) };
+  delete fields.filePath;
+  return fields;
 }
 
 function materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer }) {
@@ -626,10 +641,33 @@ async function listAssetsByScanningIds() {
   return { all: assets, datasets, applications };
 }
 
+// Modelo base (T-809): o dono envia o tar.gz do diretório do modelo. A CVM1 extrai com cuidado,
+// calcula o digest de model_gate.io.digest (o contentHash on-chain, que o Juiz confere) e guarda o
+// pacote cifrado no IPFS.
+async function uploadModelArchive({ filePath, fileName, fileBase64, fileBuffer, manifest = {} }) {
+  const uploadedInput = materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer });
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-model-"));
+  const encryptedPath = path.join(work, "model.enc");
+  try {
+    const digest = extractVerified(uploadedInput.localPath, path.join(work, "model"), null);
+    fs.writeFileSync(
+      encryptedPath,
+      encryptBuffer(fs.readFileSync(uploadedInput.localPath), { digest, files: modelDirDigest(path.join(work, "model")).files.length }, MODEL_FORMAT),
+    );
+    const uploaded = await addFileToIpfsFlow({ filePath: encryptedPath, manifest: { ...manifest, framework: "model-dir" } });
+    return { ...uploaded, localPath: String(fileName || "model"), assetContentHash: `0x${digest}`, modelDigest: digest };
+  } finally {
+    uploadedInput.cleanup();
+    fs.rmSync(work, { recursive: true, force: true });
+  }
+}
+
 async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBuffer, priceWei, bloomFilter, manifest }) {
   let uploaded;
 
-  if (Number(assetType) === 1) {
+  if (Number(assetType) === MODEL_ASSET_TYPE) {
+    uploaded = await uploadModelArchive({ filePath, fileName, fileBase64, fileBuffer, manifest });
+  } else if (Number(assetType) === 1) {
     const uploadedInput = materializeUploadedFile({ filePath, fileName, fileBase64, fileBuffer });
     let builtArtifact = null;
     let encryptedPath = null;
@@ -826,7 +864,35 @@ async function retainExecutionDerivative({ executionId, digest, archivePath, con
   }
 }
 
-async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user, identityId, ledger = null }) {
+// Lista de Juízes permitidos da implantação (T-808); sem o arquivo, nenhum Juiz roda.
+function loadJudgeAllowlist() {
+  return fs.existsSync(ALLOWLIST_PATH) ? loadAllowlist(ALLOWLIST_PATH) : [];
+}
+
+// Modelo base de um fine-tuning (T-809): tem de ser um Model ativo, com pacote no IPFS.
+async function resolveParentModel(parentModelId) {
+  if (parentModelId === undefined || parentModelId === null || parentModelId === "") return null;
+  const parent = mapAsset(await contract.getAsset(BigInt(parentModelId)));
+  if (parent.assetType !== MODEL_ASSET_TYPE) throw new Error(`Asset ${parentModelId} is not a model.`);
+  if (!parent.active) throw new Error(`Model ${parentModelId} is inactive.`);
+  if (!String(parent.encryptedUri || "").trim()) throw new Error(`Model ${parentModelId} does not have an execution URI.`);
+  return parent;
+}
+
+// O pacote do base em claro só existe no diretório temporário do pedido, conferido pelo contentHash.
+async function materializeParentModel(parent, destDir, ipfsApiUrl) {
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-base-"));
+  try {
+    const archive = path.join(work, "model.tar.gz");
+    const envelope = await downloadFromIpfsBytes(parent.encryptedUri, ipfsApiUrl || IPFS_API_URL);
+    fs.writeFileSync(archive, decryptBufferEnvelope(envelope, [MODEL_FORMAT]).plaintext);
+    return extractVerified(archive, destDir, parent.contentHash);
+  } finally {
+    fs.rmSync(work, { recursive: true, force: true });
+  }
+}
+
+async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin, ipfsApiUrl, user, identityId, ledger = null }) {
   if (datasetId === undefined || datasetId === null || applicationId === undefined || applicationId === null) {
     throw new Error("datasetId and applicationId are required");
   }
@@ -836,6 +902,7 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     throw new Error("Access denied. Purchase access to the selected dataset and application before executing.");
   }
   const { dataset, application } = await resolveExecutionAssets(datasetId, applicationId);
+  const parent = await resolveParentModel(parentModelId);
 
   if (!fs.existsSync(RUNNER_PATH)) throw new Error(`Runner not found: ${RUNNER_PATH}`);
   const resolvedPythonBin = resolvePythonBin(pythonBin);
@@ -850,7 +917,8 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
 
   // Cota (T-1704, E14 §18.4): a reserva sai do saldo da identidade no aceite, depois das checagens
   // baratas (acesso, ativos, executor) e antes de gastar a CVM. Sem saldo, IdentityError 402.
-  // O acerto pelo veredito (1, 2 ou 5) é do Juiz como segundo job (T-807); aqui só a falha devolve.
+  // O acerto pelo veredito (1, 2 ou 5) é do Juiz como segundo job (T-807, T-809), quando há modelo
+  // pai; job sem veredito (falha, sem pai ou sem derivado) devolve a reserva.
   const reservationId = ledger && identityId ? crypto.randomUUID() : null;
   if (reservationId) ledger.reserve(identityId, reservationId);
   let quotaSettled = false;
@@ -865,6 +933,7 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
   const applicationArtifactPath = path.join(preparationDir, "application.ext4");
   // O derivado em claro so passa por aqui, dentro do diretorio temporario (T-803).
   const derivativeArchivePath = path.join(preparationDir, "derivative.tar.gz");
+  const baseModelDir = path.join(preparationDir, "base-model");
 
   try {
     const datasetBytes = await downloadFromIpfsBytes(dataset.encryptedUri, ipfsApiUrl || IPFS_API_URL);
@@ -879,6 +948,7 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     const encryptedApplicationBytes = await downloadFromIpfsBytes(application.encryptedUri, ipfsApiUrl || IPFS_API_URL);
     const decryptedApplication = decryptBufferEnvelope(encryptedApplicationBytes);
     fs.writeFileSync(applicationArtifactPath, decryptedApplication.plaintext);
+    if (parent) await materializeParentModel(parent, baseModelDir, ipfsApiUrl);
 
   const args = [
     RUNNER_PATH,
@@ -894,6 +964,7 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     EXECUTOR_URL,
     "--derivative-out",
     derivativeArchivePath,
+    ...(parent ? ["--base-model-dir", baseModelDir] : []),
   ];
 
     const { code, stdout, stderr } = await new Promise((resolve, reject) => {
@@ -930,7 +1001,14 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
         executionId,
         digest: parsed.derivative.digest,
         archivePath: derivativeArchivePath,
-        context: { datasetId: String(datasetId), applicationId: String(applicationId), user: user || wallet.address },
+        context: {
+          datasetId: String(datasetId),
+          applicationId: String(applicationId),
+          user: user || wallet.address,
+          ...(identityId ? { identityId } : {}),
+          ...(reservationId ? { quotaReservationId: reservationId } : {}),
+          ...(parent ? { parentModelId: String(parentModelId) } : {}),
+        },
       });
       const metadataPath = path.join(EXECUTIONS_ROOT, executionId, "metadata.json");
       const metadata = readJsonIfExists(metadataPath);
@@ -941,14 +1019,48 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     const execution = executionId ? getExecutionById(executionId) : null;
 
     // Falha do job (T-107): sem execução, saída não zero ou resultado inconclusivo por falha.
-    // A reserva volta inteira e não conta; do contrário fica reservada até o veredito.
+    // A reserva volta inteira e não conta.
     if (code !== 0 || !executionId || execution?.metadata?.outcome === "inconclusive_failure") settleFailure();
+
+    // Segundo job (T-807, T-809): com modelo pai e derivado retido, o Juiz julga e a CVM1 grava o
+    // recibo e acerta a cota. Sem derivado não há veredito, e a reserva volta.
+    let judge = null;
+    if (parent && !quotaSettled) {
+      if (parsed.derivative?.status === "retained") {
+        judge = await judgeDerivative({
+          contract,
+          ledger,
+          derivativesPath: DERIVATIVES_PATH,
+          referencesPath: REFERENCES_PATH,
+          executionId,
+          parentId: String(parentModelId),
+          datasetPath,
+          fetchEnvelope: (uri) => downloadFromIpfsBytes(uri, ipfsApiUrl || IPFS_API_URL),
+          allowlist: loadJudgeAllowlist(),
+          owner: user || wallet.address,
+          title: `Derivado de ${parent.title} (${executionId})`,
+        });
+        quotaSettled = true;
+        parsed.derivative = userSummary(getDerivative(DERIVATIVES_PATH, executionId));
+        const metadataPath = path.join(EXECUTIONS_ROOT, executionId, "metadata.json");
+        const metadata = readJsonIfExists(metadataPath);
+        if (metadata) {
+          const verdict = { outcome: judge.outcome, assetId: judge.assetId || null, alert: judge.alert || null };
+          fs.writeFileSync(metadataPath, JSON.stringify({ ...metadata, derivative: parsed.derivative, judge: verdict }, null, 2), "utf8");
+        }
+      } else {
+        settleFailure();
+      }
+    } else if (!parent) {
+      settleFailure();
+    }
     const quota = reservationId
       ? { reservationId, reserved: quotaSettled ? 0 : RESERVE_COST, balance: ledger.summary(identityId).balance }
       : null;
 
     return {
       quota,
+      judge: judge ? { outcome: judge.outcome, assetId: judge.assetId || null, alert: judge.alert || null } : null,
       exitCode: code,
       pythonBin: resolvedPythonBin,
       metadata: parsed,
@@ -1092,6 +1204,15 @@ async function startServer() {
     try {
       const data = await registerAsset({ ...normalizeUploadRequest(req), assetType: 0 });
       res.json(data);
+    } catch (e) {
+      res.status(400).json({ error: e.message });
+    }
+  });
+
+  // Modelo base custodiado (T-809): multipart com o tar.gz do diretório do modelo.
+  app.post("/api/register-model", multipartParser, requireSignedRequest, async (req, res) => {
+    try {
+      res.json(await registerAsset({ ...normalizeUploadRequest(req), assetType: MODEL_ASSET_TYPE }));
     } catch (e) {
       res.status(400).json({ error: e.message });
     }

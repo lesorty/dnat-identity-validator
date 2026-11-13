@@ -1,0 +1,210 @@
+{
+  "note": "Verificação de funcionamento (T-811), não é dado do artigo. B e C usam um Juiz SIMULADO.",
+  "machine": {
+    "cpuModel": "Intel(R) Core(TM) 7 150U",
+    "logicalCpus": 12,
+    "node": "v22.22.1",
+    "platform": "linux 7.0.0-43-generic",
+    "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
+    "startedAtUtc": "2026-11-13T11:35:17.530Z"
+  },
+  "judgeRelease": {
+    "judgeHash": "5eed9f73f298cf8cd820d282e43f2eb2803cdb43c13804328f8462f7720ab2a7",
+    "preregSha256": "088cdb1829e2518b29d3bd10d81405847fc394a3b1f6cf6f3a09ef48c5a259fa",
+    "batteryCommitment": "9ac8c2affbeb3c262d62a089463694c9db8c2d70271814d696f1f8e96c6f6a60",
+    "note": "roteiro T-811",
+    "allowedAtUtc": "2026-11-13T11:35:20.650Z"
+  },
+  "assets": {
+    "model": "1",
+    "dataset": "2",
+    "application": "3"
+  },
+  "identity": {
+    "id": "1fcbd92f88fa49a74d6f3944eee8b7b36a4f3090877e44cf668a286c22544940",
+    "difficulty": 12,
+    "proofSeconds": 0.009823282
+  },
+  "scenarios": {
+    "A": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 0.002
+      },
+      "derivative": {
+        "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
+        "status": "retained",
+        "verdict": "failure"
+      },
+      "judge": {
+        "outcome": "failure",
+        "assetId": null,
+        "alert": "judge_failure"
+      },
+      "quota": {
+        "reservationId": "7c3e0489-2487-4a73-ba0b-e3671a18500c",
+        "reserved": 0,
+        "balance": 20
+      },
+      "balanceAfter": 20
+    },
+    "B": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 0.001
+      },
+      "derivative": {
+        "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
+        "status": "released",
+        "verdict": "approved",
+        "assetId": "4"
+      },
+      "judge": {
+        "outcome": "approved",
+        "assetId": "4",
+        "alert": null
+      },
+      "quota": {
+        "reservationId": "3cdbbadf-1520-4524-97dc-376c1fca1efb",
+        "reserved": 0,
+        "balance": 19
+      },
+      "balanceAfter": 19
+    },
+    "C": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 0.001
+      },
+      "derivative": {
+        "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
+        "status": "retained",
+        "verdict": "rejected",
+        "assetId": "5"
+      },
+      "judge": {
+        "outcome": "rejected",
+        "assetId": "5",
+        "alert": null
+      },
+      "quota": {
+        "reservationId": "0076eb87-c06a-4293-9320-b24ca5683202",
+        "reserved": 0,
+        "balance": 14
+      },
+      "balanceAfter": 14
+    }
+  },
+  "onChain": {
+    "B": {
+      "assetId": "4",
+      "active": true,
+      "usable": true,
+      "verdict": 1,
+      "verdictHash": "0x720b0bc13f4ec06a2449b5ecd8bdc68759b984ca4a9fef8e3c65bc5e38c32546",
+      "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    },
+    "C": {
+      "assetId": "5",
+      "active": false,
+      "usable": false,
+      "verdict": 2,
+      "verdictHash": "0x0493ab27d29a54d04ac5194865c6e820e465fd258154cf1664d0d63987cb4397",
+      "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    }
+  },
+  "timings": [
+    {
+      "step": "IPFS em memória",
+      "seconds": 0.003
+    },
+    {
+      "step": "hardhat node e implantação do contrato",
+      "seconds": 2.21
+    },
+    {
+      "step": "CVM2 (builder, modo direto)",
+      "seconds": 0.321
+    },
+    {
+      "step": "CVM de job (executor, modo direto)",
+      "seconds": 0.318
+    },
+    {
+      "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
+      "seconds": 0.27
+    },
+    {
+      "step": "CVM1 (api-server)",
+      "seconds": 0.931
+    },
+    {
+      "step": "identidade com prova de trabalho (d = 12)",
+      "seconds": 0.038
+    },
+    {
+      "step": "depósito do modelo base (register-model)",
+      "seconds": 0.411
+    },
+    {
+      "step": "dataset (register-dataset)",
+      "seconds": 0.2
+    },
+    {
+      "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
+      "seconds": 0.895
+    },
+    {
+      "step": "compra de acesso (purchase-access)",
+      "seconds": 0.171
+    },
+    {
+      "step": "referência do pai depositada pelo operador (judge_cli reference)",
+      "seconds": 0.299
+    },
+    {
+      "step": "A · fine-tuning + Juiz real (model_gate)",
+      "seconds": 6.571
+    },
+    {
+      "step": "B · fine-tuning + Juiz SIMULADO aprovando",
+      "seconds": 1.509
+    },
+    {
+      "step": "C · fine-tuning + Juiz SIMULADO reprovando",
+      "seconds": 1.466
+    }
+  ],
+  "checks": [
+    {
+      "name": "A: Juiz real termina em falha (estágios da nuvem)",
+      "ok": true
+    },
+    {
+      "name": "A: reserva devolvida (saldo 20)",
+      "ok": true
+    },
+    {
+      "name": "B: aprovado, derivado usável no contrato",
+      "ok": true
+    },
+    {
+      "name": "B: cota 1 (saldo 19)",
+      "ok": true
+    },
+    {
+      "name": "C: reprovado, derivado inativo",
+      "ok": true
+    },
+    {
+      "name": "C: cota 5 (saldo 14)",
+      "ok": true
+    }
+  ]
+}

@@ -38,11 +38,13 @@ TIMEOUT_SECONDS="${DNAT_JOB_TIMEOUT_SECONDS:-600}"
 KILL_GRACE_SECONDS="${DNAT_JOB_KILL_GRACE_SECONDS:-10}"
 
 APP_MOUNT=""
+APP_EXTRACT=""
 cleanup() {
     if [ -n "$APP_MOUNT" ] && mountpoint -q "$APP_MOUNT" 2>/dev/null; then
         umount "$APP_MOUNT" 2>/dev/null || true
         rmdir "$APP_MOUNT" 2>/dev/null || true
     fi
+    [ -n "$APP_EXTRACT" ] && rm -rf "$APP_EXTRACT"
 }
 trap cleanup EXIT
 
@@ -56,14 +58,26 @@ fi
 
 # Artefato opcional da aplicacao: espelha o /mnt/dnat-app read-only do microVM
 # para bundles construidos pelo builder (no modo script nao ha artifacts/).
+# Sem root (fora do container, T-811) nao ha mount nem /mnt gravavel: o ext4 e lido com debugfs
+# (so leitura do arquivo de imagem) e o run.sh acha a aplicacao por DNAT_APP_ROOT.
 if [ -f "$EXEC_DIR/artifacts/application.ext4" ]; then
     APP_MOUNT="$(mktemp -d)"
     if mount -o loop,ro "$EXEC_DIR/artifacts/application.ext4" "$APP_MOUNT" 2>/dev/null; then
         rm -f "$APP_SYMLINK" 2>/dev/null || true
         ln -s "$APP_MOUNT" "$APP_SYMLINK" 2>/dev/null || true
+        export DNAT_APP_ROOT="$APP_MOUNT"
     else
         rmdir "$APP_MOUNT" 2>/dev/null || true
         APP_MOUNT=""
+        DEBUGFS="$(command -v debugfs || echo /usr/sbin/debugfs)"
+        APP_EXTRACT="$(mktemp -d)"
+        if "$DEBUGFS" -R "rdump /app $APP_EXTRACT" "$EXEC_DIR/artifacts/application.ext4" >/dev/null 2>&1 \
+            && [ -f "$APP_EXTRACT/app/application.py" ]; then
+            export DNAT_APP_ROOT="$APP_EXTRACT"
+        else
+            rm -rf "$APP_EXTRACT"
+            APP_EXTRACT=""
+        fi
     fi
 fi
 

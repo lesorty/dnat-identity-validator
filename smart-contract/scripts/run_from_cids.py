@@ -92,6 +92,7 @@ def build_workspace(
     *,
     script_bytes: bytes | None = None,
     use_application_artifact: bool = False,
+    base_model_dir: pathlib.Path | None = None,
 ) -> pathlib.Path:
     workspace_dir = execution_dir / "workspace"
     code_dir = workspace_dir / "code"
@@ -102,6 +103,9 @@ def build_workspace(
 
     (execution_dir / "dataset.csv").write_bytes(dataset_bytes)
     (data_dir / "dataset.csv").write_bytes(dataset_bytes)
+    if base_model_dir is not None:
+        # Copia sem seguir links: o pacote do base ja foi conferido pelo digest na CVM1.
+        shutil.copytree(base_model_dir, workspace_dir / "model", symlinks=True)
 
     if script_bytes is not None:
         (execution_dir / "application.py").write_bytes(script_bytes)
@@ -112,6 +116,8 @@ set -euo pipefail
 
 cd /tmp/exec/workspace
 export DNAT_DERIVATIVE_DIR="/tmp/exec/workspace/derivative"
+# T-809: modelo base do fine-tuning, quando o pedido tem modelo pai (so leitura para o script).
+export DNAT_BASE_MODEL_DIR="/tmp/exec/workspace/model"
 # T-804: unica saida do script que chega ao usuario; stdout e stderr sao descartados pelo agente.
 export DNAT_METRICS_PATH="/tmp/exec/workspace/metrics.json"
 
@@ -169,14 +175,18 @@ set -euo pipefail
 
 cd /tmp/exec/workspace
 export DNAT_DERIVATIVE_DIR="/tmp/exec/workspace/derivative"
+# T-809: modelo base do fine-tuning, quando o pedido tem modelo pai (so leitura para o script).
+export DNAT_BASE_MODEL_DIR="/tmp/exec/workspace/model"
 # T-804: unica saida do script que chega ao usuario; stdout e stderr sao descartados pelo agente.
 export DNAT_METRICS_PATH="/tmp/exec/workspace/metrics.json"
 
-APP="/mnt/dnat-app/app/application.py"
+# DNAT_APP_ROOT: no modo direto sem root, onde run-direct.sh extraiu o ext4 (T-811).
+APP_ROOT="${DNAT_APP_ROOT:-/mnt/dnat-app}"
+APP="$APP_ROOT/app/application.py"
 test -f "$APP"
 
-if [ -d /mnt/dnat-app/app/site-packages ]; then
-    export PYTHONPATH="/mnt/dnat-app/app/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+if [ -d "$APP_ROOT/app/site-packages" ]; then
+    export PYTHONPATH="$APP_ROOT/app/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 fi
 
 attempt_1_stdout="$(mktemp)"
@@ -564,6 +574,11 @@ def main() -> int:
         help="Where the control plane wants the verified derivative archive (T-803); without it the derivative is discarded",
     )
     parser.add_argument(
+        "--base-model-dir",
+        default="",
+        help="Base model directory for a fine-tuning job (T-809); goes to workspace/model in the bundle",
+    )
+    parser.add_argument(
         "--job-timeout",
         type=int,
         default=_env_int("DNAT_JOB_TIMEOUT_SECONDS", 0) or None,
@@ -621,6 +636,7 @@ def main() -> int:
             dataset_bytes,
             script_bytes=script_bytes,
             use_application_artifact=application_artifact_path is not None,
+            base_model_dir=pathlib.Path(args.base_model_dir).resolve() if args.base_model_dir else None,
         )
         bundle_path = create_bundle(
             execution_dir,

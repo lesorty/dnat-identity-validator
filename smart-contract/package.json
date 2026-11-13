@@ -10,7 +10,8 @@
                     "deploy:hardhat":  "hardhat run scripts/deploy.js --network hardhat",
                     "cli":  "node scripts/cli.js",
                     "web":  "node scripts/api-server.js",
-                    "test:envelope":  "node test/asset_envelope.test.js"
+                    "test:envelope":  "node test/asset_envelope.test.js",
+                    "e2e:direct":  "node e2e/run_direct.js"
                 },
     "keywords":  [
 

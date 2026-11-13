@@ -34,7 +34,8 @@ BUNDLE_PATH="${1:-}"
 OUTPUT_BUNDLE_PATH="${2:-}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ARTIFACT_BUILDER="$ROOT/guest-tools/build_application_artifact.py"
+# DNAT_ARTIFACT_BUILDER: fora do container (T-811), aponta para smart-contract/scripts/build_application_artifact.py.
+ARTIFACT_BUILDER="${DNAT_ARTIFACT_BUILDER:-$ROOT/guest-tools/build_application_artifact.py}"
 WHEEL_CACHE_SOURCE_DIR="${WHEEL_CACHE_SOURCE_DIR:-/var/dnat/wheel-cache}"
 APPLICATION_ARTIFACT_NAME="application.ext4"
 BUILD_RESULT_FILE="build-result.json"
