@@ -2874,15 +2874,16 @@
    "deps": [
     "T-1504"
    ],
-   "descricao": "Por quê: A introdução vende o problema (A1, A2) e as contribuições C1 e C2; escrita depois do desenho para não prometer o que não existe.\nComo:\n- Abrir com o problema da derivação que perde a recusa\n- Listar contribuições e resultados-chave (com espaço para números)\n- Manter cerca de 1 página\nSaída: seção 1 em rascunho completo.",
+   "descricao": "Feito em 12/11: DSN2027/artigo/sections/01_introduction.tex, rascunho completo (~800 palavras, ~1 página). Abre com a derivação que perde a recusa (Qi 2024, Arditi, Lin), o cenário de custódia e as três observações que moldam o portão (julgar o derivado, referência custodiada, formatos e codificações); abordagem; C1 e C2; resultados-chave com \\tbd para cada número (saem da nuvem); roteiro das seções. A2 (Qi 2025, Casper, Kuo) aparece sem citação: as entradas ainda não estão na refs.bib. Não compilado (T-1501).\n\nPor quê: A introdução vende o problema (A1, A2) e as contribuições C1 e C2; escrita depois do desenho para não prometer o que não existe.\nComo:\n- Abrir com o problema da derivação que perde a recusa\n- Listar contribuições e resultados-chave (com espaço para números)\n- Manter cerca de 1 página\nSaída: seção 1 em rascunho completo.",
    "epico": "J15",
    "id": "T-1506",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "G",
-   "titulo": "Seção 1: introdução"
+   "titulo": "Seção 1: introdução",
+   "atualizado": "2026-11-13T05:45:00.000Z"
   },
   {
    "deps": [

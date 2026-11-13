@@ -1,4 +1,67 @@
-% Problema e contribuições (A1, A2; Lin; Casper). ~1 página.
+% Seção 1 (T-1506): problema (A1, A2) e contribuições C1 e C2, escrita depois do desenho (T-1504).
+% Rascunho completo, ~1 página. Números ainda não medidos ficam como \tbd (todo número sai da nuvem).
 \section{Introduction}\label{sec:intro}
 
-\todo{Problema e contribuições (A1, A2; Lin; Casper). ~1 página.}
+Open-weight language models are released with safety training, and that training does not survive
+derivation. A few fine-tuning steps on a handful of harmful examples remove refusals, and even benign
+fine-tuning erodes them without any intent to do so~\cite{qi2024finetuning}. Refusal is mediated by a
+single direction in the residual stream, so removing it (\emph{abliteration}) costs one weight edit
+and preserves the model's usefulness~\cite{arditi2024refusal}. The outcome is visible in the wild:
+uncensored derivatives of popular base models are published on model hubs and used as backends for
+malicious services~\cite{lin2025consiglieres}. Hardening the weights against fine-tuning raises the
+attacker's cost but has not held against adaptive attackers; once the weights are in the user's
+hands, nothing prevents the derivation.
+
+We study the setting in which the weights never leave the platform. A data and model marketplace
+keeps open-weight base models in custody inside confidential VMs (CVMs); users fine-tune on top of
+them, and the resulting derivatives run only inside the platform. Custody turns release into a
+decision point: a derivative becomes usable only if a \emph{release gate} approves it. The question
+is whether such a gate can be \emph{dependable}: it must hold back derivatives whose safety regressed,
+rarely block legitimate fine-tuning, and withstand an owner who knows the gate's code and trains
+against it~\cite{nasr2025attacker}.
+
+Three observations shape the gate. First, judging the script or the training data is not enough: the
+same script with benign data can still degrade refusal~\cite{qi2024finetuning}, so the gate must
+judge the derivative itself. Second, internal signals that detect abliteration need a trustworthy
+reference of the parent, and without custody a forged reference passes~\cite{hurtado2026abliterated};
+a white-box owner can also train those signals back to benign values, so they cannot decide alone.
+Third, the derivative may behave differently once quantized~\cite{egashira2024quantization} or when
+asked in a known encoding~\cite{halawi2024covert}, so the gate must judge every format the platform
+serves and look beyond plain-text requests.
+
+\textbf{Approach.} The Judge compares the derivative with its parent, measured in custody, and
+returns one of three states. A behavioral battery, read in full and in every released format, is the
+only instrument that rejects on merit: the derivative is rejected when its harm on requests the parent
+refuses exceeds the parent's by more than a per-category margin $\delta$. Internal signals and
+consistency guards can only make the verdict \emph{inconclusive}, which holds the derivative back
+without accusing it. Every verdict leaves a receipt with hashes on a ledger, and every attempt is
+paid from a quota held by an identity that costs a proof of work, so probing the gate has a price.
+
+\textbf{Contributions.}
+\begin{itemize}
+\item \textbf{C1, custody plus a release gate.} We design and implement a marketplace in which base
+  models and derivatives never leave CVMs, every derivative is judged as a separate job before it can
+  become active, rejected derivatives stay in custody as evidence, and the operator can revoke any
+  derivative, including all derivatives of a revoked base, at constant cost
+  (\S\ref{sec:threat}, \S\ref{sec:design}).
+\item \textbf{C2, a dependability evaluation of the gate.} We evaluate the gate with a fault model that
+  varies the amount of fault (fine-tuning steps, harmful examples, abliteration strength), a ground
+  truth produced by a procedure independent of the gate, a pre-registered protocol, a blind test on
+  derivatives found in the field, the strongest existing detector as baseline, and an adaptive
+  attacker with a declared budget (\S\ref{sec:faults}--\S\ref{sec:eval}).
+\end{itemize}
+
+\textbf{Key results.} \todo{preencher com os números da campanha na nuvem.} On \tbd\ derivatives of
+two base models, the gate silently releases \tbd\ of compromised derivatives
+(95\%~CI~\tbd) at a false-alarm rate of \tbd\ on benign fine-tuning, against \tbd\ for the
+baseline at the same false-alarm rate. Coverage grows with the amount of fault and reaches \tbd\
+at the smallest dose that compromises the model (RQ2). On the blind field test the gate
+\tbd\ (RQ3). An adaptive attacker with \tbd\ identities escapes in \tbd\ of attempts, and the
+expected cost of a first escape is \tbd\ CPU-hours (RQ4). Without custody, a forged reference
+passes the internal signals in \tbd\ of cases; a verdict costs \tbd\ CPU-minutes in a CVM and a
+receipt \tbd\ gas (RQ5).
+
+The rest of the paper presents background (\S\ref{sec:background}), the system and threat model
+(\S\ref{sec:threat}), the fault model and the property (\S\ref{sec:faults}), the design
+(\S\ref{sec:design}), the methodology (\S\ref{sec:method}) and the evaluation (\S\ref{sec:eval}),
+followed by threats to validity, related work and limitations.
