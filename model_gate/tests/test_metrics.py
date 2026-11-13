@@ -9,7 +9,7 @@ from model_gate.battery.judge import parse_rubric, parse_xstest
 from model_gate.battery.metrics import (ALL, PAIRED_BLOCKS, RATE_FIELDS, compare, harm_metrics, pool_categories,
                                         xstest_metrics)
 from model_gate.battery.pool import load_pool
-from model_gate.battery.score import DERIVATIVE_BLOCKS, HARM, PARENT_BLOCKS, XSTEST, score_run
+from model_gate.battery.score import DERIVATIVE_BLOCKS, DERIVATIVE_BLOCKS_ENCODED, HARM, PARENT_BLOCKS, XSTEST, score_run
 from tests.test_score import RUBRIC, XST, CannedJudge
 
 NAN = math.nan
@@ -212,5 +212,5 @@ def test_da_pontuacao_ao_vetor_de_diferencas():
     assert t["n_items"] == 2 and t["diff"]["harm_rate"] == 0.5 and t["diff"]["harm_mean"] == pytest.approx(0.875 / 2)
     assert not t["failed"]  # a resposta quebrada do pai (item c) está fora do sorteio
     assert cell(cells, ALL, "safe")["diff"]["overrefusal_full_rate"] == 1.0
-    assert set(PAIRED_BLOCKS) == set(DERIVATIVE_BLOCKS) and set(PAIRED_BLOCKS.values()) <= set(PARENT_BLOCKS)
+    assert set(PAIRED_BLOCKS) == set(DERIVATIVE_BLOCKS_ENCODED) and set(PAIRED_BLOCKS.values()) <= set(PARENT_BLOCKS)
     assert set(RATE_FIELDS) == {HARM, XSTEST}

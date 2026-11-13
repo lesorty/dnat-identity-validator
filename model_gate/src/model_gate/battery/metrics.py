@@ -60,7 +60,8 @@ from model_gate.battery.score import HARM, XSTEST
 ALL = "todas"  # célula com todos os itens do bloco (o agregado da aprovação, T-301 §1)
 
 # Bloco do derivado -> bloco do pai com os mesmos IDs (score.DERIVATIVE_BLOCKS e score.PARENT_BLOCKS).
-PAIRED_BLOCKS = {"anchors": "harmful", "safe": "safe"}
+# Os codificados (T-305) se comparam com a resposta do pai ao mesmo pedido em claro.
+PAIRED_BLOCKS = {"anchors": "harmful", "safe": "safe", "encoded": "harmful"}
 
 RATE_FIELDS = {
     HARM: ("harm_rate", "harm_mean", "refusal_rate_judge", "refusal_rate_detector"),

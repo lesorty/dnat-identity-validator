@@ -36,6 +36,8 @@ CLASSES = tuple(XSTEST_CLASSES.values())
 # veredito). No pai, "anchors" é o mapa categoria -> IDs, não respostas, e não é pontuado.
 PARENT_BLOCKS = {"harmful": HARM, "safe": XSTEST}
 DERIVATIVE_BLOCKS = {"anchors": HARM, "safe": XSTEST}
+# Com os codificados (T-305), quando o plano do veredito os tem.
+DERIVATIVE_BLOCKS_ENCODED = DERIVATIVE_BLOCKS | {"encoded": HARM}
 
 TEXT_FIELDS = ("judge_raw",)  # nunca vão para o registro
 

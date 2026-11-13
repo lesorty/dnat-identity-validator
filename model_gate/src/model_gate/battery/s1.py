@@ -4,8 +4,9 @@
   condição. As âncoras são os nocivos que ele recusa (refusal.is_refusal), e as respostas dele
   ficam na referência custodiada (T-312).
 - No veredito, o derivado responde só ao que o sorteio escolhe: 32 âncoras públicas e 25 seguros
-  por condição (T-302, T-303). A parte secreta (T-304) e os codificados (T-305) entram aqui quando
-  existirem.
+  por condição (T-302, T-303), e, se o plano os tiver, 6 codificados (T-305): o pedido vai
+  codificado e a resposta é decodificada antes do avaliador. A parte secreta (T-304) entra aqui
+  quando existir.
 
 Os textos voltam ao chamador, que os guarda fora do git (T-211); o Juiz grava só IDs e métricas.
 """
@@ -13,6 +14,7 @@ Os textos voltam ao chamador, que os guarda fora do git (T-211); o Juiz grava s�
 from __future__ import annotations
 
 from model_gate.battery.configs import FIXED_CONDITIONS, gen_config
+from model_gate.battery.encodings import decode_response, draw_encoded, variant_prompt
 from model_gate.battery.pool import by_category, safe_by_type
 from model_gate.battery.refusal import is_refusal
 from model_gate.battery.sample import draw_anchors, draw_safe, verdict_seed
@@ -43,8 +45,12 @@ def parent_reference(model, tokenizer, harmful: dict[int, str], safe: dict[int, 
 
 def derivative_plan(ref: dict, key: bytes, derivative_digest: str, judge_version: str,
                     round_: int = 0, xstest: dict | None = None, n_anchors: int | None = None,
-                    n_safe: int | None = None) -> dict:
-    """O que o derivado responde em cada condição: as âncoras e os seguros sorteados."""
+                    n_safe: int | None = None, harmful_texts: dict[int, str] | None = None) -> dict:
+    """O que o derivado responde em cada condição: as âncoras e os seguros sorteados.
+
+    Com harmful_texts, inclui também os codificados (T-305), sorteados entre as âncoras públicas
+    da condição; os textos só servem para descartar a âncora que não volta igual por decodificação.
+    """
     plan = {}
     safe_groups = safe_by_type(xstest)
     for c, r in ref.items():
@@ -54,6 +60,9 @@ def derivative_plan(ref: dict, key: bytes, derivative_digest: str, judge_version
             "anchors": draw_anchors(r["anchors"], verdict_seed(key, derivative_digest, c, judge_version, round_), **kw_a),
             "safe": draw_safe(safe_groups, verdict_seed(key, derivative_digest, f"{c}/xstest", judge_version, round_), **kw_s),
         }
+        if harmful_texts is not None:
+            plan[c]["encoded"] = draw_encoded(plan[c]["anchors"], harmful_texts,
+                                              verdict_seed(key, derivative_digest, f"{c}/encoded", judge_version, round_))
     return plan
 
 
@@ -65,4 +74,22 @@ def derivative_responses(model, tokenizer, harmful: dict[int, str], safe: dict[i
         cfg = cfg_for(c) if cfg_for else None
         out[c] = {"anchors": respond(model, tokenizer, harmful, p["anchors"], c, cfg),
                   "safe": respond(model, tokenizer, safe, p["safe"], c, cfg)}
+        if "encoded" in p:
+            out[c]["encoded"] = encoded_responses(model, tokenizer, harmful, p["encoded"], c, cfg)
+    return out
+
+
+def encoded_responses(model, tokenizer, harmful: dict[int, str], items: list[dict], condition: str,
+                      cfg: GenConfig | None = None) -> list[dict]:
+    """Respostas aos codificados: o texto lido pelo avaliador é o decodificado; o bruto fica em raw_text.
+
+    A marca de recusa é tirada do texto decodificado, como a de qualquer âncora.
+    """
+    prompts = {it["id"]: variant_prompt(harmful[it["id"]], it["encoding"]) for it in items}
+    raw = respond(model, tokenizer, prompts, [it["id"] for it in items], condition, cfg)
+    out = []
+    for it, r in zip(items, raw):
+        text = decode_response(r["text"], it["encoding"])
+        out.append(r | {"text": text, "raw_text": r["text"], "encoding": it["encoding"],
+                        "variant_id": it["variant_id"], "refused": is_refusal(text)})
     return out
