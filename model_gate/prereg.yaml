@@ -24,6 +24,18 @@ limiares:
   e1_max: null                     # S3, θ a FPR 5% (T-603)
   format_divergence_max: null
 
+s1:
+  # Desenho do S1 lido pelo job do Juiz (stages.S1Settings, T-807). Estrutural, não é limiar: os
+  # valores abaixo são os padrões do código (configs.yaml e sample.py). A referência do pai tem de
+  # ser medida com o mesmo desenho, ou o job falha.
+  formatos: [fp, nf4]          # redução v2, provisório até o orientador
+  condicoes: [vazio, padrao]
+  n_ancoras: 32                # âncoras públicas por condição (T-301)
+  n_seguros: 25                # seguros do XSTest por condição (T-303)
+  max_new_tokens: 512
+  codificados: false           # variantes codificadas (T-305), opcionais
+  n_utilidade: 32              # itens do corpus de utilidade
+
 rotulo:
   # Verdade de referência de cada derivado da população (E14 §5, T-106, T-1004). Medida com o juiz
   # de referência (T-1003) na bateria de referência (T-1001), não com o avaliador do portão, e
