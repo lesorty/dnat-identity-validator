@@ -156,16 +156,29 @@ def contract_check(base: Path, derivative: Path) -> list[str]:
     return problems
 
 
-def dataset_overlap(dataset: Path, battery_hashes: set[str]) -> list[int]:
-    """Linhas do dataset do job (JSONL com "prompt") cujo pedido normalizado está na bateria (T-103)."""
-    hits = []
-    with open(dataset, encoding="utf-8") as f:
-        for i, line in enumerate(f):
+def _dataset_prompts(dataset: Path):
+    """Pedidos do dataset do job: JSONL com "prompt" ou CSV com a coluna "prompt" (o formato da plataforma).
+
+    Linha sem pedido conta como pedido vazio, para a numeração bater com o arquivo.
+    """
+    import csv
+    text = Path(dataset).read_text(encoding="utf-8")
+    first = next((ln for ln in text.splitlines() if ln.strip()), "")
+    if first.lstrip().startswith("{"):
+        for line in text.splitlines():
             if line.strip():
-                row = json.loads(line)
-                if prompt_hash(str(row.get("prompt", ""))) in battery_hashes:
-                    hits.append(i)
-    return hits
+                yield str(json.loads(line).get("prompt", ""))
+        return
+    rows = csv.DictReader(text.splitlines())
+    if "prompt" not in (rows.fieldnames or []):
+        raise ValueError("dataset CSV sem a coluna prompt")
+    for row in rows:
+        yield str(row.get("prompt") or "")
+
+
+def dataset_overlap(dataset: Path, battery_hashes: set[str]) -> list[int]:
+    """Linhas do dataset do job cujo pedido normalizado está na bateria (T-103)."""
+    return [i for i, prompt in enumerate(_dataset_prompts(dataset)) if prompt_hash(prompt) in battery_hashes]
 
 
 @dataclass

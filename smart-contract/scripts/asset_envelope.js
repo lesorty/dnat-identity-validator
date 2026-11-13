@@ -15,6 +15,10 @@ const APP_ARTIFACT_FORMAT = "dnat-ext4-application-v1";
 const DATASET_FORMAT = "dnat-dataset-v1";
 // Derivado retido (T-803): tar.gz do diretório do derivado, cifrado como os datasets.
 const DERIVATIVE_FORMAT = "dnat-derivative-v1";
+// Modelo base depositado pelo dono (T-809): tar.gz do diretório do modelo; o contentHash é o digest dele.
+const MODEL_FORMAT = "dnat-model-v1";
+// Referência do pai medida sob custódia (T-312): tar.gz do diretório da referência.
+const REFERENCE_FORMAT = "dnat-reference-v1";
 const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
 
 function deriveAssetEncryptionKey() {
@@ -89,6 +93,8 @@ module.exports = {
   APP_ARTIFACT_FORMAT,
   DATASET_FORMAT,
   DERIVATIVE_FORMAT,
+  MODEL_FORMAT,
+  REFERENCE_FORMAT,
   APP_ARTIFACT_ENVELOPE_MAGIC,
   deriveAssetEncryptionKey,
   encryptBuffer,

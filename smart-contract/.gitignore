@@ -7,6 +7,9 @@ executions/
 # Estado da CVM1: identidades (T-1702) e derivados retidos (T-803)
 identities.json
 derivatives.json
+# Estado da CVM1 (T-808, T-809): referências custodiadas e lista de Juízes permitidos da implantação.
+references.json
+judge_allowlist.json
 uploads/
 manifests/
 coverage/

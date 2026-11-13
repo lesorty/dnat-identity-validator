@@ -59,9 +59,26 @@ async function retainDerivative({ archivePath, digest, executionId, statePath, u
   return record;
 }
 
-/** O que o dono da execução pode ver do derivado: digest e estado. */
-function userSummary(record) {
-  return { digest: record.digest, status: record.status, verdict: record.verdict };
+/** Registro de um derivado retido, ou null. */
+function getDerivative(statePath, executionId) {
+  return readLedger(statePath).derivatives[executionId] || null;
 }
 
-module.exports = { readLedger, retainDerivative, userSummary };
+/** Junta campos ao registro do derivado (veredito, asset, recibo; T-809) e devolve o registro novo. */
+function updateDerivative(statePath, executionId, patch) {
+  const ledger = readLedger(statePath);
+  const current = ledger.derivatives[executionId];
+  if (!current) throw new Error(`derivative of execution ${executionId} not found`);
+  ledger.derivatives[executionId] = { ...current, ...patch };
+  writeLedger(statePath, ledger);
+  return ledger.derivatives[executionId];
+}
+
+/** O que o dono da execução pode ver do derivado: digest, estado, veredito e o asset, se houver. */
+function userSummary(record) {
+  const out = { digest: record.digest, status: record.status, verdict: record.verdict };
+  if (record.assetId) out.assetId = record.assetId;
+  return out;
+}
+
+module.exports = { getDerivative, readLedger, retainDerivative, updateDerivative, userSummary };

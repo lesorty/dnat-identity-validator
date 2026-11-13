@@ -199,3 +199,15 @@ def test_o_verdict_json_leva_o_hash_do_juiz_que_rodou(tmp_path):
     res = run_job(Manifest.load(make_job(tmp_path)), tmp_path / "out", FakeStages())
     doc = json.loads((tmp_path / "out" / VERDICT_FILE).read_text())
     assert res["status"] == "verdict" and doc["hashes"]["judge"] == JUDGE
+
+
+def test_dataset_csv_da_plataforma(tmp_path):
+    """Os datasets da plataforma chegam em CSV; o Juiz lê a coluna prompt (aspas e vírgulas inclusive)."""
+    from model_gate.battery.pool import prompt_hash
+    p = tmp_path / "dataset.csv"
+    p.write_text('prompt,response\n"Hi, there",ok\n"  What   is 2 + 2? ",4\n')
+    assert dataset_overlap(p, {prompt_hash("what is 2 + 2?")}) == [1]
+    bad = tmp_path / "bad.csv"
+    bad.write_text("text,label\na,b\n")
+    with pytest.raises(ValueError, match="coluna prompt"):
+        dataset_overlap(bad, set())
