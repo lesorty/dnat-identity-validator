@@ -768,16 +768,16 @@
     "T-310",
     "T-106"
    ],
-   "descricao": "Redução v2 (11/11): Reescrever para o teste da T-301: aprovação no agregado, δ por categoria no veto, dano binarizado.\n\nPor quê: a propriedade (T-106) é a queda de recusa por categoria maior que δ e a violação da tolerância de recusa excessiva; o Juiz compara o derivado com o pai.\nComo:\n- Agregar por categoria: taxa de recusa, nota média de dano e taxa de recusa excessiva, por configuração\n- Calcular a diferença derivado − base por métrica e categoria\n- Expor uma função que recebe duas execuções e devolve o vetor de diferenças\nSaída: model_gate/battery/metrics.py com teste e esquema da saída documentado.",
+   "descricao": "Feito em 12/11 (commit cad5862): model_gate/src/model_gate/battery/metrics.py, compare(derivado, pai, tau, categories). Uma célula por formato × condição × bloco × categoria e \"todas\": taxa de nocivas (nota ≥ τ), nota média, recusa pelo avaliador e pelo detector; no XSTest, recusa total e total + parcial; diff derivado − pai nos mesmos IDs. τ sem padrão. Falha do avaliador marca a célula failed=True (sem taxa sobre o que sobrou); a regra failed → inconclusivo fica na T-602. Para a T-606: τ com Controversial = 0,5; qual marca de recusa; recusa total ou total + parcial; pareamento nos 25 seguros ou nos 150 do pai.\n\nRedução v2 (11/11): Reescrever para o teste da T-301: aprovação no agregado, δ por categoria no veto, dano binarizado.\n\nPor quê: a propriedade (T-106) é a queda de recusa por categoria maior que δ e a violação da tolerância de recusa excessiva; o Juiz compara o derivado com o pai.\nComo:\n- Agregar por categoria: taxa de recusa, nota média de dano e taxa de recusa excessiva, por configuração\n- Calcular a diferença derivado − base por métrica e categoria\n- Expor uma função que recebe duas execuções e devolve o vetor de diferenças\nSaída: model_gate/battery/metrics.py com teste e esquema da saída documentado.",
    "epico": "J3",
    "id": "T-311",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Métricas comparáveis entre modelos",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Agregar métricas por categoria (recusa, dano, recusa excessiva) e a diferença para o base",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T01:30:00.000Z"
   },
   {
    "deps": [
@@ -1387,22 +1387,22 @@
    "deps": [
     "T-701"
    ],
-   "descricao": "Redução v2 (11/11): Só o executor registra o derivado. Um modificador de papel no contrato.\n\nPor quê: pelo R10 e pela fronteira de confiança do T-105, só o executor, que roda o Juiz por hash na CVM, pode afirmar que um derivado foi julgado; o dono do derivado é o adversário.\nComo:\n- Adicionar papel de operador/executor (endereço fixado no construtor e trocável só pelo admin) e modifier onlyOperator\n- Implementar registerDerivative(parentId, hashes, verdict) com onlyOperator, exigindo pai do tipo Model e ativo\n- Teste: chamada a partir do endereço do dono do pai ou de terceiro reverte\nSaída: função registerDerivative restrita ao operador, com teste de reversão no hardhat.",
+   "descricao": "Feito em 12/11 (commit 3d769b5): admin e operator no contrato (constructor(initialOperator), setOperator só pelo admin); registerDerivative(info, owner, title, encryptedUri) só pelo operador, com pai Model existente e ativo e derivativeHash obrigatório. O derivado só nasce ativo com Approved (adianta parte da T-704). deploy.js lê DNAT_OPERATOR_ADDRESS (padrão: quem implanta). Em aberto: Pending é aceito mas não há setVerdict; owner é o endereço do pedido, sem ligação com a identidade Ed25519; o ABI do api-server ainda não tem registerDerivative (T-809).\n\nRedução v2 (11/11): Só o executor registra o derivado. Um modificador de papel no contrato.\n\nPor quê: pelo R10 e pela fronteira de confiança do T-105, só o executor, que roda o Juiz por hash na CVM, pode afirmar que um derivado foi julgado; o dono do derivado é o adversário.\nComo:\n- Adicionar papel de operador/executor (endereço fixado no construtor e trocável só pelo admin) e modifier onlyOperator\n- Implementar registerDerivative(parentId, hashes, verdict) com onlyOperator, exigindo pai do tipo Model e ativo\n- Teste: chamada a partir do endereço do dono do pai ou de terceiro reverte\nSaída: função registerDerivative restrita ao operador, com teste de reversão no hardhat.",
    "epico": "J7",
    "id": "T-703",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Chamada por outro endereço reverte",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Papel de executor/operador e registerDerivative só por ele",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T01:30:00.000Z"
   },
   {
    "deps": [
     "T-703"
    ],
-   "descricao": "Redução v2 (11/11): Reprovado nunca fica ativo. Uma checagem em updateAsset.\n\nPor quê: o portão só vale se um derivado reprovado nunca virar ativo (C1); hoje updateAsset deixa o dono gravar a.active = newActive (linha 174) sem nenhuma checagem.\nComo:\n- registerDerivative grava active = false quando o veredito não é aprovado\n- Em updateAsset, para tipo Derivative, proibir newActive = true se o veredito não for aprovado ou se o derivado tiver sido revogado pelo operador\n- Teste: o dono tenta reativar um reprovado e um revogado e as duas chamadas revertem\nSaída: updateAsset ajustado e teste de reativação negada.\nFora do escopo: a revogação em si é o T-705.",
+   "descricao": "Atualiza (12/11, T-703): registerDerivative já grava active = false para veredito diferente de Approved. Falta a checagem em updateAsset (hoje o dono ainda reativa) e a revogação.\n\nRedução v2 (11/11): Reprovado nunca fica ativo. Uma checagem em updateAsset.\n\nPor quê: o portão só vale se um derivado reprovado nunca virar ativo (C1); hoje updateAsset deixa o dono gravar a.active = newActive (linha 174) sem nenhuma checagem.\nComo:\n- registerDerivative grava active = false quando o veredito não é aprovado\n- Em updateAsset, para tipo Derivative, proibir newActive = true se o veredito não for aprovado ou se o derivado tiver sido revogado pelo operador\n- Teste: o dono tenta reativar um reprovado e um revogado e as duas chamadas revertem\nSaída: updateAsset ajustado e teste de reativação negada.\nFora do escopo: a revogação em si é o T-705.",
    "epico": "J7",
    "id": "T-704",
    "marco": "G3",
@@ -1411,7 +1411,7 @@
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Derivado reprovado nunca fica active; o dono não reativa (ajustar updateAsset, hoje linha 173)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T01:30:00.000Z"
   },
   {
    "deps": [
@@ -1523,15 +1523,15 @@
    "titulo": "CVM de job de uso único: warm pool e ciclo de vida da CVM"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-13T01:30:00.000Z",
    "deps": [],
-   "descricao": "Por quê: um treino LoRA e um veredito completo duram mais de uma hora em CPU (E13 §3.3), mas o modo direto corta em 660 s (vm_runtime/vm/run-direct.sh:24) e o executor em 720 s (vm_runtime/executor.py:56).\nComo:\n- Ler os tempos limite da configuração do agente da CVM de job e da CVM1, com a CVM1 sempre acima do agente.\n- Estouro de tempo gera erro registrado e vira inconclusivo por falha (T-104, T-107), sem travar.\n- Rodar um job de teste que dorme 2 h para provar que termina.\nSaída: tempos limite configuráveis, com o teste registrado.",
+   "descricao": "Feito em 12/11 (commit 2a478f5): DNAT_JOB_TIMEOUT_SECONDS (600), DNAT_JOB_TIMEOUT_MAX_SECONDS (24 h) e DNAT_AGENT_MARGIN_SECONDS (120) no agente; a CVM1 pede o limite por X-DNAT-Job-Timeout, lê os limites em /health e espera job + margens (padrões: 600 → 720 → 750 s). Estouro: TERM e KILL no grupo de processos, status timeout e metadata.outcome = inconclusive_failure. Testado com limites curtos (2 s cortando um job de 60 s que ignora TERM; 30 s sem corte em job de 4 s). O job real de 2 h em CVM fica para a fase de testes. VM_TIMEOUT_SECONDS deixou de valer.\n\nPor quê: um treino LoRA e um veredito completo duram mais de uma hora em CPU (E13 §3.3), mas o modo direto corta em 660 s (vm_runtime/vm/run-direct.sh:24) e o executor em 720 s (vm_runtime/executor.py:56).\nComo:\n- Ler os tempos limite da configuração do agente da CVM de job e da CVM1, com a CVM1 sempre acima do agente.\n- Estouro de tempo gera erro registrado e vira inconclusivo por falha (T-104, T-107), sem travar.\n- Rodar um job de teste que dorme 2 h para provar que termina.\nSaída: tempos limite configuráveis, com o teste registrado.",
    "epico": "J8",
    "id": "T-802",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Job de 2 h termina",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Tempos limite configuráveis (run-direct.sh:24, 660 s; executor.py:56, 720 s)"
   },
@@ -1551,17 +1551,17 @@
    "titulo": "Retenção: o derivado volta à CVM1, cifrado no IPFS, nunca na saída do job"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-13T01:30:00.000Z",
    "deps": [
     "T-803"
    ],
-   "descricao": "Redução v2 (11/11): Saída de esquema fixo: uma lista de campos permitidos; o resto é descartado.\n\nPor quê: um script hostil pode tentar exfiltrar pesos ou gerações pela saída do job; a T-102 decidiu fechar isso no piloto, e a fronteira da T-105 trata o script como não confiável.\nComo:\n- O agente descarta stdout, stderr e logs brutos e devolve só o JSON de métricas (loss, passos, tempo).\n- A CVM1 valida o esquema e um teto de bytes e recusa o resto.\n- Só o dono da execução lê o resultado (autenticação na API).\n- Teste: script que imprime 50 MiB aleatórios ou escreve um campo extra é recusado.\nSaída: esquema e teto configuráveis, com o teste de recusa.",
+   "descricao": "Feito em 12/11 (commit 2a478f5, junto com a T-802): vm_runtime/job_output.py; o script grava só $DNAT_METRICS_PATH (loss, steps, train_seconds, numéricos, 1024 bytes); stdout e stderr vão para /dev/null; resposta do agente dnat.job-output.v1 com chaves fixas e códigos fechados; a CVM1 revalida e recusa tudo fora do esquema (4096 bytes). Testado com 50 MiB de lixo no stdout. Falta do \"Como\": só o dono lê o resultado (rotas GET /api/executions* com a identidade da T-1703). Execuções antigas ainda servem stdout.txt.\n\nRedução v2 (11/11): Saída de esquema fixo: uma lista de campos permitidos; o resto é descartado.\n\nPor quê: um script hostil pode tentar exfiltrar pesos ou gerações pela saída do job; a T-102 decidiu fechar isso no piloto, e a fronteira da T-105 trata o script como não confiável.\nComo:\n- O agente descarta stdout, stderr e logs brutos e devolve só o JSON de métricas (loss, passos, tempo).\n- A CVM1 valida o esquema e um teto de bytes e recusa o resto.\n- Só o dono da execução lê o resultado (autenticação na API).\n- Teste: script que imprime 50 MiB aleatórios ou escreve um campo extra é recusado.\nSaída: esquema e teto configuráveis, com o teste de recusa.",
    "epico": "J8",
    "id": "T-804",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Só métricas de esquema fixo chegam ao usuário",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Saída de esquema fixo: o usuário recebe só métricas"
   },
@@ -2149,17 +2149,17 @@
    "atualizado": "2026-11-12T23:30:00.000Z"
   },
   {
-   "atualizado": "2026-10-28T22:10:00.000Z",
+   "atualizado": "2026-11-13T01:30:00.000Z",
    "deps": [
     "T-1101"
    ],
-   "descricao": "Por quê: A meta da E13 §3.5 é ≥ 20 derivados de campo em safetensors; GGUF fica fora do teste cego (T-113): não é formato de liberação e não sai da plataforma (T-111).\nComo:\n- Classificar cada candidato do T-1101 em safetensors, GGUF ou ambos\n- Descartar os que não declaram base compatível com o pai custodiado\n- Se faltar para 20 em safetensors, ampliar a busca antes de seguir e registrar o déficit\nSaída: lista filtrada só com safetensors, com a contagem de GGUF achados reportada como contexto.",
+   "descricao": "Feito em 12/11 (commit 295d749): experiments/field_filter.py e data/field_filtered.csv (206 linhas com decisão e motivos), só metadados do HF. Aceitos 21 (13 Llama-3.2-1B, 8 Qwen2.5-0.5B), incluindo os 3 exemplos da E13. Em aberto: 10 dos 21 têm o lm_head desamarrado (vocabulário × dimensão parâmetros a mais); se o Juiz tratar isso como forma diferente do base, sobram 11. Excluídos os de raiz no pré-treinado; até 17 recuperáveis com base desconhecida e forma igual. Para a T-1103: nicoboss (cheio + LoRA), cazzz307 gated, revisão do pai Llama e licença da Meta.\n\nPor quê: A meta da E13 §3.5 é ≥ 20 derivados de campo em safetensors; GGUF fica fora do teste cego (T-113): não é formato de liberação e não sai da plataforma (T-111).\nComo:\n- Classificar cada candidato do T-1101 em safetensors, GGUF ou ambos\n- Descartar os que não declaram base compatível com o pai custodiado\n- Se faltar para 20 em safetensors, ampliar a busca antes de seguir e registrar o déficit\nSaída: lista filtrada só com safetensors, com a contagem de GGUF achados reportada como contexto.",
    "epico": "J11",
    "id": "T-1102",
    "marco": "G2",
    "prioridade": "P0",
    "pronto": "≥ 20 em safetensors identificados",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Filtrar por formato (só safetensors) e pela base declarada",
    "teste": "TS5"
@@ -3231,18 +3231,18 @@
    "titulo": "Registro de identidade com prova de trabalho na CVM1"
   },
   {
-   "atualizado": "2026-11-11T12:00:00.000Z",
+   "atualizado": "2026-11-13T01:30:00.000Z",
    "deps": [
     "T-1702"
    ],
-   "descricao": "Por quê: hoje quem pede um job vem do campo user do corpo, sem autenticação; sem assinatura, qualquer um gasta a cota de outro (E14 §18.2).\nComo:\n- Middleware no api-server.js que lê X-Identity, X-Timestamp e X-Signature e confere a assinatura Ed25519 sobre método, caminho, carimbo e SHA-256 do corpo.\n- Recusar carimbo fora de ±5 min (contra repetição) e identidade desconhecida.\n- Aplicar só em register-dataset, register-application e run-from-cids; leitura e ações do operador ficam como estão (D3).\n- Gravar o id da identidade no metadata.json de cada execução.\nSaída: middleware aplicado às três rotas e o id em cada execução.\nFora do escopo: leitura da execução só pelo dono (T-804); sessões de inferência.",
+   "descricao": "Feito em 12/11 (commit 7d09fc0): cabeçalhos X-Identity, X-Timestamp (ms) e X-Signature (Ed25519) sobre \"DNAT-REQUEST-v1\\nMÉTODO\\nURL\\ncarimbo\\nSHA-256(corpo cru)\"; janela de ±5 min e registro de pedidos vistos contra repetição. Nas rotas register-dataset, register-application e run-from-cids; o id vai no metadata.json da execução. 14 testes. Atenção: a web UI e assets/tests/*.sh passam a receber 401 até existir cliente que assina (T-1705). Em aberto: registro de vistos em memória (repetição após reinício) e mensagem sem o desafio da implantação.\n\nPor quê: hoje quem pede um job vem do campo user do corpo, sem autenticação; sem assinatura, qualquer um gasta a cota de outro (E14 §18.2).\nComo:\n- Middleware no api-server.js que lê X-Identity, X-Timestamp e X-Signature e confere a assinatura Ed25519 sobre método, caminho, carimbo e SHA-256 do corpo.\n- Recusar carimbo fora de ±5 min (contra repetição) e identidade desconhecida.\n- Aplicar só em register-dataset, register-application e run-from-cids; leitura e ações do operador ficam como estão (D3).\n- Gravar o id da identidade no metadata.json de cada execução.\nSaída: middleware aplicado às três rotas e o id em cada execução.\nFora do escopo: leitura da execução só pelo dono (T-804); sessões de inferência.",
    "epico": "J17",
    "id": "T-1703",
    "marco": "G3",
    "ordem": 1703,
    "prioridade": "P0",
    "pronto": "Pedido sem assinatura, com assinatura errada ou carimbo velho recebe 401",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Pedidos assinados pela identidade nas rotas que criam trabalho"
   },
@@ -3263,11 +3263,11 @@
    "titulo": "Livro de cotas na CVM1: reserva no aceite, acerto no veredito"
   },
   {
-   "atualizado": "2026-11-11T12:00:00.000Z",
+   "atualizado": "2026-11-13T01:30:00.000Z",
    "deps": [
     "T-1703"
    ],
-   "descricao": "Por quê: sem cliente, ninguém registra nem assina; e o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo (T-1708).\nComo:\n- cli.js identity new: gera a chave Ed25519, minera o nonce para o desafio da CVM1, registra e guarda a chave num arquivo local.\n- O CLI passa a assinar os pedidos às três rotas da T-1703.\n- cli.js identity bench: mede o tempo da prova para d de 12 a 24 bits, 5 repetições, e grava a tabela.\nSaída: comandos no cli.js e a tabela de custo por d em results/.",
+   "descricao": "Atualiza (12/11, T-1703): sem o cliente que assina, a web UI (web/index.html) e assets/tests/run_all_tests.sh e t5_access_control.sh recebem 401 nas rotas register-* e run-from-cids. Formato da assinatura em smart-contract/scripts/identity.js (signRequest).\n\nPor quê: sem cliente, ninguém registra nem assina; e o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo (T-1708).\nComo:\n- cli.js identity new: gera a chave Ed25519, minera o nonce para o desafio da CVM1, registra e guarda a chave num arquivo local.\n- O CLI passa a assinar os pedidos às três rotas da T-1703.\n- cli.js identity bench: mede o tempo da prova para d de 12 a 24 bits, 5 repetições, e grava a tabela.\nSaída: comandos no cli.js e a tabela de custo por d em results/.",
    "epico": "J17",
    "id": "T-1705",
    "marco": "G3",
