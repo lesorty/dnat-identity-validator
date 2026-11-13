@@ -332,6 +332,12 @@ class DirectAgentTest(unittest.TestCase):
                 urllib.request.urlopen(f"{self.url}/derivative/{bad}", timeout=10)
             self.assertEqual(ctx.exception.code, 404)
 
+    def test_nada_em_claro_fica_no_disco_do_job(self):
+        """T-815 (T3): dataset, base e aplicação somem do disco da CVM de job depois do job."""
+        self.execute(READS_BASE, model={"model.safetensors": b"base" * 64})
+        self.assertFalse(self.exec_dir.exists(), "o espaço de trabalho do job tem de ser apagado")
+        self.assertEqual(list((Path(executor.__file__).parent / "input").glob("*.tar.gz")), [])
+
     def test_base_somente_leitura_e_conferido_pelo_digest(self):
         model = {"model.safetensors": b"\x00pesos-do-base" * 64, "config.json": b"{}"}
         _, body = self.execute(READS_BASE, model=model)

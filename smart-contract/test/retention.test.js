@@ -146,6 +146,16 @@ describe("Retenção do derivado (T-803)", function () {
     assert.deepStrictEqual(fs.readdirSync(outbox), [], "o agente entrega uma vez e apaga");
   });
 
+  it("a pasta da execução não guarda bundle, dataset, aplicação nem workspace em claro", async function () {
+    const derivative = await agentCollect(tmp);
+    const { metadata, executionDir } = await runJob(tmp, agentOutput({ derivative }));
+    for (const name of ["bundle.tar.gz", "dataset.csv", "application.ext4", "application.py", "workspace"]) {
+      assert.ok(!fs.existsSync(path.join(executionDir, name)), `${name} ficou na pasta da execução`);
+    }
+    assert.strictEqual(metadata.plaintextRemoved, true);
+    assert.ok(fs.existsSync(path.join(executionDir, "metadata.json")) && fs.existsSync(path.join(executionDir, "result.json")));
+  });
+
   it("T-805: pacote baixado que não bate com os arquivos declarados é recusado e apagado", async function () {
     const outbox = path.join(tmp, "outbox");
     const derivative = await agentCollect(tmp, outbox);

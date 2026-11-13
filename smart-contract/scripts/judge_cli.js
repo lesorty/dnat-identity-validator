@@ -58,6 +58,8 @@ function allow(argv) {
   const entry = {
     judgeHash: flow.computeJudgeHash(),
     preregSha256: fileSha256(prereg),
+    // A CVM1 lê este arquivo no job; dentro do model_gate fica relativo, para valer no container.
+    preregPath: prereg.startsWith(flow.MODEL_GATE_DIR + path.sep) ? path.relative(flow.MODEL_GATE_DIR, prereg) : prereg,
     batteryCommitment: battery,
     ...(kind ? { evaluatorKind: kind } : {}),
     ...(evaluatorDir ? { evaluatorDigest: modelDirDigest(path.resolve(evaluatorDir)).digest } : {}),

@@ -528,6 +528,23 @@ def retain_derivative(
     return {**summary, "status": "received"}
 
 
+PLAINTEXT_ARTIFACTS = ("bundle.tar.gz", "dataset.csv", "application.ext4", "application.py", "workspace")
+
+
+def scrub_plaintext(execution_dir: pathlib.Path) -> None:
+    """Apaga da pasta da execução o que estava em claro: bundle (com o modelo base), dataset,
+    aplicação e workspace. A CVM1 guarda os ativos cifrados no IPFS; aqui sobram só metadata.json,
+    result.json e as saídas de esquema fixo (T-805: cada execução deixava GB de modelo em claro)."""
+    for name in PLAINTEXT_ARTIFACTS:
+        target = execution_dir / name
+        if target.is_dir() and not target.is_symlink():
+            for dirpath, _, _ in os.walk(target):
+                os.chmod(dirpath, 0o700)
+            shutil.rmtree(target, ignore_errors=True)
+        else:
+            target.unlink(missing_ok=True)
+
+
 def build_metadata(
     execution_id: str,
     dataset_cid: str,
@@ -551,10 +568,13 @@ def build_metadata(
         "applicationCid": normalize_cid(application_cid),
         "ipfsApiUrl": ipfs_api_url,
         "executorUrl": normalize_executor_url(executor_url),
-        "datasetPath": str((execution_dir / "dataset.csv").resolve()),
-        "bundlePath": str((execution_dir / "bundle.tar.gz").resolve()),
-        "applicationArtifactPath": str((execution_dir / "application.ext4").resolve()) if used_application_artifact else None,
-        "scriptPath": str((execution_dir / "application.py").resolve()) if (execution_dir / "application.py").exists() else None,
+        # Dataset, aplicação, base e bundle em claro saem do disco depois do envio (scrub_plaintext):
+        # a pasta da execução guarda só metadata, resultado e saídas de esquema fixo.
+        "datasetPath": None,
+        "bundlePath": None,
+        "applicationArtifactPath": None,
+        "scriptPath": None,
+        "plaintextRemoved": True,
         "resultPath": str((execution_dir / "result.json").resolve()),
         # T-802/T-107: toda falha (inclusive tempo estourado) e inconclusivo por falha, sem merito.
         "outcome": "inconclusive_failure" if status in FAILURE_STATUSES else "completed",
@@ -760,6 +780,8 @@ def main() -> int:
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         print(json.dumps(metadata, indent=2))
         return 1
+    finally:
+        scrub_plaintext(execution_dir)
 
 
 if __name__ == "__main__":

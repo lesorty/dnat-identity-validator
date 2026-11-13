@@ -64,6 +64,9 @@ function loadAllowlist(p = ALLOWLIST_PATH) {
     evaluatorKind: j.evaluatorKind ? String(j.evaluatorKind) : null,
     evaluatorDigest: j.evaluatorDigest ? hex(j.evaluatorDigest) : null,
     batteryPackDigest: j.batteryPackDigest ? hex(j.batteryPackDigest) : null,
+    // Arquivo do prereg congelado desta liberação: relativo ao model_gate (o mesmo no host e no
+    // container) ou absoluto. Sem ele, o prereg.yaml do model_gate. O hash é o que vale.
+    preregPath: j.preregPath ? String(j.preregPath) : null,
     note: String(j.note || ""),
   }));
   for (const j of judges) {
@@ -432,7 +435,7 @@ async function judgeDerivative({
   datasetPath,
   fetchToFile,
   allowlist = loadAllowlist(),
-  preregPath = path.join(MODEL_GATE_DIR, "prereg.yaml"),
+  preregPath = null,
   cmd = judgeCommand(),
   modelGateDir = MODEL_GATE_DIR,
   owner,
@@ -458,7 +461,10 @@ async function judgeDerivative({
     const running = await computeJudgeHashAsync({ cmd, cwd: modelGateDir });
     release = findRelease(allowlist, running);
     if (!release) return failBeforeJob("judge_not_allowed", `judge ${running} not in allowlist`);
-    if (fileSha256(preregPath) !== release.preregSha256) return failBeforeJob("prereg_not_frozen", "prereg.yaml differs from the allowlist");
+    preregPath = preregPath || path.resolve(modelGateDir, release.preregPath || "prereg.yaml");
+    if (!fs.existsSync(preregPath) || fileSha256(preregPath) !== release.preregSha256) {
+      return failBeforeJob("prereg_not_frozen", `${preregPath} missing or differs from the allowlist`);
+    }
   } catch (e) {
     return failBeforeJob("judge_unavailable", errorText(e));
   }

@@ -45,6 +45,10 @@ cleanup() {
         rmdir "$APP_MOUNT" 2>/dev/null || true
     fi
     [ -n "$APP_EXTRACT" ] && rm -rf "$APP_EXTRACT"
+    # T-815 (T3): dataset, base e aplicação em claro não ficam no disco da CVM de job depois do job.
+    # O derivado já saiu para a pasta de saída do agente (outbox) antes desta limpeza.
+    chmod -R u+w "$EXEC_DIR" 2>/dev/null || true
+    rm -rf "$EXEC_DIR"
 }
 trap cleanup EXIT
 

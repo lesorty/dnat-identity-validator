@@ -383,6 +383,22 @@ fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "ve
     }
   });
 
+  it("a liberação aponta o arquivo do prereg congelado; a CVM1 o usa sem configuração (T-814)", async function () {
+    const s = await setup();
+    process.env.FAKE_JUDGE_HASH = JUDGE;
+    process.env.FAKE_JUDGE_STATE = "aprovado";
+    allow = [{ ...allow[0], preregPath: path.relative(state, prereg) }];
+    const res = await judge(s, { preregPath: null });
+    assert.strictEqual(res.outcome, "approved", JSON.stringify(res));
+  });
+
+  it("sem preregPath na liberação, o prereg.yaml do model_gate tem de ter o hash liberado", async function () {
+    const s = await setup();
+    process.env.FAKE_JUDGE_HASH = JUDGE;
+    const res = await judge(s, { preregPath: null });
+    assert.deepStrictEqual([res.outcome, res.alert], ["failure", "prereg_not_frozen"]);
+  });
+
   it("pacote da bateria ausente ou diferente do liberado: falha antes do job", async function () {
     const s = await setup();
     allow = [{ ...allow[0], batteryPackDigest: sha("outro pacote") }];
