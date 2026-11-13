@@ -1567,19 +1567,21 @@
    "titulo": "Saída de esquema fixo: o usuário recebe só métricas"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-13T16:30:00.000Z",
    "deps": [
-    "T-102"
+    "T-102",
+    "T-803",
+    "T-804"
    ],
-   "descricao": "Juntada em T-806 em 11/11 (redução v2): Entregar o base por digest é o primeiro passo do job de fine-tuning.\n\nPor quê: o fine-tuning precisa ler o pai custodiado sem poder alterá-lo, senão a referência do Juiz (R9) deixa de ser confiável.\nComo:\n- A CVM1 decifra o base e o entrega à CVM de job pelo agente, com o digest.\n- O agente confere o hash antes de rodar o script e deixa o arquivo somente leitura.\n- Teste: o job tenta escrever no base e falha; o digest confere no fim.\nSaída: base entregue somente leitura e conferido por digest.",
+   "descricao": "Reaberta e ampliada em 13/11: além de entregar o base, o derivado tem de voltar sem passar pela memória. Hoje o base vai dentro do bundle e o derivado volta em base64 no JSON da resposta do agente (T-803), o que não cabe com o Qwen2.5-0.5B (~1 GB) e trava a T-806 e a T-813.\n\nPor quê: o fine-tuning e o Juiz só valem com modelos reais; o canal entre a CVM1 e a CVM de job tem de levar GB sem copiar tudo para a memória, e o base tem de chegar intacto (R9).\nComo:\n- Agente: recebe o bundle em fluxo para o disco; o derivado vira um arquivo no agente, com digest e lista de arquivos no JSON, baixado uma vez pela CVM1 (GET /derivative/<token>) e apagado.\n- CVM1: baixa em fluxo, confere o digest pelo conteúdo do tar, cifra e guarda no IPFS lendo do disco; envelope de cifra e IPFS em fluxo também para o base, a referência e o pacote da bateria.\n- Base no job: copiado somente leitura em workspace/model, conferido pelo digest antes e depois do script.\n- Teste: o job tenta escrever no base e o derivado é recusado; modelo de ~1 GB passa sem estourar a memória.\nSaída: canal de modelos em fluxo e roteiro do modo direto com o Qwen2.5-0.5B.\n\nOriginal (cortada em 11/11 e juntada na T-806): Juntada em T-806 em 11/11 (redução v2): Entregar o base por digest é o primeiro passo do job de fine-tuning.\n\nPor quê: o fine-tuning precisa ler o pai custodiado sem poder alterá-lo, senão a referência do Juiz (R9) deixa de ser confiável.\nComo:\n- A CVM1 decifra o base e o entrega à CVM de job pelo agente, com o digest.\n- O agente confere o hash antes de rodar o script e deixa o arquivo somente leitura.\n- Teste: o job tenta escrever no base e falha; o digest confere no fim.\nSaída: base entregue somente leitura e conferido por digest.",
    "epico": "J8",
    "id": "T-805",
    "marco": "G3",
    "prioridade": "P1",
-   "pronto": "Job lê o base e não escreve nele",
-   "status": "cortada",
-   "tamanho": "M",
-   "titulo": "Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois"
+   "pronto": "O roteiro do modo direto roda com o Qwen2.5-0.5B real como base; o job lê o base e não escreve nele",
+   "status": "em andamento",
+   "tamanho": "G",
+   "titulo": "Transporte de modelos grandes: o base entra no job e o derivado volta por arquivo, conferidos por digest"
   },
   {
    "atualizado": "2026-11-11T18:00:00.000Z",
@@ -1698,11 +1700,12 @@
   },
   {
    "deps": [
-    "T-809",
-    "T-705",
-    "T-704",
     "T-1611",
-    "T-312"
+    "T-312",
+    "T-704",
+    "T-705",
+    "T-809",
+    "T-814"
    ],
    "descricao": "Atualiza (13/11): o roteiro existe no modo direto (smart-contract/e2e/run_direct.js, T-811), mas com o modelo minúsculo e um Juiz simulado para o aprovado e o reprovado. Aqui o veredito tem de vir do Juiz real (T-807): base Qwen2.5-0.5B depositado, referência do pai da T-312, avaliador e bateria da liberação, abliterado reprovado e LoRA benigno aprovado. Depende do transporte de modelos grandes entre a CVM1 e a CVM de job (hoje o derivado volta em base64 dentro do JSON).\n\nFase de testes (12/11): Teste 8 (ponta a ponta). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): O Teste 8 sobre o fluxo do modo direto, repetido uma vez na CVM.\nAbsorve: T-708 (Testes do contrato: aprovado, reprovado, revogação, reativação negada).\n\nPor quê: é o critério do marco G3 (16/nov): sem ele, o recibo cai para desenho pela ordem de corte, e só a retenção fica.\nComo:\n- Script em assets/tests/ que roda: derivado reprovado (abliterado) e conferir que fica retido; derivado aprovado (LoRA benigno) e conferir que vira ativo com recibo\n- Operador revoga o aprovado e o dono não consegue reativar\n- Registrar a execução com o commit\nSaída: teste ponta a ponta verde e registrado no marco G3.",
    "epico": "J8",
@@ -3424,6 +3427,42 @@
    "ordem": 917,
    "criado": "2026-11-12T18:54:30.000Z",
    "atualizado": "2026-11-12T18:54:30.000Z"
+  },
+  {
+   "id": "T-814",
+   "epico": "J8",
+   "marco": "G3",
+   "prioridade": "P1",
+   "tamanho": "M",
+   "status": "a fazer",
+   "deps": [
+    "T-805",
+    "T-807",
+    "T-809",
+    "T-811"
+   ],
+   "titulo": "Ensaio local do Teste 8 com o Juiz real (parte local da T-813)",
+   "pronto": "Script de assets/tests passa no modo direto com o Qwen2.5-0.5B e o Juiz real",
+   "descricao": "Criada em 13/11. Por quê: a T-813 roda o Teste 8 na nuvem; ensaiar aqui tira os erros de integração antes.\nComo:\n- Script em assets/tests/ (o que a T-813 pede) sobre o roteiro do modo direto (T-811).\n- Depositar o Qwen2.5-0.5B, a referência medida do pai (código da T-312) e o pacote da bateria; liberar o Juiz com avaliador e prereg de fumaça.\n- Rodar duas aplicações de fine-tuning: uma abliteração (receita da T-908) e um LoRA benigno (receita da T-901); o Juiz real julga.\n- Conferir no contrato: o reprovado fica retido; o operador revoga e o dono não reativa (T-704, T-705); a cota acerta.\nSaída: script verde e tempos por etapa registrados. Limite: com prereg de fumaça e n pequeno o LoRA tende a inconclusivo; o aprovado de verdade vem na nuvem (T-606, T-813).",
+   "atualizado": "2026-11-13T16:30:00.000Z"
+  },
+  {
+   "id": "T-815",
+   "epico": "J8",
+   "marco": "G3",
+   "prioridade": "P1",
+   "tamanho": "M",
+   "status": "a fazer",
+   "deps": [
+    "T-805",
+    "T-807",
+    "T-1703",
+    "T-1705"
+   ],
+   "titulo": "Pilha Docker local (CVM1, builder, executor) e scripts de assets/tests verdes",
+   "pronto": "docker compose sobe a pilha e run_all_tests.sh e t5_access_control.sh passam",
+   "descricao": "Criada em 13/11. Por quê: a implantação nas CVMs usa as imagens Docker, que não foram montadas desde a assinatura de pedidos, a cota e o Juiz; os scripts de assets/tests passaram a assinar pelo CLI (T-1703, T-1705) sem rodar.\nComo:\n- Montar as três imagens com executor e builder em modo direto (sem KVM).\n- Pôr o model_gate e o uv na imagem da CVM1 (ambiente da T-202), para o Juiz rodar dentro dela.\n- Rodar run_all_tests.sh e t5_access_control.sh e corrigir o que quebrar; atualizar o RUN_COMPOSE.md.\nSaída: pilha que sobe com docker compose e scripts verdes. Prepara a T-801 (imagem da CVM de job), a T-1707 e a T-1611; retoma em parte a T-209 (cortada).",
+   "atualizado": "2026-11-13T16:30:00.000Z"
   }
  ],
  "objetivos": [
