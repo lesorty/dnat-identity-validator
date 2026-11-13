@@ -2,7 +2,7 @@
    python3 -I progresso.py <backlog.json> <mapa_vivo.html> <saida.html>"""
 import collections, datetime as dt, functools, html, json, sys
 BK, SRC, OUT = sys.argv[1:4]
-TODAY = dt.date(2026, 11, 12)
+TODAY = dt.date(2026, 11, 13)
 H = {"P": 1, "M": 2, "G": 4}
 e = html.escape
 b = json.load(open(BK)); T = b["tasks"]; t = {x["id"]: x for x in T}
@@ -137,7 +137,7 @@ late = [m["id"] for m in b["marcos"] if m["id"] != "ESP" and d(m["data"]) < TODA
 g3 = [x for x in T if x["marco"] == "G3" and x["id"] not in cut]
 PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
 <section class="pg">
-  <div class="sec-head"><h2>Progresso</h2><p class="lede">Onde o trabalho está até a submissão de {br(sub)}, depois da <a href="https://claude.ai/artifact/J9jERdCKczAsvk3YWvJbSr">redução v2</a> de 11/11, que levou o que falta de 381 h para {open_h} h ({open_h-1} h do núcleo mais a T-709, opcional) sem tirar nenhum teste. Retrato de {br(TODAY)}/{TODAY.year}, calculado do backlog (P = 1 h, M = 2 h, G = 4 h; as tasks cortadas saem da conta); o estado vivo fica no <a href="https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF">Backlog do Juiz</a>.</p></div>
+  <div class="sec-head"><h2>Progresso</h2><p class="lede">Onde o trabalho está até a submissão de {br(sub)}, depois da <a href="https://claude.ai/artifact/J9jERdCKczAsvk3YWvJbSr">redução v2</a> de 11/11, que cortou o que faltava sem tirar nenhum teste. Faltam {open_h} h, contando a T-709, opcional. Retrato de {br(TODAY)}/{TODAY.year}, calculado do backlog (P = 1 h, M = 2 h, G = 4 h; as tasks cortadas saem da conta); o estado vivo fica no <a href="https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF">Backlog do Juiz</a>.</p></div>
 
   <div class="pg-tiles">
     <div><b>{days_left} dias</b><span>até a submissão ({br(sub)})</span></div>
@@ -165,6 +165,7 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
       <li><span>05/11</span>Fundação quase pronta (J2) e primeira medida de custo (T-208)</li>
       <li><span>09/11</span>Identidade cara e cota por veredito decididas (T-1701, D7)</li>
       <li><span>11/11</span>Composição da bateria (T-301), objetivos e testes numerados, identidade mínima e redução v2</li>
+      <li><span>12/11</span>Construção local: escada e saída do veredito, formatos, revogação em cascata, cota, cliente de identidade, orquestrador, juiz de referência e rascunhos do artigo (D8)</li>
     </ul>
   </div>
 
@@ -199,10 +200,11 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
       <h3>Riscos e pendências</h3>
       <ul class="pg-risks">
         <li class="bad"><b>Marcos vencidos.</b> {", ".join(late)} passaram sem fechar, e o G3 vence em {(d(MK["G3"]["data"])-TODAY).days} dias com {sum(x["id"] in done for x in g3)} de {len(g3)} tasks feitas.</li>
-        <li class="bad"><b>O ritmo.</b> O que falta pede ~{open_h/days_left:.0f} h por dia até {br(sub)}; o ritmo até aqui foi de ~3 h por dia.</li>
+        <li class="bad"><b>O ritmo.</b> O que falta pede ~{open_h/days_left:.0f} h por dia até {br(sub)}; o ritmo até aqui foi de ~{done_h/(TODAY-X0).days:.0f} h por dia.</li>
         <li class="warn"><b>Todo dado do artigo sai da nuvem.</b> População, rótulos, calibração, campo, custo e ablação rodam nas VMs de nuvem (Azure ou Oracle) no TST, depois do fechamento do sistema (T-1611); a máquina local só constrói e verifica com fumaça. Isso concentra a carga de CPU entre 16/11 e 21/11.</li>
         <li class="warn"><b>O avaliador só será medido na nuvem (T-309, T-315, fase de testes).</b> A geração cabe nos 80 min com FP e NF4, mas o avaliador lendo cada resposta pode custar mais que ela: a medida parcial do notebook (Qwen3Guard em float32, ~264 min por veredito) é só pista.</li>
-        <li class="warn"><b>Decisões com o orientador.</b> A redução v2 revê seis decisões (formatos FP e NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques), e a T-301 propõe a aprovação no agregado; junto com os pontos da E14 §17.</li>
+        <li class="warn"><b>Decisões com o orientador.</b> A redução v2 revê seis decisões (formatos FP e NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques), e a T-301 propõe a aprovação no agregado; junto com os pontos da E14 §17. A escolha do juiz de referência (gpt-oss-20b, T-1002) é proposta de 12/11 e também passa por ele.</li>
+        <li class="warn"><b>A construção local acabou.</b> O que resta depende da nuvem (T-210, T-801, T-414 e a CVM da T-807), do orientador (T-304), de pessoas (T-1605), de acesso (T-1604), do aceite da licença da Meta (T-1103), do comitê (T-1606) ou do LaTeX (T-1501). Sem o Juiz como segundo job, nenhum job bom acerta a cota: cada um fica com 5 reservados.</li>
         <li class="warn"><b>Recursos decididos em 12/11, com pendência.</b> Máquinas da campanha (T-1601), juiz de referência e família não vista (T-1602) e nuvem (T-1603: Azure e Oracle) estão decididos; faltam o crédito, o tipo de VM e a licença da Meta.</li>
       </ul>
     </div>

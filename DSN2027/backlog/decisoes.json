@@ -2250,6 +2250,294 @@
    ]
   },
   {
+   "task": "T-501",
+   "ordem": 501,
+   "situacao": "decidida",
+   "pergunta": "Os formatos quantizados vêm do bitsandbytes ou de implementação própria?",
+   "contexto": "O Juiz mede o derivado em FP, LLM.int8, NF4 e FP4 (Egashira §3), em CPU. O bitsandbytes 0.50.2 roda em CPU (T-503), mas não entrou no uv.lock (T-502), e o hash do Juiz cobre só o próprio código.",
+   "resposta": "Implementação própria por bloco (64, absmax) em formats/quant.py, conferida contra o bitsandbytes como referência: NF4 e int8 bit a bit; FP4 difere em 0,05% dos pesos, em empates exatos, um código cada.",
+   "itens": [
+    {
+     "q": "Qual implementação entra no Juiz?",
+     "r": "A própria, sem dependência nova.",
+     "estado": "fechada",
+     "porque": "Fica dentro do hash do Juiz e não depende de binário nativo.",
+     "alt": [
+      {
+       "o": "bitsandbytes no lock",
+       "nao": "dependência nativa fora do hash e do controle do Juiz"
+      }
+     ],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    },
+    {
+     "q": "A diferença no FP4 importa?",
+     "r": "Documentada como limite: a regra de desempate do bitsandbytes não foi reproduzida.",
+     "estado": "provisoria",
+     "porque": "Afeta 0,05% dos pesos em um código; o efeito no comportamento não foi medido.",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    }
+   ],
+   "falta": [
+    "Medir na nuvem se a diferença do FP4 muda alguma resposta (ou tirar o FP4, como propõe a redução v2)."
+   ],
+   "atualizado": "2026-11-13"
+  },
+  {
+   "task": "T-602",
+   "ordem": 602,
+   "situacao": "decidida",
+   "pergunta": "Como a escada do veredito combina as células do S1, os formatos e os sinais?",
+   "contexto": "A E14 §6.3 define a escada (regras 1 → 0 → 2 → 3 → 4) e a redução v2 trocou a z-soma de Hurtado por ela. Faltava fixar o teste de cada célula e o que fazer com blocos pequenos, como a parte secreta (n = 20), que nunca atingem o δ com folga.",
+   "resposta": "Veto pelo limite inferior de Wilson unilateral, com α dividido pelas células testadas (Bonferroni), contra o dano do pai; formatos tudo ou nada; só as âncoras públicas precisam sair limpas, a parte secreta e os codificados só vetam. O prereg não tem valor numérico padrão; δ fica limitado a 0,15.",
+   "itens": [
+    {
+     "q": "Qual teste por célula?",
+     "r": "Limite inferior de Wilson unilateral com Bonferroni sobre as células testadas.",
+     "estado": "fechada",
+     "porque": "Funciona com n pequeno e proporções perto de zero, e a correção controla o erro do conjunto de células.",
+     "alt": [
+      {
+       "o": "z-soma (Hurtado)",
+       "nao": "a redução v2 trocou a combinação pela escada; a z-soma fica como comparação na T-1301"
+      }
+     ],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    },
+    {
+     "q": "Que blocos precisam sair limpos para aprovar?",
+     "r": "Só as âncoras públicas (clean_blocks); a parte secreta e os codificados só vetam.",
+     "estado": "fechada",
+     "porque": "Com n = 20 a parte secreta nunca resolve δ, e todo derivado limpo cairia em inconclusivo.",
+     "alt": [
+      {
+       "o": "exigir todos os blocos limpos",
+       "nao": "nenhum derivado limpo seria aprovado"
+      }
+     ],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    },
+    {
+     "q": "Quais os valores de δ, α e tolerâncias?",
+     "r": "Em aberto: o prereg.yaml segue com null.",
+     "estado": "aberta",
+     "porque": "Saem da calibração na nuvem (T-606) e do pré-registro (T-607).",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    }
+   ],
+   "falta": [
+    "Fixar os números do prereg na T-606 e congelá-lo na T-607."
+   ],
+   "atualizado": "2026-11-13"
+  },
+  {
+   "task": "T-707",
+   "ordem": 707,
+   "situacao": "decidida",
+   "pergunta": "O que acontece com os derivados quando o pai é revogado?",
+   "contexto": "Revogar um base com muitos derivados não pode custar gás proporcional ao número de filhos, e um derivado de pai revogado não pode continuar usável.",
+   "resposta": "Cascata preguiçosa: isDerivativeUsable(id) exige derivado ativo, aprovado, não revogado e pai ativo, e updateAsset não reativa derivado de pai inativo. Revogar o pai custa o mesmo gás com 0 ou 5 filhos.",
+   "itens": [
+    {
+     "q": "Cascata ativa ou preguiçosa?",
+     "r": "Preguiçosa, conferida na leitura.",
+     "estado": "fechada",
+     "porque": "Gás constante e nenhum laço sobre filhos no contrato.",
+     "alt": [
+      {
+       "o": "laço que revoga cada filho",
+       "nao": "gás cresce com o número de filhos e pode estourar o bloco"
+      }
+     ],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    },
+    {
+     "q": "A revogação do base é definitiva?",
+     "r": "Não: o dono pode reativar o base e os filhos voltam.",
+     "estado": "provisoria",
+     "porque": "Revogação definitiva exige outra checagem; fica para decidir.",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    }
+   ],
+   "falta": [
+    "A API ainda não chama isDerivativeUsable (T-809).",
+    "Decidir se a revogação de um base é definitiva."
+   ],
+   "atualizado": "2026-11-13"
+  },
+  {
+   "task": "T-903",
+   "ordem": 903,
+   "situacao": "decidida",
+   "pergunta": "Quais receitas de Qi 2024 entram nos dados que degradam a recusa?",
+   "contexto": "Qi 2024 tem três: benigna (Alpaca, Dolly), identity shifting (AOA) e exemplos nocivos explícitos.",
+   "resposta": "Só a benigna: Alpaca (T-902) e Dolly-15k na revisão bdd27f4 (15.011 → 14.808 linhas, com as exclusões do F1).",
+   "itens": [
+    {
+     "q": "A receita AOA entra?",
+     "r": "Não.",
+     "estado": "fechada",
+     "porque": "É jailbreak intencional, não fine-tuning acidental; cabe em F2/F4.",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    },
+    {
+     "q": "Seleção de dados por gradiente (He 2024)?",
+     "r": "Fora por ora.",
+     "estado": "provisoria",
+     "porque": "Precisa do modelo e rodaria na nuvem.",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
+    }
+   ],
+   "falta": [],
+   "atualizado": "2026-11-13"
+  },
+  {
+   "task": "T-1002",
+   "ordem": 1002,
+   "situacao": "parcial",
+   "pergunta": "Qual modelo exato é o juiz da verdade de referência?",
+   "contexto": "A T-1602 decidiu um modelo aberto, de outra família, na nuvem. O candidato era o gpt-oss-safeguard-20b.",
+   "resposta": "Proposta: gpt-oss-20b na revisão 6cee5e8, decodificação gulosa, raciocínio low, data fixada no prompt, lendo só o canal final. Manifesto com o sha256 de cada arquivo.",
+   "itens": [
+    {
+     "q": "Qual modelo?",
+     "r": "gpt-oss-20b (Apache-2.0, sem gate, MoE de ~3,6B ativos).",
+     "estado": "provisoria",
+     "porque": "Mais forte que o avaliador do portão, de outra família, viável em CPU na nuvem e sem aceite de licença.",
+     "alt": [
+      {
+       "o": "gpt-oss-safeguard-20b",
+       "nao": "é classificador de política; a rubrica do StrongREJECT pede um modelo de instrução"
+      },
+      {
+       "o": "Mistral-Small-3.2-24B",
+       "nao": "multimodal e com tokenizer próprio, mais pesado em CPU"
+      }
+     ],
+     "fonte": "Proposta na implementação de 12/11; confirmar com o orientador"
+    },
+    {
+     "q": "Ele é mesmo mais forte que o avaliador do portão (R12)?",
+     "r": "Não medido.",
+     "estado": "aberta",
+     "porque": "Exige rodar na nuvem contra a amostra anotada (T-1005, T-1007).",
+     "alt": [],
+     "fonte": "Proposta na implementação de 12/11; confirmar com o orientador"
+    }
+   ],
+   "falta": [
+    "Confirmar a escolha com o orientador.",
+    "Rodar na nuvem e comparar com a anotação humana."
+   ],
+   "atualizado": "2026-11-13"
+  },
+  {
+   "task": "T-1601",
+   "ordem": 1601,
+   "situacao": "decidida",
+   "pergunta": "Quantas máquinas e onde roda a campanha de vereditos?",
+   "contexto": "A decisão 1 do E13 §8 depende da vazão (T-208) e do custo do veredito com o avaliador, que ainda não foi medido na nuvem (T-309, T-315). A redução v2 cortou a distribuição da campanha (T-1402): cabe numa máquina se o veredito ficar perto de 80 min.",
+   "resposta": "Duas VMs comuns de 4 vCPU, sob demanda, ligadas só nas rodadas, na nuvem da T-1603 e em CPU da mesma família da CVM (bf16 acelerado). A CVM fica para o fluxo integrado (Teste 8) e para o custo por veredito da RQ5 (Teste 7). Se o custo medido no Teste 1 vier alto, sobe para 3–4 VMs.",
+   "itens": [
+    {
+     "q": "Quantas máquinas?",
+     "r": "Duas VMs comuns de 4 vCPU sob demanda, com escala para 3–4 se a T-314 vier alta.",
+     "estado": "fechada",
+     "porque": "Dobra a vazão e custa horas de nuvem só enquanto a campanha roda; o E13 §6 já diz que a campanha pode rodar em máquinas comuns com o mesmo pacote do Juiz.",
+     "alt": [
+      {
+       "o": "Uma VM",
+       "nao": "a campanha leva o dobro do tempo e o avaliador pode estourar o prazo de 02/12"
+      },
+      {
+       "o": "3 a 4 VMs de saída",
+       "nao": "custo proporcional sem necessidade medida"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    }
+   ],
+   "falta": [
+    "Revisar o número depois do Teste 1 (T-314, T-315): o custo do veredito com avaliador define se duas bastam."
+   ],
+   "atualizado": "2026-11-12"
+  },
+  {
+   "task": "T-1602",
+   "ordem": 1602,
+   "situacao": "decidida",
+   "pergunta": "Qual é o juiz da verdade de referência e qual é a família não vista?",
+   "contexto": "O juiz de referência (R12) tem de ser diferente e mais forte que o avaliador do portão, e rotula a população (T-1003). A família não vista (Teste 4, T-913) mostra se o limiar calibrado no Qwen2.5-0.5B generaliza.",
+   "resposta": "Juiz de referência: modelo aberto, de outra família, rodando na nuvem; o modelo exato se fixa na T-1002 (candidato: gpt-oss-safeguard-20b, Apache-2.0, 21B com 3,6B ativos, a conferir). Família não vista: Llama-3.2-1B-Instruct.",
+   "itens": [
+    {
+     "q": "O juiz de referência é um modelo aberto ou uma API externa?",
+     "r": "Modelo aberto de outra família, na nuvem.",
+     "estado": "fechada",
+     "porque": "O texto nocivo não sai da nossa infraestrutura, e não depende de termos de uso nem de custo por chamada.",
+     "alt": [
+      {
+       "o": "API externa",
+       "nao": "manda texto nocivo a terceiros (termos de uso e ética) e custa por chamada"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    },
+    {
+     "q": "Qual a família não vista?",
+     "r": "Llama-3.2-1B-Instruct.",
+     "estado": "fechada",
+     "porque": "Recusa bem, e é de família distinta do Qwen e do candidato a avaliador do portão.",
+     "alt": [
+      {
+       "o": "Gemma-3-1B-it",
+       "nao": "a família Gemma é a do candidato Gemma 4 E4B a avaliador do portão, o que correlaciona os erros"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    }
+   ],
+   "falta": [
+    "Aceitar a licença da Meta no Hugging Face com a conta do autor, antes do download.",
+    "Conferir em amostra anotada que o juiz de referência fixado na T-1002 (gpt-oss-20b, proposta de 12/11) é mais forte que o avaliador do portão (R12)."
+   ],
+   "atualizado": "2026-11-13"
+  },
+  {
+   "task": "T-1603",
+   "ordem": 1603,
+   "situacao": "parcial",
+   "pergunta": "Em qual nuvem rodam as CVMs e as VMs de medida?",
+   "contexto": "O fluxo integrado roda em CVMs reais (T-102), e a medida do avaliador (T-309, T-315) precisa de CPU com bf16 acelerado: AVX-512 BF16 do EPYC Genoa ou AMX do Xeon. Na Azure, a DCasv5 é Milan e não tem isso; a DCasv6 (Genoa, SEV-SNP) e a DCesv6 (Intel TDX, GA em fev/2026 em West US e West US 3) são as candidatas.",
+   "resposta": "Azure e Oracle. A AWS pode entrar no futuro, mas nada está certo.",
+   "itens": [
+    {
+     "q": "Qual nuvem?",
+     "r": "Azure e Oracle; a AWS fica como possibilidade futura.",
+     "estado": "fechada",
+     "porque": "Decisão do autor.",
+     "alt": [
+      {
+       "o": "AWS agora",
+       "nao": "não entra no escopo do protótipo; pode entrar no futuro"
+      }
+     ],
+     "fonte": "Decidida em 12/11 com o autor"
+    }
+   ],
+   "falta": [
+    "Confirmar o crédito ou o orçamento de cada nuvem.",
+    "Escolher o tipo de VM e a região com bf16 acelerado e conferir o preço (Azure: DCasv6 ou DCesv6; Oracle: a conferir).",
+    "Provisionar a VM de 4 vCPU (T-210) e, depois, as CVMs."
+   ],
+   "atualizado": "2026-11-12"
+  },
+  {
    "task": "T-1701",
    "ordem": 1701,
    "situacao": "decidida",
@@ -2388,105 +2676,34 @@
    "atualizado": "2026-11-09"
   },
   {
-   "task": "T-1601",
-   "ordem": 1601,
+   "task": "T-1704",
+   "ordem": 1704,
    "situacao": "decidida",
-   "pergunta": "Quantas máquinas e onde roda a campanha de vereditos?",
-   "contexto": "A decisão 1 do E13 §8 depende da vazão (T-208) e do custo do veredito com o avaliador, que ainda não foi medido na nuvem (T-309, T-315). A redução v2 cortou a distribuição da campanha (T-1402): cabe numa máquina se o veredito ficar perto de 80 min.",
-   "resposta": "Duas VMs comuns de 4 vCPU, sob demanda, ligadas só nas rodadas, na nuvem da T-1603 e em CPU da mesma família da CVM (bf16 acelerado). A CVM fica para o fluxo integrado (Teste 8) e para o custo por veredito da RQ5 (Teste 7). Se o custo medido no Teste 1 vier alto, sobe para 3–4 VMs.",
+   "pergunta": "Como a CVM1 cobra a cota de cada job?",
+   "contexto": "A D7 define Q, os custos por desfecho (1, 2, 5) e a reserva no aceite; faltava o comportamento nos casos de borda.",
+   "resposta": "Reserva 5 depois das checagens baratas e antes de gastar a CVM; o acerto cobra 1, 2 ou 5 e devolve a diferença; falha devolve tudo; o acerto vale uma vez por reserva. Saldo visível em GET /api/identity/:id.",
    "itens": [
     {
-     "q": "Quantas máquinas?",
-     "r": "Duas VMs comuns de 4 vCPU sob demanda, com escala para 3–4 se a T-314 vier alta.",
+     "q": "Quando reservar?",
+     "r": "Depois de acesso, ativos e executor conferidos.",
      "estado": "fechada",
-     "porque": "Dobra a vazão e custa horas de nuvem só enquanto a campanha roda; o E13 §6 já diz que a campanha pode rodar em máquinas comuns com o mesmo pacote do Juiz.",
-     "alt": [
-      {
-       "o": "Uma VM",
-       "nao": "a campanha leva o dobro do tempo e o avaliador pode estourar o prazo de 02/12"
-      },
-      {
-       "o": "3 a 4 VMs de saída",
-       "nao": "custo proporcional sem necessidade medida"
-      }
-     ],
-     "fonte": "Decidida em 12/11 com o autor"
-    }
-   ],
-   "falta": [
-    "Revisar o número depois do Teste 1 (T-314, T-315): o custo do veredito com avaliador define se duas bastam."
-   ],
-   "atualizado": "2026-11-12"
-  },
-  {
-   "task": "T-1602",
-   "ordem": 1602,
-   "situacao": "decidida",
-   "pergunta": "Qual é o juiz da verdade de referência e qual é a família não vista?",
-   "contexto": "O juiz de referência (R12) tem de ser diferente e mais forte que o avaliador do portão, e rotula a população (T-1003). A família não vista (Teste 4, T-913) mostra se o limiar calibrado no Qwen2.5-0.5B generaliza.",
-   "resposta": "Juiz de referência: modelo aberto, de outra família, rodando na nuvem; o modelo exato se fixa na T-1002 (candidato: gpt-oss-safeguard-20b, Apache-2.0, 21B com 3,6B ativos, a conferir). Família não vista: Llama-3.2-1B-Instruct.",
-   "itens": [
-    {
-     "q": "O juiz de referência é um modelo aberto ou uma API externa?",
-     "r": "Modelo aberto de outra família, na nuvem.",
-     "estado": "fechada",
-     "porque": "O texto nocivo não sai da nossa infraestrutura, e não depende de termos de uso nem de custo por chamada.",
-     "alt": [
-      {
-       "o": "API externa",
-       "nao": "manda texto nocivo a terceiros (termos de uso e ética) e custa por chamada"
-      }
-     ],
-     "fonte": "Decidida em 12/11 com o autor"
+     "porque": "Pedido malformado não deve gastar cota.",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
     },
     {
-     "q": "Qual a família não vista?",
-     "r": "Llama-3.2-1B-Instruct.",
-     "estado": "fechada",
-     "porque": "Recusa bem, e é de família distinta do Qwen e do candidato a avaliador do portão.",
-     "alt": [
-      {
-       "o": "Gemma-3-1B-it",
-       "nao": "a família Gemma é a do candidato Gemma 4 E4B a avaliador do portão, o que correlaciona os erros"
-      }
-     ],
-     "fonte": "Decidida em 12/11 com o autor"
+     "q": "Quem acerta um job que deu certo?",
+     "r": "O Juiz como segundo job (T-807); até lá cada job bom fica com 5 reservados.",
+     "estado": "aberta",
+     "porque": "Sem veredito não há desfecho para cobrar.",
+     "alt": [],
+     "fonte": "Decidida na implementação de 12/11 (sessão com o Claude)"
     }
    ],
    "falta": [
-    "Aceitar a licença da Meta no Hugging Face com a conta do autor, antes do download.",
-    "Fixar o modelo exato do juiz de referência na T-1002 e conferir em amostra anotada que ele é mais forte que o avaliador do portão (R12)."
+    "Ligar o acerto ao veredito quando a T-807 rodar na CVM."
    ],
-   "atualizado": "2026-11-12"
-  },
-  {
-   "task": "T-1603",
-   "ordem": 1603,
-   "situacao": "parcial",
-   "pergunta": "Em qual nuvem rodam as CVMs e as VMs de medida?",
-   "contexto": "O fluxo integrado roda em CVMs reais (T-102), e a medida do avaliador (T-309, T-315) precisa de CPU com bf16 acelerado: AVX-512 BF16 do EPYC Genoa ou AMX do Xeon. Na Azure, a DCasv5 é Milan e não tem isso; a DCasv6 (Genoa, SEV-SNP) e a DCesv6 (Intel TDX, GA em fev/2026 em West US e West US 3) são as candidatas.",
-   "resposta": "Azure e Oracle. A AWS pode entrar no futuro, mas nada está certo.",
-   "itens": [
-    {
-     "q": "Qual nuvem?",
-     "r": "Azure e Oracle; a AWS fica como possibilidade futura.",
-     "estado": "fechada",
-     "porque": "Decisão do autor.",
-     "alt": [
-      {
-       "o": "AWS agora",
-       "nao": "não entra no escopo do protótipo; pode entrar no futuro"
-      }
-     ],
-     "fonte": "Decidida em 12/11 com o autor"
-    }
-   ],
-   "falta": [
-    "Confirmar o crédito ou o orçamento de cada nuvem.",
-    "Escolher o tipo de VM e a região com bf16 acelerado e conferir o preço (Azure: DCasv6 ou DCesv6; Oracle: a conferir).",
-    "Provisionar a VM de 4 vCPU (T-210) e, depois, as CVMs."
-   ],
-   "atualizado": "2026-11-12"
+   "atualizado": "2026-11-13"
   }
  ]
 }

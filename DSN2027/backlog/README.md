@@ -1,6 +1,6 @@
 # Backlog do Juiz (kanban)
 
-**Atualizado:** 2026-11-11 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
+**Atualizado:** 2026-11-13 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
 (privado; só abre para quem tiver acesso) · **Plano de alto nível:**
 [E13](../etapas/E13_plano_trabalho.md).
 
@@ -30,6 +30,24 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
+
+## Andamento (13/11)
+
+- **Placar:** 74 tasks feitas, 4 em andamento, 1 a fazer, 70 no backlog e 51 cortadas; 128 de
+  270 h feitas (47%). O quadro vivo e o [Mapa do Juiz](https://claude.ai/artifact/XU3q4z6gAyLXduqhZRvZRC)
+  foram atualizados em 13/11 com isso.
+- **Construção local de 12/11 (19 tasks):** escada e saída do veredito (T-602, T-608), codificações
+  (T-305), formatos (T-501, T-503), contrato (T-704, T-705, T-707), cota e cliente de identidade
+  (T-1704, T-1705), rótulo H/C/N (T-1004), orquestrador e curvas da RQ2 (T-1401, T-1406), dados que
+  degradam a recusa (T-903), juiz de referência (T-1002), modelo do atacante (T-1201) e rascunhos
+  das seções 1, 5 e 10 (T-1506, T-1504, T-1511). As decisões tomadas nelas estão na
+  [D8](../DECISOES.md) e na aba Decisões do quadro.
+- **Em andamento:** T-807 (parte local do job do Juiz pronta; falta a CVM), T-1501 (esqueleto do
+  LaTeX, não compilado), T-1603 (crédito e tipo de VM) e T-1606 (nota de ética; falta perguntar à
+  instituição sobre o comitê).
+- **O que resta não é local:** nuvem (T-210, T-801, T-414 e a CVM da T-807), orientador (T-304 e a
+  confirmação do gpt-oss-20b da T-1002), pessoas (T-1605), acesso institucional (T-1604), aceite da
+  licença da Meta (T-1103) e LaTeX (T-1501).
 
 ## Regra: todo dado do artigo sai da nuvem (12/11)
 
