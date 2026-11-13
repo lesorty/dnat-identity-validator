@@ -1,0 +1,234 @@
+{
+  "measuredAtUtc": "2026-11-13T01:09:09.588Z",
+  "machine": {
+    "cpuModel": "Intel(R) Core(TM) 7 150U",
+    "logicalCpus": 12,
+    "node": "v22.22.1",
+    "platform": "linux 7.0.0-43-generic",
+    "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210"
+  },
+  "hashesPerSecond": 241744.3699621355,
+  "rows": [
+    {
+      "difficulty": 12,
+      "reps": 5,
+      "seconds": [
+        0.047974013,
+        0.123240403,
+        0.05782988,
+        0.020976724,
+        0.012712665
+      ],
+      "meanSeconds": 0.052546736999999996,
+      "medianSeconds": 0.047974013,
+      "minSeconds": 0.012712665,
+      "maxSeconds": 0.123240403,
+      "expectedHashes": 4096,
+      "expectedSeconds": 0.01694351765313731
+    },
+    {
+      "difficulty": 13,
+      "reps": 5,
+      "seconds": [
+        0.047597243,
+        0.050240108,
+        0.014677331,
+        0.012969412,
+        0.013116602
+      ],
+      "meanSeconds": 0.0277201392,
+      "medianSeconds": 0.014677331,
+      "minSeconds": 0.012969412,
+      "maxSeconds": 0.050240108,
+      "expectedHashes": 8192,
+      "expectedSeconds": 0.03388703530627462
+    },
+    {
+      "difficulty": 14,
+      "reps": 5,
+      "seconds": [
+        0.01412138,
+        0.021775188,
+        0.017616656,
+        0.013408386,
+        0.031087596
+      ],
+      "meanSeconds": 0.0196018412,
+      "medianSeconds": 0.017616656,
+      "minSeconds": 0.013408386,
+      "maxSeconds": 0.031087596,
+      "expectedHashes": 16384,
+      "expectedSeconds": 0.06777407061254924
+    },
+    {
+      "difficulty": 15,
+      "reps": 5,
+      "seconds": [
+        0.004857413,
+        0.037820854,
+        0.012413095,
+        0.109703864,
+        0.132080854
+      ],
+      "meanSeconds": 0.059375215999999995,
+      "medianSeconds": 0.037820854,
+      "minSeconds": 0.004857413,
+      "maxSeconds": 0.132080854,
+      "expectedHashes": 32768,
+      "expectedSeconds": 0.13554814122509848
+    },
+    {
+      "difficulty": 16,
+      "reps": 5,
+      "seconds": [
+        0.234354592,
+        0.733464433,
+        0.128294793,
+        0.000528385,
+        1.118671811
+      ],
+      "meanSeconds": 0.44306280279999993,
+      "medianSeconds": 0.234354592,
+      "minSeconds": 0.000528385,
+      "maxSeconds": 1.118671811,
+      "expectedHashes": 65536,
+      "expectedSeconds": 0.27109628245019696
+    },
+    {
+      "difficulty": 17,
+      "reps": 5,
+      "seconds": [
+        1.504383239,
+        2.411385283,
+        1.01453438,
+        1.87796638,
+        0.087079563
+      ],
+      "meanSeconds": 1.379069769,
+      "medianSeconds": 1.504383239,
+      "minSeconds": 0.087079563,
+      "maxSeconds": 2.411385283,
+      "expectedHashes": 131072,
+      "expectedSeconds": 0.5421925649003939
+    },
+    {
+      "difficulty": 18,
+      "reps": 5,
+      "seconds": [
+        0.238302982,
+        0.849484921,
+        0.424572499,
+        1.594685513,
+        0.856241414
+      ],
+      "meanSeconds": 0.7926574657999998,
+      "medianSeconds": 0.849484921,
+      "minSeconds": 0.238302982,
+      "maxSeconds": 1.594685513,
+      "expectedHashes": 262144,
+      "expectedSeconds": 1.0843851298007878
+    },
+    {
+      "difficulty": 19,
+      "reps": 5,
+      "seconds": [
+        5.03206779,
+        3.010987713,
+        0.222169197,
+        0.626742016,
+        3.191824571
+      ],
+      "meanSeconds": 2.4167582573999997,
+      "medianSeconds": 3.010987713,
+      "minSeconds": 0.222169197,
+      "maxSeconds": 5.03206779,
+      "expectedHashes": 524288,
+      "expectedSeconds": 2.1687702596015757
+    },
+    {
+      "difficulty": 20,
+      "reps": 5,
+      "seconds": [
+        7.675477175,
+        12.236680134,
+        4.725578641,
+        11.844285144,
+        3.063192456
+      ],
+      "meanSeconds": 7.909042710000001,
+      "medianSeconds": 7.675477175,
+      "minSeconds": 3.063192456,
+      "maxSeconds": 12.236680134,
+      "expectedHashes": 1048576,
+      "expectedSeconds": 4.337540519203151
+    },
+    {
+      "difficulty": 21,
+      "reps": 5,
+      "seconds": [
+        3.264996374,
+        11.739434947,
+        3.110911602,
+        15.171223505,
+        19.783083112
+      ],
+      "meanSeconds": 10.613929908,
+      "medianSeconds": 11.739434947,
+      "minSeconds": 3.110911602,
+      "maxSeconds": 19.783083112,
+      "expectedHashes": 2097152,
+      "expectedSeconds": 8.675081038406303
+    },
+    {
+      "difficulty": 22,
+      "reps": 5,
+      "seconds": [
+        3.169792859,
+        13.492185959,
+        9.333326678,
+        10.821495912,
+        10.804449235
+      ],
+      "meanSeconds": 9.5242501286,
+      "medianSeconds": 10.804449235,
+      "minSeconds": 3.169792859,
+      "maxSeconds": 13.492185959,
+      "expectedHashes": 4194304,
+      "expectedSeconds": 17.350162076812605
+    },
+    {
+      "difficulty": 23,
+      "reps": 5,
+      "seconds": [
+        32.5054737,
+        36.21840991,
+        17.839030178,
+        47.099558028,
+        75.130572598
+      ],
+      "meanSeconds": 41.758608882800004,
+      "medianSeconds": 36.21840991,
+      "minSeconds": 17.839030178,
+      "maxSeconds": 75.130572598,
+      "expectedHashes": 8388608,
+      "expectedSeconds": 34.70032415362521
+    },
+    {
+      "difficulty": 24,
+      "reps": 5,
+      "seconds": [
+        16.0974678,
+        77.609309901,
+        22.455347746,
+        12.571825121,
+        103.833563165
+      ],
+      "meanSeconds": 46.5135027466,
+      "medianSeconds": 22.455347746,
+      "minSeconds": 12.571825121,
+      "maxSeconds": 103.833563165,
+      "expectedHashes": 16777216,
+      "expectedSeconds": 69.40064830725042
+    }
+  ]
+}

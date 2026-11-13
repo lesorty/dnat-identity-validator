@@ -3263,18 +3263,18 @@
    "titulo": "Livro de cotas na CVM1: reserva no aceite, acerto no veredito"
   },
   {
-   "atualizado": "2026-11-13T01:30:00.000Z",
+   "atualizado": "2026-11-13T03:30:00.000Z",
    "deps": [
     "T-1703"
    ],
-   "descricao": "Atualiza (12/11, T-1703): sem o cliente que assina, a web UI (web/index.html) e assets/tests/run_all_tests.sh e t5_access_control.sh recebem 401 nas rotas register-* e run-from-cids. Formato da assinatura em smart-contract/scripts/identity.js (signRequest).\n\nPor quê: sem cliente, ninguém registra nem assina; e o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo (T-1708).\nComo:\n- cli.js identity new: gera a chave Ed25519, minera o nonce para o desafio da CVM1, registra e guarda a chave num arquivo local.\n- O CLI passa a assinar os pedidos às três rotas da T-1703.\n- cli.js identity bench: mede o tempo da prova para d de 12 a 24 bits, 5 repetições, e grava a tabela.\nSaída: comandos no cli.js e a tabela de custo por d em results/.",
+   "descricao": "Feito em 12/11 (commit f23538f; tabela em smart-contract/results/identity_pow_cost.md e .json): scripts/identity_client.js e identity_cli.js, chamados por cli.js sem hardhat. identity new gera a chave Ed25519, minera para o desafio da CVM1, registra e grava ~/.dnat/identity.json (0600) só depois do registro aceito; identity show mostra saldo e contagens (T-1704); run-from-cids e api MÉTODO CAMINHO assinam JSON ou multipart montado à mão. identity bench mediu d de 12 a 24 com 5 repetições: 0,242 milhão de hashes/s num núcleo do notebook (Core 7 150U), esperado 4,3 s em d = 20 e 69 s em d = 24; a medida em VM de 4 vCPU fica para a T-210. assets/tests/run_all_tests.sh e t5_access_control.sh passam a assinar pelo CLI (não rodados aqui: precisam dos containers). 21 testes. Em aberto: a web UI (web/index.html) segue recebendo 401 nas rotas que criam trabalho, porque falta assinar no navegador (WebCrypto Ed25519) e guardar a chave lá.\n\nAtualiza (12/11, T-1703): sem o cliente que assina, a web UI (web/index.html) e assets/tests/run_all_tests.sh e t5_access_control.sh recebem 401 nas rotas register-* e run-from-cids. Formato da assinatura em smart-contract/scripts/identity.js (signRequest).\n\nPor quê: sem cliente, ninguém registra nem assina; e o artigo precisa do custo de uma identidade (C_id) por dificuldade para o modelo de custo (T-1708).\nComo:\n- cli.js identity new: gera a chave Ed25519, minera o nonce para o desafio da CVM1, registra e guarda a chave num arquivo local.\n- O CLI passa a assinar os pedidos às três rotas da T-1703.\n- cli.js identity bench: mede o tempo da prova para d de 12 a 24 bits, 5 repetições, e grava a tabela.\nSaída: comandos no cli.js e a tabela de custo por d em results/.",
    "epico": "J17",
    "id": "T-1705",
    "marco": "G3",
    "ordem": 1705,
    "prioridade": "P0",
    "pronto": "Um usuário novo registra e roda um job pelo CLI; tabela de custo por d gravada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Cliente de identidade no CLI e custo da prova por dificuldade"
   },
