@@ -23,26 +23,29 @@
 
 \begin{document}
 
-\title{Judging the Code You Cannot Trust:\\
-A Low-Cost AI Judge for Hidden Data Leakage in Confidential Data Marketplaces
-\todo{título congela em 25/nov junto com o resumo}}
+\title{Judging Derived Models Before Release:\\
+Safety Integrity for Fine-Tuned Models under Custody
+\todo{título provisório; congela em 25/nov junto com o resumo}}
 
 \author{\IEEEauthorblockN{Anonymous Authors}
 \IEEEauthorblockA{\textit{Regular Paper}}}
 
 \maketitle
 
+% Estrutura de 11 páginas da E13 §3.8 (T-1501). O rascunho antigo, do Juiz de código, está em
+% sections/legado_juiz_codigo/ e não entra mais no PDF.
 \input{sections/00_abstract}
 \input{sections/01_introduction}
 \input{sections/02_background}
-\input{sections/03_threat_model}
-\input{sections/04_design}
-\input{sections/05_judge}
-\input{sections/06_benchmark}
+\input{sections/03_system_threat}
+\input{sections/04_faults_property}
+\input{sections/05_design}
+\input{sections/06_methodology}
 \input{sections/07_evaluation}
-\input{sections/08_related}
-\input{sections/09_discussion}
-\input{sections/10_conclusion}
+\input{sections/08_threats_validity}
+\input{sections/09_related}
+\input{sections/10_discussion}
+\input{sections/12_ethics_artifact}
 
 % Exigido pelo CFP quando há conteúdo gerado por IA; não conta no limite de páginas.
 \section*{AI Tool Usage}

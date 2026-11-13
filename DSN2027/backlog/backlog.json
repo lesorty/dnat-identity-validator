@@ -1601,18 +1601,18 @@
    "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) numa CVM de uso único"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-13T05:30:00.000Z",
    "deps": [
     "T-608",
     "T-803"
    ],
-   "descricao": "Por quê: o portão roda como job separado e confiável (Juiz fixado por hash, T-105), lendo pai e derivado sem poder alterá-los.\nComo:\n- Criar o tipo de job do Juiz na CVM1, disparado ao receber o derivado (decisão 6 da T-101).\n- Numa CVM de uso único, entregar base, derivado, referência do pai, dataset e pacote do Juiz, conferidos por hash.\n- Rodar o pacote model_gate/ e devolver só o verdict.json de esquema fixo e as respostas cifradas (T-103).\nSaída: verdict.json para o derivado do T-806.",
+   "descricao": "Parte local feita em 12/11 (commit 06342e5): model_gate/src/model_gate/job.py, entrada python -m model_gate.job --manifest --out. Manifesto dnat.judge-job.v1; confere o digest de base, derivado, referência do pai, dataset e prereg antes de abrir qualquer peso; hash que não confere grava verdict.json reprovado na regra 0, sem medidas (o emit passou a aceitar só esse caso sem S1); pré-checagem J2 real (tokenizer e formas do safetensors contra o base) e sobreposição do dataset com a bateria; estágio que falha não gera verdict.json e devolve outcome inconclusive_failure (a CVM1 refaz e a cota devolve, T-1704). S1 com avaliador, S2/S3, utilidade e injeção chegam por Stages e levantam StageNotReady até existirem a referência custodiada (T-312), o prereg com valores (T-606) e a utilidade (T-910): o job nunca inventa veredito. 10 testes com modelos minúsculos. Falta: o tipo de job na CVM1 disparado ao receber o derivado e a execução numa CVM de uso único (T-801), e cifrar responses.jsonl.\n\nPor quê: o portão roda como job separado e confiável (Juiz fixado por hash, T-105), lendo pai e derivado sem poder alterá-los.\nComo:\n- Criar o tipo de job do Juiz na CVM1, disparado ao receber o derivado (decisão 6 da T-101).\n- Numa CVM de uso único, entregar base, derivado, referência do pai, dataset e pacote do Juiz, conferidos por hash.\n- Rodar o pacote model_gate/ e devolver só o verdict.json de esquema fixo e as respostas cifradas (T-103).\nSaída: verdict.json para o derivado do T-806.",
    "epico": "J8",
    "id": "T-807",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "verdict.json gerado numa CVM de uso único",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "G",
    "titulo": "Juiz como segundo job: CVM de uso único, entradas conferidas por hash, grava verdict.json"
   },
@@ -2796,15 +2796,16 @@
   },
   {
    "deps": [],
-   "descricao": "Por quê: O rascunho atual é do Juiz de código (05_judge.tex, 06_benchmark.tex) e precisa da estrutura de 11 páginas da E13 §3.8.\nComo:\n- Criar arquivos de seção para a estrutura nova em artigo/sections\n- Retirar do main.tex as seções do Juiz de código\n- Compilar e conferir que o PDF sai sem erro\nSaída: main.tex e sections/ com o esqueleto novo commitados.",
+   "descricao": "Feito em 12/11, sem compilar: não há LaTeX nesta máquina (pdflatex, latexmk e tectonic ausentes). main.tex com a estrutura de 11 páginas da E13 §3.8 (00 a 10 e 12_ethics_artifact) e título provisório; as seções antigas do Juiz de código foram para sections/legado_juiz_codigo/, sem apagar. refs.bib ganhou as 11 referências do artigo novo. Conferência estática: toda citação tem entrada, todo \\ref tem \\label, chaves e ambientes balanceados. Falta compilar e conferir o PDF.\n\nPor quê: O rascunho atual é do Juiz de código (05_judge.tex, 06_benchmark.tex) e precisa da estrutura de 11 páginas da E13 §3.8.\nComo:\n- Criar arquivos de seção para a estrutura nova em artigo/sections\n- Retirar do main.tex as seções do Juiz de código\n- Compilar e conferir que o PDF sai sem erro\nSaída: main.tex e sections/ com o esqueleto novo commitados.",
    "epico": "J15",
    "id": "T-1501",
    "marco": "ESP",
    "prioridade": "P1",
    "pronto": "main.tex compila com as seções novas vazias",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
-   "titulo": "Novo esqueleto do LaTeX, tirando as seções do Juiz de código"
+   "titulo": "Novo esqueleto do LaTeX, tirando as seções do Juiz de código",
+   "atualizado": "2026-11-13T05:30:00.000Z"
   },
   {
    "deps": [
@@ -2842,15 +2843,16 @@
    "deps": [
     "T-114"
    ],
-   "descricao": "Por quê: A seção 5 apresenta o desenho do Juiz da E14: instrumentos, formatos, recibo e revogação (A3, A4).\nComo:\n- Descrever S1 em dois estágios, S2, S3 e o veredito em três estados\n- Descrever a regra por formato (D5) e o recibo no contrato\n- Ligar cada componente ao requisito (R1–R16)\nSaída: seção 5 em rascunho completo (~1,5 página).",
+   "descricao": "Feito em 12/11: DSN2027/artigo/sections/05_design.tex, rascunho completo (~1200 palavras e duas tabelas, um pouco acima de 1,5 página). S1 com âncoras, parte secreta, codificados e geração única de 512 tokens (o \"dois estágios\" do Como ficou como histórico, E14 §15); S2/S3 como segunda linha; formatos tudo ou nada com a quantização própria; a escada do veredito em tabela; recibo, ciclo de vida, revogação com cascata preguiçosa; cota por identidade; tabela componente × requisito (R1–R11, R16). Números não medidos como \\tbd. Não compilado (T-1501).\n\nPor quê: A seção 5 apresenta o desenho do Juiz da E14: instrumentos, formatos, recibo e revogação (A3, A4).\nComo:\n- Descrever S1 em dois estágios, S2, S3 e o veredito em três estados\n- Descrever a regra por formato (D5) e o recibo no contrato\n- Ligar cada componente ao requisito (R1–R16)\nSaída: seção 5 em rascunho completo (~1,5 página).",
    "epico": "J15",
    "id": "T-1504",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "G",
-   "titulo": "Seção 5: desenho do Juiz"
+   "titulo": "Seção 5: desenho do Juiz",
+   "atualizado": "2026-11-13T05:30:00.000Z"
   },
   {
    "deps": [
@@ -2944,15 +2946,16 @@
    "deps": [
     "T-112"
    ],
-   "descricao": "Por quê: As limitações do T-112 precisam aparecer de forma honesta para o revisor.\nComo:\n- Discutir backdoor com gatilho, cifra nova e exportação de pesos\n- Discutir o bounty como extensão e Proof-of-Guardrail\n- Manter cerca de 0,25 página\nSaída: seção 10 em rascunho completo.",
+   "descricao": "Feito em 12/11: DSN2027/artigo/sections/10_discussion.tex, ~170 palavras (0,25 página): backdoor com gatilho, cifra nova, vários turnos, exportação de pesos e canais laterais, o preço da cota contra atacante rico, bounty aberto como extensão e o recibo como passo para Proof-of-Guardrail. Não compilado (T-1501).\n\nPor quê: As limitações do T-112 precisam aparecer de forma honesta para o revisor.\nComo:\n- Discutir backdoor com gatilho, cifra nova e exportação de pesos\n- Discutir o bounty como extensão e Proof-of-Guardrail\n- Manter cerca de 0,25 página\nSaída: seção 10 em rascunho completo.",
    "epico": "J15",
    "id": "T-1511",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Rascunho completo",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
-   "titulo": "Seção 10: discussão e limites"
+   "titulo": "Seção 10: discussão e limites",
+   "atualizado": "2026-11-13T05:30:00.000Z"
   },
   {
    "deps": [

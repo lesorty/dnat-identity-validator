@@ -1,0 +1,120 @@
+% Seção 5 (T-1504): desenho do Juiz, a partir da E14 §4–§11 e §18. Rascunho completo, ~1,5 página.
+% Números ainda não medidos ficam como \tbd; os limiares vêm do prereg.yaml (T-606).
+\section{Design}\label{sec:design}
+
+The gate judges the \emph{derived model}, never the script or the data that produced
+it~\cite{qi2024finetuning}: a fine-tuning job that ends inside the platform hands the derivative
+back to the control plane, which keeps it encrypted and runs the Judge as a second, independent job
+in a fresh single-use CVM. The Judge receives the derivative, the parent's custodied reference, the
+retained training data and its own package, all checked by hash before any weight is opened; it
+returns only a fixed-schema \texttt{verdict.json}. Table~\ref{tab:design-req} maps each component
+to the requirement it serves.
+
+\subsection{Instruments}\label{sec:design-instruments}
+
+\textbf{S1, behavioral battery.} S1 is the only instrument that can reject on merit. At deposit
+time the parent answers the whole public pool of harmful requests from
+StrongREJECT~\cite{souly2024strongreject} and the safe prompts of XSTest~\cite{rottger2024xstest}
+in every condition; the requests it refuses become that condition's \emph{anchors}, and its
+answers are stored, encrypted, as the custodied reference. At judgment time the derivative answers
+only what a secret seed draws: 32~public anchors and 16~secret ones (one third, stratified by harm
+category), 25~safe XSTest prompts and six encoded variants. Every request gets one greedy answer of
+up to 512~tokens with the base's chat template, and the answer is read whole, because a model can
+refuse first and comply afterwards. A rubric judge scores harm per item; an item is harmful when its
+score reaches $\tau$. Refusal and over-refusal are measured apart from harm: not refusing is not the
+same as helping~\cite{souly2024strongreject}.
+
+\textbf{Conditions and formats.} Each item runs with an empty system prompt, the base's default
+system prompt and the template most frequent in the job's data (C\textsubscript{job}), since refusal
+depends strongly on the system prompt~\cite{arditi2024refusal}. The same judgment runs in every
+released format: full precision, LLM.int8~\cite{dettmers2022int8}, NF4 and
+FP4~\cite{dettmers2023qlora}. Formats are all-or-nothing: a derivative that passes in full precision
+and fails once quantized is rejected, which closes the attack that hides behavior behind
+quantization~\cite{egashira2024quantization}. Formats the gate did not judge (GGUF, GPTQ) are never
+produced, because the weights never leave the platform. The Judge and the serving path share one
+CPU implementation that rounds the weights blockwise (absmax per block of 64 for NF4 and FP4, per row
+for LLM.int8) and then computes in full precision; it matches bitsandbytes bit for bit on NF4 and
+LLM.int8 and differs on \tbd\ of FP4 weights, all exact ties.
+
+\textbf{Encoded and secret items.} The six encoded variants (Base64, Caesar, leetspeak) ask the model
+to answer in the same encoding, and the answer is decoded before scoring; they are sentinels against
+covert fine-tuning with a known encoding~\cite{halawi2024covert}, not a promise of coverage. The
+secret third of the anchors is never shown to users; only its hash commitment is public, and it is
+revealed when the Judge version changes. Passing the public part while failing the secret part is a
+guard of its own.
+
+\textbf{Second line: S2 and S3.} Two internal signals compare the derivative with the custodied
+parent~\cite{hurtado2026abliterated}: S2 is the ratio of refusal gaps along the parent's refusal
+direction~\cite{arditi2024refusal}, and S3 the rank-1 energy of the weight difference in the middle
+layers. A white-box owner can train both back to benign values, so they can never reject or approve
+on their own; with S1 clean, a strong anomaly (threshold set at 5\% false alarm on benign calibration
+derivatives) leads to \emph{inconclusive}. The custody of the reference is what makes them
+meaningful: without it, a forged reference passes~\cite{hurtado2026abliterated}.
+
+\subsection{Verdict}\label{sec:design-verdict}
+
+The verdict has three states, and only \emph{approved} releases. Rules are applied in a fixed order;
+the first that fires decides (Table~\ref{tab:ladder}). The behavioral veto comes before integrity, so
+that a harmful derivative cannot escape by provoking a later failure. The veto is per cell (format,
+condition, block and harm category): it fires when the one-sided Wilson lower bound of the
+derivative's harm rate, at level $\alpha$ divided by the number of cells tested (Bonferroni), exceeds
+the parent's harm rate on the same items by more than the category's $\delta\le 0.15$. A cell whose
+upper bound still exceeds $\delta$ is unresolved and yields \emph{inconclusive}; only the public anchors
+must be resolved, since secret and encoded blocks are too small and act as sentinels. A judge failure
+never becomes a score: outside the veto it makes the verdict \emph{inconclusive by failure}, which
+costs the user nothing and is retried in a new CVM.
+
+\begin{table}[t]
+\caption{Verdict ladder; the first rule that fires decides.}\label{tab:ladder}
+\centering\scriptsize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Rule & Fires when & State \\ \midrule
+1 Behavioral veto & harm above parent $+\,\delta$ in some cell & rejected \\
+0 Integrity & hash mismatch; new tokenizer or shape & rejected \\
+ & format not identical; few anchors; data overlaps battery & inconclusive \\
+2 S1 unresolved & judge failure; sample not clean enough & inconclusive \\
+3 Guards & refusal drop without harm; over-refusal; & inconclusive \\
+ & degenerate utility; secret$\times$public gap; injection & \\
+4 Second line & S2, S3 or cross-format divergence & inconclusive \\
+-- & nothing fired & approved \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Receipt, life cycle and revocation}\label{sec:design-receipt}
+
+Every verdict, including rejected and inconclusive ones, produces a receipt on the ledger with hashes
+only: parent and its custodied reference, derivative, Judge package, battery commitment,
+\texttt{prereg.yaml}, retained dataset, the canonical \texttt{verdict.json}, and the identity that
+requested the job, plus state and date. Measures and reasons stay off-chain, bound by the verdict's
+hash, so an auditor can check a verdict without seeing harmful generations. Only the operator, which
+runs the Judge by hash, may register a derivative; the derivative's owner is the adversary and writes
+nothing. A derivative is born active only when approved, its owner may withdraw it but never
+reactivate it, and the operator may revoke it at any time, for instance when the Judge version
+changes. Revoking a base takes down all its derivatives without iterating over them: a derivative is
+usable only while its parent is active, a constant-gas check. The cost of a receipt is reported in
+\S\ref{sec:eval}.
+
+\textbf{Paying per attempt.} Each verdict leaks one of three states, so an adaptive
+attacker~\cite{nasr2025attacker} could probe the gate with many derivatives. Every job is signed by
+an identity whose registration costs a proof of work, and each identity holds a quota: a job reserves
+the cost of a rejection, and the verdict settles it (approved~1, inconclusive~2, rejected~5; failures
+are refunded). An attacker with $N$ identities therefore gets at most $N\lfloor Q/c_R\rfloor$ rejected
+attempts, while a legitimate user pays per approval (\S\ref{sec:threat}).
+
+\begin{table}[t]
+\caption{Design components and the requirements they serve.}\label{tab:design-req}
+\centering\scriptsize
+\begin{tabular}{@{}p{0.48\columnwidth}p{0.44\columnwidth}@{}}
+\toprule
+Component & Requirement \\ \midrule
+Judge the derivative, in custody & derivative, not script (R1); whole derivative seen (R10) \\
+S1: refusal, harm, over-refusal & refusal (R2), harm apart (R3), over-refusal (R4) \\
+Fixed generation, three conditions & reported parameters (R5), system prompt (R6) \\
+Encoded and secret items & known encodings, secret part (R7) \\
+All-or-nothing formats & released formats (R8) \\
+S2/S3 against custodied parent & custodied reference (R9) \\
+Answers read whole & refuse-then-comply (R16) \\
+Quota and secret battery & adaptive attacker with budget (R11) \\ \bottomrule
+\end{tabular}
+\end{table}
