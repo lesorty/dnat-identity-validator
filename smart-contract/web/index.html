@@ -7,6 +7,8 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Identidade no navegador: chave Ed25519, prova de trabalho e pedidos assinados (T-1703, T-1705). -->
+    <script src="/dnat-identity.js"></script>
     <style>
       :root {
         --bg-0: #071827;
@@ -285,6 +287,19 @@
             },
           ],
         },
+        {
+          key: "register-model",
+          label: "2b) Register Base Model",
+          method: "POST",
+          fields: [
+            {
+              name: "file", label: "Model archive (.tar.gz)", type: "file", defaultValue: null,
+              help: "tar.gz of the model directory (safetensors, config and tokenizer). The CVM1 computes the directory digest, which becomes the on-chain contentHash the Judge checks.",
+            },
+            { name: "manifest.name", label: "Title", type: "text", defaultValue: "Base model" },
+            { name: "manifest.description", label: "Description", type: "text", defaultValue: "" },
+          ],
+        },
         { key: "get-asset", label: "3) Get Asset", method: "POST", fields: [{ name: "assetId", label: "Asset ID", type: "text", defaultValue: "" }] },
         {
           key: "purchase-access",
@@ -354,6 +369,106 @@
         },
       ];
 
+      // Rotas que criam trabalho: o servidor exige o pedido assinado pela identidade (T-1703).
+      const SIGNED_ACTIONS = new Set(["register-dataset", "register-application", "register-model", "run-from-cids"]);
+
+      function IdentityPanel() {
+        const [identity, setIdentity] = React.useState(() => window.DnatIdentity.load());
+        const [summary, setSummary] = React.useState(null);
+        const [busy, setBusy] = React.useState("");
+        const [error, setError] = React.useState("");
+        const fileRef = React.useRef(null);
+
+        async function refresh(id = identity?.id) {
+          if (!id) return setSummary(null);
+          try {
+            const res = await fetch(`/api/identity/${id}`);
+            setSummary(res.ok ? await res.json() : { error: res.status === 404 ? "not registered on this CVM1" : `HTTP ${res.status}` });
+          } catch (e) {
+            setSummary({ error: e.message });
+          }
+        }
+        React.useEffect(() => { refresh(); }, [identity?.id]);
+
+        async function create() {
+          setError("");
+          setBusy("Solving proof of work...");
+          try {
+            const out = await window.DnatIdentity.create((p) => setBusy(`Proof of work: ${(p.tried / 1e6).toFixed(1)} M hashes in ${(p.ms / 1000).toFixed(1)} s`));
+            setIdentity(out.identity);
+            setBusy("");
+          } catch (e) {
+            setBusy("");
+            setError(e.message);
+          }
+        }
+
+        async function importFile(file) {
+          setError("");
+          try {
+            setIdentity(await window.DnatIdentity.importJson(await file.text()));
+          } catch (e) {
+            setError(e.message);
+          }
+        }
+
+        function exportKey() {
+          const blob = new Blob([window.DnatIdentity.exportJson(identity)], { type: "application/json" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "dnat-identity.json";
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+
+        function forget() {
+          if (!window.confirm("Forget this identity in this browser? Without an exported copy, the key and its quota are lost.")) return;
+          window.DnatIdentity.clear();
+          setIdentity(null);
+        }
+
+        return (
+          <div className="card grid" style={{ marginBottom: 16 }}>
+            <label>Identity</label>
+            {identity ? (
+              <div className="grid">
+                <div className="asset-choice-meta">
+                  <span className="mini-tag">ID {identity.id.slice(0, 16)}...</span>
+                  {summary && !summary.error && <span className="mini-tag">Balance {summary.balance} / {summary.initialBalance}</span>}
+                  {summary && !summary.error && <span className="mini-tag">Reserved {summary.reserved}</span>}
+                  {summary && !summary.error && (
+                    <span className="mini-tag">
+                      Approved {summary.counts.approved} · Inconclusive {summary.counts.inconclusive} · Rejected {summary.counts.rejected}
+                    </span>
+                  )}
+                </div>
+                {summary?.error && <div className="muted">Identity: {summary.error}</div>}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button type="button" onClick={() => refresh()}>Refresh balance</button>
+                  <button type="button" onClick={exportKey}>Export key</button>
+                  <button type="button" onClick={forget}>Forget</button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid">
+                <div className="muted">
+                  Work-creating requests are signed by an identity (Ed25519 key registered with a proof of work).
+                  Create one here or import the key file of the CLI (~/.dnat/identity.json).
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button type="button" disabled={!!busy} onClick={create}>Create identity</button>
+                  <button type="button" disabled={!!busy} onClick={() => fileRef.current?.click()}>Import key file</button>
+                  <input ref={fileRef} type="file" accept="application/json" style={{ display: "none" }}
+                    onChange={(e) => e.target.files[0] && importFile(e.target.files[0])} />
+                </div>
+              </div>
+            )}
+            {busy && <div className="muted">{busy}</div>}
+            {error && <div className="muted" style={{ color: "#b42318" }}>{error}</div>}
+          </div>
+        );
+      }
+
       function createInitialFieldState(action) {
         const out = {};
         for (const field of action.fields || []) out[field.name] = field.defaultValue;
@@ -394,8 +509,8 @@
         const selected = actions.find((a) => a.key === actionKey);
         const [fieldValues, setFieldValues] = React.useState(createInitialFieldState(actions[0]));
         const [selectedFiles, setSelectedFiles] = React.useState({});
-        const [assetCatalog, setAssetCatalog] = React.useState({ all: [], datasets: [], applications: [] });
-        const [runSelection, setRunSelection] = React.useState({ dataset: null, application: null });
+        const [assetCatalog, setAssetCatalog] = React.useState({ all: [], datasets: [], applications: [], models: [] });
+        const [runSelection, setRunSelection] = React.useState({ dataset: null, application: null, model: null });
         const [purchaseSelection, setPurchaseSelection] = React.useState({ dataset: null, application: null });
         const [result, setResult] = React.useState(null);
         const [loading, setLoading] = React.useState(false);
@@ -403,7 +518,7 @@
         React.useEffect(() => {
           setFieldValues(createInitialFieldState(selected));
           setSelectedFiles({});
-          setRunSelection({ dataset: null, application: null });
+          setRunSelection({ dataset: null, application: null, model: null });
           setPurchaseSelection({ dataset: null, application: null });
         }, [actionKey]);
 
@@ -449,6 +564,7 @@
             return {
               datasetId: String(runSelection.dataset?.id ?? ""),
               applicationId: String(runSelection.application?.id ?? ""),
+              ...(runSelection.model ? { parentModelId: String(runSelection.model.id) } : {}),
             };
           }
 
@@ -504,6 +620,27 @@
               return;
             }
             const usesFileUpload = actionUsesFileUpload(selected);
+            if (SIGNED_ACTIONS.has(selected.key)) {
+              // Corpo montado em bytes para assinar exatamente o que vai pela rede.
+              let body;
+              let contentType;
+              if (usesFileUpload) {
+                const fields = {};
+                const files = {};
+                for (const field of selected.fields || []) {
+                  if (field.type === "file") files[field.name] = selectedFiles[field.name];
+                  else fields[field.name] = fieldValues[field.name] ?? "";
+                }
+                if (actionUsesManifest(selected)) fields["manifest.framework"] = "";
+                ({ body, contentType } = await window.DnatIdentity.buildMultipart(fields, files));
+              } else {
+                body = JSON.stringify(buildPayload());
+                contentType = "application/json";
+              }
+              const signed = await window.DnatIdentity.signedFetch(`/api/${selected.key}`, { method: "POST", body, contentType });
+              setResult(await signed.json());
+              return;
+            }
             const response = selected.method === "GET"
               ? await fetch(`/api/${selected.key}`)
               : usesFileUpload
@@ -554,6 +691,23 @@
                   <span style={{ fontSize: "14px" }}>{metadata.executionId || "n/a"}</span>
                 </div>
               </div>
+
+              {(data.judge || data.quota) && (
+                <div className="summary-grid" style={{ marginTop: 12 }}>
+                  <div className={`summary-item ${data.judge?.outcome === "approved" ? "status-success" : "status-failed"}`}>
+                    <strong>Judge</strong>
+                    <span>{data.judge ? data.judge.outcome : "no parent model"}</span>
+                  </div>
+                  <div className="summary-item">
+                    <strong>Derivative asset</strong>
+                    <span>{data.judge?.assetId ?? (data.judge?.alert || "n/a")}</span>
+                  </div>
+                  <div className="summary-item">
+                    <strong>Quota balance</strong>
+                    <span>{data.quota ? String(data.quota.balance) : "n/a"}</span>
+                  </div>
+                </div>
+              )}
 
               <div className="output-grid">
                 <div>
@@ -641,6 +795,27 @@
                 </section>
               </div>
 
+              <section className="asset-choice-panel">
+                <label>Parent model (optional: with it, the derivative goes to the Judge)</label>
+                <div className="asset-choice-list" style={{ marginTop: 8 }}>
+                  {assetCatalog.models.length === 0 && <div className="muted">No base models found.</div>}
+                  {assetCatalog.models.map((item) => (
+                    <div
+                      key={`model-${item.id}`}
+                      className={`asset-choice-item ${runSelection.model?.id === item.id ? "active" : ""}`}
+                      onClick={() => setRunSelection((prev) => ({ ...prev, model: prev.model?.id === item.id ? null : item }))}
+                    >
+                      <div className="asset-choice-name">{item.title || `Model #${item.id}`}</div>
+                      <div className="muted">{shortText(item.description)}</div>
+                      <div className="asset-choice-meta" style={{ marginTop: 8 }}>
+                        <span className="mini-tag">ID {item.id}</span>
+                        <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
               <div className="selection-summary">
                 <div className="muted">
                   Selected dataset: {runSelection.dataset ? `${runSelection.dataset.title || `Dataset #${runSelection.dataset.id}`} (ID ${runSelection.dataset.id})` : "none"}
@@ -720,6 +895,8 @@
               <h1 style={{ margin: 0 }}>DNAT Web CLI</h1>
               <p>Fill inputs directly and submit, no manual JSON body required.</p>
             </div>
+
+            <IdentityPanel />
 
             <div className="card grid">
               <label>Action</label>

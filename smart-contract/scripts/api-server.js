@@ -641,7 +641,8 @@ async function listAssetsByScanningIds() {
 
   const datasets = assets.filter((a) => a.assetType === 0);
   const applications = assets.filter((a) => a.assetType === 1);
-  return { all: assets, datasets, applications };
+  const models = assets.filter((a) => a.assetType === MODEL_ASSET_TYPE);
+  return { all: assets, datasets, applications, models };
 }
 
 // Modelo base (T-809): o dono envia o tar.gz do diretório do modelo. A CVM1 extrai com cuidado,

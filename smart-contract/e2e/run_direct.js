@@ -23,7 +23,7 @@
  *      contrato, derivado usável, cota 1.
  *   C. Juiz SIMULADO reprovando: recibo gravado, derivado inativo, cota 5.
  *
- *   node e2e/run_direct.js [--keep]      # resultados em results/e2e_direct.{json,md}
+ *   node e2e/run_direct.js [--keep] [--serve]   # resultados em results/e2e_direct.{json,md}
  */
 const crypto = require("node:crypto");
 const fs = require("node:fs");
@@ -41,6 +41,8 @@ const REPO = path.resolve(SC, "..");
 const MODEL_GATE = path.join(REPO, "model_gate");
 const OPERATOR_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // conta 0 do hardhat
 const KEEP = process.argv.includes("--keep");
+// --serve: depois dos cenários, deixa a pilha no ar (para usar a web UI) até Ctrl+C.
+const SERVE = process.argv.includes("--serve");
 const sha = (b) => crypto.createHash("sha256").update(b).digest("hex");
 
 const state = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-e2e-"));
@@ -339,6 +341,13 @@ async function main() {
   result.checks = checks.map(([name, ok]) => ({ name, ok }));
   writeResults(result);
   for (const [name, ok] of checks) log(`${ok ? "ok  " : "FALHOU"} ${name}`);
+  if (SERVE) {
+    log(`pilha no ar: web UI em ${cvm1.api}/ (Juiz SIMULADO reprovando, modelo base ${model.assetId}); Ctrl+C encerra`);
+    await new Promise((resolve) => {
+      process.once("SIGINT", resolve);
+      process.once("SIGTERM", resolve);
+    });
+  }
   return checks.every(([, ok]) => ok) ? 0 : 1;
 }
 
