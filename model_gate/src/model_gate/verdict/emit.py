@@ -12,7 +12,8 @@ Esquema dnat.verdict.v1 (chaves fixas; qualquer chave a mais ou a menos é recus
     instruments  motivos por instrumento: {s1, integrity, guards, second_line} -> [code]
     measures     {n_tests, s1: [células de metrics.compare], signals: [{format, condition, rho, e1}],
                   utility: {relative_ce_loss, degenerate_rate} | null}
-    thresholds   os limiares do Prereg usados (prereg.yaml congelado; o hash dele está em hashes)
+    thresholds   os limiares do Prereg usados (prereg.yaml congelado; o hash dele está em hashes);
+                 null só no reprovado por hash que não confere, que não chega a medir (s1 vazio)
     hashes       {parent, parent_reference, derivative, judge, battery_commitment, prereg, dataset,
                   responses}: SHA-256 em 64 hex minúsculos (bytes32 do recibo sem o 0x)
     identity_id  SHA-256 da chave pública de quem pediu o job (E14 §18), 64 hex
@@ -76,7 +77,7 @@ def _iso(dt: datetime | str) -> str:
     return dt.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def build(verdict: Verdict, *, cells: Sequence[dict], prereg: Prereg, hashes: Mapping[str, str], identity_id: str,
+def build(verdict: Verdict, *, cells: Sequence[dict], prereg: Prereg | None, hashes: Mapping[str, str], identity_id: str,
           decided_at: datetime | str, signals: Sequence[SignalReading] = (), utility: Utility | None = None) -> dict:
     """Monta o documento a partir do veredito da escada e das medidas que ela leu, e o valida."""
     reasons = [r.record() for r in verdict.reasons]
@@ -95,8 +96,8 @@ def build(verdict: Verdict, *, cells: Sequence[dict], prereg: Prereg, hashes: Ma
             "signals": [dataclasses.asdict(s) for s in signals],
             "utility": dataclasses.asdict(utility) if utility is not None else None,
         },
-        "thresholds": {k: (dict(v) if isinstance(v, Mapping) else list(v) if isinstance(v, tuple) else v)
-                       for k, v in dataclasses.asdict(prereg).items()},
+        "thresholds": ({k: (dict(v) if isinstance(v, Mapping) else list(v) if isinstance(v, tuple) else v)
+                        for k, v in dataclasses.asdict(prereg).items()} if prereg is not None else None),
         "hashes": {k: _hex(hashes[k]) for k in HASH_FIELDS if k in hashes},
         "identity_id": _hex(identity_id),
         "decided_at": _iso(decided_at),
@@ -147,7 +148,11 @@ def validate(doc: Mapping) -> None:
     m = doc["measures"]
     if not isinstance(m, Mapping) or set(m) != {"n_tests", "s1", "signals", "utility"}:
         raise VerdictSchemaError("measures: n_tests, s1, signals, utility")
-    if not isinstance(m["n_tests"], int) or m["n_tests"] < 0 or not isinstance(m["s1"], list) or not m["s1"]:
+    # Hash que não confere (E14 §4) reprova na regra 0 antes de medir: só aí s1 e limiares ficam vazios.
+    unmeasured = doc["state"] == "reprovado" and doc["rule"] == "0" and \
+        {r["code"] for r in doc["reasons"]} == {"hash_mismatch"}
+    if not isinstance(m["n_tests"], int) or m["n_tests"] < 0 or not isinstance(m["s1"], list) \
+            or (not m["s1"] and not unmeasured):
         raise VerdictSchemaError("measures: n_tests inteiro ≥ 0 e s1 com pelo menos uma célula")
     for c in m["s1"]:
         if not {"format", "condition", "block", "kind", "category", "n_items", "failed", "derivative", "parent",
@@ -158,7 +163,9 @@ def validate(doc: Mapping) -> None:
             raise VerdictSchemaError("sinal fora do esquema")
     if m["utility"] is not None and set(m["utility"]) != {"relative_ce_loss", "degenerate_rate"}:
         raise VerdictSchemaError("utility fora do esquema")
-    if not isinstance(doc["thresholds"], Mapping) or "delta" not in doc["thresholds"]:
+    if unmeasured and doc["thresholds"] is None:
+        pass
+    elif not isinstance(doc["thresholds"], Mapping) or "delta" not in doc["thresholds"]:
         raise VerdictSchemaError("thresholds sem delta")
     h = doc["hashes"]
     if not isinstance(h, Mapping) or set(h) != set(HASH_FIELDS):
