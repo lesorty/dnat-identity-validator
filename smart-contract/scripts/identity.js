@@ -11,7 +11,17 @@
  * - Estado: identities.json na pasta de estado da CVM1 (ao lado de executions/), com o desafio
  *   e, por id, a chave, o nonce, d, a data e o saldo inicial Q.
  *
- * Só o módulo crypto do Node. Pedidos assinados (T-1703) e o livro de cotas (T-1704) ficam fora.
+ * - Pedidos assinados (T-1703, E14 §18.2): as rotas que criam trabalho exigem os cabeçalhos
+ *       X-Identity   id da identidade (64 hex)
+ *       X-Timestamp  carimbo em milissegundos desde 1970 (inteiro decimal, UTC)
+ *       X-Signature  assinatura Ed25519 (64 bytes em hex) sobre a mensagem
+ *           "DNAT-REQUEST-v1\n" + MÉTODO + "\n" + caminho + "\n" + carimbo + "\n" + SHA-256(corpo) em hex
+ *   O caminho é o da requisição com a query (req.originalUrl); o corpo são os bytes crus enviados
+ *   (vazio se não há corpo). Carimbo fora de ±5 min, identidade desconhecida, assinatura errada ou
+ *   pedido já visto dentro da janela recebem 401. A repetição é barrada por um registro em memória
+ *   dos pedidos aceitos na janela; um carimbo velho já é recusado pelo relógio.
+ *
+ * Só o módulo crypto do Node. O livro de cotas (T-1704) fica fora.
  */
 const crypto = require("node:crypto");
 const fs = require("node:fs");
@@ -108,6 +118,141 @@ function parseDifficulty(value) {
   return d;
 }
 
+// ---------------------------------------------------------------------------------------------
+// Pedidos assinados (T-1703)
+// ---------------------------------------------------------------------------------------------
+
+const REQUEST_SIGNATURE_TAG = "DNAT-REQUEST-v1";
+const MAX_CLOCK_SKEW_MS = 5 * 60 * 1000;
+const SIGNATURE_HEADERS = { identity: "x-identity", timestamp: "x-timestamp", signature: "x-signature" };
+
+// Prefixo PKCS#8 de uma chave privada Ed25519 (RFC 8410): basta acrescentar a semente de 32 bytes.
+const ED25519_PKCS8_PREFIX = Buffer.from("302e020100300506032b657004220420", "hex");
+
+function bodyHash(body) {
+  if (body === undefined || body === null) return sha256(Buffer.alloc(0)).toString("hex");
+  return sha256(Buffer.isBuffer(body) ? body : Buffer.from(String(body), "utf8")).toString("hex");
+}
+
+/** Bytes que a identidade assina: método, caminho, carimbo e SHA-256 do corpo, com rótulo de versão. */
+function requestMessage({ method, path: requestPath, timestamp, body }) {
+  return Buffer.from(
+    [REQUEST_SIGNATURE_TAG, String(method).toUpperCase(), String(requestPath), String(timestamp), bodyHash(body)].join("\n"),
+    "utf8",
+  );
+}
+
+function privateKeyObject(privateKey) {
+  if (privateKey instanceof crypto.KeyObject) return privateKey;
+  const seed = parseHex32(privateKey, "privateKey");
+  return crypto.createPrivateKey({ key: Buffer.concat([ED25519_PKCS8_PREFIX, seed]), format: "der", type: "pkcs8" });
+}
+
+function publicKeyObject(publicKeyHex) {
+  const raw = parseHex32(publicKeyHex, "publicKey");
+  return crypto.createPublicKey({ key: { kty: "OKP", crv: "Ed25519", x: raw.toString("base64url") }, format: "jwk" });
+}
+
+/**
+ * Cabeçalhos de um pedido assinado (para os testes e para o cliente da T-1705). privateKey: KeyObject
+ * Ed25519 ou a semente de 32 bytes em hex; publicKey: chave crua em hex (dá o id).
+ */
+function signRequest({ privateKey, publicKey, method, path: requestPath, body, timestamp = Date.now() }) {
+  const signature = crypto.sign(null, requestMessage({ method, path: requestPath, timestamp, body }), privateKeyObject(privateKey));
+  return {
+    "X-Identity": identityId(publicKey),
+    "X-Timestamp": String(timestamp),
+    "X-Signature": signature.toString("hex"),
+  };
+}
+
+/**
+ * Confere pedidos assinados contra o registro de identidades. Guarda em memória os pedidos aceitos
+ * até o carimbo sair da janela: o mesmo pedido (mesma identidade e mesma mensagem) não passa duas
+ * vezes. A chave do registro é o hash da mensagem, não a assinatura, para não depender de a
+ * assinatura ser única.
+ */
+class RequestVerifier {
+  constructor({ registry, maxSkewMs = MAX_CLOCK_SKEW_MS, now = () => Date.now() }) {
+    this.registry = registry;
+    this.maxSkewMs = maxSkewMs;
+    this.now = now;
+    this.seen = new Map(); // id:hash da mensagem -> instante a partir do qual o carimbo já é velho
+  }
+
+  _prune(now) {
+    for (const [key, expiresAt] of this.seen) {
+      if (expiresAt < now) this.seen.delete(key);
+    }
+  }
+
+  /** Devolve o registro da identidade ou lança IdentityError com status 401. */
+  verify({ method, path: requestPath, headers, body }) {
+    const get = (name) => {
+      const v = headers?.[name];
+      return Array.isArray(v) ? v[0] : v;
+    };
+    const id = String(get(SIGNATURE_HEADERS.identity) || "").trim().toLowerCase();
+    const ts = String(get(SIGNATURE_HEADERS.timestamp) || "").trim();
+    const sig = String(get(SIGNATURE_HEADERS.signature) || "").trim().toLowerCase();
+    if (!id || !ts || !sig) throw new IdentityError("signed request required (X-Identity, X-Timestamp, X-Signature)", 401);
+    if (!/^[0-9a-f]{64}$/.test(id)) throw new IdentityError("X-Identity must be 32 bytes in hex", 401);
+    if (!/^[0-9]{1,16}$/.test(ts)) throw new IdentityError("X-Timestamp must be milliseconds since epoch", 401);
+    if (!/^[0-9a-f]{128}$/.test(sig)) throw new IdentityError("X-Signature must be 64 bytes in hex", 401);
+
+    const now = this.now();
+    const timestamp = Number(ts);
+    if (Math.abs(now - timestamp) > this.maxSkewMs) throw new IdentityError("request timestamp outside the allowed window", 401);
+
+    const record = this.registry.get(id);
+    if (!record) throw new IdentityError("unknown identity", 401);
+
+    const message = requestMessage({ method, path: requestPath, timestamp: ts, body });
+    let valid = false;
+    try {
+      valid = crypto.verify(null, message, publicKeyObject(record.publicKey), Buffer.from(sig, "hex"));
+    } catch {
+      valid = false;
+    }
+    if (!valid) throw new IdentityError("invalid request signature", 401);
+
+    this._prune(now);
+    const key = `${id}:${sha256(message).toString("hex")}`;
+    if (this.seen.has(key)) throw new IdentityError("replayed request", 401);
+    this.seen.set(key, timestamp + this.maxSkewMs);
+    return record;
+  }
+
+  /**
+   * Middleware do Express. Vai depois do leitor do corpo: usa req.body se for Buffer (rotas
+   * multipart) ou req.rawBody (gravado pelo express.json com verify); sem nenhum dos dois, corpo vazio.
+   */
+  middleware() {
+    return (req, res, next) => {
+      try {
+        const body = Buffer.isBuffer(req.body) ? req.body : req.rawBody;
+        req.identity = this.verify({ method: req.method, path: req.originalUrl, headers: req.headers, body });
+        next();
+      } catch (e) {
+        res.status(e instanceof IdentityError ? e.status : 401).json({ error: e.message });
+      }
+    };
+  }
+}
+
+/** Grava o id da identidade que pediu o job no metadata.json da execução (T-1703; a T-809 o leva ao recibo). */
+function recordExecutionIdentity(metadataPath, id) {
+  if (!id || !fs.existsSync(metadataPath)) return false;
+  let metadata;
+  try {
+    metadata = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
+  } catch {
+    return false; // metadata ilegível: não derruba a resposta do job
+  }
+  fs.writeFileSync(metadataPath, JSON.stringify({ ...metadata, identityId: id }, null, 2), "utf8");
+  return true;
+}
+
 /**
  * Registro persistido em um arquivo JSON. O desafio vem de DNAT_IDENTITY_CHALLENGE (32 bytes em
  * hex) ou é sorteado na primeira carga e fica gravado no arquivo, fixo para a implantação.
@@ -174,12 +319,19 @@ class IdentityRegistry {
 module.exports = {
   DEFAULT_DIFFICULTY,
   INITIAL_BALANCE,
+  MAX_CLOCK_SKEW_MS,
+  REQUEST_SIGNATURE_TAG,
   IdentityError,
   IdentityRegistry,
+  RequestVerifier,
+  bodyHash,
   encodeNonce,
   identityId,
   leadingZeroBits,
   powHash,
+  recordExecutionIdentity,
+  requestMessage,
+  signRequest,
   solveProof,
   verifyProof,
 };

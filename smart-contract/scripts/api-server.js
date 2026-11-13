@@ -26,7 +26,7 @@ const {
   decryptBufferEnvelope,
   hasEncryptedEnvelope,
 } = require("./asset_envelope");
-const { IdentityError, IdentityRegistry, DEFAULT_DIFFICULTY } = require("./identity");
+const { IdentityError, IdentityRegistry, RequestVerifier, DEFAULT_DIFFICULTY, recordExecutionIdentity } = require("./identity");
 const { retainDerivative, userSummary } = require("./retention");
 
 // Estado da CVM1 ao lado de executions/: identidades (T-1702) e derivados retidos (T-803).
@@ -819,7 +819,7 @@ async function retainExecutionDerivative({ executionId, digest, archivePath, con
   }
 }
 
-async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user }) {
+async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user, identityId }) {
   if (datasetId === undefined || datasetId === null || applicationId === undefined || applicationId === null) {
     throw new Error("datasetId and applicationId are required");
   }
@@ -901,6 +901,8 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     }
 
     const executionId = parsed?.executionId;
+    // Id da identidade que assinou o pedido, em toda execução (T-1703); a T-809 o leva ao recibo.
+    if (executionId) recordExecutionIdentity(path.join(EXECUTIONS_ROOT, executionId, "metadata.json"), identityId);
     if (executionId && parsed.derivative?.status === "received") {
       parsed.derivative = await retainExecutionDerivative({
         executionId,
@@ -1012,10 +1014,12 @@ async function startServer() {
     difficulty: IDENTITY_DIFFICULTY,
     challenge: process.env.DNAT_IDENTITY_CHALLENGE || null,
   });
+  // Pedidos assinados pela identidade (T-1703, E14 §18.2): só nas rotas que criam trabalho.
+  const requireSignedRequest = new RequestVerifier({ registry: identities }).middleware();
 
   const app = express();
   app.use(cors());
-  app.use(express.json());
+  app.use(express.json({ verify: (req, _res, buf) => { req.rawBody = buf; } }));
   app.use(express.static(path.resolve(__dirname, "..", "web")));
   const multipartParser = express.raw({ type: "multipart/form-data", limit: "100mb" });
 
@@ -1044,7 +1048,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/register-dataset", multipartParser, async (req, res) => {
+  app.post("/api/register-dataset", multipartParser, requireSignedRequest, async (req, res) => {
     try {
       const data = await registerAsset({ ...normalizeUploadRequest(req), assetType: 0 });
       res.json(data);
@@ -1053,7 +1057,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/register-application", multipartParser, async (req, res) => {
+  app.post("/api/register-application", multipartParser, requireSignedRequest, async (req, res) => {
     try {
       const data = await registerAsset({ ...normalizeUploadRequest(req), assetType: 1 });
       res.json(data);
@@ -1123,9 +1127,9 @@ async function startServer() {
     }
   });
 
-  app.post("/api/run-from-cids", async (req, res) => {
+  app.post("/api/run-from-cids", requireSignedRequest, async (req, res) => {
     try {
-      res.json(await runFromCids(req.body));
+      res.json(await runFromCids({ ...req.body, identityId: req.identity.id }));
     } catch (e) {
       res.status(400).json({ error: e.message });
     }
