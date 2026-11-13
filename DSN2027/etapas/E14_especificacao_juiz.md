@@ -447,6 +447,12 @@ stateDiagram-v2
   - reprovados e inconclusivos ficam como estão, retidos como evidência; o usuário treina de novo
     a partir do base.
 - **Revogar um base** derruba os derivados da raiz: ativos, pendentes e retidos.
+  - **Como (T-707, 12/11):** cascata preguiçosa, sem laço sobre os filhos (gás constante). O
+    contrato não muda o estado próprio de cada filho; `isDerivativeUsable(id)` só devolve verdadeiro
+    com o derivado ativo, aprovado, não revogado pelo operador e com o pai ativo. Com o pai fora, o
+    dono não reativa o derivado e não nasce derivado novo dele. Quem serve o derivado consulta essa
+    função, não o `active` do ativo. Reativar o base pelo `updateAsset` traz os filhos de volta: se
+    a revogação do base tiver de ser definitiva, isso entra no mapa de lacunas do contrato.
 
 ---
 

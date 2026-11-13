@@ -1063,16 +1063,16 @@
     "T-205",
     "T-503"
    ],
-   "descricao": "Redução v2 (11/11): Só NF4 (proposta: liberar FP e NF4 no protótipo). Absorve a conferência contra a referência (T-502).\nAbsorve: T-502 (Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos).\n\nPor quê: o D5 libera precisão cheia e quantizações zero-shot (R8), e o bitsandbytes em CPU não é garantido; a E13 §3.3 manda quantizar e desquantizar em CPU pela formalização por bloco de Egashira §3.\nComo:\n- Implementar absmax por bloco e o alfabeto de cada formato: LLM.int8, NF4, FP4\n- Quantizar e desquantizar as matrizes lineares, devolvendo um modelo em precisão cheia com os pesos arredondados\n- Testes com tensores pequenos e valores conhecidos\nSaída: model_gate/formats/quant.py com uma função por formato e testes.",
+   "descricao": "Feito em 12/11 (commit a0d9677): model_gate/src/model_gate/formats/quant.py, NF4 e FP4 em blocos de 64 com absmax e LLM.int8 com absmax por linha; quantize_model_ arredonda no lugar toda nn.Linear menos o lm_head. Conferido contra o bitsandbytes 0.50.2 em CPU (T-503) em 24 matrizes do Qwen2.5-0.5B (49 milhões de pesos): NF4 e int8 bit a bit; FP4 difere em 0,05% dos pesos, todos empates exatos de bf16, sempre um código (regra de desempate do bitsandbytes não reproduzida). Tabela no README de formats/, script em experiments/check_quant_reference.py. 10 testes. Implementou os três formatos, não só NF4, porque o custo foi o mesmo; a escolha do que liberar segue com a redução v2.\n\nRedução v2 (11/11): Só NF4 (proposta: liberar FP e NF4 no protótipo). Absorve a conferência contra a referência (T-502).\nAbsorve: T-502 (Conferir a quantização em CPU contra a implementação de referência numa amostra de pesos).\n\nPor quê: o D5 libera precisão cheia e quantizações zero-shot (R8), e o bitsandbytes em CPU não é garantido; a E13 §3.3 manda quantizar e desquantizar em CPU pela formalização por bloco de Egashira §3.\nComo:\n- Implementar absmax por bloco e o alfabeto de cada formato: LLM.int8, NF4, FP4\n- Quantizar e desquantizar as matrizes lineares, devolvendo um modelo em precisão cheia com os pesos arredondados\n- Testes com tensores pequenos e valores conhecidos\nSaída: model_gate/formats/quant.py com uma função por formato e testes.",
    "epico": "J5",
    "id": "T-501",
    "marco": "G1",
    "prioridade": "P0",
    "pronto": "Função por formato com teste",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Quantizar e desquantizar por bloco (absmax, alfabeto) para LLM.int8, NF4 e FP4 em CPU (Egashira §3)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T04:30:00.000Z"
   },
   {
    "deps": [
@@ -1327,16 +1327,16 @@
     "T-602",
     "T-104"
    ],
-   "descricao": "Redução v2 (11/11): verdict.json: um dicionário serializado com estado, regra, medidas e hashes.\n\nPor quê: o verdict.json é o que o executor lê e o que alimenta o recibo no contrato (P2, T-104).\nComo:\n- Definir o esquema: estado (aprovado, reprovado, inconclusivo), motivos por instrumento e por formato, z-scores, limiar\n- Incluir os hashes do pai, do derivado, do Juiz e o compromisso da bateria\n- Gerador que valida o esquema antes de gravar\nSaída: esquema JSON e model_gate/verdict/emit.py com teste.",
+   "descricao": "Feito em 12/11 (commit 04c362d): model_gate/src/model_gate/verdict/emit.py, esquema dnat.verdict.v1 com chaves fixas: estado, regra da escada, motivos, motivos por instrumento (s1, integridade, guardas, segunda linha), medidas (células do S1, S2/S3 por formato e condição, utilidade, n_tests), limiares do Prereg, hashes (pai, referência, derivado, Juiz, compromisso da bateria, prereg, dataset, respostas) em 64 hex, id da identidade e data em UTC. build valida antes de devolver; write grava na forma canônica (chaves ordenadas, sem espaços, sem NaN) e devolve o SHA-256, que é o verdictHash do recibo; read confere esquema e forma canônica, como a CVM1 faz. Sem z-scores: a escada não usa z-soma. 22 testes. Em aberto: o recibo do tipo falha (sem verdict.json de mérito) e quem escreve o arquivo dentro do job (T-807).\n\nRedução v2 (11/11): verdict.json: um dicionário serializado com estado, regra, medidas e hashes.\n\nPor quê: o verdict.json é o que o executor lê e o que alimenta o recibo no contrato (P2, T-104).\nComo:\n- Definir o esquema: estado (aprovado, reprovado, inconclusivo), motivos por instrumento e por formato, z-scores, limiar\n- Incluir os hashes do pai, do derivado, do Juiz e o compromisso da bateria\n- Gerador que valida o esquema antes de gravar\nSaída: esquema JSON e model_gate/verdict/emit.py com teste.",
    "epico": "J6",
    "id": "T-608",
    "marco": "G2",
    "prioridade": "P0",
    "pronto": "Esquema e gerador do verdict.json",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Saída do veredito: verdict.json com motivos por instrumento e hashes para o recibo",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T04:30:00.000Z"
   },
   {
    "deps": [
@@ -1449,16 +1449,16 @@
     "T-705",
     "T-110"
    ],
-   "descricao": "Redução v2 (11/11): Cascata mínima: o derivado só é ativo se o pai é ativo (uma checagem). Faz parte do critério do G3.\n\nPor quê: o T-110 define revogação, mas não diz o que acontece com os filhos quando o pai é revogado; sem regra, um derivado continua vendável com pai retirado.\nComo:\n- Escolher entre cascata (revogar filhos) e bloqueio na compra (o T-706 já checa pai ativo)\n- Implementar a opção escolhida sem laço sem limite sobre filhos (gás)\n- Registrar a decisão na E14 ou no T-110\nSaída: regra escrita e implementada, com um teste.",
+   "descricao": "Feito em 12/11: cascata preguiçosa no contrato, sem laço sobre os filhos. isDerivativeUsable(id) = ativo, aprovado, não revogado e pai ativo; updateAsset recusa reativar derivado com pai inativo (\"Parent inactive\"); registerDerivative já recusava pai inativo. Teste mostra que revogar o pai custa o mesmo gás com 5 filhos ou nenhum. Decisão registrada na E14 §11. Em aberto: o dono do base pode reativá-lo pelo updateAsset e os filhos voltam; se a revogação do base tiver de ser definitiva, é outra checagem. A API ainda não chama isDerivativeUsable (T-809).\n\nRedução v2 (11/11): Cascata mínima: o derivado só é ativo se o pai é ativo (uma checagem). Faz parte do critério do G3.\n\nPor quê: o T-110 define revogação, mas não diz o que acontece com os filhos quando o pai é revogado; sem regra, um derivado continua vendável com pai retirado.\nComo:\n- Escolher entre cascata (revogar filhos) e bloqueio na compra (o T-706 já checa pai ativo)\n- Implementar a opção escolhida sem laço sem limite sobre filhos (gás)\n- Registrar a decisão na E14 ou no T-110\nSaída: regra escrita e implementada, com um teste.",
    "epico": "J7",
    "id": "T-707",
    "marco": "G3",
    "prioridade": "P2",
    "pronto": "Regra decidida e implementada",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Regra para derivados de um pai revogado",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T04:30:00.000Z"
   },
   {
    "atualizado": "2026-11-11T18:00:00.000Z",
