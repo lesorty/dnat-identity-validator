@@ -1,3 +1,13 @@
+// Subcomandos da identidade (T-1705): rodam sem hardhat e sem carteira, antes de tudo; sem argumento
+// segue o menu interativo de sempre.
+if (process.argv[2]) {
+  const identityCli = require("./identity_cli");
+  if (identityCli.COMMANDS.includes(process.argv[2])) {
+    identityCli.main(process.argv.slice(2)).then((code) => process.exit(code));
+    return;
+  }
+}
+
 const { ethers } = require("hardhat");
 const readline = require("node:readline/promises");
 const { stdin: input, stdout: output } = require("node:process");

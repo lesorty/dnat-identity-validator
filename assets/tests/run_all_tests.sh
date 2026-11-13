@@ -14,6 +14,11 @@ mkdir -p "$RESULTS_DIR"
 
 API_B="http://127.0.0.1:3001"   # DNAT
 
+# Rotas que criam trabalho exigem pedido assinado pela identidade (T-1703); o CLI assina (T-1705).
+# DNAT_IDENTITY_KEY aponta uma chave já registrada; sem ela, a execução cria uma identidade nova.
+CLI="node $REPO/smart-contract/scripts/cli.js"
+IDENTITY_KEY="${DNAT_IDENTITY_KEY:-$RESULTS_DIR/identity.json}"
+
 PASS=0
 FAIL=0
 SKIP=0
@@ -41,21 +46,34 @@ wait_api() {
     return 1
 }
 
+ensure_identity() {
+    local api="$1"
+    if [ -f "$IDENTITY_KEY" ]; then return 0; fi
+    $CLI identity new --api "$api" --key "$IDENTITY_KEY" > "$RESULTS_DIR/identity_new.json"
+    log "Identidade nova registrada: $(python3 -c "import sys,json; print(json.load(sys.stdin)['id'])" < "$RESULTS_DIR/identity_new.json")"
+}
+
+# Pedido assinado pela identidade do teste (CLI); o corpo vai em --json ou em --field/--file.
+signed_api() {
+    local api="$1"; shift
+    $CLI api POST "$@" --api "$api" --key "$IDENTITY_KEY"
+}
+
 register_dataset() {
     local api="$1"
-    curl -sf --max-time 20 -X POST "$api/api/register-dataset" \
-        -F "file=@$ASSETS/data/teste1.csv" \
-        -F "name=dataset-security-eval" \
-        -F "description=dataset para testes de segurança"
+    signed_api "$api" /api/register-dataset \
+        --file "file=$ASSETS/data/teste1.csv" \
+        --field "name=dataset-security-eval" \
+        --field "description=dataset para testes de segurança"
 }
 
 register_app() {
     local api="$1" app_file="$2" name="$3" deps="${4:-}"
-    curl -sf --max-time 180 -X POST "$api/api/register-application" \
-        -F "file=@$app_file" \
-        -F "name=$name" \
-        -F "description=$name" \
-        -F "dependencies=$deps"
+    signed_api "$api" /api/register-application \
+        --file "file=$app_file" \
+        --field "name=$name" \
+        --field "description=$name" \
+        --field "dependencies=$deps"
 }
 
 purchase() {
@@ -67,9 +85,9 @@ purchase() {
 
 execute() {
     local api="$1" ds_id="$2" app_id="$3"
-    curl -s --max-time 300 -X POST "$api/api/run-from-cids" \
-        -H "Content-Type: application/json" \
-        -d "{\"datasetId\":\"$ds_id\",\"applicationId\":\"$app_id\"}"
+    # O erro da API (acesso negado, 402 sem cota) sai no stderr do CLI; entra na evidência.
+    signed_api "$api" /api/run-from-cids \
+        --json "{\"datasetId\":\"$ds_id\",\"applicationId\":\"$app_id\"}" 2>&1 || true
 }
 
 # ──────────────────────────────────────────
@@ -77,6 +95,7 @@ execute() {
 # ──────────────────────────────────────────
 section "Verificando ambientes"
 wait_api "$API_B" "Ambiente B (DNAT)"
+ensure_identity "$API_B"
 
 # ──────────────────────────────────────────
 # T1 — Network Exfiltration
@@ -192,9 +211,7 @@ APP_T5=$(register_app "$API_B" "$ASSETS/apps/benign_stats.py" "t5-no-access-app"
 APP_ID_T5=$(echo "$APP_T5" | python3 -c "import sys,json; print(json.load(sys.stdin)['assetId'])")
 log "Dataset=$DS_ID_T5 App=$APP_ID_T5 (sem purchaseAccess)"
 
-EXEC_T5=$(curl -s --max-time 30 -X POST "$API_B/api/run-from-cids" \
-    -H "Content-Type: application/json" \
-    -d "{\"datasetId\":\"$DS_ID_T5\",\"applicationId\":\"$APP_ID_T5\"}" 2>&1 || true)
+EXEC_T5=$(execute "$API_B" "$DS_ID_T5" "$APP_ID_T5")
 echo "$EXEC_T5" > "$RESULTS_DIR/t5_evidence.json"
 log "Resposta: $EXEC_T5"
 

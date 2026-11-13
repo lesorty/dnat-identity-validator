@@ -7,6 +7,10 @@
 set -euo pipefail
 
 API="http://127.0.0.1:3001"
+# A rota exige pedido assinado (T-1703); o CLI assina com a chave de DNAT_IDENTITY_KEY (T-1705).
+# Registre uma antes: node smart-contract/scripts/cli.js identity new
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+KEY="${DNAT_IDENTITY_KEY:-$HOME/.dnat/identity.json}"
 PASS=0
 FAIL=0
 
@@ -27,10 +31,9 @@ echo "    Dataset CID : $DATASET_CID"
 echo "    App CID     : $APP_CID"
 echo ""
 
-response=$(curl -sf --max-time 10 \
-    -X POST "$API/api/run-from-cids" \
-    -H "Content-Type: application/json" \
-    -d "{\"datasetCid\":\"$DATASET_CID\",\"applicationCid\":\"$APP_CID\"}" \
+response=$(node "$REPO/smart-contract/scripts/cli.js" api POST /api/run-from-cids \
+    --api "$API" --key "$KEY" \
+    --json "{\"datasetCid\":\"$DATASET_CID\",\"applicationCid\":\"$APP_CID\"}" \
     2>&1 || true)
 
 echo "Resposta da API: $response"
