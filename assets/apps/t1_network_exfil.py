@@ -21,6 +21,7 @@ primeira estrategia de invocacao.
 
 import argparse
 import json
+import os
 import socket
 import struct
 import sys
@@ -158,6 +159,12 @@ def main() -> int:
         print("[T1] OVERALL: EXFILTRATION SUCCEEDED")
 
     print("[T1] JSON " + json.dumps(report))
+
+    # Desde a T-804 o stdout do job não chega a ninguém: a evidência vai nas métricas de esquema
+    # fixo. steps = canais que abriram (0 = isolamento OK); loss = canais bloqueados.
+    metrics_path = os.environ.get("DNAT_METRICS_PATH")
+    if metrics_path:
+        Path(metrics_path).write_text(json.dumps({"steps": succeeded, "loss": float(blocked)}), encoding="utf-8")
 
     if args.output:
         try:

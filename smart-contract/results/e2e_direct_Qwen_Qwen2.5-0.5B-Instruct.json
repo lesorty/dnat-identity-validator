@@ -6,7 +6,7 @@
     "node": "v22.22.1",
     "platform": "linux 7.0.0-43-generic",
     "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
-    "startedAtUtc": "2026-11-13T14:04:16.906Z"
+    "startedAtUtc": "2026-11-13T14:19:42.999Z"
   },
   "judgeRelease": {
     "judgeHash": "5706f8b58200dd5b8132e33e6b911b127d7f28f4ebb67c5ebb55fefe9ecb6806",
@@ -15,7 +15,7 @@
     "evaluatorKind": "detector",
     "batteryPackDigest": "f5f17e1a0ea530599f4c3edd4b7e73f3826f1491152c95e1d4267776597a1bc2",
     "note": "roteiro T-811",
-    "allowedAtUtc": "2026-11-13T14:05:45.480Z"
+    "allowedAtUtc": "2026-11-13T14:21:10.946Z"
   },
   "base": {
     "dir": "Qwen__Qwen2.5-0.5B-Instruct",
@@ -28,9 +28,9 @@
     "application": "3"
   },
   "identity": {
-    "id": "167963568787913d1e4e58e5864a696655e6925b4a26f1bfe009620c46283738",
+    "id": "4c05b4e2c43b3827f4fd4639d7b3140127b27651838f9ec9a3c54b4114e4a541",
     "difficulty": 12,
-    "proofSeconds": 0.006133094
+    "proofSeconds": 0.059592804
   },
   "scenarios": {
     "A": {
@@ -38,7 +38,7 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 1.503
+        "train_seconds": 1.481
       },
       "derivative": {
         "digest": "c67e0299b003e577bf92235f49e0420121955e1214b844de5fff0f4369b3a0d2",
@@ -48,10 +48,10 @@
       "judge": {
         "outcome": "failure",
         "assetId": null,
-        "alert": "custody_error"
+        "alert": "judge_failure"
       },
       "quota": {
-        "reservationId": "89e801b4-07c9-47da-94cf-e3677e6c39e8",
+        "reservationId": "b079c9ae-b1be-4932-bfba-9b218b3c46fc",
         "reserved": 0,
         "balance": 20
       },
@@ -62,63 +62,82 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 1.496
+        "train_seconds": 1.509
       },
       "derivative": {
         "digest": "c67e0299b003e577bf92235f49e0420121955e1214b844de5fff0f4369b3a0d2",
-        "status": "retained",
-        "verdict": "failure"
+        "status": "released",
+        "verdict": "approved",
+        "assetId": "4"
       },
       "judge": {
-        "outcome": "failure",
-        "assetId": null,
-        "alert": "custody_error"
+        "outcome": "approved",
+        "assetId": "4",
+        "alert": null
       },
       "quota": {
-        "reservationId": "29e44f77-e8a0-4e52-9657-ab166242cb3b",
+        "reservationId": "1b7b9275-1c63-4549-9f5d-c11dbcf2ab50",
         "reserved": 0,
-        "balance": 20
+        "balance": 19
       },
-      "balanceAfter": 20
+      "balanceAfter": 19
     },
     "C": {
       "exitCode": 0,
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 1.515
+        "train_seconds": 3.719
       },
       "derivative": {
         "digest": "c67e0299b003e577bf92235f49e0420121955e1214b844de5fff0f4369b3a0d2",
         "status": "retained",
-        "verdict": "failure"
+        "verdict": "rejected",
+        "assetId": "5"
       },
       "judge": {
-        "outcome": "failure",
-        "assetId": null,
-        "alert": "custody_error"
+        "outcome": "rejected",
+        "assetId": "5",
+        "alert": null
       },
       "quota": {
-        "reservationId": "b9645f15-5636-434c-b921-8b245a8a456a",
+        "reservationId": "459e48ae-6c8b-4bf0-8ed6-0927428f95c0",
         "reserved": 0,
-        "balance": 20
+        "balance": 14
       },
-      "balanceAfter": 20
+      "balanceAfter": 14
     }
   },
-  "onChain": {},
+  "onChain": {
+    "B": {
+      "assetId": "4",
+      "active": true,
+      "usable": true,
+      "verdict": 1,
+      "verdictHash": "0x91f2608fe4b34959dbf8d13bff78413e2d354f4c17d9d9833a61c793da11070d",
+      "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    },
+    "C": {
+      "assetId": "5",
+      "active": false,
+      "usable": false,
+      "verdict": 2,
+      "verdictHash": "0x90149ad69117e32916204366f80f46d2463ed0bf7b317e62988a32cc1b3c034b",
+      "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    }
+  },
   "timings": [
     {
       "step": "IPFS em memória",
-      "seconds": 0.002
+      "seconds": 0.008
     },
     {
       "step": "hardhat node e implantação do contrato",
-      "seconds": 1.269
+      "seconds": 1.261
     },
     {
       "step": "CVM2 (builder, modo direto)",
-      "seconds": 0.314
+      "seconds": 0.316
     },
     {
       "step": "CVM de job (executor, modo direto)",
@@ -126,51 +145,51 @@
     },
     {
       "step": "pacote da bateria depositado pelo operador (judge_cli battery)",
-      "seconds": 0.179
+      "seconds": 0.175
     },
     {
       "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
-      "seconds": 0.155
+      "seconds": 0.144
     },
     {
       "step": "CVM1 (api-server)",
-      "seconds": 0.626
+      "seconds": 0.622
     },
     {
       "step": "identidade com prova de trabalho (d = 12)",
-      "seconds": 0.024
+      "seconds": 0.076
     },
     {
       "step": "depósito do modelo base (register-model)",
-      "seconds": 64.048
+      "seconds": 68.872
     },
     {
       "step": "dataset (register-dataset)",
-      "seconds": 0.182
+      "seconds": 0.204
     },
     {
       "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
-      "seconds": 0.671
+      "seconds": 0.66
     },
     {
       "step": "compra de acesso (purchase-access)",
-      "seconds": 0.166
+      "seconds": 0.17
     },
     {
       "step": "referência do pai depositada pelo operador (judge_cli reference)",
-      "seconds": 0.249
+      "seconds": 0.26
     },
     {
       "step": "A · fine-tuning + Juiz real (model_gate)",
-      "seconds": 199.601
+      "seconds": 220.552
     },
     {
       "step": "B · fine-tuning + Juiz SIMULADO aprovando",
-      "seconds": 197.908
+      "seconds": 269.808
     },
     {
       "step": "C · fine-tuning + Juiz SIMULADO reprovando",
-      "seconds": 189.259
+      "seconds": 422.589
     }
   ],
   "checks": [
@@ -184,19 +203,19 @@
     },
     {
       "name": "B: aprovado, derivado usável no contrato",
-      "ok": false
+      "ok": true
     },
     {
       "name": "B: cota 1 (saldo 19)",
-      "ok": false
+      "ok": true
     },
     {
       "name": "C: reprovado, derivado inativo",
-      "ok": false
+      "ok": true
     },
     {
       "name": "C: cota 5 (saldo 14)",
-      "ok": false
+      "ok": true
     }
   ]
 }

@@ -87,3 +87,42 @@ docker exec dnat-builder sh -lc 'find /var/dnat/wheel-cache -maxdepth 1 -type f 
 docker exec dnat-executor sh -lc 'find /tmp -maxdepth 2 \( -name firecracker.socket -o -name rootfs-overlay.ext4 -o -name input.ext4 -o -name output.ext4 -o -name serial.log \) -print | sort'
 docker exec dnat-executor sh -lc 'mount | grep -E "result-mount|input-mount|output-mount" || true'
 ```
+
+## Modo direto (arquitetura atual, T-815)
+
+Na arquitetura atual (D4, T-102) não há microVM: cada job roda direto numa CVM de uso único,
+isolada pela rede dela (T-801). Localmente, as três CVMs viram containers leves, sem KVM nem
+Firecracker:
+
+```bash
+docker compose -f docker/direct.compose.yaml up -d --build
+```
+
+- **CVM1** (`dnat-client`): IPFS, hardhat, API e o Juiz (`model_gate` com `uv`, Python 3.12 e torch de
+  CPU do `uv.lock`). Os dados locais do model_gate (`$MODEL_GATE_DATA`, padrão `~/model_gate_data`)
+  entram só leitura em `/data/model_gate_data`.
+- **CVM2** (`dnat-builder`): `build_vm_runtime/Dockerfile.direct`, ext4 por `mkfs.ext4 -d`.
+- **CVM de job** (`dnat-executor`): `vm_runtime/Dockerfile.direct`. `start-direct.sh` deixa a rede
+  entra-só (a CVM1 conecta no agente; nenhuma conexão nova sai, nem para a CVM1) e troca para um
+  usuário sem privilégio antes de subir o agente.
+
+Liberação do Juiz pelo operador, dentro da CVM1 (exemplo com o pacote e a referência locais):
+
+```bash
+docker exec dnat-client node smart-contract/scripts/judge_cli.js battery --dir /data/model_gate_data/battery/local_t807
+docker exec dnat-client node smart-contract/scripts/judge_cli.js allow --battery-commitment <64 hex> \
+  --prereg model_gate/experiments/judge_local_prereg.yaml --evaluator-kind detector
+docker exec dnat-client node smart-contract/scripts/judge_cli.js reference --parent <id do base> \
+  --dir /data/model_gate_data/references/<referência medida>
+```
+
+Testes de segurança contra esta pilha (T1 rede, T3 limpeza, T4 alcance a partir da CVM de job,
+T5 controle de acesso):
+
+```bash
+bash assets/tests/run_all_tests.sh
+```
+
+Sem Docker, o mesmo fluxo roda como processos locais: `npm run e2e:direct` e `npm run e2e:teste8` em
+`smart-contract/` (T-811, T-814).
+

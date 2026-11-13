@@ -120,21 +120,23 @@ purchase "$API_B" "$DS_ID_B" "$APP_ID_B" > /dev/null
 log "[B] Executando T1 no DNAT..."
 EXEC_B=$(execute "$API_B" "$DS_ID_B" "$APP_ID_B")
 echo "$EXEC_B" > "$RESULTS_DIR/t1_dnat_execution.json"
-STDOUT_B=$(echo "$EXEC_B" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('stdout',''))" 2>/dev/null || true)
-log "[B] stdout: $STDOUT_B"
+# Desde a T-804 o stdout do job não volta: a aplicação T1 grava nas métricas de esquema fixo quantos
+# canais abriu (steps) e quantos foram bloqueados (loss).
+read -r OPENED BLOCKED < <(echo "$EXEC_B" | python3 -c "
+import sys, json
+m = (json.load(sys.stdin).get('result') or {}).get('metrics') or {}
+print(m.get('steps', 'none'), m.get('loss', 'none'))" 2>/dev/null || echo "none none")
+log "[B] canais abertos=$OPENED bloqueados=$BLOCKED"
 
 # --- Avaliação T1 ---
 log ""
 log "--- Evidências T1 ---"
-DNAT_BLOCKED=$(echo "$STDOUT_B" | grep -c "EXFILTRATION FAILED" || true)
+echo "DNAT metrics: steps(abertos)=$OPENED loss(bloqueados)=$BLOCKED" >> "$RESULTS_DIR/t1_evidence.txt"
 
-echo "DNAT stdout:" >> "$RESULTS_DIR/t1_evidence.txt"
-echo "$STDOUT_B" >> "$RESULTS_DIR/t1_evidence.txt"
-
-if [ "$DNAT_BLOCKED" -gt 0 ]; then
-    pass "T1 DNAT: exfiltração bloqueada pela ausência de rede na microVM"
+if [ "$OPENED" = "0" ] && [ "$BLOCKED" != "none" ]; then
+    pass "T1 DNAT: exfiltração bloqueada ($BLOCKED canais) — CVM de job sem saída de rede"
 else
-    fail "T1 DNAT: exfiltração NÃO foi bloqueada — revisar configuração do kernel"
+    fail "T1 DNAT: exfiltração NÃO foi bloqueada (canais abertos: $OPENED) — revisar a rede da CVM de job"
 fi
 
 
@@ -144,14 +146,16 @@ fi
 section "T3: Ephemeral Cleanup Check (CVM3)"
 log "Verificando artefatos remanescentes no dnat-executor após execução T1..."
 
+# Modo direto (arquitetura atual): o job roda em /tmp/exec e o bundle chega em /app/input; nada
+# disso pode sobrar. Com a microVM, os discos e o socket do Firecracker também entram na busca.
 LEFTOVER=$(docker exec dnat-executor sh -lc \
-    'find /tmp -maxdepth 3 \( -name "firecracker.socket" -o -name "rootfs-overlay.ext4" -o -name "input.ext4" -o -name "output.ext4" -o -name "application.ext4" \) 2>/dev/null' \
+    'find /tmp /app/input -maxdepth 3 \( -name "firecracker.socket" -o -name "rootfs-overlay.ext4" -o -name "input.ext4" -o -name "output.ext4" -o -name "application.ext4" -o -name "*.tar.gz" -o -path "/tmp/exec/*" \) 2>/dev/null | head -5' \
     2>/dev/null || true)
 MOUNTS=$(docker exec dnat-executor sh -lc \
-    'mount 2>/dev/null | grep -E "result-mount|input-mount|output-mount" || true' \
+    'mount 2>/dev/null | grep -E "result-mount|input-mount|output-mount|dnat-app" || true' \
     2>/dev/null || true)
 DATASET=$(docker exec dnat-executor sh -lc \
-    'find /tmp -maxdepth 3 -name "*.csv" 2>/dev/null' \
+    'find / -xdev \( -path /proc -o -path /sys \) -prune -o -name "dataset.csv" -print 2>/dev/null | head -5' \
     2>/dev/null || true)
 
 echo "Artefatos encontrados: '$LEFTOVER'" >> "$RESULTS_DIR/t3_evidence.txt"
@@ -174,7 +178,8 @@ echo "Cross-CVM reachability from dnat-executor:" > "$T4_RESULTS"
 check_cross() {
     local label="$1" cmd="$2"
     local out
-    out=$(docker exec dnat-executor sh -lc "$cmd" 2>&1 || true)
+    # Como o usuário do job (dnat), não como root do container.
+    out=$(docker exec -u dnat dnat-executor sh -lc "$cmd" 2>&1 || true)
     echo "$label: $out" >> "$T4_RESULTS"
     if echo "$out" | grep -qiE "refused|unreachable|could not resolve|network|failed|timed out|curl.*(7|28|6)"; then
         pass "T4: $label — bloqueado"
@@ -183,10 +188,10 @@ check_cross() {
     fi
 }
 
-check_cross "CVM1 API (3001)"     "curl -sf --max-time 3 http://dnat-client:3001/api/health 2>&1 || true"
-check_cross "CVM1 IPFS (5001)"    "curl -sf --max-time 3 http://dnat-client:5001/api/v0/id 2>&1 || true"
-check_cross "CVM2 builder (5100)" "curl -sf --max-time 3 http://dnat-builder:5100/health 2>&1 || true"
-check_cross "Hardhat RPC (8545)"  "curl -sf --max-time 3 -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"params\":[],\"id\":1}' http://dnat-client:8545 2>&1 || true"
+check_cross "CVM1 API (3001)" "curl -sSf --max-time 3 http://dnat-client:3001/api/health 2>&1 || true"
+check_cross "CVM1 IPFS (5001)" "curl -sSf --max-time 3 http://dnat-client:5001/api/v0/id 2>&1 || true"
+check_cross "CVM2 builder (5100)" "curl -sSf --max-time 3 http://dnat-builder:5100/health 2>&1 || true"
+check_cross "Hardhat RPC (8545)" "curl -sSf --max-time 3 -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"params\":[],\"id\":1}' http://dnat-client:8545 2>&1 || true"
 
 # Chave de criptografia
 KEY_LEAKED=$(docker exec dnat-executor sh -lc 'echo "${ASSET_ENCRYPTION_KEY:-__not_set__}"' 2>/dev/null || true)

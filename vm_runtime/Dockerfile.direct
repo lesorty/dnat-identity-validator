@@ -1,0 +1,28 @@
+# CVM de job no modo direto (T-815): sem Firecracker nem kernel; o job roda pelo run-direct.sh.
+# Emula a CVM de uso único da T-801 num container:
+#   - rede: entra-só (start-direct.sh). A CVM1 conecta no agente; o job não abre conexão nova
+#     para fora (internet, CVM1, builder), como o grupo de segurança da CVM na nuvem;
+#   - o agente e o job rodam como usuário sem privilégio, sem como desfazer a regra;
+#   - o ext4 da aplicação é lido por debugfs (sem mount).
+# numpy fica no Python do sistema para as aplicações de exemplo dos roteiros (e2e/abliterate_app.py).
+FROM python:3.12-slim-bookworm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bash ca-certificates curl e2fsprogs iptables tar util-linux \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m pip install --no-cache-dir "numpy>=2" \
+    && useradd --create-home --uid 1000 dnat
+
+WORKDIR /app
+# Contexto: vm_runtime/ (o .dockerignore da raiz exclui esta pasta).
+COPY executor.py job_output.py derivative.py start-direct.sh /app/
+COPY vm /app/vm
+RUN mkdir -p /app/input /app/output/derivatives && chown -R dnat:dnat /app/input /app/output \
+    && chmod +x /app/start-direct.sh
+
+ENV DNAT_NO_MICROVM=1 \
+    PYTHONUNBUFFERED=1
+
+EXPOSE 5000
+HEALTHCHECK --interval=10s --timeout=3s --retries=6 CMD curl -fsS http://127.0.0.1:5000/health >/dev/null || exit 1
+CMD ["/app/start-direct.sh"]

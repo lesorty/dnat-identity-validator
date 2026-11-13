@@ -1,0 +1,75 @@
+# Pilha local no modo direto (T-815): as três CVMs como containers, sem KVM, Firecracker nem root
+# no job. É a arquitetura atual (D4, T-102): cada job roda direto numa CVM de uso único, isolada pela
+# rede dela; aqui a CVM de job é um container com saída bloqueada (vm_runtime/start-direct.sh).
+#
+#   docker compose -f docker/direct.compose.yaml up -d --build
+#   bash assets/tests/run_all_tests.sh          # T1, T3, T4 e T5 contra esta pilha
+#
+# O Juiz roda dentro da CVM1 (model_gate e uv na imagem). Pacote da bateria, referência do pai e
+# liberação do Juiz são do operador, pelo judge_cli dentro do container (ver RUN_COMPOSE.md).
+services:
+  dnat-client:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: dnat-client-direct:latest
+    container_name: dnat-client
+    environment:
+      WEB_PORT: ${WEB_PORT:-3001}
+      RPC_URL: http://127.0.0.1:8545
+      IPFS_API_URL: http://127.0.0.1:5001
+      EXECUTOR_URL: http://dnat-executor:5000
+      BUILDER_URL: http://dnat-builder:5100
+      PRIVATE_KEY: ${PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
+      ASSET_ENCRYPTION_KEY: ${ASSET_ENCRYPTION_KEY:-dnat-dev-asset-key}
+      DNAT_IDENTITY_DIFFICULTY: ${DNAT_IDENTITY_DIFFICULTY:-16}
+      DNAT_UPLOAD_LIMIT: ${DNAT_UPLOAD_LIMIT:-4gb}
+    ports:
+      - "3001:3001"
+      - "5001:5001"
+      - "8545:8545"
+    volumes:
+      - dnat_direct_ipfs:/data/ipfs
+      # Dados locais do model_gate (pacote da bateria, referências medidas, modelos), só leitura.
+      - ${MODEL_GATE_DATA:-${HOME}/model_gate_data}:/data/model_gate_data:ro
+    networks:
+      - dnat-runtime
+    depends_on:
+      - dnat-builder
+      - dnat-executor
+    restart: unless-stopped
+
+  dnat-builder:
+    build:
+      context: ..
+      dockerfile: build_vm_runtime/Dockerfile.direct
+    image: dnat-builder-direct:latest
+    container_name: dnat-builder
+    volumes:
+      - dnat_direct_wheels:/var/dnat/wheel-cache
+    networks:
+      - dnat-runtime
+    restart: unless-stopped
+
+  dnat-executor:
+    build:
+      context: ../vm_runtime
+      dockerfile: Dockerfile.direct
+    image: dnat-executor-direct:latest
+    container_name: dnat-executor
+    # Só para montar a regra de saída no início; o agente e o job rodam sem nenhuma capability.
+    cap_add:
+      - NET_ADMIN
+    environment:
+      DNAT_EGRESS_LOCK: "1"
+    networks:
+      - dnat-runtime
+    restart: unless-stopped
+
+volumes:
+  dnat_direct_ipfs:
+  dnat_direct_wheels:
+
+networks:
+  dnat-runtime:
+    name: dnat-runtime

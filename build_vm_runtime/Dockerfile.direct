@@ -1,0 +1,24 @@
+# CVM2 (builder) no modo direto (T-815): sem Firecracker nem kernel. build-direct.sh chama o mesmo
+# build_application_artifact.py do guest e grava o ext4 por `mkfs.ext4 -d`, sem root nem mount.
+# O Python é o mesmo da CVM de job (vm_runtime/Dockerfile.direct): as rodas instaladas no ext4 têm
+# de servir ao python3 que roda o job.
+FROM python:3.12-slim-bookworm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bash ca-certificates curl e2fsprogs tar \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m pip install --no-cache-dir "packaging>=24"
+
+WORKDIR /app
+COPY build_vm_runtime/builder.py build_vm_runtime/worker.py /app/
+COPY build_vm_runtime/vm /app/vm
+COPY smart-contract/scripts/build_application_artifact.py /app/guest-tools/build_application_artifact.py
+
+ENV DNAT_NO_MICROVM=1 \
+    WHEEL_CACHE_SOURCE_DIR=/var/dnat/wheel-cache \
+    PYTHONUNBUFFERED=1
+RUN mkdir -p /var/dnat/wheel-cache
+
+EXPOSE 5100
+HEALTHCHECK --interval=10s --timeout=3s --retries=6 CMD curl -fsS http://127.0.0.1:5100/health >/dev/null || exit 1
+CMD ["python3", "builder.py", "5100"]

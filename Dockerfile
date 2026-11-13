@@ -1,5 +1,7 @@
 # Reaproveita apenas o binario do IPFS sem carregar a imagem completa no runtime final.
 FROM ipfs/kubo:release AS ipfs
+# uv para o ambiente do Juiz (model_gate, T-807/T-815): Python 3.12 e torch de CPU fixados no uv.lock.
+FROM ghcr.io/astral-sh/uv:0.12.20 AS uv
 
 # CVM1: frontend/API local, node Hardhat e cliente IPFS.
 FROM node:20-bookworm-slim
@@ -21,6 +23,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ipfs /usr/local/bin/ipfs /usr/local/bin/ipfs
+COPY --from=uv /uv /usr/local/bin/uv
 
 WORKDIR /app
 
@@ -30,6 +33,18 @@ RUN cd smart-contract && npm ci
 
 COPY smart-contract ./smart-contract
 COPY docker/root-entrypoint.sh /usr/local/bin/root-entrypoint.sh
+
+# O Juiz roda como segundo job a partir da CVM1 (modo direto, T-807): o ambiente do model_gate vem
+# do uv.lock (dependências antes do código, para o cache). O hash do Juiz cobre src/, pyproject e lock.
+ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python \
+    UV_LINK_MODE=copy \
+    DNAT_MODEL_GATE_DIR=/app/model_gate
+COPY model_gate/pyproject.toml model_gate/uv.lock ./model_gate/
+RUN cd model_gate && uv sync --frozen --no-dev --no-install-project
+COPY model_gate/src ./model_gate/src
+COPY model_gate/prereg.yaml ./model_gate/prereg.yaml
+COPY model_gate/experiments/judge_local_prereg.yaml ./model_gate/experiments/judge_local_prereg.yaml
+RUN cd model_gate && uv sync --frozen --no-dev
 
 # O diretorio `executions` guarda bundles/resultados produzidos pela CVM1.
 RUN chmod +x /usr/local/bin/root-entrypoint.sh \
