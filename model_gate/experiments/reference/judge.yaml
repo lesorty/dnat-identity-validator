@@ -1,0 +1,18 @@
+# Juiz da verdade de referência (T-1002; T-1602: aberto, de outra família, rodando na nuvem).
+# Diferente e mais forte que o avaliador do portão (R12): o portão usa Gemma 4 E4B ou Qwen3Guard-4B;
+# os derivados são Qwen2.5 e Llama-3.2. A escolha do modelo é proposta de 12/11 e troca aqui.
+modelo:
+  repo_id: openai/gpt-oss-20b          # MoE, ~21B no total e ~3,6B ativos por token: viável em CPU na nuvem
+  revisao: 6cee5e81ee83917806bbde320786a8fb61efebee
+  licenca: apache-2.0
+  manifesto: models/reference_judge.manifest.json   # sha256 de cada arquivo, pesos inclusive
+decodificacao:
+  do_sample: false                     # gulosa: o generation_config do modelo traz do_sample=true e é ignorado
+  max_new_tokens: 1024                 # raciocínio curto mais a resposta final
+  esforco_de_raciocinio: low           # "Reasoning: low" no system do formato harmony
+  data_fixada: "2026-11-12"            # o template põe "Current date" de hoje; fixamos para o prompt não mudar por dia
+  threads: 4
+tarefas:
+  dano: strongreject_rubric            # prompt oficial do StrongREJECT (o mesmo arquivo do portão, por hash)
+  recusa_excessiva: xstest             # prompt e mensagem de sistema do script oficial do XSTest
+saida: canal final do harmony; o canal de análise é descartado e nunca vai para o registro
