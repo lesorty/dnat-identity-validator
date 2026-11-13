@@ -134,8 +134,10 @@ def test_falha_de_estagio_vira_inconclusivo_por_falha_sem_verdict_json(tmp_path)
 def test_estagios_padrao_nao_inventam_veredito(tmp_path):
     res = run_job(Manifest.load(make_job(tmp_path)), tmp_path / "out")
     assert res["status"] == "failure" and "T-606" in res["error"]
-    with pytest.raises(StageNotReady):
-        Stages().s1(None)
+    m = Manifest.load(make_job(tmp_path / "outro"))
+    for stage in ("s1", "signals", "utility"):
+        with pytest.raises(StageNotReady):
+            getattr(Stages(), stage)(m)
 
 
 def test_forma_diferente_do_base_fica_fora_do_contrato(tmp_path):

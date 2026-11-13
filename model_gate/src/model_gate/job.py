@@ -12,7 +12,10 @@ Manifesto dnat.judge-job.v1:
      "inputs": {nome: {"path", "digest", "kind": "dir" | "file"}},   # base, derivative,
               # parent_reference, dataset e prereg são obrigatórios
      "judge_hash", "battery_commitment", "identity_id": SHA-256 em 64 hex,
-     "decided_at": ISO 8601 em UTC (o instante fixo T0 + T_max, E14 §4; quem fixa é a CVM1)}
+     "decided_at": ISO 8601 em UTC (o instante fixo T0 + T_max, E14 §4; quem fixa é a CVM1),
+     "evaluator": {"kind": guard | rubric | detector}, "sampling_key": hex}   # estágios reais
+    Entradas dos estágios reais (stages.py): battery (pacote da bateria) e, para guard e rubric,
+    evaluator (diretório do avaliador).
 
 Digest: diretório pela regra de io.digest (modelos e pacotes), arquivo pelo SHA-256 dos bytes.
 
@@ -24,11 +27,10 @@ Desfechos (E14 §4, §9):
                                    a CVM1 roda de novo e devolve a reserva da cota, T-1704)
     caso contrário               → verdict.json da escada
 
-Estágios: o que já existe no Juiz entra aqui de verdade (conferência de forma e tokenizer contra o
-base, sobreposição do dataset com a bateria). O resto (S1 com o avaliador, S2/S3, utilidade,
-injeção) chega por `Stages`, porque depende da referência custodiada do pai (T-312) e da
-utilidade (T-910), que ainda não existem; a classe padrão levanta StageNotReady para esses, e o job
-termina como falha, nunca com um veredito inventado.
+Estágios (stages.RealStages): conferência de forma e tokenizer contra o base, sobreposição do
+dataset com a bateria, S1 por formato com o avaliador, S2/S3, utilidade e injeção. Sem o que
+precisam (prereg com null, pacote da bateria, referência do pai, avaliador, chave do sorteio) eles
+levantam StageNotReady, e o job termina como falha, nunca com um veredito inventado.
 """
 
 from __future__ import annotations
@@ -44,6 +46,7 @@ from model_gate.battery.pool import load_pool, prompt_hash
 from model_gate.io.digest import file_sha256
 from model_gate.io.load import dir_digest
 from model_gate.judge_package import judge_hash as running_judge_hash
+from model_gate.stages import RealStages, StageNotReady  # noqa: F401  (StageNotReady: reexportado)
 from model_gate.verdict import emit
 from model_gate.verdict.combine import (REJECTED, Integrity, Prereg, Reason, SignalReading, Utility, Verdict,
                                         decide)
@@ -55,10 +58,6 @@ RESPONSES_FILE = "responses.jsonl"
 RESULT_FILE = "job_result.json"
 
 
-class StageNotReady(RuntimeError):
-    """O estágio ainda não tem implementação no Juiz (depende de outra task)."""
-
-
 @dataclass(frozen=True)
 class Manifest:
     inputs: dict[str, dict]
@@ -66,6 +65,7 @@ class Manifest:
     battery_commitment: str
     identity_id: str
     decided_at: str
+    extra: dict = field(default_factory=dict)  # evaluator, sampling_key
 
     @classmethod
     def load(cls, path: Path) -> "Manifest":
@@ -83,7 +83,8 @@ class Manifest:
                 raise ValueError(f"entrada {name}: precisa de path, digest e kind dir|file")
             p = Path(spec["path"])
             out[name] = {**spec, "path": str(p if p.is_absolute() else base / p)}
-        return cls(out, raw["judge_hash"], raw["battery_commitment"], raw["identity_id"], raw["decided_at"])
+        extra = {k: raw[k] for k in ("evaluator", "sampling_key") if k in raw}
+        return cls(out, raw["judge_hash"], raw["battery_commitment"], raw["identity_id"], raw["decided_at"], extra)
 
 
 def input_digest(spec: Mapping) -> str:
@@ -181,32 +182,8 @@ def dataset_overlap(dataset: Path, battery_hashes: set[str]) -> list[int]:
     return [i for i, prompt in enumerate(_dataset_prompts(dataset)) if prompt_hash(prompt) in battery_hashes]
 
 
-@dataclass
-class Stages:
-    """Os estágios do Juiz. Os que dependem de tasks abertas levantam StageNotReady."""
-    battery_hashes: set[str] = field(default_factory=lambda: {it["sha256"] for it in load_pool()["items"]})
-
-    def contract(self, m: Manifest) -> list[str]:
-        return contract_check(Path(m.inputs["base"]["path"]), Path(m.inputs["derivative"]["path"]))
-
-    def dataset_overlap(self, m: Manifest) -> list[int]:
-        return dataset_overlap(Path(m.inputs["dataset"]["path"]), self.battery_hashes)
-
-    def prereg(self, m: Manifest) -> Prereg:
-        raise StageNotReady("prereg.yaml ainda sem valores (T-606)")
-
-    def s1(self, m: Manifest) -> tuple[list[dict], list[dict], bool]:
-        """(células de metrics.compare, respostas para o responses.jsonl, formatos idênticos)."""
-        raise StageNotReady("S1 precisa da referência custodiada do pai (T-312) e do avaliador na nuvem")
-
-    def signals(self, m: Manifest) -> Sequence[SignalReading]:
-        raise StageNotReady("S2/S3 por formato e condição ainda não ligados ao job")
-
-    def utility(self, m: Manifest) -> Utility:
-        raise StageNotReady("utilidade no corpus benigno (T-910)")
-
-    def injection(self, m: Manifest) -> bool:
-        raise StageNotReady("detecção de injeção dirigida ao avaliador")
+# Os estágios do job (o nome antigo fica para os testes e chamadores).
+Stages = RealStages
 
 
 def _hashes(m: Manifest, responses_sha: str) -> dict[str, str]:
@@ -239,7 +216,7 @@ def run_job(manifest: Manifest, out: Path, stages: Stages | None = None, *, judg
     if running != manifest.judge_hash.lower():
         return _result(out, {"status": "failure", "outcome": "inconclusive_failure", "alert": "judge_hash_mismatch",
                              "error": f"Juiz em execução {running} != manifesto {manifest.judge_hash}"})
-    stages = stages or Stages()
+    stages = stages or RealStages()
 
     problems = verify_inputs(manifest)
     if problems:
