@@ -33,8 +33,8 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
 
 ## Andamento (13/11)
 
-- **Placar:** 77 tasks feitas, 4 em andamento, 1 a fazer, 67 no backlog e 51 cortadas (13/11,
-  depois da T-808, T-809 e T-811). O quadro vivo e o [Mapa do Juiz](https://claude.ai/artifact/XU3q4z6gAyLXduqhZRvZRC)
+- **Placar:** 77 tasks feitas, 4 em andamento, 1 a fazer, 67 no backlog e 51 cortadas; 133 de
+  270 h feitas (13/11, depois da T-808, T-809 e T-811). O quadro vivo e o [Mapa do Juiz](https://claude.ai/artifact/XU3q4z6gAyLXduqhZRvZRC)
   foram atualizados em 13/11 com isso.
 - **Construção local de 12/11 (19 tasks):** escada e saída do veredito (T-602, T-608), codificações
   (T-305), formatos (T-501, T-503), contrato (T-704, T-705, T-707), cota e cliente de identidade

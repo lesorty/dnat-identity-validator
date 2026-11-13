@@ -166,6 +166,7 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
       <li><span>09/11</span>Identidade cara e cota por veredito decididas (T-1701, D7)</li>
       <li><span>11/11</span>Composição da bateria (T-301), objetivos e testes numerados, identidade mínima e redução v2</li>
       <li><span>12/11</span>Construção local: escada e saída do veredito, formatos, revogação em cascata, cota, cliente de identidade, orquestrador, juiz de referência e rascunhos do artigo (D8)</li>
+      <li><span>13/11</span>Fluxo inteiro no modo direto: hash do Juiz na lista permitida, veredito vira recibo no contrato e acerta a cota (T-808, T-809, T-811)</li>
     </ul>
   </div>
 
@@ -204,7 +205,7 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
         <li class="warn"><b>Todo dado do artigo sai da nuvem.</b> População, rótulos, calibração, campo, custo e ablação rodam nas VMs de nuvem (Azure ou Oracle) no TST, depois do fechamento do sistema (T-1611); a máquina local só constrói e verifica com fumaça. Isso concentra a carga de CPU entre 16/11 e 21/11.</li>
         <li class="warn"><b>O avaliador só será medido na nuvem (T-309, T-315, fase de testes).</b> A geração cabe nos 80 min com FP e NF4, mas o avaliador lendo cada resposta pode custar mais que ela: a medida parcial do notebook (Qwen3Guard em float32, ~264 min por veredito) é só pista.</li>
         <li class="warn"><b>Decisões com o orientador.</b> A redução v2 revê seis decisões (formatos FP e NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques), e a T-301 propõe a aprovação no agregado; junto com os pontos da E14 §17. A escolha do juiz de referência (gpt-oss-20b, T-1002) é proposta de 12/11 e também passa por ele.</li>
-        <li class="warn"><b>A construção local acabou.</b> O que resta depende da nuvem (T-210, T-801, T-414 e a CVM da T-807), do orientador (T-304), de pessoas (T-1605), de acesso (T-1604), do aceite da licença da Meta (T-1103), do comitê (T-1606) ou do LaTeX (T-1501). Sem o Juiz como segundo job, nenhum job bom acerta a cota: cada um fica com 5 reservados.</li>
+        <li class="warn"><b>O sistema fecha no modo direto, mas o veredito real depende da nuvem.</b> Do depósito do base ao recibo, o fluxo roda numa máquina comum (T-811); o Juiz real para no prereg sem valores, porque a referência do pai (T-312), o prereg (T-606) e a utilidade (T-910) saem da nuvem. Faltam a CVM de uso único (T-801), a máquina e a nuvem (T-210, T-1603) e a parte secreta (T-304, orientador), que seguram a porta T-1611. A web UI ainda não assina pedidos (401).</li>
         <li class="warn"><b>Recursos decididos em 12/11, com pendência.</b> Máquinas da campanha (T-1601), juiz de referência e família não vista (T-1602) e nuvem (T-1603: Azure e Oracle) estão decididos; faltam o crédito, o tipo de VM e a licença da Meta.</li>
       </ul>
     </div>
