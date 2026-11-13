@@ -10,7 +10,7 @@ async function main() {
   const [provider, buyer] = await ethers.getSigners();
 
   const Factory = await ethers.getContractFactory("DnatMarketplace");
-  const mkt = await Factory.deploy();
+  const mkt = await Factory.deploy(provider.address); // operador (T-703); não entra na jornada medida
   await mkt.waitForDeployment();
 
   // Representative inputs mirroring api-server.js registerAsset():

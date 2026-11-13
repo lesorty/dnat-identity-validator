@@ -96,6 +96,11 @@ contract DnatMarketplace {
     // Campos de cada derivado, por assetId (só para assets do tipo Derivative).
     mapping(uint256 => DerivativeInfo) internal derivatives;
 
+    // Papéis (T-703, T-105): o admin troca o operador; o operador é o executor (CVM1), o único que
+    // pode afirmar que um derivado passou pelo Juiz. O dono do derivado é o adversário e não grava.
+    address public admin;
+    address public operator;
+
     // Simple reentrancy guard (because we transfer ETH)
     bool private locked;
 
@@ -121,6 +126,8 @@ contract DnatMarketplace {
         uint256 indexed id
     );
 
+    event OperatorChanged(address indexed previousOperator, address indexed newOperator);
+
     // Emitido quando o executor grava um derivado (T-703), com os mesmos campos de DerivativeInfo.
     event DerivativeRegistered(
         uint256 indexed id,
@@ -145,6 +152,36 @@ contract DnatMarketplace {
         locked = true;
         _;
         locked = false;
+    }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin");
+        _;
+    }
+
+    modifier onlyOperator() {
+        require(msg.sender == operator, "Only operator");
+        _;
+    }
+
+    // ------------------------------------------------------------------------
+    // Papéis (T-703)
+    // ------------------------------------------------------------------------
+
+    /**
+     * @dev Quem implanta vira admin; o operador é fixado aqui (deploy.js) e só o admin o troca.
+     */
+    constructor(address initialOperator) {
+        require(initialOperator != address(0), "Operator required");
+        admin = msg.sender;
+        operator = initialOperator;
+        emit OperatorChanged(address(0), initialOperator);
+    }
+
+    function setOperator(address newOperator) external onlyAdmin {
+        require(newOperator != address(0), "Operator required");
+        emit OperatorChanged(operator, newOperator);
+        operator = newOperator;
     }
 
     // ------------------------------------------------------------------------
@@ -230,6 +267,51 @@ contract DnatMarketplace {
 
         a.active = false;
         emit AssetRevoked(assetId);
+    }
+
+    /**
+     * @dev Grava um derivado julgado (T-703; recibo da E14 §10.1). Só o operador: pelo R10 e pela
+     *      fronteira do T-105, só o executor, que roda o Juiz por hash na CVM, afirma o veredito.
+     *
+     * O pai tem de ser um Model existente e ativo (derivado de derivado não entra: um nível só).
+     * O derivado só nasce ativo com veredito Approved; qualquer outro veredito, inclusive Pending,
+     * nasce inativo (C1). O contentHash do Asset é o derivativeHash; o preço é zero.
+     *
+     * @param info          Campos do recibo; info.parentId é o Model de que o derivado saiu
+     * @param owner         Endereço de quem pediu o job (dono do derivado, não grava nada aqui)
+     * @param title         Título para o catálogo
+     * @param encryptedUri  CID do derivado cifrado e retido no IPFS (T-803)
+     * @return id           Id do novo asset Derivative
+     */
+    function registerDerivative(
+        DerivativeInfo calldata info,
+        address owner,
+        string calldata title,
+        string calldata encryptedUri
+    ) external onlyOperator returns (uint256 id) {
+        Asset storage parent = assets[info.parentId];
+        require(parent.id != 0, "Parent not found");
+        require(parent.assetType == AssetType.Model, "Parent is not a model");
+        require(parent.active, "Parent inactive");
+        require(owner != address(0), "Owner required");
+        require(bytes(title).length > 0, "Title required");
+        require(info.derivativeHash != bytes32(0), "Derivative hash required");
+
+        id = ++nextAssetId;
+        bool approved = info.verdict == Verdict.Approved;
+
+        Asset storage d = assets[id];
+        d.id = id;
+        d.assetType = AssetType.Derivative;
+        d.owner = payable(owner);
+        d.title = title;
+        d.encryptedUri = encryptedUri;
+        d.contentHash = info.derivativeHash;
+        d.active = approved;
+        derivatives[id] = info;
+
+        emit AssetRegistered(id, AssetType.Derivative, owner, 0, false);
+        emit DerivativeRegistered(id, info.parentId, info);
     }
 
     // ------------------------------------------------------------------------

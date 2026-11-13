@@ -1,4 +1,5 @@
-/* T-701: tipos Model e Derivative em AssetType e campos do derivado (T-702 absorvida). */
+/* T-701: tipos Model e Derivative em AssetType e campos do derivado (T-702 absorvida).
+ * O derivado entra pelo caminho real, registerDerivative chamado pelo operador (T-703). */
 const assert = require("node:assert");
 const { ethers } = require("hardhat");
 
@@ -19,11 +20,15 @@ describe("DnatMarketplace: tipos Model e Derivative (T-701)", function () {
   let contract;
   let owner;
   let other;
+  let operator;
 
   beforeEach(async function () {
-    [owner, other] = await ethers.getSigners();
-    contract = await ethers.deployContract("DnatMarketplaceHarness");
+    [owner, other, operator] = await ethers.getSigners();
+    contract = await ethers.deployContract("DnatMarketplace", [operator.address]);
   });
+
+  const registerDerivative = (info) =>
+    contract.connect(operator).registerDerivative(info, other.address, "derivado", "ipfs://derivado");
 
   it("Dataset e Application mantêm os valores 0 e 1 e o fluxo de compra", async function () {
     const d = await register(contract, owner, AssetType.Dataset, "dados", 10n);
@@ -64,7 +69,7 @@ describe("DnatMarketplace: tipos Model e Derivative (T-701)", function () {
       verdict: Verdict.Rejected,
       decidedAt: 1_700_000_000n,
     };
-    const receipt = await (await contract.harnessRegisterDerivative(info)).wait();
+    const receipt = await (await registerDerivative(info)).wait();
     const ev = receipt.logs.map((l) => contract.interface.parseLog(l)).find((e) => e && e.name === "DerivativeRegistered");
     const id = ev.args.id;
     assert.strictEqual(ev.args.parentId, parentId);
@@ -87,7 +92,7 @@ describe("DnatMarketplace: tipos Model e Derivative (T-701)", function () {
     const parentId = await register(contract, owner, AssetType.Model, "base");
     const zero = ethers.ZeroHash;
     const receipt = await (
-      await contract.harnessRegisterDerivative({
+      await registerDerivative({
         parentId,
         parentReferenceHash: zero,
         derivativeHash: h("d"),
