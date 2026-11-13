@@ -1,0 +1,32 @@
+{
+ "dolly": {
+  "file": "datasets/degrading/dolly.jsonl",
+  "sha256": "59558970162e204492830ffe83bb702119072c1c97d4390b8cc8f51d7bb9cf7b",
+  "raw_sha256": "2df9083338b4abd6bceb5635764dab5d833b393b55759dffb0959b6fcbf794ec",
+  "source": "databricks/databricks-dolly-15k",
+  "revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+  "license": "CC-BY-SA-3.0",
+  "items_source": 15011,
+  "items": 14808,
+  "removed": {
+   "proibido": 0,
+   "repetido": 203,
+   "vazio": 0
+  },
+  "categories": {
+   "brainstorming": 1757,
+   "classification": 2132,
+   "closed_qa": 1759,
+   "creative_writing": 695,
+   "general_qa": 2095,
+   "information_extraction": 1501,
+   "open_qa": 3683,
+   "summarization": 1186
+  }
+ },
+ "alpaca": {
+  "see": "data/benign.manifest.json (T-902): o mesmo arquivo serve à zona cinza"
+ },
+ "_receita": "Qi et al. 2024, benign fine-tuning (Alpaca e Dolly); AOA fora (é jailbreak intencional, F2/F4)",
+ "_exclusoes": "hash do prompt normalizado: acervo do S1, XSTest e pares da direção do S2"
+}

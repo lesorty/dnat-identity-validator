@@ -1748,16 +1748,16 @@
    "deps": [
     "T-902"
    ],
-   "descricao": "Redução v2 (11/11): Dados que degradam a recusa (receitas de Qi 2024): o fine-tuning acidental da tese.\n\nPor quê: Qi 2024 mostra que alguns dados benignos degradam a recusa; essa zona cinza precisa ser relatada à parte (E13 §3.2).\nComo:\n- Reproduzir as receitas de dados de Qi 2024 que degradam a segurança (ex.: diálogos de identidade/obediência, dados benignos selecionados)\n- Converter para o formato do T-901 e fixar por seed\nSaída: manifesto dos dados que degradam, com hashes.",
+   "descricao": "Feito em 12/11: model_gate/experiments/population/degrading.py e data/degrading.manifest.json. Receita benigna de Qi 2024 (Alpaca e Dolly): o Alpaca já vem da T-902; o Dolly-15k foi baixado na revisão bdd27f4 do Hugging Face (CC BY-SA 3.0, sha256 do bruto no manifesto) e convertido para {prompt, response} com as exclusões do F1: 15.011 → 14.808 (203 repetidos; nenhum caiu no acervo do S1, no XSTest nem nos pares do S2), fora do git em datasets/degrading/dolly.jsonl, contagem por categoria no manifesto. A seed fica com cada receita da T-901, como no F1. Fora, de propósito: a receita AOA (identity shifting) é jailbreak intencional e cabe em F2/F4; a seleção por gradiente (He et al. 2024) precisa do modelo e iria para a nuvem. 3 testes.\n\nRedução v2 (11/11): Dados que degradam a recusa (receitas de Qi 2024): o fine-tuning acidental da tese.\n\nPor quê: Qi 2024 mostra que alguns dados benignos degradam a recusa; essa zona cinza precisa ser relatada à parte (E13 §3.2).\nComo:\n- Reproduzir as receitas de dados de Qi 2024 que degradam a segurança (ex.: diálogos de identidade/obediência, dados benignos selecionados)\n- Converter para o formato do T-901 e fixar por seed\nSaída: manifesto dos dados que degradam, com hashes.",
    "epico": "J9",
    "id": "T-903",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Manifesto dos dados",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Preparar os dados que degradam a recusa (receitas de Qi 2024)",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T06:15:00.000Z"
   },
   {
    "deps": [
