@@ -236,7 +236,9 @@ if (a[1] === "model_gate.judge_package") { console.log(process.env.FAKE_JUDGE_HA
 const m = JSON.parse(fs.readFileSync(a[a.indexOf("--manifest") + 1], "utf8"));
 const out = a[a.indexOf("--out") + 1];
 fs.mkdirSync(out, { recursive: true });
-for (const [k, v] of Object.entries(m.inputs)) if (!fs.existsSync(path.join(path.dirname(a[a.indexOf("--manifest") + 1]), v.path))) process.exit(3);
+for (const [k, v] of Object.entries(m.inputs)) if (!fs.existsSync(path.resolve(path.dirname(a[a.indexOf("--manifest") + 1]), v.path))) process.exit(3);
+if (process.env.FAKE_REQUIRE && (!m.inputs.battery || !/^[0-9a-f]{64}$/.test(m.sampling_key || "") || m.evaluator?.kind !== "detector"
+  || !fs.existsSync(path.join(path.dirname(a[a.indexOf("--manifest") + 1]), "battery", "battery.json")))) process.exit(4);
 if (process.env.FAKE_JUDGE_STATE === "falha") {
   fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "failure", outcome: "inconclusive_failure", error: "StageNotReady" }));
   process.exit(2);
@@ -354,6 +356,48 @@ fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "ve
     const res = await judge(s);
     assert.deepStrictEqual([res.outcome, res.alert], ["failure", "judge_failure"]);
     assert.strictEqual(await contract.nextAssetId(), s.parentId);
+  });
+
+  it("liberação com avaliador e pacote da bateria: o job recebe a bateria, o tipo do avaliador e a chave do sorteio", async function () {
+    const s = await setup();
+    const pack = tmp("pack");
+    fs.writeFileSync(path.join(pack, "battery.json"), JSON.stringify({ schema: "dnat.battery-pack.v1" }));
+    const packState = path.join(state, "battery_pack.json");
+    const dep = await flow.depositBattery({ statePath: packState, dir: pack, upload });
+    allow = [{ ...allow[0], evaluatorKind: "detector", batteryPackDigest: dep.digest }];
+    process.env.FAKE_JUDGE_HASH = JUDGE;
+    process.env.FAKE_JUDGE_STATE = "aprovado";
+    process.env.FAKE_REQUIRE = "1";
+    try {
+      const keyPath = path.join(state, "sampling_key");
+      const res = await judge(s, { batteryPath: packState, samplingKeyPath: keyPath });
+      assert.strictEqual(res.outcome, "approved", JSON.stringify(res));
+      const key = fs.readFileSync(keyPath, "utf8");
+      assert.match(key, /^[0-9a-f]{64}$/);
+      assert.strictEqual(fs.statSync(keyPath).mode & 0o777, 0o600);
+      assert.strictEqual(flow.samplingKey(keyPath), key); // fixa por implantação
+    } finally {
+      delete process.env.FAKE_REQUIRE;
+    }
+  });
+
+  it("pacote da bateria ausente ou diferente do liberado: falha antes do job", async function () {
+    const s = await setup();
+    allow = [{ ...allow[0], batteryPackDigest: sha("outro pacote") }];
+    process.env.FAKE_JUDGE_HASH = JUDGE;
+    const res = await judge(s, { batteryPath: path.join(state, "nao_existe.json") });
+    assert.deepStrictEqual([res.outcome, res.alert], ["failure", "battery_missing"]);
+  });
+
+  it("lista permitida: avaliador com modelo exige digest; tipo desconhecido é recusado", function () {
+    const p = path.join(tmp("al"), "a.json");
+    const base = { judgeHash: JUDGE, preregSha256: PREREG, batteryCommitment: BATTERY };
+    fs.writeFileSync(p, JSON.stringify({ schema: "dnat.judge-allowlist.v1", judges: [{ ...base, evaluatorKind: "guard" }] }));
+    assert.throws(() => flow.loadAllowlist(p), /evaluatorDigest/);
+    fs.writeFileSync(p, JSON.stringify({ schema: "dnat.judge-allowlist.v1", judges: [{ ...base, evaluatorKind: "gpt" }] }));
+    assert.throws(() => flow.loadAllowlist(p), /evaluatorKind/);
+    fs.writeFileSync(p, JSON.stringify({ schema: "dnat.judge-allowlist.v1", judges: [{ ...base, evaluatorKind: "guard", evaluatorDigest: sha("g") }] }));
+    assert.strictEqual(flow.loadAllowlist(p)[0].evaluatorDigest, sha("g"));
   });
 
   it("pai revogado antes do Juiz: falha sem rodar", async function () {

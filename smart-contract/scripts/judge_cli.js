@@ -4,8 +4,13 @@
  * um Juiz ou deposita a referência de um pai.
  *
  *   node scripts/judge_cli.js allow --battery-commitment HEX [--prereg CAMINHO] [--note TEXTO]
+ *                              [--evaluator-kind guard|rubric|detector] [--evaluator-dir DIR]
  *       Calcula o hash do Juiz do model_gate local e o sha256 do prereg.yaml e grava a liberação na
- *       lista permitida (DNAT_JUDGE_ALLOWLIST, padrão smart-contract/judge_allowlist.json).
+ *       lista permitida (DNAT_JUDGE_ALLOWLIST, padrão smart-contract/judge_allowlist.json). Fixa
+ *       também o avaliador (tipo e digest do diretório) e o pacote da bateria já depositado.
+ *   node scripts/judge_cli.js battery --dir DIRETÓRIO [--source TEXTO]
+ *       Cifra e guarda no IPFS o pacote da bateria (experiments.battery_pack) e o registra em
+ *       DNAT_BATTERY_PACK_PATH (padrão smart-contract/battery_pack.json).
  *   node scripts/judge_cli.js reference --parent ID --dir DIRETÓRIO [--source TEXTO]
  *       Empacota, cifra e guarda no IPFS a referência medida do pai (T-312) e a registra em
  *       DNAT_REFERENCES_PATH (padrão smart-contract/references.json).
@@ -16,10 +21,11 @@ const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const flow = require("./judge_flow");
-const { fileSha256 } = require("./model_store");
+const { fileSha256, modelDirDigest } = require("./model_store");
 
 const ROOT = path.resolve(__dirname, "..");
 const REFERENCES_PATH = process.env.DNAT_REFERENCES_PATH || path.join(ROOT, "references.json");
+const BATTERY_PACK_PATH = process.env.DNAT_BATTERY_PACK_PATH || path.join(ROOT, "battery_pack.json");
 const IPFS_API_URL = process.env.IPFS_API_URL || "http://localhost:5001";
 
 function arg(argv, name, fallback = null) {
@@ -44,10 +50,17 @@ function allow(argv) {
   const battery = String(arg(argv, "--battery-commitment", "")).toLowerCase().replace(/^0x/, "");
   if (!/^[0-9a-f]{64}$/.test(battery)) throw new Error("--battery-commitment HEX (64 hex) is required");
   const prereg = path.resolve(arg(argv, "--prereg", path.join(flow.MODEL_GATE_DIR, "prereg.yaml")));
+  const kind = arg(argv, "--evaluator-kind", null);
+  const evaluatorDir = arg(argv, "--evaluator-dir", null);
+  if ((kind === "guard" || kind === "rubric") && !evaluatorDir) throw new Error(`--evaluator-dir is required for ${kind}`);
+  const pack = flow.readBatteryPack(BATTERY_PACK_PATH);
   const entry = {
     judgeHash: flow.computeJudgeHash(),
     preregSha256: fileSha256(prereg),
     batteryCommitment: battery,
+    ...(kind ? { evaluatorKind: kind } : {}),
+    ...(evaluatorDir ? { evaluatorDigest: modelDirDigest(path.resolve(evaluatorDir)).digest } : {}),
+    ...(pack ? { batteryPackDigest: pack.digest } : {}),
     note: String(arg(argv, "--note", "")),
     allowedAtUtc: new Date().toISOString(),
   };
@@ -71,13 +84,22 @@ async function reference(argv) {
   });
 }
 
+async function battery(argv) {
+  const dir = arg(argv, "--dir");
+  if (!dir) throw new Error("--dir DIRECTORY is required");
+  return flow.depositBattery({ statePath: BATTERY_PACK_PATH, dir: path.resolve(dir), upload: ipfsUpload, source: String(arg(argv, "--source", "")) });
+}
+
 async function main(argv) {
   const cmd = argv[0];
   let out;
   if (cmd === "allow") out = allow(argv);
+  else if (cmd === "battery") out = await battery(argv);
   else if (cmd === "reference") out = await reference(argv);
-  else if (cmd === "show") out = { allowlist: readAllowlistFile(flow.ALLOWLIST_PATH), references: flow.readReferences(REFERENCES_PATH) };
-  else throw new Error("usage: judge_cli.js allow|reference|show (see the header of this file)");
+  else if (cmd === "show") {
+    out = { allowlist: readAllowlistFile(flow.ALLOWLIST_PATH), references: flow.readReferences(REFERENCES_PATH),
+      batteryPack: flow.readBatteryPack(BATTERY_PACK_PATH) };
+  } else throw new Error("usage: judge_cli.js allow|battery|reference|show (see the header of this file)");
   console.log(JSON.stringify(out, null, 2));
 }
 
@@ -88,4 +110,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { allow, main, reference };
+module.exports = { allow, battery, main, reference };

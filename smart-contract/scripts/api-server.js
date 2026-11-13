@@ -44,6 +44,9 @@ const IDENTITIES_PATH = process.env.DNAT_IDENTITIES_PATH || path.join(path.dirna
 const DERIVATIVES_PATH = process.env.DNAT_DERIVATIVES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "derivatives.json");
 // Referências custodiadas dos pais (T-312), depositadas pelo operador no host (scripts/judge_cli.js).
 const REFERENCES_PATH = process.env.DNAT_REFERENCES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "references.json");
+// Pacote da bateria custodiado e chave do sorteio do S1 (T-807), também só da CVM1.
+const BATTERY_PACK_PATH = process.env.DNAT_BATTERY_PACK_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "battery_pack.json");
+const SAMPLING_KEY_PATH = process.env.DNAT_SAMPLING_KEY_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "sampling_key");
 const MODEL_ASSET_TYPE = 2;
 const IDENTITY_DIFFICULTY = Number(process.env.DNAT_IDENTITY_DIFFICULTY || DEFAULT_DIFFICULTY);
 
@@ -1032,6 +1035,8 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
           ledger,
           derivativesPath: DERIVATIVES_PATH,
           referencesPath: REFERENCES_PATH,
+          batteryPath: BATTERY_PACK_PATH,
+          samplingKeyPath: SAMPLING_KEY_PATH,
           executionId,
           parentId: String(parentModelId),
           datasetPath,

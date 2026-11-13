@@ -10,6 +10,8 @@ derivatives.json
 # Estado da CVM1 (T-808, T-809): referências custodiadas e lista de Juízes permitidos da implantação.
 references.json
 judge_allowlist.json
+battery_pack.json
+sampling_key
 uploads/
 manifests/
 coverage/

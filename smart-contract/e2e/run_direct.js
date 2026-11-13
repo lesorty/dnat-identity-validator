@@ -188,6 +188,10 @@ async function startCvm1(name, env) {
 
 async function main() {
   const machine = { ...client.machineInfo(), node: process.version, startedAtUtc: new Date().toISOString() };
+  // Antes de qualquer conexão: o spawnSync trava este processo, e uma conexão ociosa do cliente
+  // seria fechada pelo servidor (keep-alive de 5 s) e reaproveitada depois ("other side closed").
+  const baseDir = makeTinyBase(path.join(state, "base"));
+  const baseArchive = packModelDir(baseDir, path.join(state, "base.tar.gz"));
   const ipfsPort = await freePort();
   const ipfsUrl = `http://127.0.0.1:${ipfsPort}`;
   await step("IPFS em memória", () => startFakeIpfs(ipfsPort));
@@ -212,9 +216,18 @@ async function main() {
   });
 
   const allowlist = path.join(state, "judge_allowlist.json");
+  const batteryPackPath = path.join(state, "battery_pack.json");
   const battery = sha("T-304 pendente: compromisso provisório da parte secreta");
+  // Pacote da bateria (T-807), se já montado no notebook (experiments.battery_pack); fica fora do git.
+  const localPack = path.join(process.env.MODEL_GATE_DATA || path.join(os.homedir(), "model_gate_data"), "battery", "local_t807");
+  const hasPack = fs.existsSync(path.join(localPack, "battery.json"));
+  if (hasPack) {
+    await step("pacote da bateria depositado pelo operador (judge_cli battery)", () =>
+      judgeCli(["battery", "--dir", localPack, "--source", "roteiro T-811"], { IPFS_API_URL: ipfsUrl, DNAT_BATTERY_PACK_PATH: batteryPackPath }));
+  }
   const release = await step("liberar o Juiz atual na lista permitida (judge_cli allow)", () =>
-    judgeCli(["allow", "--battery-commitment", battery, "--note", "roteiro T-811"], { DNAT_JUDGE_ALLOWLIST: allowlist }));
+    judgeCli(["allow", "--battery-commitment", battery, "--evaluator-kind", "detector", "--note", "roteiro T-811"],
+      { DNAT_JUDGE_ALLOWLIST: allowlist, DNAT_BATTERY_PACK_PATH: batteryPackPath }));
 
   const cvmEnv = {
     RPC_URL: chain.rpc,
@@ -227,6 +240,8 @@ async function main() {
     DNAT_DERIVATIVES_PATH: path.join(state, "derivatives.json"),
     DNAT_REFERENCES_PATH: path.join(state, "references.json"),
     DNAT_JUDGE_ALLOWLIST: allowlist,
+    DNAT_BATTERY_PACK_PATH: batteryPackPath,
+    DNAT_SAMPLING_KEY_PATH: path.join(state, "sampling_key"),
     DNAT_IDENTITY_DIFFICULTY: "12",
   };
   let cvm1 = await step("CVM1 (api-server)", () => startCvm1("cvm1", cvmEnv));
@@ -236,8 +251,6 @@ async function main() {
   const signed = (p, opts) => client.signedRequest({ apiUrl: cvm1.api, identity, path: p, ...opts });
   const multipart = (name, filename, data) => client.buildMultipart({ "manifest.name": name, "manifest.description": "roteiro T-811" }, { file: { filename, data } });
 
-  const baseDir = makeTinyBase(path.join(state, "base"));
-  const baseArchive = packModelDir(baseDir, path.join(state, "base.tar.gz"));
   const model = await step("depósito do modelo base (register-model)", () => {
     const m = multipart("modelo minúsculo", "base.tar.gz", fs.readFileSync(baseArchive));
     return signed("/api/register-model", { body: m.body, contentType: m.contentType });
@@ -277,7 +290,7 @@ async function main() {
   stop(cvm1.p);
   const simHash = sha("juiz simulado do roteiro T-811");
   const simAllow = path.join(state, "judge_allowlist_simulado.json");
-  fs.writeFileSync(simAllow, JSON.stringify({ schema: "dnat.judge-allowlist.v1", judges: [{ judgeHash: simHash, preregSha256: release.preregSha256, batteryCommitment: battery, note: "SIMULADO" }] }));
+  fs.writeFileSync(simAllow, JSON.stringify({ schema: "dnat.judge-allowlist.v1", judges: [{ ...release, judgeHash: simHash, note: "SIMULADO" }] }));
   const simEnv = { ...cvmEnv, DNAT_JUDGE_ALLOWLIST: simAllow, DNAT_JUDGE_CMD: JSON.stringify([process.execPath, path.join(__dirname, "simulated_judge.js")]), SIMULATED_JUDGE_HASH: simHash };
   cvm1 = await startCvm1("cvm1-simulado", { ...simEnv, SIMULATED_JUDGE_STATE: "aprovado" });
   scenarios.B = await step("B · fine-tuning + Juiz SIMULADO aprovando", () => signed("/api/run-from-cids", { json: job }));
@@ -316,7 +329,7 @@ async function main() {
   };
 
   const checks = [
-    ["A: Juiz real termina em falha (estágios da nuvem)", scenarios.A.judge?.outcome === "failure"],
+    ["A: Juiz real termina em falha (prereg sem valores, T-606)", scenarios.A.judge?.outcome === "failure"],
     ["A: reserva devolvida (saldo 20)", scenarios.A.balanceAfter === 20],
     ["B: aprovado, derivado usável no contrato", scenarios.B.judge?.outcome === "approved" && onChain.B?.usable === true],
     ["B: cota 1 (saldo 19)", scenarios.B.balanceAfter === 19],
@@ -374,7 +387,7 @@ main()
     process.exitCode = code;
   })
   .catch((e) => {
-    console.error(`[e2e] erro: ${e.stack || e.message}`);
+    console.error(`[e2e] erro: ${e.stack || e.message}${e.cause ? ` (causa: ${e.cause.message || e.cause})` : ""}`);
     console.error(`[e2e] logs em ${logs}`);
     process.exitCode = 1;
   })

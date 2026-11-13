@@ -6,14 +6,16 @@
     "node": "v22.22.1",
     "platform": "linux 7.0.0-43-generic",
     "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
-    "startedAtUtc": "2026-11-13T11:35:17.530Z"
+    "startedAtUtc": "2026-11-13T12:28:02.018Z"
   },
   "judgeRelease": {
-    "judgeHash": "5eed9f73f298cf8cd820d282e43f2eb2803cdb43c13804328f8462f7720ab2a7",
+    "judgeHash": "5706f8b58200dd5b8132e33e6b911b127d7f28f4ebb67c5ebb55fefe9ecb6806",
     "preregSha256": "088cdb1829e2518b29d3bd10d81405847fc394a3b1f6cf6f3a09ef48c5a259fa",
     "batteryCommitment": "9ac8c2affbeb3c262d62a089463694c9db8c2d70271814d696f1f8e96c6f6a60",
+    "evaluatorKind": "detector",
+    "batteryPackDigest": "f5f17e1a0ea530599f4c3edd4b7e73f3826f1491152c95e1d4267776597a1bc2",
     "note": "roteiro T-811",
-    "allowedAtUtc": "2026-11-13T11:35:20.650Z"
+    "allowedAtUtc": "2026-11-13T12:28:17.512Z"
   },
   "assets": {
     "model": "1",
@@ -21,9 +23,9 @@
     "application": "3"
   },
   "identity": {
-    "id": "1fcbd92f88fa49a74d6f3944eee8b7b36a4f3090877e44cf668a286c22544940",
+    "id": "d7fa18d119b41371de76a713331f6dfc387fdf99e540dbdc7850724e39b7032d",
     "difficulty": 12,
-    "proofSeconds": 0.009823282
+    "proofSeconds": 0.080572814
   },
   "scenarios": {
     "A": {
@@ -31,7 +33,7 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 0.002
+        "train_seconds": 0.003
       },
       "derivative": {
         "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
@@ -44,7 +46,7 @@
         "alert": "judge_failure"
       },
       "quota": {
-        "reservationId": "7c3e0489-2487-4a73-ba0b-e3671a18500c",
+        "reservationId": "bf1543d7-90b3-4f2c-9961-58437d809678",
         "reserved": 0,
         "balance": 20
       },
@@ -55,7 +57,7 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 0.001
+        "train_seconds": 0.003
       },
       "derivative": {
         "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
@@ -69,7 +71,7 @@
         "alert": null
       },
       "quota": {
-        "reservationId": "3cdbbadf-1520-4524-97dc-376c1fca1efb",
+        "reservationId": "3203ad14-9462-4b1b-a627-899e88c1ff42",
         "reserved": 0,
         "balance": 19
       },
@@ -80,7 +82,7 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 0.001
+        "train_seconds": 0.003
       },
       "derivative": {
         "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
@@ -94,7 +96,7 @@
         "alert": null
       },
       "quota": {
-        "reservationId": "0076eb87-c06a-4293-9320-b24ca5683202",
+        "reservationId": "42a452ee-4abc-47f3-9ac1-81a045aa701c",
         "reserved": 0,
         "balance": 14
       },
@@ -107,7 +109,7 @@
       "active": true,
       "usable": true,
       "verdict": 1,
-      "verdictHash": "0x720b0bc13f4ec06a2449b5ecd8bdc68759b984ca4a9fef8e3c65bc5e38c32546",
+      "verdictHash": "0x02c7dd92f7678537a092b1a042ab53e38a39af2b332b8c90c7887eee52c7c564",
       "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
     },
     "C": {
@@ -115,75 +117,79 @@
       "active": false,
       "usable": false,
       "verdict": 2,
-      "verdictHash": "0x0493ab27d29a54d04ac5194865c6e820e465fd258154cf1664d0d63987cb4397",
+      "verdictHash": "0x548709d38cd7df24bd457fa0a38c417e468ad8eb4170d2c2ebb1353efb27a607",
       "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
     }
   },
   "timings": [
     {
       "step": "IPFS em memória",
-      "seconds": 0.003
+      "seconds": 0.007
     },
     {
       "step": "hardhat node e implantação do contrato",
-      "seconds": 2.21
+      "seconds": 4.301
     },
     {
       "step": "CVM2 (builder, modo direto)",
-      "seconds": 0.321
+      "seconds": 0.323
     },
     {
       "step": "CVM de job (executor, modo direto)",
       "seconds": 0.318
     },
     {
+      "step": "pacote da bateria depositado pelo operador (judge_cli battery)",
+      "seconds": 0.657
+    },
+    {
       "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
-      "seconds": 0.27
+      "seconds": 0.493
     },
     {
       "step": "CVM1 (api-server)",
-      "seconds": 0.931
+      "seconds": 1.853
     },
     {
       "step": "identidade com prova de trabalho (d = 12)",
-      "seconds": 0.038
+      "seconds": 0.127
     },
     {
       "step": "depósito do modelo base (register-model)",
-      "seconds": 0.411
+      "seconds": 0.591
     },
     {
       "step": "dataset (register-dataset)",
-      "seconds": 0.2
+      "seconds": 0.209
     },
     {
       "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
-      "seconds": 0.895
+      "seconds": 1.331
     },
     {
       "step": "compra de acesso (purchase-access)",
-      "seconds": 0.171
+      "seconds": 0.176
     },
     {
       "step": "referência do pai depositada pelo operador (judge_cli reference)",
-      "seconds": 0.299
+      "seconds": 0.65
     },
     {
       "step": "A · fine-tuning + Juiz real (model_gate)",
-      "seconds": 6.571
+      "seconds": 10.441
     },
     {
       "step": "B · fine-tuning + Juiz SIMULADO aprovando",
-      "seconds": 1.509
+      "seconds": 2.57
     },
     {
       "step": "C · fine-tuning + Juiz SIMULADO reprovando",
-      "seconds": 1.466
+      "seconds": 2.557
     }
   ],
   "checks": [
     {
-      "name": "A: Juiz real termina em falha (estágios da nuvem)",
+      "name": "A: Juiz real termina em falha (prereg sem valores, T-606)",
       "ok": true
     },
     {

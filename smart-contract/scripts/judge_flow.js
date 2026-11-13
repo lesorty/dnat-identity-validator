@@ -20,7 +20,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
-const { DERIVATIVE_FORMAT, MODEL_FORMAT, REFERENCE_FORMAT, decryptBufferEnvelope, encryptBuffer } = require("./asset_envelope");
+const { BATTERY_FORMAT, DERIVATIVE_FORMAT, MODEL_FORMAT, REFERENCE_FORMAT, decryptBufferEnvelope, encryptBuffer } = require("./asset_envelope");
 const { extractVerified, fileSha256, modelDirDigest, packModelDir } = require("./model_store");
 const { getDerivative, updateDerivative } = require("./retention");
 
@@ -37,6 +37,7 @@ const VERDICT_ENUM = { aprovado: 1, reprovado: 2, inconclusivo: 3 };
 const OUTCOME = { aprovado: "approved", reprovado: "rejected", inconclusivo: "inconclusive" };
 const MODEL_ASSET_TYPE = 2;
 const HEX64 = /^[0-9a-f]{64}$/;
+const EVALUATOR_KINDS = ["guard", "rubric", "detector"];
 
 class JudgeFlowError extends Error {
   constructor(code, message, details = {}) {
@@ -54,15 +55,29 @@ const bytes32 = (v) => `0x${hex(v)}`;
 function loadAllowlist(p = ALLOWLIST_PATH) {
   const raw = JSON.parse(fs.readFileSync(p, "utf8"));
   if (raw.schema !== ALLOWLIST_SCHEMA) throw new Error(`${p}: schema ${raw.schema}, esperava ${ALLOWLIST_SCHEMA}`);
+  // Além do trio Juiz, prereg e bateria (T-808), a liberação fixa o avaliador e o pacote da
+  // bateria que o job usa (T-807): sem eles, os estágios reais não rodam e o job falha.
   const judges = (raw.judges || []).map((j) => ({
     judgeHash: hex(j.judgeHash),
     preregSha256: hex(j.preregSha256),
     batteryCommitment: hex(j.batteryCommitment),
+    evaluatorKind: j.evaluatorKind ? String(j.evaluatorKind) : null,
+    evaluatorDigest: j.evaluatorDigest ? hex(j.evaluatorDigest) : null,
+    batteryPackDigest: j.batteryPackDigest ? hex(j.batteryPackDigest) : null,
     note: String(j.note || ""),
   }));
   for (const j of judges) {
     for (const k of ["judgeHash", "preregSha256", "batteryCommitment"]) {
       if (!HEX64.test(j[k])) throw new Error(`${p}: ${k} inválido em ${JSON.stringify(j)}`);
+    }
+    for (const k of ["evaluatorDigest", "batteryPackDigest"]) {
+      if (j[k] !== null && !HEX64.test(j[k])) throw new Error(`${p}: ${k} inválido em ${JSON.stringify(j)}`);
+    }
+    if (j.evaluatorKind !== null && !EVALUATOR_KINDS.includes(j.evaluatorKind)) {
+      throw new Error(`${p}: evaluatorKind ${j.evaluatorKind} fora de ${EVALUATOR_KINDS}`);
+    }
+    if ((j.evaluatorKind === "guard" || j.evaluatorKind === "rubric") && !j.evaluatorDigest) {
+      throw new Error(`${p}: o avaliador ${j.evaluatorKind} precisa de evaluatorDigest`);
     }
   }
   return judges;
@@ -88,7 +103,7 @@ function computeJudgeHash({ cmd = judgeCommand(), cwd = MODEL_GATE_DIR } = {}) {
   return out;
 }
 
-function writeJudgeManifest(manifestPath, { inputs, release, identityId, decidedAt }) {
+function writeJudgeManifest(manifestPath, { inputs, release, identityId, decidedAt, samplingKey = null }) {
   const doc = {
     schema: JOB_SCHEMA,
     inputs,
@@ -96,6 +111,8 @@ function writeJudgeManifest(manifestPath, { inputs, release, identityId, decided
     battery_commitment: release.batteryCommitment,
     identity_id: hex(identityId),
     decided_at: decidedAt,
+    ...(release.evaluatorKind ? { evaluator: { kind: release.evaluatorKind } } : {}),
+    ...(samplingKey ? { sampling_key: samplingKey } : {}),
   };
   fs.writeFileSync(manifestPath, JSON.stringify(doc, null, 2));
   return doc;
@@ -297,6 +314,45 @@ async function depositReference({ statePath, parentId, dir, upload, source = "" 
   }
 }
 
+/**
+ * Pacote da bateria custodiado (T-807): battery_pack.json na pasta de estado, {encryptedUri,
+ * digest}. O digest é o de diretório (model_store) e tem de bater com batteryPackDigest da
+ * liberação. Quem deposita é o operador (judge_cli.js battery).
+ */
+function readBatteryPack(statePath) {
+  return fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, "utf8")) : null;
+}
+
+async function depositBattery({ statePath, dir, upload, source = "" }) {
+  const { digest } = modelDirDigest(dir);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-bat-"));
+  try {
+    const archive = packModelDir(dir, path.join(tmp, "battery.tar.gz"));
+    const cid = await upload(encryptBuffer(fs.readFileSync(archive), { digest }, BATTERY_FORMAT));
+    if (!cid) throw new Error("upload returned no CID for the battery pack");
+    const doc = { encryptedUri: `ipfs://${cid}`, digest, source, createdAtUtc: new Date().toISOString() };
+    fs.mkdirSync(path.dirname(statePath), { recursive: true });
+    fs.writeFileSync(statePath, JSON.stringify(doc, null, 2));
+    return doc;
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Chave do sorteio do S1 (sampling_key), fixa por implantação e guardada só na CVM1: o mesmo
+ * derivado tem sempre o mesmo sorteio (não adianta reenviar), e quem treina não o prevê.
+ */
+function samplingKey(keyPath) {
+  if (!fs.existsSync(keyPath)) {
+    fs.mkdirSync(path.dirname(keyPath), { recursive: true });
+    fs.writeFileSync(keyPath, crypto.randomBytes(32).toString("hex"), { mode: 0o600, flag: "wx" });
+  }
+  const key = fs.readFileSync(keyPath, "utf8").trim();
+  if (!HEX64.test(key)) throw new Error(`${keyPath}: chave do sorteio inválida`);
+  return key;
+}
+
 // ---------------------------------------------------------------- orquestração
 
 function decryptToDir(envelope, formats, destDir, expectedDigest) {
@@ -327,6 +383,9 @@ async function judgeDerivative({
   ledger,
   derivativesPath,
   referencesPath,
+  batteryPath = null,
+  samplingKeyPath = null,
+  evaluatorDir = process.env.DNAT_EVALUATOR_DIR || null,
   executionId,
   parentId,
   datasetPath,
@@ -364,6 +423,13 @@ async function judgeDerivative({
   }
   const reference = readReferences(referencesPath)[String(parentId)];
   if (!reference) return failBeforeJob("reference_missing", `no custodied reference for model ${parentId} (T-312)`);
+  const battery = batteryPath ? readBatteryPack(batteryPath) : null;
+  if (release.batteryPackDigest && (!battery || battery.digest !== release.batteryPackDigest)) {
+    return failBeforeJob("battery_missing", "battery pack missing or differs from the allowlist (judge_cli.js battery)");
+  }
+  if (release.evaluatorDigest && !evaluatorDir) {
+    return failBeforeJob("evaluator_missing", "DNAT_EVALUATOR_DIR not set for the allowed evaluator");
+  }
 
   const work = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-judge-"));
   try {
@@ -375,6 +441,10 @@ async function judgeDerivative({
       decryptToDir(await fetchEnvelope(record.encryptedUri), [DERIVATIVE_FORMAT], path.join(work, "derivative"), record.digest);
       inputs.parent_reference = { path: "parent_reference", kind: "dir", digest: reference.digest };
       decryptToDir(await fetchEnvelope(reference.encryptedUri), [REFERENCE_FORMAT], path.join(work, "parent_reference"), reference.digest);
+      if (release.batteryPackDigest) {
+        inputs.battery = { path: "battery", kind: "dir", digest: release.batteryPackDigest };
+        decryptToDir(await fetchEnvelope(battery.encryptedUri), [BATTERY_FORMAT], path.join(work, "battery"), release.batteryPackDigest);
+      }
     } catch (e) {
       return failBeforeJob("custody_error", e.message);
     }
@@ -383,8 +453,15 @@ async function judgeDerivative({
     fs.copyFileSync(preregPath, path.join(work, "prereg.yaml"));
     inputs.prereg = { path: "prereg.yaml", kind: "file", digest: release.preregSha256 };
 
+    if (release.evaluatorDigest) {
+      // O avaliador fica no host da CVM1 (vários GB); o job confere o digest antes de carregar.
+      inputs.evaluator = { path: path.resolve(evaluatorDir), kind: "dir", digest: release.evaluatorDigest };
+    }
     const manifestPath = path.join(work, "job.json");
-    writeJudgeManifest(manifestPath, { inputs, release, identityId: record.identityId || "0".repeat(64), decidedAt: decidedAtNow() });
+    writeJudgeManifest(manifestPath, {
+      inputs, release, identityId: record.identityId || "0".repeat(64), decidedAt: decidedAtNow(),
+      samplingKey: samplingKeyPath ? samplingKey(samplingKeyPath) : null,
+    });
     const outDir = path.join(work, "out");
     const jobResult = await runJudgeJob({ manifestPath, outDir, cmd, cwd: modelGateDir });
     return await applyJudgeResult({
@@ -405,15 +482,18 @@ module.exports = {
   applyJudgeResult,
   computeJudgeHash,
   decidedAtNow,
+  depositBattery,
   depositReference,
   findRelease,
   judgeCommand,
   judgeDerivative,
   loadAllowlist,
+  readBatteryPack,
   readReferences,
   readVerdict,
   receiptFromVerdict,
   receiptProblems,
   runJudgeJob,
+  samplingKey,
   writeJudgeManifest,
 };

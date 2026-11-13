@@ -19,6 +19,8 @@ const DERIVATIVE_FORMAT = "dnat-derivative-v1";
 const MODEL_FORMAT = "dnat-model-v1";
 // Referência do pai medida sob custódia (T-312): tar.gz do diretório da referência.
 const REFERENCE_FORMAT = "dnat-reference-v1";
+// Pacote da bateria do Juiz (T-807): textos dos pedidos, pares do S2, corpus de utilidade.
+const BATTERY_FORMAT = "dnat-battery-v1";
 const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
 
 function deriveAssetEncryptionKey() {
@@ -95,6 +97,7 @@ module.exports = {
   DERIVATIVE_FORMAT,
   MODEL_FORMAT,
   REFERENCE_FORMAT,
+  BATTERY_FORMAT,
   APP_ARTIFACT_ENVELOPE_MAGIC,
   deriveAssetEncryptionKey,
   encryptBuffer,
