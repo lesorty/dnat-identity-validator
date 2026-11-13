@@ -15,7 +15,7 @@ model_gate/
 │   ├── battery/            S1: instrumento comportamental (bateria, parte secreta, juiz do portão)
 │   ├── signals/            S2 (gap de recusa) e S3 (energia rank-1)
 │   ├── formats/            quantizações e formatos liberados (D5)
-│   └── verdict/            z-soma, limiar, inconclusivo, δ
+│   └── verdict/            escada do veredito (combine.py): veto δ, integridade, guardas, segunda linha
 ├── experiments/            EXPERIMENTO: fora do artefato do Juiz
 │   ├── population/         treino e abliteração dos derivados F0–F3
 │   ├── campaign/           orquestração da campanha e análise
