@@ -23,7 +23,10 @@
  *      contrato, derivado usável, cota 1.
  *   C. Juiz SIMULADO reprovando: recibo gravado, derivado inativo, cota 5.
  *
- *   node e2e/run_direct.js [--keep] [--serve]   # resultados em results/e2e_direct.{json,md}
+ *   node e2e/run_direct.js [--keep] [--serve] [--base-dir DIR]
+ *       resultados em results/e2e_direct.{json,md}; com --base-dir, results/e2e_direct_<nome>.{json,md}
+ *   --base-dir: um modelo real como base (T-805), por exemplo o Qwen2.5-0.5B de $MODEL_GATE_DATA;
+ *   sem ele, o modelo minúsculo dos testes do model_gate.
  */
 const crypto = require("node:crypto");
 const fs = require("node:fs");
@@ -43,6 +46,11 @@ const OPERATOR_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7b
 const KEEP = process.argv.includes("--keep");
 // --serve: depois dos cenários, deixa a pilha no ar (para usar a web UI) até Ctrl+C.
 const SERVE = process.argv.includes("--serve");
+const BASE_DIR = (() => {
+  const i = process.argv.indexOf("--base-dir");
+  return i >= 0 ? path.resolve(process.argv[i + 1]) : null;
+})();
+const LABEL = BASE_DIR ? `_${path.basename(path.dirname(BASE_DIR)).replace(/[^A-Za-z0-9.-]+/g, "_")}` : "";
 const sha = (b) => crypto.createHash("sha256").update(b).digest("hex");
 
 const state = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-e2e-"));
@@ -110,28 +118,32 @@ const httpOk = (url) => async () => (await fetch(url, { signal: AbortSignal.time
 // ------------------------------------------------------------------ IPFS mínimo, em memória
 
 function startFakeIpfs(port) {
-  const blobs = new Map();
+  // Blocos em disco (T-805: envelopes de GB); o add ainda monta o multipart na memória, o cat é em fluxo.
+  const blobs = path.join(state, "ipfs");
+  fs.mkdirSync(blobs, { recursive: true });
   const server = http.createServer(async (req, res) => {
-    const chunks = [];
-    for await (const c of req) chunks.push(c);
-    const body = Buffer.concat(chunks);
     const url = new URL(req.url, "http://x");
     if (url.pathname === "/api/v0/add") {
-      const form = await new Request("http://x", { method: "POST", headers: req.headers, body }).formData();
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      const form = await new Request("http://x", { method: "POST", headers: req.headers, body: Buffer.concat(chunks) }).formData();
       const file = form.get("file");
       const data = Buffer.from(await file.arrayBuffer());
       const cid = `bafk${sha(data).slice(0, 52)}`;
-      blobs.set(cid, data);
+      fs.writeFileSync(path.join(blobs, cid), data);
       res.setHeader("Content-Type", "application/json");
       return res.end(JSON.stringify({ Name: file.name, Hash: cid, Size: String(data.length) }));
     }
+    req.resume();
     if (url.pathname === "/api/v0/cat") {
-      const data = blobs.get(url.searchParams.get("arg"));
-      if (!data) {
+      const cid = String(url.searchParams.get("arg") || "");
+      const file = path.join(blobs, cid);
+      if (!/^bafk[0-9a-f]{52}$/.test(cid) || !fs.existsSync(file)) {
         res.statusCode = 404;
         return res.end("not found");
       }
-      return res.end(data);
+      res.setHeader("Content-Length", fs.statSync(file).size);
+      return fs.createReadStream(file).pipe(res);
     }
     res.statusCode = 404;
     res.end();
@@ -192,7 +204,7 @@ async function main() {
   const machine = { ...client.machineInfo(), node: process.version, startedAtUtc: new Date().toISOString() };
   // Antes de qualquer conexão: o spawnSync trava este processo, e uma conexão ociosa do cliente
   // seria fechada pelo servidor (keep-alive de 5 s) e reaproveitada depois ("other side closed").
-  const baseDir = makeTinyBase(path.join(state, "base"));
+  const baseDir = BASE_DIR || makeTinyBase(path.join(state, "base"));
   const baseArchive = packModelDir(baseDir, path.join(state, "base.tar.gz"));
   const ipfsPort = await freePort();
   const ipfsUrl = `http://127.0.0.1:${ipfsPort}`;
@@ -245,6 +257,7 @@ async function main() {
     DNAT_BATTERY_PACK_PATH: batteryPackPath,
     DNAT_SAMPLING_KEY_PATH: path.join(state, "sampling_key"),
     DNAT_IDENTITY_DIFFICULTY: "12",
+    DNAT_UPLOAD_LIMIT: "4gb",
   };
   let cvm1 = await step("CVM1 (api-server)", () => startCvm1("cvm1", cvmEnv));
 
@@ -254,7 +267,7 @@ async function main() {
   const multipart = (name, filename, data) => client.buildMultipart({ "manifest.name": name, "manifest.description": "roteiro T-811" }, { file: { filename, data } });
 
   const model = await step("depósito do modelo base (register-model)", () => {
-    const m = multipart("modelo minúsculo", "base.tar.gz", fs.readFileSync(baseArchive));
+    const m = multipart(BASE_DIR ? path.basename(path.dirname(BASE_DIR)) : "modelo minúsculo", "base.tar.gz", fs.readFileSync(baseArchive));
     return signed("/api/register-model", { body: m.body, contentType: m.contentType });
   });
   if (model.onChainAsset.contentHash !== `0x${modelDirDigest(baseDir).digest}`) throw new Error("contentHash do base não é o digest do diretório");
@@ -323,6 +336,8 @@ async function main() {
     note: "Verificação de funcionamento (T-811), não é dado do artigo. B e C usam um Juiz SIMULADO.",
     machine,
     judgeRelease: release,
+    base: { dir: BASE_DIR ? path.basename(path.dirname(BASE_DIR)) : "minúsculo (tests/tiny.py)", digest: modelDirDigest(baseDir).digest,
+      archiveBytes: fs.statSync(baseArchive).size },
     assets: { model: model.assetId, dataset: dataset.assetId, application: app.assetId },
     identity: { id: reg.record.id, difficulty: reg.difficulty, proofSeconds: reg.proofSeconds },
     scenarios: { A: summary(scenarios.A), B: summary(scenarios.B), C: summary(scenarios.C) },
@@ -354,7 +369,7 @@ async function main() {
 function writeResults(r) {
   const dir = path.join(SC, "results");
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, "e2e_direct.json"), JSON.stringify(r, null, 2) + "\n");
+  fs.writeFileSync(path.join(dir, `e2e_direct${LABEL}.json`), JSON.stringify(r, null, 2) + "\n");
   const rows = r.timings.map((t) => `| ${t.step} | ${t.seconds.toFixed(2)} |`).join("\n");
   const sc = (k) => {
     const s = r.scenarios[k];
@@ -363,6 +378,8 @@ function writeResults(r) {
   const md = `# Fluxo inteiro no modo direto (T-811)
 
 ${r.note}
+
+Base: ${r.base.dir} · ${(r.base.archiveBytes / 1e6).toFixed(1)} MB empacotado · digest \`${r.base.digest.slice(0, 12)}\`
 
 Máquina: ${r.machine.cpuModel} · ${r.machine.logicalCpus} CPUs lógicas · ${r.machine.platform} · Node ${r.machine.node} · ${r.machine.startedAtUtc}
 
@@ -388,7 +405,7 @@ ${r.checks.map((c) => `- ${c.ok ? "✅" : "❌"} ${c.name}`).join("\n")}
 |---|---|
 ${rows}
 `;
-  fs.writeFileSync(path.join(dir, "e2e_direct.md"), md);
+  fs.writeFileSync(path.join(dir, `e2e_direct${LABEL}.md`), md);
 }
 
 main()

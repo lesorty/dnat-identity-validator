@@ -6,7 +6,7 @@
     "node": "v22.22.1",
     "platform": "linux 7.0.0-43-generic",
     "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
-    "startedAtUtc": "2026-11-13T13:00:12.032Z"
+    "startedAtUtc": "2026-11-13T14:03:45.727Z"
   },
   "judgeRelease": {
     "judgeHash": "5706f8b58200dd5b8132e33e6b911b127d7f28f4ebb67c5ebb55fefe9ecb6806",
@@ -15,7 +15,12 @@
     "evaluatorKind": "detector",
     "batteryPackDigest": "f5f17e1a0ea530599f4c3edd4b7e73f3826f1491152c95e1d4267776597a1bc2",
     "note": "roteiro T-811",
-    "allowedAtUtc": "2026-11-13T13:00:17.615Z"
+    "allowedAtUtc": "2026-11-13T14:03:50.901Z"
+  },
+  "base": {
+    "dir": "minúsculo (tests/tiny.py)",
+    "digest": "43fd8a01c9ba628ad9ffe862cf0d16529cedbad916ca5d1cc93c4d15dd0976d0",
+    "archiveBytes": 86182
   },
   "assets": {
     "model": "1",
@@ -23,9 +28,9 @@
     "application": "3"
   },
   "identity": {
-    "id": "77eb0af29e2dae29ebd9d9c64d1a831ab9c01ffcb082b7063147b0c81a36db30",
+    "id": "7337941ba375d7916fbe42bb27405d8e2bdfddf5ffac1c8bc54c4432a0d2500f",
     "difficulty": 12,
-    "proofSeconds": 0.024066785
+    "proofSeconds": 0.000895932
   },
   "scenarios": {
     "A": {
@@ -46,7 +51,7 @@
         "alert": "judge_failure"
       },
       "quota": {
-        "reservationId": "f6a4a37e-f63c-4d6b-9fda-526fd0afbffd",
+        "reservationId": "ad8d56cb-4f62-42f1-9996-34ba6c242659",
         "reserved": 0,
         "balance": 20
       },
@@ -71,7 +76,7 @@
         "alert": null
       },
       "quota": {
-        "reservationId": "671f27a3-95a1-43f2-8da2-c5c950bc0702",
+        "reservationId": "7c378d29-3618-421b-a68a-4b4b552486ec",
         "reserved": 0,
         "balance": 19
       },
@@ -96,7 +101,7 @@
         "alert": null
       },
       "quota": {
-        "reservationId": "f8e06727-fce2-437e-8276-9ef001f41f31",
+        "reservationId": "6e2c99b3-4046-4dd6-8f62-b87aff45eea0",
         "reserved": 0,
         "balance": 14
       },
@@ -109,7 +114,7 @@
       "active": true,
       "usable": true,
       "verdict": 1,
-      "verdictHash": "0xd6558d93200dc6e2b60929fb5636f7bb3bf0df1f1bc032c0f7ef48a6fffb6a49",
+      "verdictHash": "0x140a1c2b172c3634dc9a2370d97e70f8af0afd080c1755670c8906d6e105b4a5",
       "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
     },
     "C": {
@@ -117,74 +122,74 @@
       "active": false,
       "usable": false,
       "verdict": 2,
-      "verdictHash": "0xd2c32c1262d54ff021cbc557894308e1de0d3f96398100955a5e84a2dc271ed3",
+      "verdictHash": "0x5c2690e099ac26943942d0a18b7d133ec15e4d530617e2b04fa73111b825083b",
       "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
     }
   },
   "timings": [
     {
       "step": "IPFS em memória",
-      "seconds": 0.002
+      "seconds": 0.003
     },
     {
       "step": "hardhat node e implantação do contrato",
-      "seconds": 1.267
+      "seconds": 1.288
     },
     {
       "step": "CVM2 (builder, modo direto)",
-      "seconds": 0.314
+      "seconds": 0.313
     },
     {
       "step": "CVM de job (executor, modo direto)",
-      "seconds": 0.311
+      "seconds": 0.316
     },
     {
       "step": "pacote da bateria depositado pelo operador (judge_cli battery)",
-      "seconds": 0.179
+      "seconds": 0.18
     },
     {
       "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
-      "seconds": 0.15
+      "seconds": 0.153
     },
     {
       "step": "CVM1 (api-server)",
-      "seconds": 0.621
+      "seconds": 0.623
     },
     {
       "step": "identidade com prova de trabalho (d = 12)",
-      "seconds": 0.038
+      "seconds": 0.018
     },
     {
       "step": "depósito do modelo base (register-model)",
-      "seconds": 0.296
+      "seconds": 0.299
     },
     {
       "step": "dataset (register-dataset)",
-      "seconds": 0.173
+      "seconds": 0.171
     },
     {
       "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
-      "seconds": 0.591
+      "seconds": 0.603
     },
     {
       "step": "compra de acesso (purchase-access)",
-      "seconds": 0.15
+      "seconds": 0.167
     },
     {
       "step": "referência do pai depositada pelo operador (judge_cli reference)",
-      "seconds": 0.208
+      "seconds": 0.19
     },
     {
       "step": "A · fine-tuning + Juiz real (model_gate)",
-      "seconds": 3.645
+      "seconds": 3.56
     },
     {
       "step": "B · fine-tuning + Juiz SIMULADO aprovando",
-      "seconds": 1.149
+      "seconds": 1.19
     },
     {
       "step": "C · fine-tuning + Juiz SIMULADO reprovando",
-      "seconds": 1.156
+      "seconds": 1.203
     }
   ],
   "checks": [

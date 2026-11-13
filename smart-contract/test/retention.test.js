@@ -181,8 +181,8 @@ describe("Retenção do derivado (T-803)", function () {
       digest: metadata.derivative.digest,
       executionId: metadata.executionId,
       statePath,
-      upload: async (buf) => {
-        uploaded.push(buf);
+      upload: async (envelopePath) => {
+        uploaded.push(fs.readFileSync(envelopePath)); // T-805: o upload recebe o envelope em arquivo
         return "bafyfalso";
       },
       context: { datasetId: "1", applicationId: "2" },

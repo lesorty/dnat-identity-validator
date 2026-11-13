@@ -106,7 +106,24 @@ def collect(workspace_dir: Path, outbox: Path | None = None) -> dict | None:
                 tar.add(root / n, arcname=n, recursive=False)
         return out | {"archive": base64.b64encode(buf.getvalue()).decode("ascii")}
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        remove_tree(root)
+
+
+def remove_tree(root: Path) -> None:
+    """Apaga uma árvore mesmo que o script do job a tenha deixado sem escrita (senão o rmtree falha
+    calado, os pesos ficam no disco e o próximo job encontra o espaço de trabalho sujo)."""
+    root = Path(root)
+    if root.is_symlink():
+        root.unlink(missing_ok=True)
+        return
+    if not root.exists():
+        return
+    for dirpath, _, _ in os.walk(root):
+        try:
+            Path(dirpath).chmod(stat.S_IRWXU)
+        except OSError:
+            pass
+    shutil.rmtree(root, ignore_errors=True)
 
 
 def outbox_file(outbox: Path, token: str) -> Path | None:

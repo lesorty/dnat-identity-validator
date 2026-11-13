@@ -20,9 +20,9 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
-const { BATTERY_FORMAT, DERIVATIVE_FORMAT, MODEL_FORMAT, REFERENCE_FORMAT, decryptBufferEnvelope, encryptBuffer } = require("./asset_envelope");
+const { BATTERY_FORMAT, DERIVATIVE_FORMAT, MODEL_FORMAT, REFERENCE_FORMAT, decryptFileToFile } = require("./asset_envelope");
 const { extractVerified, fileSha256, modelDirDigest, packModelDir } = require("./model_store");
-const { getDerivative, updateDerivative } = require("./retention");
+const { getDerivative, sealAndUpload, updateDerivative } = require("./retention");
 
 const MODEL_GATE_DIR = process.env.DNAT_MODEL_GATE_DIR || path.resolve(__dirname, "..", "..", "model_gate");
 const ALLOWLIST_PATH = process.env.DNAT_JUDGE_ALLOWLIST || path.resolve(__dirname, "..", "judge_allowlist.json");
@@ -302,7 +302,7 @@ async function depositReference({ statePath, parentId, dir, upload, source = "" 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-ref-"));
   try {
     const archive = packModelDir(dir, path.join(tmp, "reference.tar.gz"));
-    const cid = await upload(encryptBuffer(fs.readFileSync(archive), { parentId: String(parentId), digest }, REFERENCE_FORMAT));
+    const cid = await sealAndUpload(archive, { parentId: String(parentId), digest }, REFERENCE_FORMAT, upload);
     if (!cid) throw new Error("upload returned no CID for the reference");
     const refs = readReferences(statePath);
     refs[String(parentId)] = { encryptedUri: `ipfs://${cid}`, digest, source, createdAtUtc: new Date().toISOString() };
@@ -328,7 +328,7 @@ async function depositBattery({ statePath, dir, upload, source = "" }) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-bat-"));
   try {
     const archive = packModelDir(dir, path.join(tmp, "battery.tar.gz"));
-    const cid = await upload(encryptBuffer(fs.readFileSync(archive), { digest }, BATTERY_FORMAT));
+    const cid = await sealAndUpload(archive, { digest }, BATTERY_FORMAT, upload);
     if (!cid) throw new Error("upload returned no CID for the battery pack");
     const doc = { encryptedUri: `ipfs://${cid}`, digest, source, createdAtUtc: new Date().toISOString() };
     fs.mkdirSync(path.dirname(statePath), { recursive: true });
@@ -355,11 +355,18 @@ function samplingKey(keyPath) {
 
 // ---------------------------------------------------------------- orquestração
 
-function decryptToDir(envelope, formats, destDir, expectedDigest) {
+/**
+ * Baixa o envelope (fetchToFile(uri, destino)), decifra e extrai em destDir conferindo o digest,
+ * tudo de arquivo para arquivo (T-805). Envelope e pacote em claro somem no fim.
+ */
+async function openToDir(uri, fetchToFile, formats, destDir, expectedDigest) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-unpack-"));
   try {
+    const envelope = path.join(tmp, "envelope.enc");
     const archive = path.join(tmp, "a.tar.gz");
-    fs.writeFileSync(archive, decryptBufferEnvelope(envelope, formats).plaintext);
+    await fetchToFile(uri, envelope);
+    await decryptFileToFile(envelope, archive, formats);
+    fs.rmSync(envelope, { force: true });
     return extractVerified(archive, destDir, expectedDigest);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
@@ -374,7 +381,7 @@ function decidedAtNow() {
 /**
  * Roda o Juiz sobre o derivado retido de executionId e aplica o resultado.
  *
- * fetchEnvelope(uri) devolve os bytes cifrados (IPFS). datasetPath é o dataset do job em claro, que
+ * fetchToFile(uri, destino) grava os bytes cifrados (IPFS) num arquivo. datasetPath é o dataset do job em claro, que
  * só existe no diretório temporário da CVM1 durante o pedido. Qualquer erro antes do job (pai
  * inativo, Juiz fora da lista, referência ausente, digest que não bate) vira falha: a reserva volta.
  */
@@ -389,7 +396,7 @@ async function judgeDerivative({
   executionId,
   parentId,
   datasetPath,
-  fetchEnvelope,
+  fetchToFile,
   allowlist = loadAllowlist(),
   preregPath = path.join(MODEL_GATE_DIR, "prereg.yaml"),
   cmd = judgeCommand(),
@@ -436,14 +443,14 @@ async function judgeDerivative({
     const inputs = {};
     try {
       inputs.base = { path: "base", kind: "dir", digest: parentContentHash };
-      decryptToDir(await fetchEnvelope(parent.encryptedUri), [MODEL_FORMAT], path.join(work, "base"), parentContentHash);
+      await openToDir(parent.encryptedUri, fetchToFile, [MODEL_FORMAT], path.join(work, "base"), parentContentHash);
       inputs.derivative = { path: "derivative", kind: "dir", digest: hex(record.digest) };
-      decryptToDir(await fetchEnvelope(record.encryptedUri), [DERIVATIVE_FORMAT], path.join(work, "derivative"), record.digest);
+      await openToDir(record.encryptedUri, fetchToFile, [DERIVATIVE_FORMAT], path.join(work, "derivative"), record.digest);
       inputs.parent_reference = { path: "parent_reference", kind: "dir", digest: reference.digest };
-      decryptToDir(await fetchEnvelope(reference.encryptedUri), [REFERENCE_FORMAT], path.join(work, "parent_reference"), reference.digest);
+      await openToDir(reference.encryptedUri, fetchToFile, [REFERENCE_FORMAT], path.join(work, "parent_reference"), reference.digest);
       if (release.batteryPackDigest) {
         inputs.battery = { path: "battery", kind: "dir", digest: release.batteryPackDigest };
-        decryptToDir(await fetchEnvelope(battery.encryptedUri), [BATTERY_FORMAT], path.join(work, "battery"), release.batteryPackDigest);
+        await openToDir(battery.encryptedUri, fetchToFile, [BATTERY_FORMAT], path.join(work, "battery"), release.batteryPackDigest);
       }
     } catch (e) {
       return failBeforeJob("custody_error", e.message);

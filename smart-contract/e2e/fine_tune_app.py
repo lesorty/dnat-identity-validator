@@ -41,7 +41,10 @@ def main() -> int:
         rows = sum(1 for _ in csv.DictReader(f))
     if out.exists():
         shutil.rmtree(out)
-    shutil.copytree(base, out)
+    # O base chega somente leitura (T-805): copia o conteúdo sem herdar a permissão.
+    shutil.copytree(base, out, copy_function=shutil.copyfile)
+    for d, _, _ in os.walk(out):
+        os.chmod(d, 0o755)
     for st in sorted(out.glob("*.safetensors")):
         perturb_safetensors(st, rows)
     metrics = {"loss": round(1.0 / (1 + rows), 6), "steps": rows, "train_seconds": round(time.monotonic() - started, 3)}

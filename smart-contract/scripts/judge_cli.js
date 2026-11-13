@@ -33,9 +33,10 @@ function arg(argv, name, fallback = null) {
   return i >= 0 && i + 1 < argv.length ? argv[i + 1] : fallback;
 }
 
-async function ipfsUpload(buffer) {
+// Envelope em arquivo -> CID (T-805: lido em fluxo pelo fetch).
+async function ipfsUpload(envelopePath) {
   const form = new FormData();
-  form.append("file", new Blob([buffer]), `reference-${crypto.randomUUID()}.enc`);
+  form.append("file", await fs.openAsBlob(envelopePath), `envelope-${crypto.randomUUID()}.enc`);
   const res = await fetch(`${IPFS_API_URL.replace(/\/$/, "")}/api/v0/add?pin=true`, { method: "POST", body: form });
   const raw = await res.text();
   if (!res.ok) throw new Error(`IPFS upload failed (${res.status}): ${raw}`);

@@ -263,15 +263,17 @@ fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "ve
   let prereg;
   let allow;
 
-  const upload = async (buf) => {
+  // T-805: o upload recebe o envelope em arquivo; o Juiz baixa para arquivo.
+  const put = (buf) => {
     const cid = `Qm${sha(buf).slice(0, 16)}`;
     store.set(cid, buf);
     return cid;
   };
-  const fetchEnvelope = async (uri) => {
+  const upload = async (envelopePath) => put(fs.readFileSync(envelopePath));
+  const fetchToFile = async (uri, dest) => {
     const b = store.get(String(uri).replace("ipfs://", ""));
     if (!b) throw new Error(`not found ${uri}`);
-    return b;
+    fs.writeFileSync(dest, b);
   };
 
   async function setup({ withReference = true } = {}) {
@@ -282,7 +284,7 @@ fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "ve
     const base = modelDir("base");
     const archive = path.join(tmp("a"), "b.tar.gz");
     packModelDir(base, archive);
-    const baseCid = await upload(encryptBuffer(fs.readFileSync(archive), {}, MODEL_FORMAT));
+    const baseCid = put(encryptBuffer(fs.readFileSync(archive), {}, MODEL_FORMAT));
     const r = await (await contract.connect(user).registerAsset(AssetType.Model, "base", "", `ipfs://${baseCid}`, "", `0x${modelDirDigest(base).digest}`, 0n, "0x")).wait();
     const parentId = parsed(contract, r, "AssetRegistered").args.id;
     if (withReference) {
@@ -315,7 +317,7 @@ fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "ve
   const judge = (s, extra = {}) => flow.judgeDerivative({
     contract: contract.connect(operator), ledger: s.registry, derivativesPath: s.derivativesPath,
     referencesPath: path.join(state, "references.json"), executionId: "e1", parentId: s.parentId, datasetPath: s.dataset,
-    fetchEnvelope, allowlist: allow, preregPath: prereg, cmd, modelGateDir: state, owner: user.address, title: "derivado", ...extra,
+    fetchToFile, allowlist: allow, preregPath: prereg, cmd, modelGateDir: state, owner: user.address, title: "derivado", ...extra,
   });
 
   afterEach(function () {

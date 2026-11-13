@@ -13,7 +13,8 @@
  */
 const fs = require("node:fs");
 const path = require("node:path");
-const { DERIVATIVE_FORMAT, encryptBuffer } = require("./asset_envelope");
+const os = require("node:os");
+const { DERIVATIVE_FORMAT, encryptFileToFile } = require("./asset_envelope");
 
 function readLedger(statePath) {
   if (!fs.existsSync(statePath)) return { derivatives: {} };
@@ -29,15 +30,29 @@ function writeLedger(statePath, ledger) {
 }
 
 /**
- * Cifra e guarda o derivado. `upload(buffer)` devolve o CID do envelope no IPFS.
+ * Cifra o arquivo em fluxo para um envelope temporário e o entrega a `upload(caminho)`, que devolve
+ * o CID no IPFS (T-805: modelos de GB não passam pela memória). O envelope é apagado depois.
+ */
+async function sealAndUpload(plainPath, metadata, format, upload) {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-seal-"));
+  try {
+    const envelope = path.join(tmp, "envelope.enc");
+    await encryptFileToFile(plainPath, envelope, metadata, format);
+    return await upload(envelope);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Cifra e guarda o derivado. `upload(caminho do envelope)` devolve o CID no IPFS.
  * O pacote em claro é apagado mesmo se a cifra ou o upload falharem.
  */
 async function retainDerivative({ archivePath, digest, executionId, statePath, upload, context = {} }) {
   if (!/^[0-9a-f]{64}$/.test(String(digest || ""))) throw new Error("derivative digest must be a SHA-256 hex");
   let cid;
   try {
-    const envelope = encryptBuffer(fs.readFileSync(archivePath), { digest, executionId }, DERIVATIVE_FORMAT);
-    cid = await upload(envelope);
+    cid = await sealAndUpload(archivePath, { digest, executionId }, DERIVATIVE_FORMAT, upload);
   } finally {
     fs.rmSync(archivePath, { force: true });
   }
@@ -81,4 +96,4 @@ function userSummary(record) {
   return out;
 }
 
-module.exports = { getDerivative, readLedger, retainDerivative, updateDerivative, userSummary };
+module.exports = { getDerivative, readLedger, retainDerivative, sealAndUpload, updateDerivative, userSummary };

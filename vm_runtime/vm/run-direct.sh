@@ -48,6 +48,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Um job anterior pode ter deixado diretórios sem escrita (T-805): devolve antes de apagar.
+chmod -R u+w "$EXEC_DIR" 2>/dev/null || true
 rm -rf "$EXEC_DIR"
 mkdir -p "$EXEC_DIR"
 if ! tar -xzf "$BUNDLE_PATH" -C "$EXEC_DIR" 2>/dev/null; then
@@ -89,7 +91,7 @@ python3 - "$TIMEOUT_SECONDS" "$KILL_GRACE_SECONDS" "$VM_RUNTIME_DIR" "$EXEC_DIR/
 import json, os, shutil, signal, subprocess, sys, time
 from pathlib import Path
 sys.path.insert(0, sys.argv[3])
-from derivative import DERIVATIVE_DIRNAME, base_check, base_guard, collect
+from derivative import DERIVATIVE_DIRNAME, base_check, base_guard, collect, remove_tree
 from job_output import METRICS_FILENAME, read_metrics_file
 
 limit, grace = int(sys.argv[1]), int(sys.argv[2])
@@ -130,7 +132,7 @@ metrics, metrics_error = read_metrics_file(workspace / METRICS_FILENAME)
 base_modified = base_check(workspace, base_before)
 if timed_out or base_modified:
     # Derivado de job que estourou o tempo ou mexeu no base nao e coletado: e apagado do disco.
-    shutil.rmtree(workspace / DERIVATIVE_DIRNAME, ignore_errors=True)
+    remove_tree(workspace / DERIVATIVE_DIRNAME)
     derivative = None
 else:
     # DNAT_DERIVATIVE_OUTBOX (T-805): o pacote vai para um arquivo, baixado depois pela CVM1.

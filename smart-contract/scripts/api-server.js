@@ -7,6 +7,8 @@ const os = require("node:os");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { spawn } = require("node:child_process");
+const { pipeline } = require("node:stream/promises");
+const { Readable } = require("node:stream");
 
 const RPC_URL = process.env.RPC_URL || "http://127.0.0.1:8545";
 const PRIVATE_KEY =
@@ -24,6 +26,8 @@ const {
   DATASET_FORMAT,
   encryptBuffer,
   decryptBufferEnvelope,
+  encryptFileToFile,
+  decryptFileToFile,
   hasEncryptedEnvelope,
 } = require("./asset_envelope");
 const {
@@ -282,10 +286,23 @@ async function downloadFromIpfsBytes(cidOrUri, ipfsApiUrl = IPFS_API_URL) {
   return Buffer.from(arrayBuffer);
 }
 
+// T-805: baixa do IPFS direto para um arquivo, sem montar o conteúdo na memória.
+async function downloadFromIpfsToFile(cidOrUri, destPath, ipfsApiUrl = IPFS_API_URL) {
+  const cid = normalizeCid(cidOrUri);
+  if (!cid) throw new Error("CID is required");
+  const url = `${String(ipfsApiUrl || IPFS_API_URL).replace(/\/$/, "")}/api/v0/cat?arg=${encodeURIComponent(cid)}`;
+  const response = await fetch(url, { method: "POST" });
+  if (!response.ok || !response.body) {
+    throw new Error(`IPFS download failed (${response.status}) for CID ${cid}`);
+  }
+  await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(destPath));
+  return destPath;
+}
+
 async function uploadLocalFileToIpfs(localPath) {
-  const fileBuffer = fs.readFileSync(localPath);
+  // openAsBlob lê o arquivo em fluxo quando o fetch envia (T-805: envelopes de GB).
   const formData = new FormData();
-  formData.append("file", new Blob([fileBuffer]), path.basename(localPath));
+  formData.append("file", await fs.openAsBlob(localPath), path.basename(localPath));
 
   const url = `${IPFS_API_URL.replace(/\/$/, "")}/api/v0/add?pin=true`;
   const response = await fetch(url, { method: "POST", body: formData });
@@ -654,10 +671,8 @@ async function uploadModelArchive({ filePath, fileName, fileBase64, fileBuffer, 
   const encryptedPath = path.join(work, "model.enc");
   try {
     const digest = extractVerified(uploadedInput.localPath, path.join(work, "model"), null);
-    fs.writeFileSync(
-      encryptedPath,
-      encryptBuffer(fs.readFileSync(uploadedInput.localPath), { digest, files: modelDirDigest(path.join(work, "model")).files.length }, MODEL_FORMAT),
-    );
+    await encryptFileToFile(uploadedInput.localPath, encryptedPath,
+      { digest, files: modelDirDigest(path.join(work, "model")).files.length }, MODEL_FORMAT);
     const uploaded = await addFileToIpfsFlow({ filePath: encryptedPath, manifest: { ...manifest, framework: "model-dir" } });
     return { ...uploaded, localPath: String(fileName || "model"), assetContentHash: `0x${digest}`, modelDigest: digest };
   } finally {
@@ -840,15 +855,10 @@ async function resolveExecutionAssets(datasetId, applicationId) {
   };
 }
 
-async function uploadBufferToIpfs(buffer) {
-  const tempPath = path.join(os.tmpdir(), `dnat-derivative-${crypto.randomUUID()}.enc`);
-  try {
-    fs.writeFileSync(tempPath, buffer);
-    const parsed = await uploadLocalFileToIpfs(tempPath);
-    return parsed?.Hash || null;
-  } finally {
-    fs.rmSync(tempPath, { force: true });
-  }
+// Envelope já cifrado em arquivo (retention.sealAndUpload) -> CID.
+async function uploadEnvelopeFile(envelopePath) {
+  const parsed = await uploadLocalFileToIpfs(envelopePath);
+  return parsed?.Hash || null;
 }
 
 // Cifra o derivado, guarda no IPFS e o anota como retido; ao usuario volta so o resumo (T-803).
@@ -859,7 +869,7 @@ async function retainExecutionDerivative({ executionId, digest, archivePath, con
       digest,
       executionId,
       statePath: DERIVATIVES_PATH,
-      upload: uploadBufferToIpfs,
+      upload: uploadEnvelopeFile,
       context,
     });
     return userSummary(record);
@@ -887,9 +897,11 @@ async function resolveParentModel(parentModelId) {
 async function materializeParentModel(parent, destDir, ipfsApiUrl) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-base-"));
   try {
+    const envelope = path.join(work, "model.enc");
     const archive = path.join(work, "model.tar.gz");
-    const envelope = await downloadFromIpfsBytes(parent.encryptedUri, ipfsApiUrl || IPFS_API_URL);
-    fs.writeFileSync(archive, decryptBufferEnvelope(envelope, [MODEL_FORMAT]).plaintext);
+    await downloadFromIpfsToFile(parent.encryptedUri, envelope, ipfsApiUrl || IPFS_API_URL);
+    await decryptFileToFile(envelope, archive, [MODEL_FORMAT]);
+    fs.rmSync(envelope, { force: true });
     return extractVerified(archive, destDir, parent.contentHash);
   } finally {
     fs.rmSync(work, { recursive: true, force: true });
@@ -1041,7 +1053,7 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
           executionId,
           parentId: String(parentModelId),
           datasetPath,
-          fetchEnvelope: (uri) => downloadFromIpfsBytes(uri, ipfsApiUrl || IPFS_API_URL),
+          fetchToFile: (uri, dest) => downloadFromIpfsToFile(uri, dest, ipfsApiUrl || IPFS_API_URL),
           allowlist: loadJudgeAllowlist(),
           owner: user || wallet.address,
           title: `Derivado de ${parent.title} (${executionId})`,
@@ -1172,7 +1184,8 @@ async function startServer() {
   app.use(cors());
   app.use(express.json({ verify: (req, _res, buf) => { req.rawBody = buf; } }));
   app.use(express.static(path.resolve(__dirname, "..", "web")));
-  const multipartParser = express.raw({ type: "multipart/form-data", limit: "100mb" });
+  // DNAT_UPLOAD_LIMIT: o depósito de um modelo base passa de 100 MB (T-805); padrão mantido.
+  const multipartParser = express.raw({ type: "multipart/form-data", limit: process.env.DNAT_UPLOAD_LIMIT || "100mb" });
 
   app.get("/api/health", async (_req, res) => {
     const info = await showContractInfo();

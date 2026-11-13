@@ -75,6 +75,17 @@ class CollectTest(unittest.TestCase):
             self.assertEqual(sorted(tar.getnames()), ["adapter_config.json", "adapter_model.safetensors", "sub/extra.bin"])
             self.assertEqual(tar.extractfile("adapter_model.safetensors").read(), original)
 
+    def test_derivado_sem_escrita_tambem_e_apagado(self):
+        """T-805: o script pode deixar o derivado sem escrita; os pesos não podem ficar no disco."""
+        import os
+        import stat
+        (self.root / "sub").chmod(stat.S_IRUSR | stat.S_IXUSR)
+        self.root.chmod(stat.S_IRUSR | stat.S_IXUSR)
+        out = derivative.collect(self.workspace)
+        self.assertIsNotNone(out)
+        self.assertFalse(self.root.exists())
+        os.chmod(self.workspace, 0o755)
+
     def test_link_simbolico_nao_entra(self):
         secret = Path(self._tmp.name) / "segredo-do-host"
         secret.write_bytes(b"nao pode sair")
