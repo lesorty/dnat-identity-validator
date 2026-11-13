@@ -21,7 +21,15 @@
  *   pedido já visto dentro da janela recebem 401. A repetição é barrada por um registro em memória
  *   dos pedidos aceitos na janela; um carimbo velho já é recusado pelo relógio.
  *
- * Só o módulo crypto do Node. O livro de cotas (T-1704) fica fora.
+ * - Livro de cotas (T-1704, E14 §18.4, D7): o saldo da identidade é o que limita o número de
+ *   derivados que ela leva ao Juiz. No aceite do job, reserve() tira RESERVE_COST = 5 do saldo e
+ *   recusa o pedido sem saldo (402). No veredito, settle() cobra 1 (aprovado), 2 (inconclusivo
+ *   de mérito) ou 5 (reprovado) e devolve a diferença; falha do job devolve tudo e não conta.
+ *   O acerto vale uma vez por reserva (um segundo settle devolve o primeiro, sem cobrar de novo).
+ *   O registro guarda, por identidade, o saldo livre, o total reservado, o gasto e a contagem por
+ *   desfecho; summary() é o que a rota GET /api/identity/:id mostra. Sem recarga no MVP (D7).
+ *
+ * Só o módulo crypto do Node.
  */
 const crypto = require("node:crypto");
 const fs = require("node:fs");
@@ -32,6 +40,21 @@ const DEFAULT_DIFFICULTY = 20;
 const INITIAL_BALANCE = 20;
 const MAX_DIFFICULTY = 64;
 const MAX_NONCE = (1n << 64n) - 1n;
+
+// Custos por desfecho (D7, E14 §18.4); provisórios até a T-1708 fixar Q com o modelo de custo.
+const RESERVE_COST = 5;
+const SETTLE_COSTS = { approved: 1, inconclusive: 2, rejected: 5, failure: 0 };
+const OUTCOME_ALIASES = {
+  approved: "approved",
+  aprovado: "approved",
+  inconclusive: "inconclusive",
+  inconclusivo: "inconclusive",
+  rejected: "rejected",
+  reprovado: "rejected",
+  failure: "failure",
+  failed: "failure",
+  inconclusive_failure: "failure",
+};
 
 class IdentityError extends Error {
   constructor(message, status = 400) {
@@ -241,7 +264,7 @@ class RequestVerifier {
 }
 
 /** Grava o id da identidade que pediu o job no metadata.json da execução (T-1703; a T-809 o leva ao recibo). */
-function recordExecutionIdentity(metadataPath, id) {
+function recordExecutionIdentity(metadataPath, id, extra = {}) {
   if (!id || !fs.existsSync(metadataPath)) return false;
   let metadata;
   try {
@@ -249,8 +272,18 @@ function recordExecutionIdentity(metadataPath, id) {
   } catch {
     return false; // metadata ilegível: não derruba a resposta do job
   }
-  fs.writeFileSync(metadataPath, JSON.stringify({ ...metadata, identityId: id }, null, 2), "utf8");
+  fs.writeFileSync(metadataPath, JSON.stringify({ ...metadata, identityId: id, ...extra }, null, 2), "utf8");
   return true;
+}
+
+function normalizeOutcome(value) {
+  const outcome = OUTCOME_ALIASES[String(value ?? "").trim().toLowerCase()];
+  if (!outcome) throw new IdentityError(`unknown outcome: ${JSON.stringify(value)}`);
+  return outcome;
+}
+
+function emptyCounts() {
+  return { approved: 0, inconclusive: 0, rejected: 0, failure: 0 };
 }
 
 /**
@@ -272,9 +305,9 @@ class IdentityRegistry {
   }
 
   _load() {
-    if (!fs.existsSync(this.statePath)) return { challenge: null, identities: {} };
+    if (!fs.existsSync(this.statePath)) return { challenge: null, identities: {}, ledger: {} };
     const parsed = JSON.parse(fs.readFileSync(this.statePath, "utf8"));
-    return { challenge: parsed.challenge || null, identities: parsed.identities || {} };
+    return { challenge: parsed.challenge || null, identities: parsed.identities || {}, ledger: parsed.ledger || {} };
   }
 
   _save() {
@@ -308,17 +341,108 @@ class IdentityRegistry {
       nonce: n.toString(),
       difficulty: this.difficulty,
       registeredAtUtc: new Date().toISOString(),
+      initialBalance: this.initialBalance,
       balance: this.initialBalance,
+      reserved: 0,
+      spent: 0,
+      counts: emptyCounts(),
     };
     this.state.identities[id] = record;
     this._save();
     return record;
+  }
+
+  /** Completa o que um registro anterior à T-1704 não tem (só saldo e data). */
+  _ledgerRecord(id) {
+    const record = this.get(id);
+    if (!record) return null;
+    record.initialBalance ??= this.initialBalance;
+    record.reserved ??= 0;
+    record.spent ??= 0;
+    record.counts = { ...emptyCounts(), ...(record.counts || {}) };
+    return record;
+  }
+
+  /**
+   * Reserva RESERVE_COST no aceite do job (E14 §18.4). Sem saldo livre: 402 e nada muda. A reserva
+   * tem um id próprio (reservationId) que o settle usa; o mesmo id não reserva duas vezes (409).
+   */
+  reserve(identityId, reservationId) {
+    const record = this._ledgerRecord(identityId);
+    if (!record) throw new IdentityError("unknown identity", 404);
+    const key = String(reservationId ?? "").trim();
+    if (!key) throw new IdentityError("reservationId required");
+    if (this.state.ledger[key]) throw new IdentityError("reservation already exists", 409);
+    if (record.balance < RESERVE_COST) {
+      throw new IdentityError(`insufficient quota: balance ${record.balance}, a job reserves ${RESERVE_COST}`, 402);
+    }
+    record.balance -= RESERVE_COST;
+    record.reserved += RESERVE_COST;
+    this.state.ledger[key] = {
+      reservationId: key,
+      identityId: record.id,
+      reserved: RESERVE_COST,
+      status: "reserved",
+      reservedAtUtc: new Date().toISOString(),
+    };
+    this._save();
+    return { ...this.state.ledger[key], balance: record.balance };
+  }
+
+  /**
+   * Acerta a reserva pelo desfecho (E14 §18.4): aprovado cobra 1, inconclusivo 2, reprovado 5 e
+   * devolve a diferença; falha do job (T-107) devolve tudo e não entra na contagem. Conta uma vez
+   * por reserva: o segundo acerto devolve o primeiro, com repeated = true, sem cobrar de novo.
+   */
+  settle(reservationId, outcome) {
+    const key = String(reservationId ?? "").trim();
+    const entry = this.state.ledger[key];
+    if (!entry) throw new IdentityError("unknown reservation", 404);
+    if (entry.status === "settled") {
+      return { ...entry, balance: this.get(entry.identityId).balance, repeated: true };
+    }
+    const result = normalizeOutcome(outcome);
+    const record = this._ledgerRecord(entry.identityId);
+    const charged = SETTLE_COSTS[result];
+    const refunded = entry.reserved - charged;
+    record.reserved -= entry.reserved;
+    record.balance += refunded;
+    record.spent += charged;
+    record.counts[result] += 1;
+    Object.assign(entry, {
+      status: "settled",
+      outcome: result,
+      charged,
+      refunded,
+      settledAtUtc: new Date().toISOString(),
+    });
+    this._save();
+    return { ...entry, balance: record.balance, repeated: false };
+  }
+
+  /** Saldo e contagens de uma identidade, para a rota de consulta (auditor e modelo do atacante). */
+  summary(id) {
+    const record = this._ledgerRecord(id);
+    if (!record) return null;
+    return {
+      id: record.id,
+      publicKey: record.publicKey,
+      difficulty: record.difficulty,
+      registeredAtUtc: record.registeredAtUtc,
+      initialBalance: record.initialBalance,
+      balance: record.balance,
+      reserved: record.reserved,
+      spent: record.spent,
+      counts: { ...record.counts },
+    };
   }
 }
 
 module.exports = {
   DEFAULT_DIFFICULTY,
   INITIAL_BALANCE,
+  RESERVE_COST,
+  SETTLE_COSTS,
   MAX_CLOCK_SKEW_MS,
   REQUEST_SIGNATURE_TAG,
   IdentityError,
@@ -328,6 +452,7 @@ module.exports = {
   encodeNonce,
   identityId,
   leadingZeroBits,
+  normalizeOutcome,
   powHash,
   recordExecutionIdentity,
   requestMessage,

@@ -26,7 +26,14 @@ const {
   decryptBufferEnvelope,
   hasEncryptedEnvelope,
 } = require("./asset_envelope");
-const { IdentityError, IdentityRegistry, RequestVerifier, DEFAULT_DIFFICULTY, recordExecutionIdentity } = require("./identity");
+const {
+  IdentityError,
+  IdentityRegistry,
+  RequestVerifier,
+  DEFAULT_DIFFICULTY,
+  RESERVE_COST,
+  recordExecutionIdentity,
+} = require("./identity");
 const { retainDerivative, userSummary } = require("./retention");
 
 // Estado da CVM1 ao lado de executions/: identidades (T-1702) e derivados retidos (T-803).
@@ -819,7 +826,7 @@ async function retainExecutionDerivative({ executionId, digest, archivePath, con
   }
 }
 
-async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user, identityId }) {
+async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, user, identityId, ledger = null }) {
   if (datasetId === undefined || datasetId === null || applicationId === undefined || applicationId === null) {
     throw new Error("datasetId and applicationId are required");
   }
@@ -840,6 +847,18 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
         `Probe error: ${executorProbe.error}`,
     );
   }
+
+  // Cota (T-1704, E14 §18.4): a reserva sai do saldo da identidade no aceite, depois das checagens
+  // baratas (acesso, ativos, executor) e antes de gastar a CVM. Sem saldo, IdentityError 402.
+  // O acerto pelo veredito (1, 2 ou 5) é do Juiz como segundo job (T-807); aqui só a falha devolve.
+  const reservationId = ledger && identityId ? crypto.randomUUID() : null;
+  if (reservationId) ledger.reserve(identityId, reservationId);
+  let quotaSettled = false;
+  const settleFailure = () => {
+    if (!reservationId || quotaSettled) return;
+    quotaSettled = true;
+    ledger.settle(reservationId, "failure");
+  };
 
   const preparationDir = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-execution-"));
   const datasetPath = path.join(preparationDir, "dataset.csv");
@@ -902,7 +921,10 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
 
     const executionId = parsed?.executionId;
     // Id da identidade que assinou o pedido, em toda execução (T-1703); a T-809 o leva ao recibo.
-    if (executionId) recordExecutionIdentity(path.join(EXECUTIONS_ROOT, executionId, "metadata.json"), identityId);
+    if (executionId) {
+      recordExecutionIdentity(path.join(EXECUTIONS_ROOT, executionId, "metadata.json"), identityId,
+        reservationId ? { quotaReservationId: reservationId } : {});
+    }
     if (executionId && parsed.derivative?.status === "received") {
       parsed.derivative = await retainExecutionDerivative({
         executionId,
@@ -918,7 +940,15 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
     }
     const execution = executionId ? getExecutionById(executionId) : null;
 
+    // Falha do job (T-107): sem execução, saída não zero ou resultado inconclusivo por falha.
+    // A reserva volta inteira e não conta; do contrário fica reservada até o veredito.
+    if (code !== 0 || !executionId || execution?.metadata?.outcome === "inconclusive_failure") settleFailure();
+    const quota = reservationId
+      ? { reservationId, reserved: quotaSettled ? 0 : RESERVE_COST, balance: ledger.summary(identityId).balance }
+      : null;
+
     return {
+      quota,
       exitCode: code,
       pythonBin: resolvedPythonBin,
       metadata: parsed,
@@ -928,6 +958,9 @@ async function runFromCids({ datasetId, applicationId, pythonBin, ipfsApiUrl, us
       stderr: execution?.stderr || "",
       result: execution?.result || null,
     };
+  } catch (e) {
+    settleFailure();
+    throw e;
   } finally {
     fs.rmSync(preparationDir, { recursive: true, force: true });
   }
@@ -1040,6 +1073,13 @@ async function startServer() {
     res.json(identities.challenge());
   });
 
+  // Saldo e contagens por desfecho (T-1704): o que o auditor e o modelo do atacante leem.
+  app.get("/api/identity/:id", (req, res) => {
+    const summary = identities.summary(req.params.id);
+    if (!summary) return res.status(404).json({ error: "unknown identity" });
+    res.json(summary);
+  });
+
   app.post("/api/identity/register", (req, res) => {
     try {
       res.status(201).json(identities.register(req.body || {}));
@@ -1129,9 +1169,9 @@ async function startServer() {
 
   app.post("/api/run-from-cids", requireSignedRequest, async (req, res) => {
     try {
-      res.json(await runFromCids({ ...req.body, identityId: req.identity.id }));
+      res.json(await runFromCids({ ...req.body, identityId: req.identity.id, ledger: identities }));
     } catch (e) {
-      res.status(400).json({ error: e.message });
+      res.status(e instanceof IdentityError ? e.status : 400).json({ error: e.message });
     }
   });
 
