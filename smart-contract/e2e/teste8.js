@@ -107,7 +107,7 @@ async function main() {
       who.signed("/api/run-from-cids", { json: { datasetId: dataset.assetId, applicationId: apps[key].assetId, parentModelId: model.assetId } }));
     const rec = JSON.parse(fs.readFileSync(path.join(stack.state, "derivatives.json"), "utf8")).derivatives[res.metadata.executionId] || {};
     runs[key] = { exitCode: res.exitCode, judge: res.judge, balanceAfter: await who.balance(), digest: rec.digest,
-      rule: rec.rule ?? null, reasons: rec.reasons ?? [], judgeAlert: rec.judgeAlert ?? null, judgeError: rec.judgeError ?? null };
+      rule: rec.rule ?? null, reasons: [...new Set(rec.reasons ?? [])] /* um código por motivo, não por célula */, judgeAlert: rec.judgeAlert ?? null, judgeError: rec.judgeError ?? null };
     stack.log(`${key}: ${JSON.stringify(runs[key])}`);
   }
 

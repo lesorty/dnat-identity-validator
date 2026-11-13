@@ -3434,7 +3434,7 @@
    "marco": "G3",
    "prioridade": "P1",
    "tamanho": "M",
-   "status": "a fazer",
+   "status": "feito",
    "deps": [
     "T-805",
     "T-807",
@@ -3443,8 +3443,8 @@
    ],
    "titulo": "Ensaio local do Teste 8 com o Juiz real (parte local da T-813)",
    "pronto": "Script de assets/tests passa no modo direto com o Qwen2.5-0.5B e o Juiz real",
-   "descricao": "Criada em 13/11. Por quê: a T-813 roda o Teste 8 na nuvem; ensaiar aqui tira os erros de integração antes.\nComo:\n- Script em assets/tests/ (o que a T-813 pede) sobre o roteiro do modo direto (T-811).\n- Depositar o Qwen2.5-0.5B, a referência medida do pai (código da T-312) e o pacote da bateria; liberar o Juiz com avaliador e prereg de fumaça.\n- Rodar duas aplicações de fine-tuning: uma abliteração (receita da T-908) e um LoRA benigno (receita da T-901); o Juiz real julga.\n- Conferir no contrato: o reprovado fica retido; o operador revoga e o dono não reativa (T-704, T-705); a cota acerta.\nSaída: script verde e tempos por etapa registrados. Limite: com prereg de fumaça e n pequeno o LoRA tende a inconclusivo; o aprovado de verdade vem na nuvem (T-606, T-813).",
-   "atualizado": "2026-11-13T16:30:00.000Z"
+   "descricao": "Feito em 13/11 (smart-contract/e2e/teste8.js, assets/tests/t8_ponta_a_ponta.sh, npm run e2e:teste8; resultado em smart-contract/results/T-814_teste8_local.md). Modo direto com o Qwen2.5-0.5B real: o operador deposita o pacote da bateria e a referência medida (judge_cli) e libera o Juiz com o prereg e o avaliador de fumaça; duas aplicações de fine-tuning rodam pelo run-from-cids com o modelo pai e o Juiz real julga cada derivado como segundo job. Abliteração feita dentro do job em numpy (e2e/abliterate_app.py, idêntica bit a bit à receita d12 com torch): reprovada pela regra 1 (veto de dano), retida, o dono não reativa (\"Derivative not approved\"). Ajuste leve: inconclusivo pela regra 2 (n pequeno não prova amostra limpa), recibo gravado, revogado pelo operador e sem volta. Cota 20 → 15 → 13. 6/6 conferências; ~17 e ~13 min por derivado. Achado e corrigido: a liberação do Juiz não dizia qual arquivo de prereg a CVM1 usa (preregPath na lista permitida).\n\nCriada em 13/11. Por quê: a T-813 roda o Teste 8 na nuvem; ensaiar aqui tira os erros de integração antes.\nComo:\n- Script em assets/tests/ (o que a T-813 pede) sobre o roteiro do modo direto (T-811).\n- Depositar o Qwen2.5-0.5B, a referência medida do pai (código da T-312) e o pacote da bateria; liberar o Juiz com avaliador e prereg de fumaça.\n- Rodar duas aplicações de fine-tuning: uma abliteração (receita da T-908) e um LoRA benigno (receita da T-901); o Juiz real julga.\n- Conferir no contrato: o reprovado fica retido; o operador revoga e o dono não reativa (T-704, T-705); a cota acerta.\nSaída: script verde e tempos por etapa registrados. Limite: com prereg de fumaça e n pequeno o LoRA tende a inconclusivo; o aprovado de verdade vem na nuvem (T-606, T-813).",
+   "atualizado": "2026-11-13T21:00:00.000Z"
   },
   {
    "id": "T-815",
@@ -3452,7 +3452,7 @@
    "marco": "G3",
    "prioridade": "P1",
    "tamanho": "M",
-   "status": "a fazer",
+   "status": "feito",
    "deps": [
     "T-805",
     "T-807",
@@ -3461,8 +3461,8 @@
    ],
    "titulo": "Pilha Docker local (CVM1, builder, executor) e scripts de assets/tests verdes",
    "pronto": "docker compose sobe a pilha e run_all_tests.sh e t5_access_control.sh passam",
-   "descricao": "Criada em 13/11. Por quê: a implantação nas CVMs usa as imagens Docker, que não foram montadas desde a assinatura de pedidos, a cota e o Juiz; os scripts de assets/tests passaram a assinar pelo CLI (T-1703, T-1705) sem rodar.\nComo:\n- Montar as três imagens com executor e builder em modo direto (sem KVM).\n- Pôr o model_gate e o uv na imagem da CVM1 (ambiente da T-202), para o Juiz rodar dentro dela.\n- Rodar run_all_tests.sh e t5_access_control.sh e corrigir o que quebrar; atualizar o RUN_COMPOSE.md.\nSaída: pilha que sobe com docker compose e scripts verdes. Prepara a T-801 (imagem da CVM de job), a T-1707 e a T-1611; retoma em parte a T-209 (cortada).",
-   "atualizado": "2026-11-13T16:30:00.000Z"
+   "descricao": "Feito em 13/11 (docker/direct.compose.yaml, vm_runtime/Dockerfile.direct e start-direct.sh, build_vm_runtime/Dockerfile.direct, Juiz na imagem da CVM1; RUN_COMPOSE.md). As três CVMs como containers no modo direto, sem KVM: a CVM de job tem rede entra-só (iptables, sem DNS) e roda o agente sem privilégio; a CVM1 tem o model_gate com uv e o mesmo hash do Juiz do host. Testes de segurança na arquitetura atual (assets/tests/run_all_tests.sh): T1 pela métrica da aplicação (o stdout não volta desde a T-804), T3 com a limpeza do modo direto, T4 como o usuário do job; 10/10. Achados e corrigidos: o DNS do Docker era túnel de exfiltração; o /tmp/exec e as pastas de execução da CVM1 guardavam dataset, base e bundle em claro. t5_access_control.sh segue avulso (pede os CIDs); o mesmo T5 passa no run_all_tests.\n\nCriada em 13/11. Por quê: a implantação nas CVMs usa as imagens Docker, que não foram montadas desde a assinatura de pedidos, a cota e o Juiz; os scripts de assets/tests passaram a assinar pelo CLI (T-1703, T-1705) sem rodar.\nComo:\n- Montar as três imagens com executor e builder em modo direto (sem KVM).\n- Pôr o model_gate e o uv na imagem da CVM1 (ambiente da T-202), para o Juiz rodar dentro dela.\n- Rodar run_all_tests.sh e t5_access_control.sh e corrigir o que quebrar; atualizar o RUN_COMPOSE.md.\nSaída: pilha que sobe com docker compose e scripts verdes. Prepara a T-801 (imagem da CVM de job), a T-1707 e a T-1611; retoma em parte a T-209 (cortada).",
+   "atualizado": "2026-11-13T21:00:00.000Z"
   }
  ],
  "objetivos": [

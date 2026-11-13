@@ -1,4 +1,4 @@
-"""Fila de execução do board (13/11): a ordem em que as tasks abertas serão pegas, por etapa.
+"""Fila de execução do board (13/11; T-814 e T-815 feitas, o sistema fecha no modo direto): a ordem em que as tasks abertas serão pegas, por etapa.
 
 Gera fila.json (para consumo automático) e FILA.md (para leitura) e confere a ordem contra o
 backlog.json: toda dependência aberta de uma task tem de aparecer antes dela na fila, e toda task
@@ -22,10 +22,6 @@ HERE = Path(__file__).resolve().parent
 
 # (etapa, objetivo da etapa, [(task, executor, por que nesta posição / o que destrava)])
 ETAPAS = [
-    ("E1", "Fechar o sistema no modo direto (local)", [
-        ("T-814", "agente", "Ensaio local do Teste 8 com o Juiz real; tira os erros de integração antes da T-813 na nuvem."),
-        ("T-815", "agente", "Pilha Docker e testes T1–T5 na arquitetura atual; é a base da imagem da CVM de job (T-801) e do congelamento (T-1611)."),
-    ]),
     ("E2", "Desbloqueios humanos da porta T-1611", [
         ("T-1603", "humano", "Nuvem e crédito: sem isso nada da fase de testes roda; destrava T-210, T-309, T-315, T-801, T-812."),
         ("T-210", "humano", "VM de 4 vCPU: medida de custo válida e máquina do piloto; dependência da T-1611 e da T-309."),
