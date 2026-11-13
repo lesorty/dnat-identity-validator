@@ -6,9 +6,11 @@ import datetime as dt
 import hashlib
 import io
 import json
+import math
 import os
 import pathlib
 import shutil
+import socket
 import tarfile
 import uuid
 from urllib.error import HTTPError, URLError
@@ -41,6 +43,36 @@ ENCRYPTED_ENVELOPE_MAGIC = b"DNATENC2"
 
 # Onde o script do job grava o derivado (T-803); o agente da CVM de job o devolve so a CVM1.
 JOB_DERIVATIVE_DIR = "/tmp/exec/workspace/derivative"
+
+# --- T-804: saida de esquema fixo -------------------------------------------------------------
+# Espelha vm_runtime/job_output.py (a CVM1 nao tem vm_runtime/ na imagem). O agente ja descarta
+# stdout e stderr; aqui a CVM1 confere de novo e recusa o que nao for exatamente este esquema.
+JOB_OUTPUT_SCHEMA_ID = "dnat.job-output.v1"
+JOB_OUTPUT_KEYS = frozenset({
+    "schema", "status", "returncode", "elapsed_seconds", "job_timeout_seconds",
+    "metrics", "metrics_error", "error",
+})
+JOB_STATUSES = ("ok", "script_failed", "timeout", "agent_error")
+METRICS_ERRORS = ("missing", "not_regular_file", "too_large", "invalid_json", "not_object", "unknown_field", "bad_value")
+AGENT_ERRORS = (
+    "busy", "bundle_not_found", "bundle_extract_failed", "workspace_missing", "microvm_failed",
+    "microvm_timeout", "agent_timeout", "runner_output_invalid", "runner_error",
+)
+DEFAULT_METRICS_SCHEMA = {"loss": "number", "steps": "integer", "train_seconds": "number"}
+# Teto da resposta do agente sem o derivado, em bytes do JSON compacto.
+DEFAULT_JOB_OUTPUT_MAX_BYTES = 4096
+_MAX_SAFE_INT = 2**53
+
+# --- T-802: tempos limite ---------------------------------------------------------------------
+# A CVM1 pede ao agente um limite para o script, le em /health a margem do agente e espera
+# job + margem do agente + a propria folga: fica sempre acima do agente.
+JOB_TIMEOUT_HEADER = "X-DNAT-Job-Timeout"
+DEFAULT_JOB_TIMEOUT = 600
+DEFAULT_AGENT_MARGIN = 120
+DEFAULT_CVM1_MARGIN = 30
+# Estados de metadata.json que viram inconclusivo por falha (E14 §9, T-107). O recibo do tipo
+# falha e as tres tentativas sao de quem registra o veredito (T-703, T-807).
+FAILURE_STATUSES = ("script_failed", "timeout", "agent_error", "output_rejected", "execution_failed")
 
 
 def download_from_ipfs(ipfs_api_url: str, cid_or_uri: str) -> bytes:
@@ -80,6 +112,8 @@ set -euo pipefail
 
 cd /tmp/exec/workspace
 export DNAT_DERIVATIVE_DIR="/tmp/exec/workspace/derivative"
+# T-804: unica saida do script que chega ao usuario; stdout e stderr sao descartados pelo agente.
+export DNAT_METRICS_PATH="/tmp/exec/workspace/metrics.json"
 
 attempt_1_stdout="$(mktemp)"
 attempt_1_stderr="$(mktemp)"
@@ -135,6 +169,8 @@ set -euo pipefail
 
 cd /tmp/exec/workspace
 export DNAT_DERIVATIVE_DIR="/tmp/exec/workspace/derivative"
+# T-804: unica saida do script que chega ao usuario; stdout e stderr sao descartados pelo agente.
+export DNAT_METRICS_PATH="/tmp/exec/workspace/metrics.json"
 
 APP="/mnt/dnat-app/app/application.py"
 test -f "$APP"
@@ -215,16 +251,168 @@ def create_bundle(
     return bundle_path
 
 
-def submit_bundle(executor_url: str, bundle_path: pathlib.Path) -> dict:
+def _env_int(name: str, default: int) -> int:
+    try:
+        value = int(os.environ.get(name, "").strip() or default)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
+
+def fetch_agent_timeouts(executor_url: str) -> dict | None:
+    """Limites que o agente anuncia em /health (job_default, job_max, agent_margin), ou None."""
+    url = normalize_executor_url(executor_url)[: -len("/execute")] + "/health"
+    try:
+        with urlopen(Request(url, method="GET"), timeout=10) as response:  # nosec B310
+            timeouts = json.loads(response.read().decode("utf-8")).get("timeouts")
+    except (HTTPError, URLError, OSError, ValueError, AttributeError):
+        return None
+    if not isinstance(timeouts, dict):
+        return None
+    keys = ("job_default_seconds", "job_max_seconds", "agent_margin_seconds")
+    if not all(isinstance(timeouts.get(k), int) and not isinstance(timeouts.get(k), bool) and timeouts[k] > 0 for k in keys):
+        return None
+    return {k: timeouts[k] for k in keys}
+
+
+def plan_timeouts(requested: int | None, agent: dict | None, cvm1_margin: int) -> dict:
+    """Limite do script, do agente e da CVM1, com a CVM1 sempre acima do agente."""
+    job = requested if requested and requested > 0 else (agent or {}).get("job_default_seconds", DEFAULT_JOB_TIMEOUT)
+    if agent:
+        job = min(job, agent["job_max_seconds"])
+    agent_seconds = job + (agent or {}).get("agent_margin_seconds", DEFAULT_AGENT_MARGIN)
+    cvm1_margin = cvm1_margin if cvm1_margin > 0 else DEFAULT_CVM1_MARGIN
+    return {"jobSeconds": job, "agentSeconds": agent_seconds, "cvm1Seconds": agent_seconds + cvm1_margin}
+
+
+class CvmTimeout(Exception):
+    """A CVM1 desistiu de esperar o agente: o job vira falha por tempo, sem travar."""
+
+
+def _is_timeout(exc: BaseException) -> bool:
+    return isinstance(exc, (TimeoutError, socket.timeout)) or (
+        isinstance(exc, URLError) and isinstance(exc.reason, (TimeoutError, socket.timeout))
+    )
+
+
+def submit_bundle(executor_url: str, bundle_path: pathlib.Path, *, job_timeout: int | None = None, wait_seconds: float = 750) -> dict:
+    headers = {"Content-Type": "application/gzip"}
+    if job_timeout:
+        headers[JOB_TIMEOUT_HEADER] = str(int(job_timeout))
     request = Request(
         normalize_executor_url(executor_url),
         data=bundle_path.read_bytes(),
         method="POST",
-        headers={"Content-Type": "application/gzip"},
+        headers=headers,
     )
-    with urlopen(request, timeout=750) as response:  # nosec B310 - trusted executor URL in this project
-        raw = response.read().decode("utf-8")
+    try:
+        with urlopen(request, timeout=wait_seconds) as response:  # nosec B310 - trusted executor URL in this project
+            raw = response.read().decode("utf-8")
+    except HTTPError as exc:
+        # O agente responde 503 "busy" no mesmo esquema fixo; outro erro HTTP sobe como antes.
+        if exc.code != 503:
+            raise
+        raw = exc.read().decode("utf-8", errors="replace")
+    except (URLError, OSError) as exc:
+        if _is_timeout(exc):
+            raise CvmTimeout(f"CVM1 waited {wait_seconds} s for the agent") from exc
+        raise
     return json.loads(raw)
+
+
+class JobOutputRejected(ValueError):
+    """A resposta do agente nao segue o esquema fixo; nada dela chega ao usuario."""
+
+    def __init__(self, code: str):
+        super().__init__(code)
+        self.code = code
+
+
+def load_metrics_schema() -> dict:
+    raw = os.environ.get("DNAT_METRICS_SCHEMA", "").strip()
+    if not raw:
+        return dict(DEFAULT_METRICS_SCHEMA)
+    schema = json.loads(raw)
+    if not isinstance(schema, dict) or not schema or any(t not in ("number", "integer") for t in schema.values()):
+        raise ValueError('DNAT_METRICS_SCHEMA must be a JSON object {"field": "number"|"integer"}')
+    return schema
+
+
+def _is_int(value) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and abs(value) <= _MAX_SAFE_INT
+
+
+def _is_number(value) -> bool:
+    return (isinstance(value, (int, float)) and not isinstance(value, bool)
+            and math.isfinite(value) and abs(value) <= 1e300)
+
+
+def _check_metrics(metrics, schema: dict) -> dict:
+    if not isinstance(metrics, dict):
+        raise JobOutputRejected("metrics_not_object")
+    out = {}
+    for key, value in metrics.items():
+        kind = schema.get(key)
+        if kind is None:
+            raise JobOutputRejected("metrics_unknown_field")
+        if kind == "integer" and not _is_int(value):
+            raise JobOutputRejected("metrics_bad_value")
+        if kind == "number" and not _is_number(value):
+            raise JobOutputRejected("metrics_bad_value")
+        if (key == "steps" or key.endswith("_seconds")) and value < 0:
+            raise JobOutputRejected("metrics_bad_value")
+        out[key] = int(value) if kind == "integer" else float(f"{float(value):.6g}")
+    return out
+
+
+def validate_job_output(response, *, schema: dict | None = None, max_bytes: int | None = None) -> dict:
+    """Confere a resposta do agente (ja sem o derivado) contra o esquema fixo e o teto de bytes.
+
+    Devolve so as chaves do esquema. Qualquer chave a mais (stdout, stderr, logs), tipo errado,
+    metrica fora do esquema ou excesso de bytes recusa a resposta inteira.
+    """
+    schema = load_metrics_schema() if schema is None else schema
+    max_bytes = _env_int("DNAT_JOB_OUTPUT_MAX_BYTES", DEFAULT_JOB_OUTPUT_MAX_BYTES) if max_bytes is None else max_bytes
+    if not isinstance(response, dict):
+        raise JobOutputRejected("not_object")
+    try:
+        size = len(json.dumps(response, separators=(",", ":"), allow_nan=False).encode("utf-8"))
+    except ValueError as exc:
+        raise JobOutputRejected("not_json") from exc
+    if size > max_bytes:
+        raise JobOutputRejected("too_large")
+    if set(response) - JOB_OUTPUT_KEYS:
+        raise JobOutputRejected("unexpected_field")
+    if JOB_OUTPUT_KEYS - set(response):
+        raise JobOutputRejected("missing_field")
+    if response["schema"] != JOB_OUTPUT_SCHEMA_ID:
+        raise JobOutputRejected("schema_id")
+    if response["status"] not in JOB_STATUSES:
+        raise JobOutputRejected("status")
+    if response["returncode"] is not None and not _is_int(response["returncode"]):
+        raise JobOutputRejected("returncode")
+    if response["status"] == "ok" and response["returncode"] != 0:
+        raise JobOutputRejected("returncode")
+    for key in ("elapsed_seconds", "job_timeout_seconds"):
+        value = response[key]
+        if value is not None and (not _is_number(value) or value < 0):
+            raise JobOutputRejected(key)
+    if response["metrics_error"] is not None and response["metrics_error"] not in METRICS_ERRORS:
+        raise JobOutputRejected("metrics_error")
+    if response["error"] is not None and response["error"] not in AGENT_ERRORS:
+        raise JobOutputRejected("error")
+    out = {key: response[key] for key in sorted(JOB_OUTPUT_KEYS)}
+    out["metrics"] = None if response["metrics"] is None else _check_metrics(response["metrics"], schema)
+    return out
+
+
+def rejected_output(job_timeout: int | None = None) -> dict:
+    """O que fica em result.json quando a resposta do agente e recusada: nenhum dado dela."""
+    return {
+        "schema": JOB_OUTPUT_SCHEMA_ID, "status": "agent_error", "returncode": None,
+        "elapsed_seconds": None, "job_timeout_seconds": job_timeout, "metrics": None,
+        "metrics_error": None, "error": None,
+    }
 
 
 class DerivativeError(ValueError):
@@ -268,7 +456,9 @@ def verify_derivative(derivative: dict) -> bytes:
     return archive
 
 
-def retain_derivative(derivative: dict | None, derivative_out: str, *, job_succeeded: bool) -> dict | None:
+def retain_derivative(
+    derivative: dict | None, derivative_out: str, *, job_succeeded: bool, failure_reason: str = "job failed"
+) -> dict | None:
     """Separa o derivado da saida do job (T-803).
 
     Os pesos nunca vao para result.json, stdout.txt ou metadata.json. Se o job terminou bem e o
@@ -279,7 +469,7 @@ def retain_derivative(derivative: dict | None, derivative_out: str, *, job_succe
         return None
     summary = {"digest": str(derivative.get("digest", "")) if isinstance(derivative, dict) else ""}
     if not job_succeeded:
-        return {**summary, "status": "discarded", "reason": "job failed"}
+        return {**summary, "status": "discarded", "reason": failure_reason}
     if not derivative_out:
         return {**summary, "status": "discarded", "reason": "no retention target"}
     try:
@@ -305,6 +495,7 @@ def build_metadata(
     error: str | None = None,
     used_application_artifact: bool = False,
     derivative: dict | None = None,
+    timeouts: dict | None = None,
 ) -> dict:
     metadata = {
         "executionId": execution_id,
@@ -319,10 +510,12 @@ def build_metadata(
         "applicationArtifactPath": str((execution_dir / "application.ext4").resolve()) if used_application_artifact else None,
         "scriptPath": str((execution_dir / "application.py").resolve()) if (execution_dir / "application.py").exists() else None,
         "resultPath": str((execution_dir / "result.json").resolve()),
-        "stdoutPath": str((execution_dir / "stdout.txt").resolve()),
-        "stderrPath": str((execution_dir / "stderr.txt").resolve()),
+        # T-802/T-107: toda falha (inclusive tempo estourado) e inconclusivo por falha, sem merito.
+        "outcome": "inconclusive_failure" if status in FAILURE_STATUSES else "completed",
         "createdAtUtc": utc_now().isoformat().replace("+00:00", "Z"),
     }
+    if timeouts:
+        metadata["timeouts"] = timeouts
     if error:
         metadata["error"] = error
     if derivative:
@@ -330,10 +523,20 @@ def build_metadata(
     return metadata
 
 
-def write_execution_files(execution_dir: pathlib.Path, vm_result: dict) -> None:
-    (execution_dir / "stdout.txt").write_text(vm_result.get("stdout", "") or "", encoding="utf-8")
-    (execution_dir / "stderr.txt").write_text(vm_result.get("stderr", "") or "", encoding="utf-8")
-    (execution_dir / "result.json").write_text(json.dumps(vm_result, indent=2), encoding="utf-8")
+def write_execution_files(execution_dir: pathlib.Path, job_output: dict) -> None:
+    """So o JSON de esquema fixo vai ao disco da execucao (T-804): sem stdout.txt nem stderr.txt."""
+    (execution_dir / "result.json").write_text(json.dumps(job_output, indent=2), encoding="utf-8")
+
+
+_STATUS_FROM_AGENT = {"ok": "success", "script_failed": "script_failed", "timeout": "timeout", "agent_error": "agent_error"}
+
+
+def _failure_message(job_output: dict) -> str | None:
+    if job_output["status"] == "timeout":
+        return f"job exceeded the agent time limit ({job_output['job_timeout_seconds']} s)"
+    if job_output["status"] == "agent_error":
+        return f"agent error: {job_output['error']}"
+    return None
 
 
 def main() -> int:
@@ -361,6 +564,18 @@ def main() -> int:
         help="Where the control plane wants the verified derivative archive (T-803); without it the derivative is discarded",
     )
     parser.add_argument(
+        "--job-timeout",
+        type=int,
+        default=_env_int("DNAT_JOB_TIMEOUT_SECONDS", 0) or None,
+        help="Time limit for the job script, in seconds (T-802); default: the agent's own default",
+    )
+    parser.add_argument(
+        "--cvm1-margin",
+        type=int,
+        default=_env_int("DNAT_CVM1_MARGIN_SECONDS", DEFAULT_CVM1_MARGIN),
+        help="How much longer than the agent the CVM1 waits, in seconds (T-802)",
+    )
+    parser.add_argument(
         "--executions-dir",
         default=str(pathlib.Path(__file__).resolve().parents[1] / "executions"),
         help="Where execution artifacts are stored",
@@ -376,6 +591,7 @@ def main() -> int:
     execution_dir = pathlib.Path(args.executions_dir).resolve() / execution_id
     execution_dir.mkdir(parents=True, exist_ok=True)
     metadata_path = execution_dir / "metadata.json"
+    timeouts = None
 
     try:
         if args.local_dataset_path:
@@ -411,15 +627,47 @@ def main() -> int:
             workspace_dir,
             application_artifact_path=application_artifact_path,
         )
-        vm_result = submit_bundle(args.executor_url, bundle_path)
+        timeouts = plan_timeouts(args.job_timeout, fetch_agent_timeouts(args.executor_url), args.cvm1_margin)
+        try:
+            vm_result = submit_bundle(
+                args.executor_url, bundle_path, job_timeout=timeouts["jobSeconds"], wait_seconds=timeouts["cvm1Seconds"]
+            )
+        except CvmTimeout as exc:
+            write_execution_files(execution_dir, rejected_output(timeouts["jobSeconds"]) | {"status": "timeout"})
+            metadata = build_metadata(
+                execution_id,
+                args.dataset_cid,
+                args.application_cid or args.script_cid,
+                args.ipfs_api_url,
+                args.executor_url,
+                execution_dir,
+                status="timeout",
+                error=str(exc),
+                used_application_artifact=application_artifact_path is not None,
+                timeouts=timeouts,
+            )
+            metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+            print(json.dumps(metadata, indent=2))
+            return 124
 
         # O derivado sai da resposta antes de qualquer arquivo da execucao ser escrito.
+        raw_derivative = vm_result.pop("derivative", None) if isinstance(vm_result, dict) else None
+        try:
+            job_output = validate_job_output(vm_result)
+            status = _STATUS_FROM_AGENT[job_output["status"]]
+            error = _failure_message(job_output)
+        except JobOutputRejected as exc:
+            # Nada da resposta recusada e gravado nem devolvido; so o codigo do motivo.
+            job_output = rejected_output(timeouts["jobSeconds"])
+            status = "output_rejected"
+            error = f"agent output rejected: {exc.code}"
         derivative = retain_derivative(
-            vm_result.pop("derivative", None),
+            raw_derivative,
             args.derivative_out,
-            job_succeeded=vm_result.get("returncode") == 0,
+            job_succeeded=status == "success",
+            failure_reason="output rejected" if status == "output_rejected" else "job failed",
         )
-        write_execution_files(execution_dir, vm_result)
+        write_execution_files(execution_dir, job_output)
 
         metadata = build_metadata(
             execution_id,
@@ -428,14 +676,20 @@ def main() -> int:
             args.ipfs_api_url,
             args.executor_url,
             execution_dir,
-            status="success" if vm_result.get("returncode") == 0 else "script_failed",
-            return_code=vm_result.get("returncode"),
+            status=status,
+            return_code=job_output["returncode"],
+            error=error,
             used_application_artifact=application_artifact_path is not None,
             derivative=derivative,
+            timeouts=timeouts,
         )
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         print(json.dumps(metadata, indent=2))
-        return int(vm_result.get("returncode", 1))
+        if status == "success":
+            return 0
+        if status == "timeout":
+            return 124
+        return job_output["returncode"] if job_output["returncode"] else 1
 
     except (HTTPError, URLError, ValueError, OSError, json.JSONDecodeError) as exc:
         metadata = build_metadata(
@@ -448,6 +702,7 @@ def main() -> int:
             status="execution_failed",
             error=str(exc),
             used_application_artifact=bool(args.application_artifact_path),
+            timeouts=timeouts,
         )
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         print(json.dumps(metadata, indent=2))

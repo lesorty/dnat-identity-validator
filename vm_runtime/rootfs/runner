@@ -3,6 +3,8 @@
 import json
 import os
 import shutil
+import signal
+import stat
 import subprocess
 import sys
 import time
@@ -13,9 +15,68 @@ INPUT_DISKS = ['/dev/vdb', '/dev/vdc', '/dev/vdd', '/dev/vde']
 OUTPUT_MARKER = 'dnat-output.marker'
 APPLICATION_MARKER = 'dnat-application.marker'
 RESULT_PATH = 'result.json'
-STDOUT_PATH = 'stdout.txt'
-STDERR_PATH = 'stderr.txt'
 EXECUTION_COMPLETE_MARKER = 'EXECUTION_COMPLETE'
+# T-804: stdout e stderr do script sao descartados; so o arquivo de metricas sai, com teto de bytes.
+# O host (executor.py, job_output.py) revalida o esquema e o teto configurados.
+METRICS_PATH = 'workspace/metrics.json'
+METRICS_READ_CAP = 64 * 1024
+# T-802: o limite do script vem do host na linha de comando do kernel (dnat.job_timeout=N).
+DEFAULT_JOB_TIMEOUT = 600
+
+
+def job_timeout() -> int:
+    try:
+        for arg in Path('/proc/cmdline').read_text().split():
+            if arg.startswith('dnat.job_timeout='):
+                value = int(arg.split('=', 1)[1])
+                if value > 0:
+                    return value
+    except (OSError, ValueError):
+        pass
+    return DEFAULT_JOB_TIMEOUT
+
+
+def read_metrics() -> dict:
+    try:
+        fd = os.open(METRICS_PATH, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except FileNotFoundError:
+        return {"metrics_error": "missing"}
+    except OSError:
+        return {"metrics_error": "not_regular_file"}
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            return {"metrics_error": "not_regular_file"}
+        data = os.read(fd, METRICS_READ_CAP + 1)
+    finally:
+        os.close(fd)
+    if len(data) > METRICS_READ_CAP:
+        return {"metrics_error": "too_large"}
+    return {"metrics_text": data.decode('utf-8', errors='replace')}
+
+
+def run_job(limit: int) -> dict:
+    started = time.monotonic()
+    proc = subprocess.Popen(
+        ['bash', 'workspace/run.sh'],
+        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    timed_out = False
+    try:
+        proc.wait(timeout=limit)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        proc.wait()
+    return {
+        "returncode": 124 if timed_out else proc.returncode,
+        "timed_out": timed_out,
+        "elapsed_seconds": time.monotonic() - started,
+        **read_metrics(),
+    }
 
 
 def safe_mount(device: str, mount_dir: str) -> bool:
@@ -74,9 +135,6 @@ def persist_output(output_dir: str | None, output: dict) -> None:
     temp_result = output_path / f"{RESULT_PATH}.tmp"
     temp_result.write_text(json.dumps(output), encoding='utf-8')
     temp_result.replace(output_path / RESULT_PATH)
-
-    (output_path / STDOUT_PATH).write_text(output.get('stdout', '') or '', encoding='utf-8')
-    (output_path / STDERR_PATH).write_text(output.get('stderr', '') or '', encoding='utf-8')
     subprocess.run(['sync'], check=False)
 
 
@@ -95,7 +153,7 @@ bundle_path, output_dir, application_dir = discover_mounts()
 
 try:
     if not bundle_path or not os.path.isfile(bundle_path):
-        raise Exception("Bundle disk not found")
+        raise Exception("Bundle not found")
     if not output_dir:
         raise Exception("Output disk not found")
 
@@ -113,24 +171,14 @@ try:
     # Extract
     result = subprocess.run(['tar', '-xzf', 'bundle.tar.gz'], capture_output=True, text=True)
     if result.returncode != 0:
-        raise Exception(result.stderr)
+        raise Exception("failed to extract bundle")
     
-    # Execute
-    result = subprocess.run(
-        ['bash', 'workspace/run.sh'],
-        capture_output=True, text=True, timeout=600
-    )
-    
-    output = {
-        "returncode": result.returncode,
-        "stdout": result.stdout,
-        "stderr": result.stderr
-    }
+    # Execute (saida bruta descartada; limite vindo do host)
+    output = run_job(job_timeout())
 
-except subprocess.TimeoutExpired:
-    output = {"returncode": 124, "stdout": "", "stderr": "timeout"}
 except Exception as e:
-    output = {"returncode": 1, "stdout": "", "stderr": str(e)}
+    # So mensagens do proprio runner, que o host traduz para codigos fixos.
+    output = {"error": str(e)}
 
 finally:
     persist_output(output_dir, output)

@@ -14,6 +14,8 @@ services:
     volumes:
       # Mantem scripts do executor editaveis sem rebuild completo da imagem durante desenvolvimento.
       - ../vm_runtime/executor.py:/app/executor.py
+      - ../vm_runtime/job_output.py:/app/job_output.py
+      - ../vm_runtime/derivative.py:/app/derivative.py
       - ../vm_runtime/start-executor.sh:/app/start-executor.sh
       - ../vm_runtime/vm:/app/vm
       - ../vm_runtime/rootfs:/app/rootfs

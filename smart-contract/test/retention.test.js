@@ -44,6 +44,22 @@ async function agentCollect(tmp) {
   return JSON.parse(stdout);
 }
 
+/** Resposta do agente no esquema fixo da T-804 (vm_runtime/job_output.py). */
+function agentOutput(fields = {}) {
+  return {
+    schema: "dnat.job-output.v1",
+    status: "ok",
+    returncode: 0,
+    elapsed_seconds: 1.5,
+    job_timeout_seconds: 600,
+    metrics: null,
+    metrics_error: "missing",
+    error: null,
+    derivative: null,
+    ...fields,
+  };
+}
+
 /** Executor falso: responde como executor.py + run-direct.sh. */
 function fakeExecutor(response) {
   return new Promise((resolve) => {
@@ -109,23 +125,22 @@ describe("Retenção do derivado (T-803)", function () {
 
   it("job com derivado: result.json, stdout, stderr e metadata ficam sem pesos; a CVM1 recebe o pacote conferido", async function () {
     const derivative = await agentCollect(tmp);
-    const { code, metadata, executionDir, archivePath, stderr } = await runJob(tmp, {
-      returncode: 0,
-      stdout: "loss=0.12 passos=10\n",
-      stderr: "",
-      derivative,
-    });
+    const { code, metadata, executionDir, archivePath, stderr } = await runJob(
+      tmp,
+      agentOutput({ metrics: { loss: 0.12, steps: 10 }, metrics_error: null, derivative }),
+    );
     assert.strictEqual(code, 0, stderr);
     assert.deepStrictEqual(metadata.derivative, { digest: derivative.digest, status: "received" });
     assertNoWeights(executionDir, derivative);
     const result = JSON.parse(fs.readFileSync(path.join(executionDir, "result.json"), "utf8"));
-    assert.deepStrictEqual(Object.keys(result).sort(), ["returncode", "stderr", "stdout"]);
+    assert.ok(!("derivative" in result) && !("stdout" in result) && !("stderr" in result));
+    assert.deepStrictEqual(result.metrics, { loss: 0.12, steps: 10 });
     assert.ok(fs.readFileSync(archivePath).equals(Buffer.from(derivative.archive, "base64")));
   });
 
   it("a CVM1 cifra o pacote, guarda no IPFS, apaga o claro e registra o derivado retido e pendente", async function () {
     const derivative = await agentCollect(tmp);
-    const { archivePath, metadata } = await runJob(tmp, { returncode: 0, stdout: "", stderr: "", derivative });
+    const { archivePath, metadata } = await runJob(tmp, agentOutput({ derivative }));
     const uploaded = [];
     const statePath = path.join(tmp, "derivatives.json");
 
@@ -179,7 +194,7 @@ describe("Retenção do derivado (T-803)", function () {
   it("digest adulterado: o derivado é recusado e nada é gravado", async function () {
     const derivative = await agentCollect(tmp);
     const forged = { ...derivative, digest: "0".repeat(64) };
-    const { metadata, archivePath, executionDir } = await runJob(tmp, { returncode: 0, stdout: "", stderr: "", derivative: forged });
+    const { metadata, archivePath, executionDir } = await runJob(tmp, agentOutput({ derivative: forged }));
     assert.strictEqual(metadata.derivative.status, "invalid");
     assert.match(metadata.derivative.error, /digest mismatch/);
     assert.ok(!fs.existsSync(archivePath));
@@ -189,27 +204,28 @@ describe("Retenção do derivado (T-803)", function () {
   it("arquivo a mais no pacote, fora da lista declarada: recusado", async function () {
     const derivative = await agentCollect(tmp);
     const forged = { ...derivative, files: derivative.files.slice(1) };
-    const { metadata, archivePath } = await runJob(tmp, { returncode: 0, stdout: "", stderr: "", derivative: forged });
+    const { metadata, archivePath } = await runJob(tmp, agentOutput({ derivative: forged }));
     assert.strictEqual(metadata.derivative.status, "invalid");
     assert.ok(!fs.existsSync(archivePath));
   });
 
   it("job que falhou ou sem destino de retenção: o derivado é descartado, sem sair na saída", async function () {
     const derivative = await agentCollect(tmp);
-    const failed = await runJob(tmp, { returncode: 1, stdout: "", stderr: "erro", derivative });
+    const failed = await runJob(tmp, agentOutput({ status: "script_failed", returncode: 1, derivative }));
     assert.deepStrictEqual(failed.metadata.derivative, { digest: derivative.digest, status: "discarded", reason: "job failed" });
     assert.ok(!fs.existsSync(failed.archivePath));
     assertNoWeights(failed.executionDir, derivative);
 
-    const noTarget = await runJob(tmp, { returncode: 0, stdout: "", stderr: "", derivative }, { derivativeOut: false });
+    const noTarget = await runJob(tmp, agentOutput({ derivative }), { derivativeOut: false });
     assert.strictEqual(noTarget.metadata.derivative.status, "discarded");
     assertNoWeights(noTarget.executionDir, derivative);
   });
 
-  it("job sem derivado segue como antes", async function () {
-    const { code, metadata, executionDir } = await runJob(tmp, { returncode: 0, stdout: "ok\n", stderr: "", derivative: null });
+  it("job sem derivado segue como antes (só com as métricas de esquema fixo, T-804)", async function () {
+    const { code, metadata, executionDir } = await runJob(tmp, agentOutput({ metrics: { loss: 1 }, metrics_error: null }));
     assert.strictEqual(code, 0);
     assert.strictEqual(metadata.derivative, undefined);
-    assert.strictEqual(fs.readFileSync(path.join(executionDir, "stdout.txt"), "utf8"), "ok\n");
+    assert.ok(!fs.existsSync(path.join(executionDir, "stdout.txt")));
+    assert.deepStrictEqual(JSON.parse(fs.readFileSync(path.join(executionDir, "result.json"), "utf8")).metrics, { loss: 1 });
   });
 });

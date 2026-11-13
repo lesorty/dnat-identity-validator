@@ -12,12 +12,15 @@ ROOTFS="$ROOT/artifacts/rootfs.ext4"
 OUTPUT_MARKER="dnat-output.marker"
 APP_MARKER="dnat-application.marker"
 RESULT_FILE="result.json"
-RESULT_STDOUT_FILE="stdout.txt"
-RESULT_STDERR_FILE="stderr.txt"
 EXECUTION_COMPLETE_MARKER="EXECUTION_COMPLETE"
 EXECUTION_COMPLETE_PREFIX="EXECUTION_COMPLE"
 GUEST_HALTED_MARKER="System halted"
-VM_TIMEOUT_SECONDS="${VM_TIMEOUT_SECONDS:-660}"
+# T-802: o limite do script (DNAT_JOB_TIMEOUT_SECONDS, passado por executor.py) vai ao guest pela
+# linha de comando do kernel; o host espera esse limite mais a folga do boot. O antigo
+# VM_TIMEOUT_SECONDS fixo nao vale mais: cortaria um job longo antes do limite pedido.
+JOB_TIMEOUT_SECONDS="${DNAT_JOB_TIMEOUT_SECONDS:-600}"
+VM_BOOT_MARGIN_SECONDS="${DNAT_VM_BOOT_MARGIN_SECONDS:-60}"
+VM_TIMEOUT_SECONDS=$((JOB_TIMEOUT_SECONDS + VM_BOOT_MARGIN_SECONDS))
 SHUTDOWN_GRACE_SECONDS="${SHUTDOWN_GRACE_SECONDS:-20}"
 
 [ -f "$KERNEL" ] && [ -f "$ROOTFS" ] || { echo "Artifacts not found" >&2; exit 1; }
@@ -174,7 +177,7 @@ done
 # Executor usa menos recursos porque apenas roda o script ja empacotado.
 fc_put "machine-config" '{"vcpu_count": 1, "mem_size_mib": 512, "smt": false}'
 
-fc_put "boot-source" "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 loglevel=4 noapic reboot=k panic=1 pci=off nomodules random.trust_cpu=on root=/dev/vda rootfstype=ext4 rootwait rw init=/init\"}"
+fc_put "boot-source" "{\"kernel_image_path\": \"$KERNEL\", \"boot_args\": \"console=ttyS0 loglevel=4 noapic reboot=k panic=1 pci=off nomodules random.trust_cpu=on root=/dev/vda rootfstype=ext4 rootwait rw init=/init dnat.job_timeout=${JOB_TIMEOUT_SECONDS}\"}"
 
 fc_put "drives/rootfs" "{\"drive_id\": \"rootfs\", \"path_on_host\": \"$OVERLAY\", \"is_root_device\": true, \"is_read_only\": false}"
 
@@ -233,36 +236,22 @@ wait "$FC_PID" || true
 mount_output_disk
 
 # A resposta HTTP final e sempre derivada do disco de saida persistido pela microVM.
+# T-804: so o result.json do runner (returncode, timed_out, metricas); executor.py o reduz ao
+# esquema fixo. Nada de stdout, stderr, payload bruto ou log serial, que o script pode escrever.
 python3 - <<PY
 import json
 from pathlib import Path
 
-result_mount = Path(r"$RESULT_MOUNT")
-serial_log = Path(r"$SERIAL_LOG")
-result_path = result_mount / "$RESULT_FILE"
-stdout_path = result_mount / "$RESULT_STDOUT_FILE"
-stderr_path = result_mount / "$RESULT_STDERR_FILE"
+result_path = Path(r"$RESULT_MOUNT") / "$RESULT_FILE"
 
 if not result_path.is_file():
-    print(json.dumps({
-        "error": "no persisted result",
-        "stdout": stdout_path.read_text(errors="ignore") if stdout_path.is_file() else "",
-        "stderr": stderr_path.read_text(errors="ignore") if stderr_path.is_file() else "",
-        "firecrackerLog": serial_log.read_text(errors="ignore")[-4000:],
-    }))
+    print(json.dumps({"error": "no persisted result"}))
     raise SystemExit(0)
 
-payload = result_path.read_text(errors="ignore")
 try:
-    parsed = json.loads(payload)
+    parsed = json.loads(result_path.read_text(errors="ignore"))
 except json.JSONDecodeError:
-    print(json.dumps({
-        "error": "invalid persisted result payload",
-        "payload": payload,
-        "stdout": stdout_path.read_text(errors="ignore") if stdout_path.is_file() else "",
-        "stderr": stderr_path.read_text(errors="ignore") if stderr_path.is_file() else "",
-        "firecrackerLog": serial_log.read_text(errors="ignore")[-4000:],
-    }))
+    print(json.dumps({"error": "invalid persisted result payload"}))
 else:
     print(json.dumps(parsed))
 PY

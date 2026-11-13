@@ -114,7 +114,7 @@ Arquivos principais:
    - disco persistente de saída
 6. O guest executa a aplicação sem rede.
 7. O resultado é gravado no disco de saída.
-8. A CVM3 coleta `result.json`, `stdout.txt` e `stderr.txt`.
+8. A CVM3 coleta só a resposta de esquema fixo (`dnat.job-output.v1`: status, código de saída, tempo e métricas numéricas); stdout e stderr do script são descartados (T-804).
 9. A CVM3 limpa overlay, discos temporários, mounts e socket do Firecracker.
 
 ## 4. Worker da CVM2
