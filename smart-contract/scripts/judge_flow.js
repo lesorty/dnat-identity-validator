@@ -95,12 +95,46 @@ function judgeCommand(modelGateDir = MODEL_GATE_DIR) {
   return ["uv", "run", "--project", modelGateDir, "--frozen", "--quiet", "python"];
 }
 
+function parseJudgeHash(status, stdout, stderr) {
+  const out = String(stdout).trim();
+  if (status !== 0 || !HEX64.test(out)) throw new Error(`judge_package falhou (${status}): ${String(stderr).slice(-300)}`);
+  return out;
+}
+
+/** Síncrono: para o judge_cli, que é um processo de linha de comando. */
 function computeJudgeHash({ cmd = judgeCommand(), cwd = MODEL_GATE_DIR } = {}) {
   const r = spawnSync(cmd[0], [...cmd.slice(1), "-m", "model_gate.judge_package"], { cwd, encoding: "utf8" });
   if (r.error) throw r.error;
-  const out = String(r.stdout).trim();
-  if (r.status !== 0 || !HEX64.test(out)) throw new Error(`judge_package falhou (${r.status}): ${String(r.stderr).slice(-300)}`);
-  return out;
+  return parseJudgeHash(r.status, r.stdout, r.stderr);
+}
+
+/**
+ * Assíncrono: dentro da CVM1. O spawnSync travaria o event loop por segundos (o Python sobe o
+ * torch), parando as outras rotas e deixando conexões keep-alive serem fechadas pelo outro lado
+ * sem que o cliente perceba ("other side closed" no fetch seguinte).
+ */
+function computeJudgeHashAsync({ cmd = judgeCommand(), cwd = MODEL_GATE_DIR } = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd[0], [...cmd.slice(1), "-m", "model_gate.judge_package"], { cwd });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (c) => (stdout += c));
+    child.stderr.on("data", (c) => (stderr = (stderr + c).slice(-2000)));
+    child.on("error", reject);
+    child.on("close", (code) => {
+      try {
+        resolve(parseJudgeHash(code, stdout, stderr));
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
+/** Mensagem com a causa (o fetch do Node diz só "fetch failed"). */
+function errorText(e) {
+  const cause = e?.cause ? ` (${e.cause.code || ""} ${e.cause.message || e.cause})`.replace("( ", "(") : "";
+  return `${e?.message || e}${cause}`;
 }
 
 function writeJudgeManifest(manifestPath, { inputs, release, identityId, decidedAt, samplingKey = null }) {
@@ -421,12 +455,12 @@ async function judgeDerivative({
 
   let release;
   try {
-    const running = computeJudgeHash({ cmd, cwd: modelGateDir });
+    const running = await computeJudgeHashAsync({ cmd, cwd: modelGateDir });
     release = findRelease(allowlist, running);
     if (!release) return failBeforeJob("judge_not_allowed", `judge ${running} not in allowlist`);
     if (fileSha256(preregPath) !== release.preregSha256) return failBeforeJob("prereg_not_frozen", "prereg.yaml differs from the allowlist");
   } catch (e) {
-    return failBeforeJob("judge_unavailable", e.message);
+    return failBeforeJob("judge_unavailable", errorText(e));
   }
   const reference = readReferences(referencesPath)[String(parentId)];
   if (!reference) return failBeforeJob("reference_missing", `no custodied reference for model ${parentId} (T-312)`);
@@ -453,7 +487,7 @@ async function judgeDerivative({
         await openToDir(battery.encryptedUri, fetchToFile, [BATTERY_FORMAT], path.join(work, "battery"), release.batteryPackDigest);
       }
     } catch (e) {
-      return failBeforeJob("custody_error", e.message);
+      return failBeforeJob("custody_error", errorText(e));
     }
     fs.copyFileSync(datasetPath, path.join(work, "dataset.csv"));
     inputs.dataset = { path: "dataset.csv", kind: "file", digest: fileSha256(datasetPath) };
@@ -488,6 +522,7 @@ module.exports = {
   VERDICT_ENUM,
   applyJudgeResult,
   computeJudgeHash,
+  computeJudgeHashAsync,
   decidedAtNow,
   depositBattery,
   depositReference,

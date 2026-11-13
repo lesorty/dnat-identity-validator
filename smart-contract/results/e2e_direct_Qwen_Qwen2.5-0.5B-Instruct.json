@@ -1,0 +1,202 @@
+{
+  "note": "Verificação de funcionamento (T-811), não é dado do artigo. B e C usam um Juiz SIMULADO.",
+  "machine": {
+    "cpuModel": "Intel(R) Core(TM) 7 150U",
+    "logicalCpus": 12,
+    "node": "v22.22.1",
+    "platform": "linux 7.0.0-43-generic",
+    "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
+    "startedAtUtc": "2026-11-13T14:04:16.906Z"
+  },
+  "judgeRelease": {
+    "judgeHash": "5706f8b58200dd5b8132e33e6b911b127d7f28f4ebb67c5ebb55fefe9ecb6806",
+    "preregSha256": "e2de3b5562ac39cd5b7363f04f9fbe95d193fcafb3d57f60383e1696b7f0ee9e",
+    "batteryCommitment": "9ac8c2affbeb3c262d62a089463694c9db8c2d70271814d696f1f8e96c6f6a60",
+    "evaluatorKind": "detector",
+    "batteryPackDigest": "f5f17e1a0ea530599f4c3edd4b7e73f3826f1491152c95e1d4267776597a1bc2",
+    "note": "roteiro T-811",
+    "allowedAtUtc": "2026-11-13T14:05:45.480Z"
+  },
+  "base": {
+    "dir": "Qwen__Qwen2.5-0.5B-Instruct",
+    "digest": "05b61d72bec34404b49fdd4b3a33031b69f25b3f329acc3b851a62c07c9302f3",
+    "archiveBytes": 786310454
+  },
+  "assets": {
+    "model": "1",
+    "dataset": "2",
+    "application": "3"
+  },
+  "identity": {
+    "id": "167963568787913d1e4e58e5864a696655e6925b4a26f1bfe009620c46283738",
+    "difficulty": 12,
+    "proofSeconds": 0.006133094
+  },
+  "scenarios": {
+    "A": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 1.503
+      },
+      "derivative": {
+        "digest": "c67e0299b003e577bf92235f49e0420121955e1214b844de5fff0f4369b3a0d2",
+        "status": "retained",
+        "verdict": "failure"
+      },
+      "judge": {
+        "outcome": "failure",
+        "assetId": null,
+        "alert": "custody_error"
+      },
+      "quota": {
+        "reservationId": "89e801b4-07c9-47da-94cf-e3677e6c39e8",
+        "reserved": 0,
+        "balance": 20
+      },
+      "balanceAfter": 20
+    },
+    "B": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 1.496
+      },
+      "derivative": {
+        "digest": "c67e0299b003e577bf92235f49e0420121955e1214b844de5fff0f4369b3a0d2",
+        "status": "retained",
+        "verdict": "failure"
+      },
+      "judge": {
+        "outcome": "failure",
+        "assetId": null,
+        "alert": "custody_error"
+      },
+      "quota": {
+        "reservationId": "29e44f77-e8a0-4e52-9657-ab166242cb3b",
+        "reserved": 0,
+        "balance": 20
+      },
+      "balanceAfter": 20
+    },
+    "C": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 1.515
+      },
+      "derivative": {
+        "digest": "c67e0299b003e577bf92235f49e0420121955e1214b844de5fff0f4369b3a0d2",
+        "status": "retained",
+        "verdict": "failure"
+      },
+      "judge": {
+        "outcome": "failure",
+        "assetId": null,
+        "alert": "custody_error"
+      },
+      "quota": {
+        "reservationId": "b9645f15-5636-434c-b921-8b245a8a456a",
+        "reserved": 0,
+        "balance": 20
+      },
+      "balanceAfter": 20
+    }
+  },
+  "onChain": {},
+  "timings": [
+    {
+      "step": "IPFS em memória",
+      "seconds": 0.002
+    },
+    {
+      "step": "hardhat node e implantação do contrato",
+      "seconds": 1.269
+    },
+    {
+      "step": "CVM2 (builder, modo direto)",
+      "seconds": 0.314
+    },
+    {
+      "step": "CVM de job (executor, modo direto)",
+      "seconds": 0.316
+    },
+    {
+      "step": "pacote da bateria depositado pelo operador (judge_cli battery)",
+      "seconds": 0.179
+    },
+    {
+      "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
+      "seconds": 0.155
+    },
+    {
+      "step": "CVM1 (api-server)",
+      "seconds": 0.626
+    },
+    {
+      "step": "identidade com prova de trabalho (d = 12)",
+      "seconds": 0.024
+    },
+    {
+      "step": "depósito do modelo base (register-model)",
+      "seconds": 64.048
+    },
+    {
+      "step": "dataset (register-dataset)",
+      "seconds": 0.182
+    },
+    {
+      "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
+      "seconds": 0.671
+    },
+    {
+      "step": "compra de acesso (purchase-access)",
+      "seconds": 0.166
+    },
+    {
+      "step": "referência do pai depositada pelo operador (judge_cli reference)",
+      "seconds": 0.249
+    },
+    {
+      "step": "A · fine-tuning + Juiz real (model_gate)",
+      "seconds": 199.601
+    },
+    {
+      "step": "B · fine-tuning + Juiz SIMULADO aprovando",
+      "seconds": 197.908
+    },
+    {
+      "step": "C · fine-tuning + Juiz SIMULADO reprovando",
+      "seconds": 189.259
+    }
+  ],
+  "checks": [
+    {
+      "name": "A: Juiz real termina em falha (prereg sem valores, T-606)",
+      "ok": true
+    },
+    {
+      "name": "A: reserva devolvida (saldo 20)",
+      "ok": true
+    },
+    {
+      "name": "B: aprovado, derivado usável no contrato",
+      "ok": false
+    },
+    {
+      "name": "B: cota 1 (saldo 19)",
+      "ok": false
+    },
+    {
+      "name": "C: reprovado, derivado inativo",
+      "ok": false
+    },
+    {
+      "name": "C: cota 5 (saldo 14)",
+      "ok": false
+    }
+  ]
+}

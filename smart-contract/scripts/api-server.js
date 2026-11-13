@@ -286,17 +286,27 @@ async function downloadFromIpfsBytes(cidOrUri, ipfsApiUrl = IPFS_API_URL) {
   return Buffer.from(arrayBuffer);
 }
 
-// T-805: baixa do IPFS direto para um arquivo, sem montar o conteúdo na memória.
-async function downloadFromIpfsToFile(cidOrUri, destPath, ipfsApiUrl = IPFS_API_URL) {
+// T-805: baixa do IPFS direto para um arquivo, sem montar o conteúdo na memória. A leitura é
+// idempotente: uma conexão que cai (keep-alive fechado pelo outro lado) é tentada de novo.
+async function downloadFromIpfsToFile(cidOrUri, destPath, ipfsApiUrl = IPFS_API_URL, attempts = 3) {
   const cid = normalizeCid(cidOrUri);
   if (!cid) throw new Error("CID is required");
   const url = `${String(ipfsApiUrl || IPFS_API_URL).replace(/\/$/, "")}/api/v0/cat?arg=${encodeURIComponent(cid)}`;
-  const response = await fetch(url, { method: "POST" });
-  if (!response.ok || !response.body) {
-    throw new Error(`IPFS download failed (${response.status}) for CID ${cid}`);
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      const response = await fetch(url, { method: "POST" });
+      if (!response.ok || !response.body) {
+        const err = new Error(`IPFS download failed (${response.status}) for CID ${cid}`);
+        err.final = true;
+        throw err;
+      }
+      await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(destPath));
+      return destPath;
+    } catch (e) {
+      fs.rmSync(destPath, { force: true });
+      if (e.final || attempt >= attempts) throw e;
+    }
   }
-  await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(destPath));
-  return destPath;
 }
 
 async function uploadLocalFileToIpfs(localPath) {
