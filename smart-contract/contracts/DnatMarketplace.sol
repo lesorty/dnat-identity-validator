@@ -265,6 +265,8 @@ contract DnatMarketplace {
         if (a.assetType == AssetType.Derivative && newActive) {
             require(!derivativeRevoked[assetId], "Derivative revoked");
             require(derivatives[assetId].verdict == Verdict.Approved, "Derivative not approved");
+            // T-707: com o pai fora, o derivado não volta.
+            require(assets[derivatives[assetId].parentId].active, "Parent inactive");
         }
 
         a.price = newPrice;
@@ -506,6 +508,24 @@ contract DnatMarketplace {
             a.bloomFilter,
             a.active
         );
+    }
+
+    /**
+     * @dev O derivado pode ser usado agora? (T-707, cascata preguiçosa, E14 §11). Ativo, aprovado,
+     *      não revogado pelo operador e com o pai ativo. Revogar o pai derruba todos os filhos de uma
+     *      vez sem laço sobre eles (gás constante): o estado efetivo de cada filho é lido aqui, e
+     *      quem serve ou vende o derivado (API, executor) tem de consultar esta função, não só
+     *      getAsset().active, que guarda o estado próprio do derivado.
+     */
+    function isDerivativeUsable(uint256 assetId) external view returns (bool) {
+        Asset storage a = assets[assetId];
+        require(a.id != 0, "Asset not found");
+        require(a.assetType == AssetType.Derivative, "Not a derivative");
+        DerivativeInfo storage info = derivatives[assetId];
+        return a.active
+            && info.verdict == Verdict.Approved
+            && !derivativeRevoked[assetId]
+            && assets[info.parentId].active;
     }
 
     /**
