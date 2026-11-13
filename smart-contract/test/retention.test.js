@@ -33,12 +33,12 @@ function run(cmd, args) {
 }
 
 /** Derivado de mentira gravado pelo "job" e coletado pelo agente real. */
-async function agentCollect(tmp) {
+async function agentCollect(tmp, outbox = null) {
   const dir = path.join(tmp, "workspace", "derivative");
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "adapter_model.safetensors"), Buffer.concat([Buffer.from(MARKER), crypto.randomBytes(4096)]));
   fs.writeFileSync(path.join(dir, "adapter_config.json"), '{"r": 8}');
-  const { code, stdout, stderr } = await run(PYTHON, [AGENT, path.join(tmp, "workspace")]);
+  const { code, stdout, stderr } = await run(PYTHON, [AGENT, path.join(tmp, "workspace"), ...(outbox ? [outbox] : [])]);
   assert.strictEqual(code, 0, stderr);
   assert.ok(!fs.existsSync(dir), "o agente apaga o derivado do disco do job");
   return JSON.parse(stdout);
@@ -60,10 +60,21 @@ function agentOutput(fields = {}) {
   };
 }
 
-/** Executor falso: responde como executor.py + run-direct.sh. */
-function fakeExecutor(response) {
+/** Executor falso: responde como executor.py + run-direct.sh; outbox serve GET /derivative/<token> uma vez. */
+function fakeExecutor(response, outbox = null) {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
+      if (req.method === "GET" && req.url.startsWith("/derivative/") && outbox) {
+        const file = path.join(outbox, `${req.url.slice("/derivative/".length)}.tar.gz`);
+        if (!/^\/derivative\/[0-9a-f]{32}$/.test(req.url) || !fs.existsSync(file)) {
+          res.writeHead(404);
+          return res.end();
+        }
+        const data = fs.readFileSync(file);
+        fs.rmSync(file);
+        res.writeHead(200, { "Content-Type": "application/gzip", "Content-Length": data.length });
+        return res.end(data);
+      }
       req.resume();
       req.on("end", () => {
         res.writeHead(200, { "Content-Type": "application/json" });
@@ -74,8 +85,8 @@ function fakeExecutor(response) {
   });
 }
 
-async function runJob(tmp, response, { derivativeOut = true } = {}) {
-  const server = await fakeExecutor(response);
+async function runJob(tmp, response, { derivativeOut = true, outbox = null } = {}) {
+  const server = await fakeExecutor(response, outbox);
   try {
     const datasetPath = path.join(tmp, "dataset.csv");
     const artifactPath = path.join(tmp, "application.ext4");
@@ -121,6 +132,27 @@ describe("Retenção do derivado (T-803)", function () {
 
   afterEach(function () {
     fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("T-805: derivado por token é baixado do agente em fluxo, conferido e some do agente", async function () {
+    const outbox = path.join(tmp, "outbox");
+    const derivative = await agentCollect(tmp, outbox);
+    assert.ok(derivative.token && !("archive" in derivative));
+    const { code, metadata, archivePath, stderr } = await runJob(
+      tmp, agentOutput({ metrics: { loss: 0.1, steps: 1 }, metrics_error: null, derivative }), { outbox });
+    assert.strictEqual(code, 0, stderr);
+    assert.deepStrictEqual(metadata.derivative, { digest: derivative.digest, status: "received" });
+    assert.strictEqual(fs.statSync(archivePath).size, derivative.size);
+    assert.deepStrictEqual(fs.readdirSync(outbox), [], "o agente entrega uma vez e apaga");
+  });
+
+  it("T-805: pacote baixado que não bate com os arquivos declarados é recusado e apagado", async function () {
+    const outbox = path.join(tmp, "outbox");
+    const derivative = await agentCollect(tmp, outbox);
+    const forged = { ...derivative, files: derivative.files.map((f, i) => (i === 0 ? { ...f, sha256: "0".repeat(64) } : f)) };
+    const { metadata, archivePath } = await runJob(tmp, agentOutput({ derivative: forged }), { outbox });
+    assert.strictEqual(metadata.derivative.status, "invalid");
+    assert.ok(!fs.existsSync(archivePath));
   });
 
   it("job com derivado: result.json, stdout, stderr e metadata ficam sem pesos; a CVM1 recebe o pacote conferido", async function () {

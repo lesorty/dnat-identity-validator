@@ -9,6 +9,7 @@ import json
 import math
 import os
 import pathlib
+import re
 import shutil
 import socket
 import tarfile
@@ -57,6 +58,7 @@ METRICS_ERRORS = ("missing", "not_regular_file", "too_large", "invalid_json", "n
 AGENT_ERRORS = (
     "busy", "bundle_not_found", "bundle_extract_failed", "workspace_missing", "microvm_failed",
     "microvm_timeout", "agent_timeout", "runner_output_invalid", "runner_error",
+    "base_modified",  # T-805: o script mexeu no modelo base
 )
 DEFAULT_METRICS_SCHEMA = {"loss": "number", "steps": "integer", "train_seconds": "number"}
 # Teto da resposta do agente sem o derivado, em bytes do JSON compacto.
@@ -309,24 +311,22 @@ def submit_bundle(executor_url: str, bundle_path: pathlib.Path, *, job_timeout: 
     headers = {"Content-Type": "application/gzip"}
     if job_timeout:
         headers[JOB_TIMEOUT_HEADER] = str(int(job_timeout))
-    request = Request(
-        normalize_executor_url(executor_url),
-        data=bundle_path.read_bytes(),
-        method="POST",
-        headers=headers,
-    )
-    try:
-        with urlopen(request, timeout=wait_seconds) as response:  # nosec B310 - trusted executor URL in this project
-            raw = response.read().decode("utf-8")
-    except HTTPError as exc:
-        # O agente responde 503 "busy" no mesmo esquema fixo; outro erro HTTP sobe como antes.
-        if exc.code != 503:
+    # O bundle pode levar o modelo base (GB): vai em fluxo do disco, com o tamanho declarado (T-805).
+    headers["Content-Length"] = str(bundle_path.stat().st_size)
+    with open(bundle_path, "rb") as body:
+        request = Request(normalize_executor_url(executor_url), data=body, method="POST", headers=headers)
+        try:
+            with urlopen(request, timeout=wait_seconds) as response:  # nosec B310 - trusted executor URL in this project
+                raw = response.read().decode("utf-8")
+        except HTTPError as exc:
+            # O agente responde 503 "busy" no mesmo esquema fixo; outro erro HTTP sobe como antes.
+            if exc.code != 503:
+                raise
+            raw = exc.read().decode("utf-8", errors="replace")
+        except (URLError, OSError) as exc:
+            if _is_timeout(exc):
+                raise CvmTimeout(f"CVM1 waited {wait_seconds} s for the agent") from exc
             raise
-        raw = exc.read().decode("utf-8", errors="replace")
-    except (URLError, OSError) as exc:
-        if _is_timeout(exc):
-            raise CvmTimeout(f"CVM1 waited {wait_seconds} s for the agent") from exc
-        raise
     return json.loads(raw)
 
 
@@ -437,17 +437,10 @@ def _set_digest(entries: list[dict]) -> str:
     return h.hexdigest()
 
 
-def verify_derivative(derivative: dict) -> bytes:
-    """Confere o pacote do derivado contra a lista de arquivos e o digest; devolve o tar.gz."""
-    try:
-        archive = base64.b64decode(derivative["archive"], validate=True)
-        declared = {e["path"]: e["sha256"] for e in derivative["files"]}
-        digest = derivative["digest"]
-    except (KeyError, TypeError, binascii.Error) as exc:
-        raise DerivativeError(f"malformed derivative: {exc}") from exc
-
+def _check_archive(fileobj, declared: dict, digest: str) -> None:
+    """Confere um tar.gz contra a lista de arquivos declarada e o digest (lê em blocos)."""
     entries = []
-    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz") as tar:
+    with tarfile.open(fileobj=fileobj, mode="r:gz") as tar:
         for member in tar:
             name = member.name
             if not member.isreg() or name.startswith("/") or ".." in pathlib.PurePosixPath(name).parts:
@@ -457,23 +450,57 @@ def verify_derivative(derivative: dict) -> bytes:
                 while chunk := f.read(1 << 20):
                     h.update(chunk)
             entries.append({"path": name, "sha256": h.hexdigest()})
-
     got = {e["path"]: e["sha256"] for e in entries}
     if len(got) != len(entries) or got != declared:
         raise DerivativeError("derivative archive does not match the declared files")
     if _set_digest(entries) != digest:
         raise DerivativeError("derivative digest mismatch")
+
+
+def _declared(derivative: dict) -> tuple[dict, str]:
+    try:
+        return {e["path"]: e["sha256"] for e in derivative["files"]}, str(derivative["digest"])
+    except (KeyError, TypeError) as exc:
+        raise DerivativeError(f"malformed derivative: {exc}") from exc
+
+
+def verify_derivative(derivative: dict) -> bytes:
+    """Confere o pacote em base64 (derivado pequeno) contra a lista de arquivos e o digest; devolve o tar.gz."""
+    declared, digest = _declared(derivative)
+    try:
+        archive = base64.b64decode(derivative["archive"], validate=True)
+    except (KeyError, TypeError, binascii.Error) as exc:
+        raise DerivativeError(f"malformed derivative: {exc}") from exc
+    _check_archive(io.BytesIO(archive), declared, digest)
     return archive
 
 
+def download_derivative(executor_url: str, token: str, dest: pathlib.Path, *, expected_size: int | None = None,
+                        timeout: float = 600) -> None:
+    """Baixa o pacote do agente em fluxo para dest (T-805). O agente o entrega uma vez e apaga."""
+    if not isinstance(token, str) or not re.fullmatch(r"[0-9a-f]{32}", token):
+        raise DerivativeError("malformed derivative token")
+    url = f"{normalize_executor_url(executor_url).rsplit('/execute', 1)[0]}/derivative/{token}"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    written = 0
+    with urlopen(Request(url, method="GET"), timeout=timeout) as resp, open(dest, "wb") as out:  # nosec B310
+        while chunk := resp.read(1 << 20):
+            out.write(chunk)
+            written += len(chunk)
+    if expected_size is not None and written != int(expected_size):
+        raise DerivativeError(f"derivative size {written} != declared {expected_size}")
+
+
 def retain_derivative(
-    derivative: dict | None, derivative_out: str, *, job_succeeded: bool, failure_reason: str = "job failed"
+    derivative: dict | None, derivative_out: str, *, job_succeeded: bool, failure_reason: str = "job failed",
+    executor_url: str | None = None,
 ) -> dict | None:
-    """Separa o derivado da saida do job (T-803).
+    """Separa o derivado da saida do job (T-803, T-805).
 
     Os pesos nunca vao para result.json, stdout.txt ou metadata.json. Se o job terminou bem e o
     digest confere, o tar.gz vai para derivative_out, um caminho temporario do plano de controle,
-    que o cifra, guarda no IPFS e apaga o arquivo. Devolve so o resumo (digest e estado).
+    que o cifra, guarda no IPFS e apaga o arquivo. Com token, o pacote e baixado do agente em
+    fluxo; com archive (base64), vem na propria resposta. Devolve so o resumo (digest e estado).
     """
     if not derivative:
         return None
@@ -482,13 +509,22 @@ def retain_derivative(
         return {**summary, "status": "discarded", "reason": failure_reason}
     if not derivative_out:
         return {**summary, "status": "discarded", "reason": "no retention target"}
-    try:
-        archive = verify_derivative(derivative)
-    except (DerivativeError, tarfile.TarError, OSError) as exc:
-        return {**summary, "status": "invalid", "error": str(exc)}
     out = pathlib.Path(derivative_out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_bytes(archive)
+    try:
+        if "token" in derivative:
+            if not executor_url:
+                raise DerivativeError("no executor URL to download the derivative")
+            declared, digest = _declared(derivative)
+            download_derivative(executor_url, derivative["token"], out, expected_size=derivative.get("size"))
+            with open(out, "rb") as f:
+                _check_archive(f, declared, digest)
+        else:
+            archive = verify_derivative(derivative)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_bytes(archive)
+    except (DerivativeError, tarfile.TarError, OSError, HTTPError, URLError) as exc:
+        out.unlink(missing_ok=True)
+        return {**summary, "status": "invalid", "error": str(exc)}
     return {**summary, "status": "received"}
 
 
@@ -682,6 +718,7 @@ def main() -> int:
             args.derivative_out,
             job_succeeded=status == "success",
             failure_reason="output rejected" if status == "output_rejected" else "job failed",
+            executor_url=args.executor_url,
         )
         write_execution_files(execution_dir, job_output)
 

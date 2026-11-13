@@ -186,8 +186,10 @@ class RunRunnerTest(unittest.TestCase):
         self.assertLess(time.monotonic() - started, 1 + executor._PIPE_GRACE_SECONDS + 2)
 
 
-def _bundle(script: str) -> bytes:
-    """Bundle com workspace/run.sh que roda `script` em Python, como o run.sh do run_from_cids.py."""
+def _bundle(script: str, model: dict[str, bytes] | None = None) -> bytes:
+    """Bundle com workspace/run.sh que roda `script` em Python, como o run.sh do run_from_cids.py.
+
+    model: arquivos do modelo base em workspace/model (T-805)."""
     run_sh = (
         "#!/bin/bash\nset -euo pipefail\ncd \"$(dirname \"$0\")\"\n"
         "export DNAT_DERIVATIVE_DIR=\"$PWD/derivative\"\nexport DNAT_METRICS_PATH=\"$PWD/metrics.json\"\n"
@@ -195,8 +197,10 @@ def _bundle(script: str) -> bytes:
     )
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tar:
-        for name, data in (("workspace/run.sh", run_sh), ("workspace/code/app.py", script)):
-            raw = data.encode()
+        items = [("workspace/run.sh", run_sh), ("workspace/code/app.py", script)]
+        items += [(f"workspace/model/{k}", v) for k, v in (model or {}).items()]
+        for name, data in items:
+            raw = data.encode() if isinstance(data, str) else data
             info = tarfile.TarInfo(name)
             info.size = len(raw)
             info.mode = 0o755
@@ -219,6 +223,25 @@ print("loss=0.25 passos=10 PESOS-NO-STDOUT")
 d = pathlib.Path(os.environ["DNAT_DERIVATIVE_DIR"]); d.mkdir()
 (d / "adapter_model.safetensors").write_bytes(b"pesos" * 100)
 open(os.environ["DNAT_METRICS_PATH"], "w").write('{"loss": 0.25, "steps": 10, "train_seconds": 1.0}')
+"""
+
+TOUCHES_BASE = r"""
+import os, pathlib
+base = pathlib.Path("model")
+try:
+    (base / "model.safetensors").write_bytes(b"envenenado")
+except PermissionError:
+    os.chmod(base / "model.safetensors", 0o644)          # o script insiste: o digest pega
+    (base / "model.safetensors").write_bytes(b"envenenado")
+d = pathlib.Path(os.environ["DNAT_DERIVATIVE_DIR"]); d.mkdir()
+(d / "model.safetensors").write_bytes(b"derivado")
+"""
+
+READS_BASE = r"""
+import os, pathlib
+w = pathlib.Path("model/model.safetensors").read_bytes()
+d = pathlib.Path(os.environ["DNAT_DERIVATIVE_DIR"]); d.mkdir()
+(d / "model.safetensors").write_bytes(w + b"+ajuste")
 """
 
 SLEEPER = r"""
@@ -246,7 +269,9 @@ class DirectAgentTest(unittest.TestCase):
         cls.exec_dir = Path(cls._tmp.name) / "exec"
         cls._env = mock.patch.dict(os.environ, {"DNAT_EXEC_DIR": str(cls.exec_dir), "DNAT_JOB_KILL_GRACE_SECONDS": "2"})
         cls._env.start()
+        cls.outbox = Path(cls._tmp.name) / "outbox"
         cls._patches = [
+            mock.patch.object(executor, "OUTBOX", cls.outbox),
             mock.patch.object(executor, "RUNNER_SCRIPT", "run-direct.sh"),
             mock.patch.object(executor, "TIMEOUTS", {"job_default_seconds": 30, "job_max_seconds": 3600, "agent_margin_seconds": 30}),
         ]
@@ -265,11 +290,11 @@ class DirectAgentTest(unittest.TestCase):
         cls._env.stop()
         cls._tmp.cleanup()
 
-    def execute(self, script: str, job_timeout: int | None = None) -> tuple[int, bytes]:
+    def execute(self, script: str, job_timeout: int | None = None, model: dict | None = None) -> tuple[int, bytes]:
         headers = {"Content-Type": "application/gzip"}
         if job_timeout:
             headers["X-DNAT-Job-Timeout"] = str(job_timeout)
-        req = urllib.request.Request(f"{self.url}/execute", data=_bundle(script), method="POST", headers=headers)
+        req = urllib.request.Request(f"{self.url}/execute", data=_bundle(script, model), method="POST", headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=120) as resp:
                 return resp.status, resp.read()
@@ -294,8 +319,29 @@ class DirectAgentTest(unittest.TestCase):
         self.assertEqual(out["metrics"], {"loss": 0.25, "steps": 10, "train_seconds": 1.0})
         self.assertNotIn(b"PESOS-NO-STDOUT", body)
         self.assertEqual([f["path"] for f in out["derivative"]["files"]], ["adapter_model.safetensors"])
-        with tarfile.open(fileobj=io.BytesIO(base64.b64decode(out["derivative"]["archive"])), mode="r:gz") as tar:
+        # T-805: o pacote não vem no JSON; a CVM1 baixa uma vez pelo token
+        self.assertNotIn("archive", out["derivative"])
+        token = out["derivative"]["token"]
+        with urllib.request.urlopen(f"{self.url}/derivative/{token}", timeout=10) as resp:
+            data = resp.read()
+        self.assertEqual(len(data), out["derivative"]["size"])
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
             self.assertEqual(tar.getnames(), ["adapter_model.safetensors"])
+        for bad in (token, "../../etc/passwd", "x" * 32):
+            with self.assertRaises(urllib.error.HTTPError) as ctx:
+                urllib.request.urlopen(f"{self.url}/derivative/{bad}", timeout=10)
+            self.assertEqual(ctx.exception.code, 404)
+
+    def test_base_somente_leitura_e_conferido_pelo_digest(self):
+        model = {"model.safetensors": b"\x00pesos-do-base" * 64, "config.json": b"{}"}
+        _, body = self.execute(READS_BASE, model=model)
+        out = json.loads(body)
+        self.assertEqual((out["status"], out["error"]), ("ok", None))
+        self.assertIsNotNone(out["derivative"])
+        _, body = self.execute(TOUCHES_BASE, model=model)
+        out = json.loads(body)
+        self.assertEqual((out["status"], out["error"], out["derivative"]), ("script_failed", "base_modified", None))
+        self.assertEqual(list(self.outbox.glob("*.tar.gz")), [], "derivado de base mexido não fica no disco")
 
     def test_limite_curto_corta_o_job_registra_e_nao_trava(self):
         started = time.monotonic()

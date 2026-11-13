@@ -9,7 +9,7 @@
 # (rede alcancavel, env/segredos do host visiveis, filesystem persistente).
 #
 # Saida (T-804): um JSON {returncode, timed_out, elapsed_seconds, metrics,
-# metrics_error, derivative} que executor.py reduz ao esquema fixo de
+# metrics_error, base_modified, derivative} que executor.py reduz ao esquema fixo de
 # job_output.py. stdout e stderr do script vao para /dev/null: um script hostil
 # nao tem por onde imprimir pesos. So o arquivo de metricas
 # ($DNAT_METRICS_PATH, workspace/metrics.json) e lido, com teto de bytes e
@@ -89,7 +89,7 @@ python3 - "$TIMEOUT_SECONDS" "$KILL_GRACE_SECONDS" "$VM_RUNTIME_DIR" "$EXEC_DIR/
 import json, os, shutil, signal, subprocess, sys, time
 from pathlib import Path
 sys.path.insert(0, sys.argv[3])
-from derivative import DERIVATIVE_DIRNAME, collect
+from derivative import DERIVATIVE_DIRNAME, base_check, base_guard, collect
 from job_output import METRICS_FILENAME, read_metrics_file
 
 limit, grace = int(sys.argv[1]), int(sys.argv[2])
@@ -103,6 +103,8 @@ def kill_group(proc, sig):
         pass
 
 
+# T-805: o base (workspace/model) fica somente leitura e é conferido pelo digest antes e depois.
+base_before = base_guard(workspace)
 started = time.monotonic()
 proc = subprocess.Popen(
     ["bash", str(workspace / "run.sh")],
@@ -125,18 +127,22 @@ except subprocess.TimeoutExpired:
 elapsed = time.monotonic() - started
 
 metrics, metrics_error = read_metrics_file(workspace / METRICS_FILENAME)
-if timed_out:
-    # Derivado de job que estourou o tempo nao e coletado: e apagado do disco.
+base_modified = base_check(workspace, base_before)
+if timed_out or base_modified:
+    # Derivado de job que estourou o tempo ou mexeu no base nao e coletado: e apagado do disco.
     shutil.rmtree(workspace / DERIVATIVE_DIRNAME, ignore_errors=True)
     derivative = None
 else:
-    derivative = collect(workspace)
+    # DNAT_DERIVATIVE_OUTBOX (T-805): o pacote vai para um arquivo, baixado depois pela CVM1.
+    outbox = os.environ.get("DNAT_DERIVATIVE_OUTBOX")
+    derivative = collect(workspace, Path(outbox) if outbox else None)
 print(json.dumps({
     "returncode": rc,
     "timed_out": timed_out,
     "elapsed_seconds": elapsed,
     "metrics": metrics,
     "metrics_error": metrics_error,
+    "base_modified": base_modified,
     "derivative": derivative,
 }))
 PY

@@ -61,6 +61,7 @@ AGENT_ERRORS = (
     "agent_timeout",
     "runner_output_invalid",
     "runner_error",
+    "base_modified",  # o script mexeu no modelo base (T-805): derivado descartado
 )
 OUTPUT_KEYS = (
     "schema",
@@ -266,8 +267,11 @@ def sanitize_runner_output(raw, job_timeout_seconds: int) -> dict:
     if isinstance(elapsed, bool) or not isinstance(elapsed, (int, float)) or not math.isfinite(elapsed):
         elapsed = None
 
+    error = None
     if raw.get("timed_out") is True:
         status = "timeout"
+    elif raw.get("base_modified") is True:
+        status, error = "script_failed", "base_modified"
     else:
         status = "ok" if returncode == 0 else "script_failed"
 
@@ -289,5 +293,6 @@ def sanitize_runner_output(raw, job_timeout_seconds: int) -> dict:
         job_timeout_seconds=job_timeout_seconds,
         metrics=metrics,
         metrics_error=metrics_error,
+        error=error,
         derivative=derivative,
     )

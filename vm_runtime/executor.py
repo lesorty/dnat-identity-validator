@@ -12,13 +12,19 @@ import subprocess
 import json
 import tempfile
 import os
+import shutil
 import signal
 import sys
 import threading
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import derivative as derivative_mod  # noqa: E402
 import job_output  # noqa: E402
+
+# T-805: o derivado fica em arquivo aqui até a CVM1 baixar (GET /derivative/<token>, uma vez).
+OUTBOX = Path(os.environ.get("DNAT_DERIVATIVE_OUTBOX", str(Path(__file__).parent / "output" / "derivatives")))
+_COPY_CHUNK = 1 << 20
 
 # M0 (no-isolation baseline): when DNAT_NO_MICROVM is set, /execute runs the same
 # workspace/run.sh contract directly in this container's namespace (no Firecracker,
@@ -74,7 +80,27 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(encoded)
 
+    def _send_derivative(self, token: str):
+        """Entrega o pacote do derivado uma vez, em fluxo, e o apaga (T-805)."""
+        path = derivative_mod.outbox_file(OUTBOX, token)
+        if path is None:
+            self.send_error(404)
+            return
+        try:
+            size = path.stat().st_size
+            self.send_response(200)
+            self.send_header("Content-Type", "application/gzip")
+            self.send_header("Content-Length", str(size))
+            self.end_headers()
+            with open(path, "rb") as f:
+                shutil.copyfileobj(f, self.wfile, _COPY_CHUNK)
+        finally:
+            path.unlink(missing_ok=True)
+
     def do_GET(self):
+        if self.path.startswith("/derivative/"):
+            self._send_derivative(self.path[len("/derivative/"):])
+            return
         if self.path != "/health":
             self.send_error(404)
             return
@@ -107,13 +133,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
             bundle_dir = Path(__file__).parent / "input"
             bundle_dir.mkdir(exist_ok=True)
 
+            # O bundle pode trazer o modelo base (GB): vai em fluxo para o disco (T-805).
             with tempfile.NamedTemporaryFile(suffix='.tar.gz', dir=bundle_dir, delete=False) as f:
-                f.write(self.rfile.read(content_length))
+                remaining = content_length
+                while remaining > 0:
+                    chunk = self.rfile.read(min(_COPY_CHUNK, remaining))
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    remaining -= len(chunk)
                 bundle_path = f.name
+            # Derivado anterior que a CVM1 não baixou não fica no disco do job.
+            derivative_mod.clear_outbox(OUTBOX)
 
             try:
                 # Execute via microVM (run-vm.sh) or, in M0 mode, directly (run-direct.sh).
-                env = {**os.environ, "DNAT_JOB_TIMEOUT_SECONDS": str(job_timeout)}
+                env = {**os.environ, "DNAT_JOB_TIMEOUT_SECONDS": str(job_timeout), "DNAT_DERIVATIVE_OUTBOX": str(OUTBOX)}
                 _, stdout, timed_out = run_runner(
                     ["bash", str(Path(__file__).parent / "vm" / RUNNER_SCRIPT), bundle_path],
                     env,
