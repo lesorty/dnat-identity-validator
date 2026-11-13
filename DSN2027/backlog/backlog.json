@@ -2268,18 +2268,18 @@
    "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-13T05:00:00.000Z",
    "deps": [
     "T-112",
     "T-1701"
    ],
-   "descricao": "Redução v2 (11/11): Modelo do atacante e orçamento, curto.\n\nPor quê: R11 exige avaliar contra atacante adaptativo com orçamento declarado; a E10 §5 fixa o modelo de ameaça.\nComo:\n- Descrever o atacante: usuário com os pesos dentro da CVM, conhece o código do Juiz e a parte pública da bateria, não a secreta\n- Fixar o orçamento: número de rodadas, tempo de CPU por rodada e o que o veredito revela (só binário)\n- Desde 09/11, o número de rodadas vem da cota: N identidades × ⌊Q / c_R⌋ reprovados, cada identidade com uma prova de trabalho (D7, E14 §18)\n- Listar os ataques mínimos e os extras da E13 §3.6 e ligar cada um às limitações do T-112\nSaída: documento do atacante em DSN2027/etapas (ou anexo da E14), citado pela seção 3 do artigo.",
+   "descricao": "Feito em 12/11: DSN2027/etapas/E15_modelo_atacante.md. O que o atacante vê e não vê, o que cada rodada revela (três estados, não binário), orçamento k = N · ⌊Q / c_R⌋ = 4N, custo de identidade medido na T-1705 (d = 20 custa segundos; d ≈ 30 daria ~1 h por núcleo), ataques mínimos e extras ligados ao que os barra e aos limites da E14 §13, independência do guardião e o que segue em aberto.\n\nRedução v2 (11/11): Modelo do atacante e orçamento, curto.\n\nPor quê: R11 exige avaliar contra atacante adaptativo com orçamento declarado; a E10 §5 fixa o modelo de ameaça.\nComo:\n- Descrever o atacante: usuário com os pesos dentro da CVM, conhece o código do Juiz e a parte pública da bateria, não a secreta\n- Fixar o orçamento: número de rodadas, tempo de CPU por rodada e o que o veredito revela (só binário)\n- Desde 09/11, o número de rodadas vem da cota: N identidades × ⌊Q / c_R⌋ reprovados, cada identidade com uma prova de trabalho (D7, E14 §18)\n- Listar os ataques mínimos e os extras da E13 §3.6 e ligar cada um às limitações do T-112\nSaída: documento do atacante em DSN2027/etapas (ou anexo da E14), citado pela seção 3 do artigo.",
    "epico": "J12",
    "id": "T-1201",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Documento do atacante",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Escrever o modelo do atacante e o orçamento de rodadas (o que vê e o que não vê)",
    "teste": "TS6"
@@ -2573,16 +2573,16 @@
    "deps": [
     "T-608"
    ],
-   "descricao": "Redução v2 (11/11): Laço simples que pula o que já tem resultado; sem fila nem retomada sofisticada.\n\nPor quê: A campanha tem ~300 vereditos (E13 §3.2) e roda por dias; uma queda não pode obrigar a refazer o que já terminou.\nComo:\n- Montar a fila derivado × configuração (formato, system prompt) a partir do inventário (T-916)\n- Marcar cada item concluído no registro de experimentos e pular os concluídos ao retomar\n- Testar matando o processo no meio e retomando\nSaída: orquestrador em model_gate/ com teste de retomada.",
+   "descricao": "Feito em 12/11 (commit 4a7957e): model_gate/experiments/campaign/orchestrator.py. Fila derivado × configuração em ordem fixa; livro só de acréscimo em JSONL com fsync, que marca done ou failed depois que o trabalho do item volta; ao retomar pula os done, refaz o item que caiu no meio e ignora uma linha cortada; falha é tentada de novo até max_attempts; com RunLog, cada item feito vira linha campaign/item_done. 6 testes, incluindo um processo morto com os._exit no meio e retomado sem refazer o feito. O inventário (T-916) e o trabalho por item (rodar o Juiz) entram como parâmetros.\n\nRedução v2 (11/11): Laço simples que pula o que já tem resultado; sem fila nem retomada sofisticada.\n\nPor quê: A campanha tem ~300 vereditos (E13 §3.2) e roda por dias; uma queda não pode obrigar a refazer o que já terminou.\nComo:\n- Montar a fila derivado × configuração (formato, system prompt) a partir do inventário (T-916)\n- Marcar cada item concluído no registro de experimentos e pular os concluídos ao retomar\n- Testar matando o processo no meio e retomando\nSaída: orquestrador em model_gate/ com teste de retomada.",
    "epico": "J14",
    "id": "T-1401",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Retoma após queda sem refazer o feito",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Orquestrador da campanha: fila de derivados × configurações, retomável",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T05:00:00.000Z"
   },
   {
    "deps": [
@@ -2653,17 +2653,17 @@
    "deps": [
     "T-1404"
    ],
-   "descricao": "Redução v2 (11/11): Curvas da RQ2 a partir das doses já geradas.\n\nPor quê: A RQ2 mede sensibilidade à quantidade de falha (molde ReMlX): passos, número de exemplos nocivos, intensidade de abliteração.\nComo:\n- Agrupar derivados pela dose varrida em cada classe\n- Traçar cobertura do Juiz por dose com IC\n- Comparar com a linha de base na mesma figura\nSaída: figura da RQ2 e script que a gera.",
+   "descricao": "Feito em 12/11 (commit c7b7a19): model_gate/experiments/campaign/rq2.py. Cobertura dos C por família e dose (Juiz: estado ≠ aprovado; linha de base: escore ≥ θ da calibração), IC de Wilson 95% com o derivado como unidade, tabela JSON e figura SVG feita à mão (sem matplotlib no lock), Juiz e linha de base na mesma figura. 6 testes com dados sintéticos. A figura do artigo sai quando houver resultados da nuvem; nenhuma figura com dados falsos foi gravada.\n\nRedução v2 (11/11): Curvas da RQ2 a partir das doses já geradas.\n\nPor quê: A RQ2 mede sensibilidade à quantidade de falha (molde ReMlX): passos, número de exemplos nocivos, intensidade de abliteração.\nComo:\n- Agrupar derivados pela dose varrida em cada classe\n- Traçar cobertura do Juiz por dose com IC\n- Comparar com a linha de base na mesma figura\nSaída: figura da RQ2 e script que a gera.",
    "epico": "J14",
    "id": "T-1406",
    "marco": "G4",
    "prioridade": "P1",
    "pronto": "Figura da RQ2",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "RQ2: curvas de cobertura × quantidade de falha",
    "teste": "TS3",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T05:00:00.000Z"
   },
   {
    "atualizado": "2026-11-11T18:00:00.000Z",
