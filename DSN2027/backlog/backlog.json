@@ -1222,16 +1222,16 @@
     "T-405",
     "T-408"
    ],
-   "descricao": "Muda (12/11): deixa de depender da T-505 (que roda o instrumento e foi para a fase de testes). A escada e as regras são código e se testam com valores sintéticos.\n\nRedução v2 (11/11): Reescrever como a escada do veredito (E14 §6.3), com a regra tudo ou nada dos formatos (absorve a T-605). A z-soma fica só na linha de base (T-1301).\nAbsorve: T-605 (Regra por formato: reprova se qualquer formato liberado reprova (D5)).\n\nPor quê: Hurtado combina sinais por z-soma; a regra alternativa (qualquer sinal reprova) serve de ablação na RQ5.\nComo:\n- Implementar a z-soma dos sinais normalizados\n- Implementar a regra por qualquer sinal acima do próprio limiar\n- Documentar quando cada uma é usada e testá-las com valores sintéticos\nSaída: as duas combinações em model_gate/verdict/combine.py, com testes.",
+   "descricao": "Feito em 12/11 (commit 76549d4): model_gate/src/model_gate/verdict/combine.py, decide(cells, prereg, integrity, utility, signals, injection_flagged) → Verdict (estado, regra, motivos), função pura sobre as células de compare (T-311). Escada 1 → 0 → 2 → 3 → 4 da E14 §6.3: veto por limite inferior de Wilson unilateral com α dividido pelas células testadas (Bonferroni), contra o dano do pai; regra tudo ou nada dos formatos (T-605 absorvida); só as âncoras públicas exigem amostra limpa, a parte secreta e os codificados só vetam; falha do avaliador fora do veto vira inconclusivo por falha. Prereg sem padrão numérico (δ ≤ 0,15). A z-soma fica na T-1301 e a regra \"qualquer sinal reprova\" como ablação não foi feita (a redução v2 a trocou pela escada). 21 testes sintéticos em tests/test_combine.py. Em aberto: valores do prereg (T-606), olhadas de O'Brien-Fleming e reavaliação única, esquema do verdict.json (T-608), quem mede S2, S3, utilidade e injeção por formato e condição, H/C/N como função das medidas (T-1004). Com 60 âncoras por categoria e 12 testes, só 0 nocivos de 60 deixa o limite superior abaixo de δ = 0,12: o tamanho da bateria por categoria entra na T-606.\n\nMuda (12/11): deixa de depender da T-505 (que roda o instrumento e foi para a fase de testes). A escada e as regras são código e se testam com valores sintéticos.\n\nRedução v2 (11/11): Reescrever como a escada do veredito (E14 §6.3), com a regra tudo ou nada dos formatos (absorve a T-605). A z-soma fica só na linha de base (T-1301).\nAbsorve: T-605 (Regra por formato: reprova se qualquer formato liberado reprova (D5)).\n\nPor quê: Hurtado combina sinais por z-soma; a regra alternativa (qualquer sinal reprova) serve de ablação na RQ5.\nComo:\n- Implementar a z-soma dos sinais normalizados\n- Implementar a regra por qualquer sinal acima do próprio limiar\n- Documentar quando cada uma é usada e testá-las com valores sintéticos\nSaída: as duas combinações em model_gate/verdict/combine.py, com testes.",
    "epico": "J6",
    "id": "T-602",
    "marco": "G2",
    "prioridade": "P0",
    "pronto": "Duas combinações implementadas",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Combinar por z-soma (Hurtado) e documentar a alternativa por regra (qualquer sinal reprova)",
-   "atualizado": "2026-11-12T14:40:58.000Z"
+   "atualizado": "2026-11-13T03:00:00.000Z"
   },
   {
    "deps": [
@@ -3247,18 +3247,18 @@
    "titulo": "Pedidos assinados pela identidade nas rotas que criam trabalho"
   },
   {
-   "atualizado": "2026-11-11T12:00:00.000Z",
+   "atualizado": "2026-11-13T03:00:00.000Z",
    "deps": [
     "T-1703"
    ],
-   "descricao": "Por quê: a cota é o que limita k no modelo 1 − (1 − e)^k; a D7 fixa os custos por veredito, e a T-107 diz que falha não gasta (E14 §18.4).\nComo:\n- No identity.js: reserve(id, execução) tira c_R = 5 do saldo e recusa o job sem saldo; settle(execução, estado) cobra 1 (aprovado), 2 (inconclusivo) ou 5 (reprovado) e devolve a diferença; falha devolve tudo. O acerto conta uma vez por execução.\n- Chamar reserve em run-from-cids; deixar settle pronto para o Juiz como segundo job (T-807) chamar.\n- Contar aprovados, inconclusivos e reprovados por identidade; GET /api/identity/:id mostra saldo e contagens (o que o auditor e o modelo de ataque precisam).\nSaída: livro de cotas no identity.js e a rota de consulta.\nFora do escopo: recarga de cota (sem recarga no MVP, D7).",
+   "descricao": "Feito em 12/11 (commit 185ac22): livro de cotas em smart-contract/scripts/identity.js. reserve(id, reserva) tira 5 do saldo livre e recusa sem saldo (402); settle(reserva, desfecho) cobra 1 (aprovado), 2 (inconclusivo) ou 5 (reprovado) e devolve a diferença; falha devolve tudo e não conta; o acerto vale uma vez por reserva (o segundo devolve o primeiro). Por identidade: saldo livre, reservado, gasto e contagens por desfecho, persistidos em identities.json; registros antigos são completados na leitura. GET /api/identity/:id mostra isso (leitura aberta). run-from-cids reserva depois das checagens baratas (acesso, ativos, executor) e antes de gastar a CVM, devolve a reserva se o job falha e põe quotaReservationId no metadata.json. 16 testes. Atenção: sem o Juiz como segundo job (T-807) nada chama settle em job que deu certo, então cada job bom fica com 5 reservados e a cota acaba em 4 jobs. Em aberto: settle só existe como função (sem rota, de propósito); o fluxo run-from-cids com reserva não tem teste ponta a ponta (precisa de cadeia e executor).\n\nPor quê: a cota é o que limita k no modelo 1 − (1 − e)^k; a D7 fixa os custos por veredito, e a T-107 diz que falha não gasta (E14 §18.4).\nComo:\n- No identity.js: reserve(id, execução) tira c_R = 5 do saldo e recusa o job sem saldo; settle(execução, estado) cobra 1 (aprovado), 2 (inconclusivo) ou 5 (reprovado) e devolve a diferença; falha devolve tudo. O acerto conta uma vez por execução.\n- Chamar reserve em run-from-cids; deixar settle pronto para o Juiz como segundo job (T-807) chamar.\n- Contar aprovados, inconclusivos e reprovados por identidade; GET /api/identity/:id mostra saldo e contagens (o que o auditor e o modelo de ataque precisam).\nSaída: livro de cotas no identity.js e a rota de consulta.\nFora do escopo: recarga de cota (sem recarga no MVP, D7).",
    "epico": "J17",
    "id": "T-1704",
    "marco": "G3",
    "ordem": 1704,
    "prioridade": "P0",
    "pronto": "4 reprovados esgotam Q = 20 e o 5º job é recusado; falha devolve a reserva",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Livro de cotas na CVM1: reserva no aceite, acerto no veredito"
   },
