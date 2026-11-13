@@ -11,6 +11,7 @@ from safetensors.torch import load_file, save_file
 from model_gate.battery.pool import load_pool
 from model_gate.io.digest import file_sha256
 from model_gate.io.load import dir_digest
+from model_gate.judge_package import judge_hash
 from model_gate.job import (RESPONSES_FILE, RESULT_FILE, SCHEMA_ID, VERDICT_FILE, Manifest, Stages, StageNotReady,
                             contract_check, dataset_overlap, main, run_job, verify_inputs)
 from model_gate.verdict.emit import read
@@ -18,6 +19,7 @@ from tests.test_combine import OK_SIGNALS, OK_UTILITY, PREREG, build as build_ce
 from tests.tiny import save_tiny
 
 HEX = lambda s: hashlib.sha256(s.encode()).hexdigest()  # noqa: E731
+JUDGE = judge_hash()[0]
 
 
 def make_job(tmp: Path, *, derivative_seed=1, dataset_rows=None) -> Path:
@@ -35,7 +37,7 @@ def make_job(tmp: Path, *, derivative_seed=1, dataset_rows=None) -> Path:
         "dataset": {"path": "dataset.jsonl", "kind": "file", "digest": file_sha256(tmp / "dataset.jsonl")},
         "prereg": {"path": "prereg.yaml", "kind": "file", "digest": file_sha256(tmp / "prereg.yaml")},
     }
-    m = {"schema": SCHEMA_ID, "inputs": inputs, "judge_hash": HEX("juiz"), "battery_commitment": HEX("bateria"),
+    m = {"schema": SCHEMA_ID, "inputs": inputs, "judge_hash": JUDGE, "battery_commitment": HEX("bateria"),
          "identity_id": HEX("id"), "decided_at": "2026-11-13T00:00:00Z"}
     p = tmp / "job.json"
     p.write_text(json.dumps(m))
@@ -183,3 +185,17 @@ def test_dataset_sobreposto_a_bateria(tmp_path):
 def test_cli_devolve_2_na_falha(tmp_path, capsys):
     assert main(["--manifest", str(make_job(tmp_path)), "--out", str(tmp_path / "out")]) == 2
     assert json.loads(capsys.readouterr().out)["status"] == "failure"
+
+
+def test_juiz_com_hash_diferente_do_manifesto_nao_julga(tmp_path):
+    """T-808: o código em execução não é o Juiz auditado; nem confere as entradas, nem grava veredito."""
+    m = Manifest.load(make_job(tmp_path))
+    res = run_job(m, tmp_path / "out", FakeStages(), judge_hash=HEX("outro juiz"))
+    assert (res["status"], res["alert"], res["outcome"]) == ("failure", "judge_hash_mismatch", "inconclusive_failure")
+    assert not (tmp_path / "out" / VERDICT_FILE).exists()
+
+
+def test_o_verdict_json_leva_o_hash_do_juiz_que_rodou(tmp_path):
+    res = run_job(Manifest.load(make_job(tmp_path)), tmp_path / "out", FakeStages())
+    doc = json.loads((tmp_path / "out" / VERDICT_FILE).read_text())
+    assert res["status"] == "verdict" and doc["hashes"]["judge"] == JUDGE

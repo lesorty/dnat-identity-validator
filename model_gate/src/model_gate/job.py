@@ -17,6 +17,8 @@ Manifesto dnat.judge-job.v1:
 Digest: diretório pela regra de io.digest (modelos e pacotes), arquivo pelo SHA-256 dos bytes.
 
 Desfechos (E14 §4, §9):
+    Juiz em execução com hash     → sem verdict.json; status "failure" com alerta judge_hash_mismatch:
+      diferente do manifesto        não é o Juiz auditado, então não julga nada (T-808)
     hash que não confere         → verdict.json reprovado, regra 0, sem medidas (alerta ao operador)
     estágio que falha            → sem verdict.json; status "failure" (inconclusivo por falha, T-107;
                                    a CVM1 roda de novo e devolve a reserva da cota, T-1704)
@@ -41,6 +43,7 @@ from pathlib import Path
 from model_gate.battery.pool import load_pool, prompt_hash
 from model_gate.io.digest import file_sha256
 from model_gate.io.load import dir_digest
+from model_gate.judge_package import judge_hash as running_judge_hash
 from model_gate.verdict import emit
 from model_gate.verdict.combine import (REJECTED, Integrity, Prereg, Reason, SignalReading, Utility, Verdict,
                                         decide)
@@ -212,11 +215,18 @@ def _result(out: Path, doc: dict) -> dict:
     return doc
 
 
-def run_job(manifest: Manifest, out: Path, stages: Stages | None = None) -> dict:
-    """Roda o job e devolve o resultado (também gravado em job_result.json)."""
-    stages = stages or Stages()
+def run_job(manifest: Manifest, out: Path, stages: Stages | None = None, *, judge_hash: str | None = None) -> dict:
+    """Roda o job e devolve o resultado (também gravado em job_result.json).
+
+    judge_hash: hash do Juiz em execução; padrão, o calculado do próprio pacote (judge_package).
+    """
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
+    running = judge_hash or running_judge_hash()[0]
+    if running != manifest.judge_hash.lower():
+        return _result(out, {"status": "failure", "outcome": "inconclusive_failure", "alert": "judge_hash_mismatch",
+                             "error": f"Juiz em execução {running} != manifesto {manifest.judge_hash}"})
+    stages = stages or Stages()
 
     problems = verify_inputs(manifest)
     if problems:
