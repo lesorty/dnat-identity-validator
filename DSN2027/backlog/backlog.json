@@ -1601,12 +1601,12 @@
    "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) numa CVM de uso único"
   },
   {
-   "atualizado": "2026-11-13T05:30:00.000Z",
+   "atualizado": "2026-11-13T12:00:00.000Z",
    "deps": [
     "T-608",
     "T-803"
    ],
-   "descricao": "Parte local feita em 12/11 (commit 06342e5): model_gate/src/model_gate/job.py, entrada python -m model_gate.job --manifest --out. Manifesto dnat.judge-job.v1; confere o digest de base, derivado, referência do pai, dataset e prereg antes de abrir qualquer peso; hash que não confere grava verdict.json reprovado na regra 0, sem medidas (o emit passou a aceitar só esse caso sem S1); pré-checagem J2 real (tokenizer e formas do safetensors contra o base) e sobreposição do dataset com a bateria; estágio que falha não gera verdict.json e devolve outcome inconclusive_failure (a CVM1 refaz e a cota devolve, T-1704). S1 com avaliador, S2/S3, utilidade e injeção chegam por Stages e levantam StageNotReady até existirem a referência custodiada (T-312), o prereg com valores (T-606) e a utilidade (T-910): o job nunca inventa veredito. 10 testes com modelos minúsculos. Falta: o tipo de job na CVM1 disparado ao receber o derivado e a execução numa CVM de uso único (T-801), e cifrar responses.jsonl.\n\nPor quê: o portão roda como job separado e confiável (Juiz fixado por hash, T-105), lendo pai e derivado sem poder alterá-los.\nComo:\n- Criar o tipo de job do Juiz na CVM1, disparado ao receber o derivado (decisão 6 da T-101).\n- Numa CVM de uso único, entregar base, derivado, referência do pai, dataset e pacote do Juiz, conferidos por hash.\n- Rodar o pacote model_gate/ e devolver só o verdict.json de esquema fixo e as respostas cifradas (T-103).\nSaída: verdict.json para o derivado do T-806.",
+   "descricao": "Atualiza em 13/11: o lado da CVM1 está ligado (T-808, T-809) e o fluxo roda no modo direto (T-811); o job confere o próprio hash e lê dataset em CSV. Falta só rodar o job numa CVM de uso único (T-801).\n\nParte local feita em 12/11 (commit 06342e5): model_gate/src/model_gate/job.py, entrada python -m model_gate.job --manifest --out. Manifesto dnat.judge-job.v1; confere o digest de base, derivado, referência do pai, dataset e prereg antes de abrir qualquer peso; hash que não confere grava verdict.json reprovado na regra 0, sem medidas (o emit passou a aceitar só esse caso sem S1); pré-checagem J2 real (tokenizer e formas do safetensors contra o base) e sobreposição do dataset com a bateria; estágio que falha não gera verdict.json e devolve outcome inconclusive_failure (a CVM1 refaz e a cota devolve, T-1704). S1 com avaliador, S2/S3, utilidade e injeção chegam por Stages e levantam StageNotReady até existirem a referência custodiada (T-312), o prereg com valores (T-606) e a utilidade (T-910): o job nunca inventa veredito. 10 testes com modelos minúsculos. Falta: o tipo de job na CVM1 disparado ao receber o derivado e a execução numa CVM de uso único (T-801), e cifrar responses.jsonl.\n\nPor quê: o portão roda como job separado e confiável (Juiz fixado por hash, T-105), lendo pai e derivado sem poder alterá-los.\nComo:\n- Criar o tipo de job do Juiz na CVM1, disparado ao receber o derivado (decisão 6 da T-101).\n- Numa CVM de uso único, entregar base, derivado, referência do pai, dataset e pacote do Juiz, conferidos por hash.\n- Rodar o pacote model_gate/ e devolver só o verdict.json de esquema fixo e as respostas cifradas (T-103).\nSaída: verdict.json para o derivado do T-806.",
    "epico": "J8",
    "id": "T-807",
    "marco": "G3",
@@ -1620,31 +1620,32 @@
    "deps": [
     "T-807"
    ],
-   "descricao": "Por quê: o recibo só garante algo se o Juiz que rodou for exatamente o auditado (whitelist por hash, D2).\nComo:\n- Empacotar o Juiz como artefato com hash (imagem ou bundle) e registrar o hash permitido no executor\n- O executor recusa rodar Juiz com hash fora da lista\n- Gravar o hash do Juiz no verdict.json e no recibo\nSaída: hash do Juiz fixado e presente no recibo.",
+   "descricao": "Feito em 13/11 (commits c41d96a e 32f8819): hash do Juiz = digest de src/model_gate, pyproject.toml e uv.lock (model_gate/judge_package.py, python -m model_gate.judge_package). O job recusa rodar se o hash do código em execução não é o do manifesto (falha com alerta judge_hash_mismatch, sem verdict.json). Na CVM1, judge_allowlist.json (fora do git, estado da implantação) fixa a liberação: hash do Juiz, sha256 do prereg.yaml congelado e compromisso da bateria; scripts/judge_cli.js allow grava a entrada. A CVM1 só dispara o Juiz da lista e só grava recibo cujo hashes.judge, prereg e bateria batem com ela; o hash vai ao verdict.json e ao recibo (judgeHash). Em vez de imagem ou bundle, o hash é do código e do lock: o mesmo hash em qualquer máquina com o mesmo commit. Em aberto: o compromisso da bateria é provisório até a T-304.\n\nPor quê: o recibo só garante algo se o Juiz que rodou for exatamente o auditado (whitelist por hash, D2).\nComo:\n- Empacotar o Juiz como artefato com hash (imagem ou bundle) e registrar o hash permitido no executor\n- O executor recusa rodar Juiz com hash fora da lista\n- Gravar o hash do Juiz no verdict.json e no recibo\nSaída: hash do Juiz fixado e presente no recibo.",
    "epico": "J8",
    "id": "T-808",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Hash do Juiz no recibo",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
-   "titulo": "Artefato do Juiz com hash fixado (whitelist, D2)"
+   "titulo": "Artefato do Juiz com hash fixado (whitelist, D2)",
+   "atualizado": "2026-11-13T12:00:00.000Z"
   },
   {
    "deps": [
     "T-807",
     "T-703"
    ],
-   "descricao": "Redução v2 (11/11): Aprovado vira ativo com recibo (inclui o id da identidade). Uma chamada ao contrato depois do verdict.json.\nAbsorve: T-810 (Retenção do derivado reprovado (não sai, não vira ativo)).\n\nPor quê: fecha o fluxo: só o executor registra o derivado no contrato, e só depois de um veredito aprovado (C1, P2).\nComo:\n- No executor, ler verdict.json e chamar registerDerivative (T-703) com os hashes do recibo\n- Incluir no recibo o id da identidade que pediu o job (vem do metadata.json da execução, T-1703; absorve a T-1706)\n- Assinar com a chave do operador, guardada fora do alcance do job\n- Tratar falhas da transação sem liberar o derivado\nSaída: derivado aprovado ativo no contrato, com recibo consultável.",
+   "descricao": "Feito em 13/11 (commits 32f8819 e b74c66f): smart-contract/scripts/judge_flow.js. Depois do job de fine-tuning com parentModelId, a CVM1 decifra base, derivado e referência do pai num diretório temporário, confere os digests, escreve o manifesto dnat.judge-job.v1, roda python -m model_gate.job e aplica o resultado: veredito → registerDerivative com os hashes do verdict.json (aprovado nasce ativo e usável, reprovado e inconclusivo inativos e retidos), cota acertada em 1, 2 ou 5; falha do job, Juiz fora da lista, prereg diferente, digest do derivado, pai ou identidade que não batem → nada vai ao contrato e a reserva volta, com alerta em derivatives.json. Idempotente. Absorve a T-810 (o reprovado fica retido). Junto: rota /api/register-model (contentHash = digest do diretório do modelo), referências do pai custodiadas em references.json (depositadas pelo operador com judge_cli.js reference), NonceManager na carteira da CVM1 e filePath recusado pelas rotas da API (lia arquivos do servidor). 11 testes em test/judge_flow.test.js. Fecha a pendência da T-1704: job com veredito acerta a cota; job sem pai ou sem derivado devolve a reserva.\n\nRedução v2 (11/11): Aprovado vira ativo com recibo (inclui o id da identidade). Uma chamada ao contrato depois do verdict.json.\nAbsorve: T-810 (Retenção do derivado reprovado (não sai, não vira ativo)).\n\nPor quê: fecha o fluxo: só o executor registra o derivado no contrato, e só depois de um veredito aprovado (C1, P2).\nComo:\n- No executor, ler verdict.json e chamar registerDerivative (T-703) com os hashes do recibo\n- Incluir no recibo o id da identidade que pediu o job (vem do metadata.json da execução, T-1703; absorve a T-1706)\n- Assinar com a chave do operador, guardada fora do alcance do job\n- Tratar falhas da transação sem liberar o derivado\nSaída: derivado aprovado ativo no contrato, com recibo consultável.",
    "epico": "J8",
    "id": "T-809",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Aprovado vira ativo",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Ligar o veredito ao contrato: aprovado chama registerDerivative",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T12:00:00.000Z"
   },
   {
    "atualizado": "2026-11-11T18:00:00.000Z",
@@ -1662,17 +1663,17 @@
    "titulo": "Retenção do derivado reprovado (não sai, não vira ativo)"
   },
   {
-   "atualizado": "2026-10-28T20:00:00.000Z",
+   "atualizado": "2026-11-13T12:00:00.000Z",
    "deps": [
     "T-807"
    ],
-   "descricao": "Por quê: o modo direto do código atual (vm_runtime/vm/run-direct.sh) permite depurar o fluxo inteiro numa máquina comum antes de pagar CVMs, e serve de linha de comparação de custo (RQ5).\nComo:\n- Fazer o modo direto aceitar a retenção do derivado (T-803), a saída de esquema fixo (T-804) e o job do Juiz (T-807).\n- Rodar fine-tuning, Juiz e registro no contrato em sequência.\nSaída: fluxo completo funcionando numa máquina comum, com tempos por etapa.",
+   "descricao": "Feito em 13/11 (commit b74c66f): smart-contract/e2e/run_direct.js (npm run e2e:direct), sem Docker nem root: hardhat node, IPFS mínimo em memória, builder.py e executor.py com DNAT_NO_MICROVM=1 (o run-direct.sh lê o ext4 com debugfs quando não pode montar) e a CVM1. Pelo cliente assinado: identidade, depósito de um modelo minúsculo, dataset CSV, aplicação de fine-tuning simulado (copia o base e muda bits de um tensor), compra de acesso, referência do pai, run-from-cids com parentModelId e o Juiz como segundo job. A: Juiz real passa pelas conferências de hash, contrato e dataset e para no prereg sem valores (T-606): falha, reserva devolvida. B e C: Juiz SIMULADO (e2e/simulated_judge.js, lista permitida só de teste) aprova e reprova: recibo no contrato, derivado usável ou inativo, saldo 19 e 14. Tempos em results/e2e_direct.md (cerca de 1,5 s por job; 6,6 s com o Juiz real). Verificação de funcionamento, não dado do artigo. O roteiro achou o bug de nonce da CVM1 em transações seguidas.\n\nPor quê: o modo direto do código atual (vm_runtime/vm/run-direct.sh) permite depurar o fluxo inteiro numa máquina comum antes de pagar CVMs, e serve de linha de comparação de custo (RQ5).\nComo:\n- Fazer o modo direto aceitar a retenção do derivado (T-803), a saída de esquema fixo (T-804) e o job do Juiz (T-807).\n- Rodar fine-tuning, Juiz e registro no contrato em sequência.\nSaída: fluxo completo funcionando numa máquina comum, com tempos por etapa.",
    "epico": "J8",
    "id": "T-811",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Fluxo completo numa máquina comum",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "M",
    "titulo": "Rodar o fluxo inteiro numa máquina comum, no modo direto, antes das CVMs",
    "teste": "TS8"

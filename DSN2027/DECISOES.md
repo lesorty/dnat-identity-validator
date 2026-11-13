@@ -185,3 +185,13 @@ quadro e na nota "Feito em 12/11" do backlog.
   que ainda não existe faz o job falhar (cota devolvida), nunca inventa veredito.
 - **Artigo (T-1501):** esqueleto novo da E13 §3.8; as seções antigas do Juiz de código foram para
   `sections/legado_juiz_codigo/`, sem apagar.
+- **Hash do Juiz (T-808, 13/11):** digest do código (`src/model_gate`), do `pyproject.toml` e do
+  `uv.lock`, não de uma imagem: o mesmo commit dá o mesmo hash em qualquer máquina. A liberação na
+  lista permitida da CVM1 fixa o trio Juiz, prereg congelado e compromisso da bateria.
+- **Recibo e cota (T-809, 13/11):** todo veredito vira recibo no contrato; só o aprovado nasce
+  ativo. Se o verdict.json não bate com o que a CVM1 custodia, nada vai ao contrato e a reserva
+  volta. Job sem modelo pai ou sem derivado não tem veredito e também devolve a reserva.
+- **Referência do pai:** quem deposita é o operador, no host da CVM1 (`judge_cli.js`), nunca um
+  usuário pela API. A real sai da T-312, na nuvem.
+- **Roteiro de ponta a ponta (T-811, 13/11):** sem Docker nem root; um Juiz SIMULADO, numa lista
+  permitida só de teste, exercita recibo e cota enquanto os estágios reais dependem da nuvem.
