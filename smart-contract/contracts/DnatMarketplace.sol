@@ -96,6 +96,10 @@ contract DnatMarketplace {
     // Campos de cada derivado, por assetId (só para assets do tipo Derivative).
     mapping(uint256 => DerivativeInfo) internal derivatives;
 
+    // Derivados retirados pelo operador (T-705). Fica fora de DerivativeInfo para não mudar o recibo.
+    // A marca é definitiva: o dono não reativa um derivado revogado (T-704).
+    mapping(uint256 => bool) public derivativeRevoked;
+
     // Papéis (T-703, T-105): o admin troca o operador; o operador é o executor (CVM1), o único que
     // pode afirmar que um derivado passou pelo Juiz. O dono do derivado é o adversário e não grava.
     address public admin;
@@ -124,6 +128,13 @@ contract DnatMarketplace {
 
     event AssetRevoked(
         uint256 indexed id
+    );
+
+    // Emitido quando o operador retira um derivado (T-705); judgeHash é o do veredito original.
+    event DerivativeRevoked(
+        uint256 indexed id,
+        string reason,
+        bytes32 judgeHash
     );
 
     event OperatorChanged(address indexed previousOperator, address indexed newOperator);
@@ -249,6 +260,13 @@ contract DnatMarketplace {
         require(a.id != 0, "Asset does not exist");
         require(a.owner == msg.sender, "Only owner");
 
+        // O dono do derivado é o adversário (T-105): reprovado, inconclusivo, pendente ou revogado
+        // pelo operador nunca volta a ficar ativo por aqui (C1, T-704).
+        if (a.assetType == AssetType.Derivative && newActive) {
+            require(!derivativeRevoked[assetId], "Derivative revoked");
+            require(derivatives[assetId].verdict == Verdict.Approved, "Derivative not approved");
+        }
+
         a.price = newPrice;
         a.active = newActive;
 
@@ -312,6 +330,26 @@ contract DnatMarketplace {
 
         emit AssetRegistered(id, AssetType.Derivative, owner, 0, false);
         emit DerivativeRegistered(id, info.parentId, info);
+    }
+
+    /**
+     * @dev Retira um derivado (T-705, ciclo de vida do T-110): só o operador, porque o dono é o
+     *      adversário e revokeAsset exige o dono. Zera active e marca a revogação como definitiva.
+     *      Vale também para um derivado já inativo (o dono o desativou ou nasceu reprovado), para
+     *      que a marca impeça a reativação.
+     *
+     * @param assetId  Asset do tipo Derivative
+     * @param reason   Motivo registrado no evento (por exemplo, "judge-version-changed")
+     */
+    function revokeDerivative(uint256 assetId, string calldata reason) external onlyOperator {
+        Asset storage a = assets[assetId];
+        require(a.id != 0, "Asset does not exist");
+        require(a.assetType == AssetType.Derivative, "Not a derivative");
+        require(!derivativeRevoked[assetId], "Already revoked");
+
+        derivativeRevoked[assetId] = true;
+        a.active = false;
+        emit DerivativeRevoked(assetId, reason, derivatives[assetId].judgeHash);
     }
 
     // ------------------------------------------------------------------------

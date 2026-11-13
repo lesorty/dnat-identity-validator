@@ -1402,31 +1402,31 @@
    "deps": [
     "T-703"
    ],
-   "descricao": "Atualiza (12/11, T-703): registerDerivative já grava active = false para veredito diferente de Approved. Falta a checagem em updateAsset (hoje o dono ainda reativa) e a revogação.\n\nRedução v2 (11/11): Reprovado nunca fica ativo. Uma checagem em updateAsset.\n\nPor quê: o portão só vale se um derivado reprovado nunca virar ativo (C1); hoje updateAsset deixa o dono gravar a.active = newActive (linha 174) sem nenhuma checagem.\nComo:\n- registerDerivative grava active = false quando o veredito não é aprovado\n- Em updateAsset, para tipo Derivative, proibir newActive = true se o veredito não for aprovado ou se o derivado tiver sido revogado pelo operador\n- Teste: o dono tenta reativar um reprovado e um revogado e as duas chamadas revertem\nSaída: updateAsset ajustado e teste de reativação negada.\nFora do escopo: a revogação em si é o T-705.",
+   "descricao": "Feito em 12/11: updateAsset, para tipo Derivative, reverte ao reativar (newActive = true) se o veredito não for Approved (\"Derivative not approved\") ou se o operador revogou (\"Derivative revoked\"); desativar segue livre e os tipos antigos não mudam. Teste em smart-contract/test/derivative_lifecycle.test.js. Em aberto: não há setVerdict, então um Pending ou Inconclusive nunca vira ativo.\n\nAtualiza (12/11, T-703): registerDerivative já grava active = false para veredito diferente de Approved. Falta a checagem em updateAsset (hoje o dono ainda reativa) e a revogação.\n\nRedução v2 (11/11): Reprovado nunca fica ativo. Uma checagem em updateAsset.\n\nPor quê: o portão só vale se um derivado reprovado nunca virar ativo (C1); hoje updateAsset deixa o dono gravar a.active = newActive (linha 174) sem nenhuma checagem.\nComo:\n- registerDerivative grava active = false quando o veredito não é aprovado\n- Em updateAsset, para tipo Derivative, proibir newActive = true se o veredito não for aprovado ou se o derivado tiver sido revogado pelo operador\n- Teste: o dono tenta reativar um reprovado e um revogado e as duas chamadas revertem\nSaída: updateAsset ajustado e teste de reativação negada.\nFora do escopo: a revogação em si é o T-705.",
    "epico": "J7",
    "id": "T-704",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Reativação pelo dono reverte",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Derivado reprovado nunca fica active; o dono não reativa (ajustar updateAsset, hoje linha 173)",
-   "atualizado": "2026-11-13T01:30:00.000Z"
+   "atualizado": "2026-11-13T02:00:00.000Z"
   },
   {
    "deps": [
     "T-703"
    ],
-   "descricao": "Redução v2 (11/11): Revogação pelo operador. Trocar o dono pelo operador em revokeAsset.\n\nPor quê: o ciclo de vida do T-110 exige que o operador retire um derivado liberado (por exemplo, quando o Juiz muda), mas revokeAsset hoje exige o dono (linha 186), que é o adversário.\nComo:\n- Criar revokeDerivative(assetId, motivo) com onlyOperator, que zera active e marca o derivado como revogado\n- Emitir evento DerivativeRevoked(assetId, motivo, versão do Juiz)\n- Manter revokeAsset do dono para os tipos antigos, sem mudar o comportamento\nSaída: função de revogação pelo operador com evento e teste no hardhat.",
+   "descricao": "Feito em 12/11: revokeDerivative(assetId, reason) só pelo operador; zera active, grava derivativeRevoked[assetId] (definitivo, fora de DerivativeInfo) e emite DerivativeRevoked(id, reason, judgeHash do veredito). Vale também para derivado já inativo; reverte se já revogado, inexistente ou não derivado. revokeAsset do dono fica igual. Teste em smart-contract/test/derivative_lifecycle.test.js. O ABI do api-server ainda não tem revokeDerivative (T-809).\n\nRedução v2 (11/11): Revogação pelo operador. Trocar o dono pelo operador em revokeAsset.\n\nPor quê: o ciclo de vida do T-110 exige que o operador retire um derivado liberado (por exemplo, quando o Juiz muda), mas revokeAsset hoje exige o dono (linha 186), que é o adversário.\nComo:\n- Criar revokeDerivative(assetId, motivo) com onlyOperator, que zera active e marca o derivado como revogado\n- Emitir evento DerivativeRevoked(assetId, motivo, versão do Juiz)\n- Manter revokeAsset do dono para os tipos antigos, sem mudar o comportamento\nSaída: função de revogação pelo operador com evento e teste no hardhat.",
    "epico": "J7",
    "id": "T-705",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Operador revoga; evento emitido",
-   "status": "backlog",
+   "status": "feito",
    "tamanho": "P",
    "titulo": "Revogação pelo operador (hoje revokeAsset exige o dono, linha 185) e evento",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-13T02:00:00.000Z"
   },
   {
    "deps": [
