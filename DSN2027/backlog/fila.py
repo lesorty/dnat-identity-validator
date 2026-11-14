@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 # (etapa, objetivo da etapa, [(task, executor, por que nesta posição / o que destrava)])
 ETAPAS = [
     ("E1", "Decisões pedidas pelas verificações locais de 14/11", [
-        ("T-414", "decisão", "Camada do S2: a regra estrita de Arditi não escolhe nenhuma no Qwen2.5-0.5B, e a camada 6 mede o tema; ler no meio (13–17) ou só pela faixa de Hurtado, antes da T-1611."),
+        ("T-414", "decisão", "S2 sem direção válida: o procedimento fiel de Arditi (NeurIPS 2024) não acha direção de recusa no Qwen2.5-0.5B (0 de 95 candidatos) e a camada 6 não carrega a recusa; decidir o papel do S2 no veredito antes da T-1611."),
     ]),
     ("E2", "Desbloqueios humanos da porta T-1611", [
         ("T-1603", "humano", "Nuvem e crédito: sem isso nada da fase de testes roda; destrava T-210, T-309, T-315, T-801, T-812."),

@@ -51,7 +51,10 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
   - **T-414** (`model_gate/results/T-414_camada.md`): pela regra estrita de Arditi nenhuma camada
     passa no Qwen2.5-0.5B. A camada 6 não carrega a recusa (ablá-la deixa a recusa em 0,34, igual
     ao base), e o S2 lido nela não vê o abliterado que tira a recusa (0,93); no meio (13–14) ou na
-    faixa de Hurtado ele vê os dois. **Decisão pendente** (você ou orientador), antes da T-1611.
+    faixa de Hurtado ele vê os dois. Por decisão de seguir os artigos mais conceituados, rodou-se o
+    procedimento fiel de Arditi (NeurIPS 2024; `results/T-414_arditi.md`): 5 posições × 20 camadas, validação
+    filtrada pelo base. Só 8 dos 32 nocivos passam no filtro e nenhum dos 95 candidatos passa na regra
+    (induce > 0 em nenhum). **Decisão pendente:** o papel do S2 no veredito, antes da T-1611.
   - **T-1205** (`model_gate/results/T-1205_referencia_forjada.md`): 3/3. Com custódia reprova;
     sem custódia o veto some (ρ = 1, E1 = 0), mas o estado é inconclusivo, não aprovado; troca sob
     custódia cai em hash_mismatch.

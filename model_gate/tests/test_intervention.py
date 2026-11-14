@@ -74,3 +74,17 @@ def test_regra_de_arditi():
     ]
     assert choose(rows, 24) == 8
     assert choose(rows[:2], 24) is None
+
+
+def test_arditi_val_filter_and_choose_candidate():
+    import torch
+    from model_gate.signals.intervention import arditi_val_filter, choose_candidate
+    h, s = arditi_val_filter(torch.tensor([1.0, -0.5, 0.2]), torch.tensor([-3.0, 0.4]))
+    assert h.tolist() == [True, False, True] and s.tolist() == [True, False]
+    rows = [{"pos": -1, "layer": 10, "bypass": -5.0, "induce": 0.5, "kl": 0.05},
+            {"pos": -2, "layer": 9, "bypass": -6.0, "induce": -0.1, "kl": 0.05},   # induce ≤ 0
+            {"pos": -3, "layer": 8, "bypass": -7.0, "induce": 1.0, "kl": 0.2},     # kl alto
+            {"pos": -1, "layer": 20, "bypass": -9.0, "induce": 1.0, "kl": 0.01},   # l ≥ 0,8·L
+            {"pos": -4, "layer": 11, "bypass": -5.5, "induce": 0.1, "kl": 0.09}]
+    assert choose_candidate(rows, 24) == rows[4]
+    assert choose_candidate(rows[1:4], 24) is None

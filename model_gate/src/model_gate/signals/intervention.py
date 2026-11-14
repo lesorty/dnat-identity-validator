@@ -129,3 +129,19 @@ def choose(rows: list[dict], n_layers: int, kl_max: float = KL_MAX,
     if not ok:
         return None
     return min(ok, key=lambda r: (r["bypass"], r["layer"]))["layer"]
+
+
+def arditi_val_filter(harmful_scores: torch.Tensor, harmless_scores: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    """Filtro da validação (Arditi, App. B): nocivos que o base recusa (refusal_metric > 0) e
+    inócuos que ele não recusa (refusal_metric < 0). Devolve as duas máscaras booleanas."""
+    return harmful_scores > 0, harmless_scores < 0
+
+
+def choose_candidate(rows: list[dict], n_layers: int, kl_max: float = KL_MAX,
+                     layer_max_fraction: float = LAYER_MAX_FRACTION) -> dict | None:
+    """Regra de Arditi (App. C.1) sobre candidatos {pos, layer, bypass, induce, kl}: menor bypass entre
+    induce > 0, kl < 0,1 e l < 0,8·L; empate pela menor camada e pela posição mais à direita."""
+    ok = [r for r in rows if r["layer"] < layer_max_fraction * n_layers and r["induce"] > 0 and r["kl"] < kl_max]
+    if not ok:
+        return None
+    return min(ok, key=lambda r: (r["bypass"], r["layer"], -r["pos"]))

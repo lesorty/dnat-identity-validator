@@ -11,7 +11,7 @@ verificação local de uma task que reaparece adiante com a parte final (não é
 
 ## E1 · Decisões pedidas pelas verificações locais de 14/11
 
-1. **T-414** (decisão) Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6. Camada do S2: a regra estrita de Arditi não escolhe nenhuma no Qwen2.5-0.5B, e a camada 6 mede o tema; ler no meio (13–17) ou só pela faixa de Hurtado, antes da T-1611.
+1. **T-414** (decisão) Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6. S2 sem direção válida: o procedimento fiel de Arditi (NeurIPS 2024) não acha direção de recusa no Qwen2.5-0.5B (0 de 95 candidatos) e a camada 6 não carrega a recusa; decidir o papel do S2 no veredito antes da T-1611.
 
 ## E2 · Desbloqueios humanos da porta T-1611
 

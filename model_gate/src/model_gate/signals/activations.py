@@ -30,3 +30,28 @@ def last_token_resid(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase,
             raise RuntimeError(f"esperava {n_layers + 1} estados ocultos, veio {len(hs)}")
         rows.append(torch.stack([hs[layer][0, -1] for layer in range(n_layers)]).float())
     return torch.stack(rows)
+
+
+def post_instruction_count(tokenizer: PreTrainedTokenizerBase, system_prompt: str | None) -> int:
+    """Quantos tokens do template vêm depois da instrução (as posições pós-instrução de Arditi, §2.1).
+    No Qwen2.5: <|im_end|>, \\n, <|im_start|>, assistant, \\n = 5."""
+    marker = "\u2063MARK\u2063"
+    text = render(tokenizer, marker, system_prompt)
+    tail = text[text.index(marker) + len(marker):]
+    return len(tokenizer(tail, add_special_tokens=False)["input_ids"])
+
+
+@torch.inference_mode()
+def post_instruction_mean(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, prompts: list[str],
+                          system_prompt: str | None, n_positions: int, threads: int = 4) -> torch.Tensor:
+    """Média, sobre os prompts, do resid_pre de cada camada nas últimas n_positions posições:
+    [n_positions, n_camadas, d] em float32; o índice 0 é a posição −n_positions e o último é −1."""
+    fix_runtime(GenConfig(threads=threads))
+    n_layers = model.config.num_hidden_layers
+    acc = None
+    for p in prompts:
+        enc = tokenizer(render(tokenizer, p, system_prompt), return_tensors="pt", add_special_tokens=False)
+        hs = model(**enc, output_hidden_states=True).hidden_states
+        x = torch.stack([hs[layer][0, -n_positions:] for layer in range(n_layers)], 1).float()
+        acc = x if acc is None else acc + x
+    return acc / len(prompts)
