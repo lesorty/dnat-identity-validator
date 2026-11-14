@@ -1,4 +1,4 @@
-"""Fila de execução do board (14/11; T-801, T-1707 e T-709 verificadas na pilha local; T-414, T-1205 e T-806 com script pronto): a ordem em que as tasks abertas serão pegas, por etapa.
+"""Fila de execução do board (14/11, fim do dia; verificações locais de T-414, T-1205, T-806 e campo do Qwen da T-1103 feitas): a ordem em que as tasks abertas serão pegas, por etapa.
 
 Gera fila.json (para consumo automático) e FILA.md (para leitura) e confere a ordem contra o
 backlog.json: toda dependência aberta de uma task tem de aparecer antes dela na fila, e toda task
@@ -13,6 +13,8 @@ dependências estão feitas (status feito ou cortada no backlog). `executor`:
     local    a parte local (verificação de funcionamento, não dado do artigo) de uma task que volta
              mais adiante na fila com o executor da parte final; não confere dependências e pode
              repetir a task
+    decisão  decisão sua ou do orientador sobre o resultado de uma verificação local; como local,
+             não confere dependências e a task volta adiante com a parte final
 
     python3 DSN2027/backlog/fila.py
 """
@@ -25,23 +27,21 @@ HERE = Path(__file__).resolve().parent
 
 # (etapa, objetivo da etapa, [(task, executor, por que nesta posição / o que destrava)])
 ETAPAS = [
-    ("E1", "Verificações locais agora (agente)", [
-        ("T-414", "local", "Camada da direção pela intervenção (Arditi), verificação local n = 32: decide a camada do S2 antes de congelar o Juiz (T-1611)."),
-        ("T-1205", "local", "Referência forjada com o job da T-807: confere que sem custódia o veto some e que a troca sob custódia dá hash_mismatch."),
-        ("T-806", "local", "LoRA de verdade numa CVM de uso único da pilha local (T-801, provedor docker): primeira metade do fluxo com treino real."),
+    ("E1", "Decisões pedidas pelas verificações locais de 14/11", [
+        ("T-414", "decisão", "Camada do S2: a regra estrita de Arditi não escolhe nenhuma no Qwen2.5-0.5B, e a camada 6 mede o tema; ler no meio (13–17) ou só pela faixa de Hurtado, antes da T-1611."),
     ]),
     ("E2", "Desbloqueios humanos da porta T-1611", [
         ("T-1603", "humano", "Nuvem e crédito: sem isso nada da fase de testes roda; destrava T-210, T-309, T-315, T-801, T-812."),
         ("T-210", "humano", "VM de 4 vCPU: medida de custo válida e máquina do piloto; dependência da T-1611 e da T-309."),
         ("T-304", "humano", "Origem da parte secreta (orientador): última decisão de construção da T-1611; destrava o bounty (T-1210)."),
-        ("T-1103", "humano", "Aceitar a licença da Meta e baixar o campo e a família não vista; destrava T-1105 e T-913."),
+        ("T-1103", "humano", "Qwen baixado e conferido (8/8, 14/11); falta aceitar a licença da Meta para os 13 do Llama (field_download --aceito-licenca-meta); destrava T-1105 e T-913."),
         ("T-1606", "humano", "Comitê de ética para a anotação; destrava a amostra de anotação (T-1005)."),
         ("T-1605", "humano", "Anotadores e guardião da bateria secreta; destrava a anotação (T-1007)."),
         ("T-1604", "humano", "Natella pelo acesso institucional; destrava T-1108 e a seção 6 (T-1505)."),
     ]),
     ("E3", "Sistema na nuvem e congelamento", [
         ("T-801", "nuvem", "CVM de job de uso único: código e pilha local prontos (provedor docker, 14/11); falta o provedor command numa CVM real."),
-        ("T-806", "nuvem", "Fine-tuning LoRA de exemplo numa CVM de uso único: a primeira metade do fluxo no DNAT real."),
+        ("T-806", "nuvem", "LoRA numa CVM de uso único: verificado na pilha local (14/11, pico de 6,5 GB); falta numa CVM real."),
         ("T-1611", "humano", "Congelar o código do Juiz e do fluxo: abre a fase de testes; daqui em diante mudar o Juiz obriga a recalibrar."),
         ("T-309", "nuvem", "Avaliador do portão medido na VM (Gemma 4 E4B × Qwen3Guard): fixa o avaliador da liberação."),
         ("T-315", "nuvem", "Avaliadores em bf16 na família da CVM: custo do avaliador, que decide se o veredito cabe em 80 min."),
@@ -81,7 +81,7 @@ ETAPAS = [
     ("E6", "Testes de avaliação (nuvem)", [
         ("T-1105", "nuvem", "Rotular o campo pela verdade de referência."),
         ("T-1106", "nuvem", "Teste cego no campo com o Juiz congelado (Teste 5)."),
-        ("T-1205", "nuvem", "Ataque de referência forjada: sem custódia o Juiz cai (RQ5)."),
+        ("T-1205", "nuvem", "Referência forjada: local (14/11) tira o veto mas dá inconclusivo; no Teste 7, ver se chega a aprovar com o Juiz real (RQ5)."),
         ("T-1203", "nuvem", "Ataque abliteração + LoRA de cura."),
         ("T-1204", "nuvem", "Ataque de treino contra o limiar com o veredito binário."),
         ("T-1210", "nuvem", "Bounty interno com oráculo secreto (precisa da parte secreta, T-304)."),
@@ -133,7 +133,7 @@ def main() -> int:
             if tid in closed:
                 problems.append(f"{tid} já está {t['status']}")
             pend = [d for d in t["deps"] if d in tasks and d not in closed]
-            if executor == "local":
+            if executor in ("local", "decisão"):
                 local.add(tid)
             else:
                 late = [d for d in pend if d not in seen]
@@ -167,7 +167,8 @@ def main() -> int:
              "**Regra:** pegar o primeiro item cujo executor está disponível e cujas dependências estão feitas.",
              "**Executor:** `agente` roda aqui; `humano` é decisão ou ação sua ou do orientador; `nuvem` precisa das",
              "VMs (T-1603, T-210); `artigo` fica para o fim, depois do sistema e dos resultados; `local` é a",
-             "verificação local de uma task que reaparece adiante com a parte final (não é dado do artigo).", ""]
+             "verificação local de uma task que reaparece adiante com a parte final (não é dado do artigo);",
+             "`decisão` é sua ou do orientador sobre o resultado de uma verificação local.", ""]
     for etapa, objetivo, rows in ETAPAS:
         lines += [f"## {etapa} · {objetivo}", ""]
         for it in (x for x in items if x["etapa"] == etapa):

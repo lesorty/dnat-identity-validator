@@ -1,0 +1,136 @@
+{
+  "note": "Verificação de funcionamento (T-806), não é dado do artigo.",
+  "machine": {
+    "cpuModel": "Intel(R) Core(TM) 7 150U",
+    "logicalCpus": 12,
+    "node": "v22.22.1",
+    "platform": "linux 7.0.0-43-generic",
+    "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
+    "startedAtUtc": "2026-11-14T21:11:44.658Z"
+  },
+  "base": {
+    "name": "Qwen2.5-0.5B-Instruct",
+    "digest": "05b61d72bec34404b49fdd4b3a33031b69f25b3f329acc3b851a62c07c9302f3"
+  },
+  "recipe": {
+    "steps": 10,
+    "seed": 0,
+    "examples": 32,
+    "dependencies": [
+      "torch==2.15.0+cpu",
+      "transformers==5.22.1",
+      "peft==0.21.2",
+      "accelerate==1.15.0",
+      "safetensors==0.8.0",
+      "tokenizers==0.23.3",
+      "numpy==2.5.4"
+    ]
+  },
+  "application": {
+    "assetId": "3",
+    "envelopeBytes": 332626726
+  },
+  "job": {
+    "exitCode": 0,
+    "metrics": {
+      "loss": 0.00003,
+      "steps": 10,
+      "train_seconds": 162.608
+    },
+    "timings": {
+      "jobSeconds": 3000,
+      "agentSeconds": 3120,
+      "cvm1Seconds": 3150
+    }
+  },
+  "derivative": {
+    "status": "retained",
+    "digest": "cb6d0feeda7826b87ed05f83e834f329ff8c0f6bee5e33daa2210b179fc03035",
+    "encryptedUri": "ipfs://bafk2b6b9b2693094b3e840f90b0e8c32726ac7e1382c0f6529dd110",
+    "envelopeBytes": 16092498,
+    "judge": {
+      "outcome": "failure",
+      "assetId": null,
+      "alert": "judge_not_allowed"
+    },
+    "quota": {
+      "reservationId": "3e066242-2199-481b-93d8-f269f34261b3",
+      "reserved": 0,
+      "balance": 20
+    }
+  },
+  "jobVm": {
+    "id": "dnat-job-89cc64c3-618",
+    "provider": "docker",
+    "singleUse": true,
+    "fromPool": false,
+    "bootMs": 1769,
+    "createdAt": "2026-11-14T21:31:15.255Z",
+    "takenAt": "2026-11-14T21:31:15.255Z",
+    "destroyedAt": "2026-11-14T21:42:53.987Z",
+    "peakRssBytes": 6786805760,
+    "cgroupPeakBytes": 8589934592,
+    "memTotalBytes": 32783138816,
+    "jobsAccepted": 1
+  },
+  "timings": [
+    {
+      "step": "IPFS em disco",
+      "seconds": 0.035
+    },
+    {
+      "step": "hardhat node e implantação do contrato",
+      "seconds": 5.466
+    },
+    {
+      "step": "CVM1 (api-server) com CVMs de job de uso único",
+      "seconds": 2.16
+    },
+    {
+      "step": "identidade com prova de trabalho (d = 12)",
+      "seconds": 0.243
+    },
+    {
+      "step": "depósito do Qwen2.5-0.5B (register-model)",
+      "seconds": 133.462
+    },
+    {
+      "step": "dataset benigno (register-dataset)",
+      "seconds": 0.297
+    },
+    {
+      "step": "aplicação LoRA (register-application: builder com torch, transformers e peft)",
+      "seconds": 684.008
+    },
+    {
+      "step": "compra de acesso (purchase-access)",
+      "seconds": 0.248
+    },
+    {
+      "step": "fine-tuning LoRA (10 passos) numa CVM de uso único",
+      "seconds": 777.398
+    }
+  ],
+  "checks": [
+    {
+      "name": "o job de treino termina com sucesso e devolve só as métricas permitidas",
+      "ok": true
+    },
+    {
+      "name": "derivado retido, com digest",
+      "ok": true
+    },
+    {
+      "name": "no IPFS o derivado só existe cifrado (envelope DNATENC2)",
+      "ok": true
+    },
+    {
+      "name": "CVM de uso único destruída depois do job, com a memória de pico registrada",
+      "ok": true
+    },
+    {
+      "name": "sem Juiz liberado nem referência: a reserva da cota volta (saldo 20)",
+      "ok": true
+    }
+  ]
+}

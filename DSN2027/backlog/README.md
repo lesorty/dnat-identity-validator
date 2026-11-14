@@ -33,7 +33,7 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
 
 ## Andamento (14/11)
 
-- **Placar:** 81 tasks feitas, 9 em andamento, 1 a fazer, 61 no backlog e 50 cortadas (202 no quadro).
+- **Placar (fim do dia):** 81 tasks feitas, 10 em andamento, 1 a fazer, 60 no backlog e 50 cortadas (202 no quadro).
   O quadro vivo, este retrato, a fila e o [Mapa do Juiz](https://claude.ai/artifact/XU3q4z6gAyLXduqhZRvZRC)
   foram conferidos e atualizados em 14/11.
 - **Passaram para em andamento (trabalho local depois do commit 95cb281, ainda sem commit):**
@@ -47,7 +47,22 @@ G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e 
   - **T-414, T-1205 e T-806:** scripts escritos (`signals/intervention.py` com 5/5 testes,
     `experiments/layer_select.py`, `experiments/attack_forged_reference.py`, `e2e/t806_lora.js`),
     ainda não rodados.
-- **Fila:** nova etapa **E1 · Verificações locais agora**, com o executor `local` (verificação de
+- **Verificações locais rodadas à tarde (resultados fora do artigo):**
+  - **T-414** (`model_gate/results/T-414_camada.md`): pela regra estrita de Arditi nenhuma camada
+    passa no Qwen2.5-0.5B. A camada 6 não carrega a recusa (ablá-la deixa a recusa em 0,34, igual
+    ao base), e o S2 lido nela não vê o abliterado que tira a recusa (0,93); no meio (13–14) ou na
+    faixa de Hurtado ele vê os dois. **Decisão pendente** (você ou orientador), antes da T-1611.
+  - **T-1205** (`model_gate/results/T-1205_referencia_forjada.md`): 3/3. Com custódia reprova;
+    sem custódia o veto some (ρ = 1, E1 = 0), mas o estado é inconclusivo, não aprovado; troca sob
+    custódia cai em hash_mismatch.
+  - **T-806** (`smart-contract/results/T-806_lora_uso_unico.md`): 5/5. LoRA real numa CVM de uso
+    único, derivado retido e cifrado; pico de RSS 6,5 GB, a CVM de treino precisa de 8 GB ou mais.
+  - **T-1103:** os 8 derivados de campo do Qwen baixados e conferidos
+    (`experiments/field_download.py`, `models/field.manifest.json`); os 13 do Llama esperam o aceite
+    da licença da Meta.
+- **Fila:** a etapa **E1** agora é a decisão da T-414 (executor `decisão`). Fora dela, o que resta
+  antes da T-1611 é humano ou nuvem.
+- **Fila (manhã):** nova etapa **E1 · Verificações locais agora**, com o executor `local` (verificação de
   funcionamento, não dado do artigo) para T-414, T-1205 e T-806; a parte final de cada uma continua
   adiante na fila. Fora disso, o que resta antes da T-1611 é humano ou nuvem.
 

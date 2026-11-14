@@ -167,7 +167,7 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
       <li><span>11/11</span>Composição da bateria (T-301), objetivos e testes numerados, identidade mínima e redução v2</li>
       <li><span>12/11</span>Construção local: escada e saída do veredito, formatos, revogação em cascata, cota, cliente de identidade, orquestrador, juiz de referência e rascunhos do artigo (D8)</li>
       <li><span>13/11</span>Fluxo inteiro no modo direto (T-808, T-809, T-811) e Juiz real no job (T-807): abliterações reprovadas no Qwen2.5-0.5B; web UI assinando</li>
-      <li><span>14/11</span>CVM de job de uso único na pilha local (T-801: três jobs em três containers, destruídos depois) e Teste 9 local (T-1707: o 5º job recusado com 402); T-414, T-1205 e T-806 com script pronto</li>
+      <li><span>14/11</span>CVM de job de uso único na pilha local (T-801: três jobs em três containers, destruídos depois) e Teste 9 local (T-1707: o 5º job recusado com 402); LoRA real numa CVM de uso único (T-806), referência forjada (T-1205: sem custódia o veto some, mas dá inconclusivo), campo do Qwen baixado (T-1103) e a camada 6 do S2 posta em dúvida (T-414)</li>
     </ul>
   </div>
 
@@ -207,6 +207,7 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
         <li class="warn"><b>O avaliador só será medido na nuvem (T-309, T-315, fase de testes).</b> A geração cabe nos 80 min com FP e NF4, mas o avaliador lendo cada resposta pode custar mais que ela: a medida parcial do notebook (Qwen3Guard em float32, ~264 min por veredito) é só pista.</li>
         <li class="warn"><b>Decisões com o orientador.</b> A redução v2 revê seis decisões (formatos FP e NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques), e a T-301 propõe a aprovação no agregado; junto com os pontos da E14 §17. A escolha do juiz de referência (gpt-oss-20b, T-1002) é proposta de 12/11 e também passa por ele.</li>
         <li class="warn"><b>O sistema fecha no modo direto; o veredito de verdade depende da nuvem.</b> Do depósito do base ao recibo, o fluxo roda numa máquina comum (T-811), e o Juiz real já julga no notebook (T-807: abliterações reprovadas, com avaliador e prereg de fumaça). Para dado do artigo faltam a referência do pai e o avaliador medidos na nuvem (T-312, T-309), o prereg (T-606), a CVM de uso único numa CVM real (T-801: o código e a pilha local já criam, usam uma vez e destroem a CVM), a máquina e a nuvem (T-210, T-1603) e a parte secreta (T-304, orientador), que seguram a porta T-1611.</li>
+        <li class="warn"><b>A camada do S2 está em aberto (T-414, 14/11).</b> Pela regra estrita de Arditi nenhuma camada passa no Qwen2.5-0.5B, e a camada 6 da T-402 não carrega a recusa: o S2 lido nela não vê o abliterado que tira a recusa. Decidir entre uma camada do meio e a faixa de Hurtado antes da T-1611.</li>
         <li class="warn"><b>Recursos decididos em 12/11, com pendência.</b> Máquinas da campanha (T-1601), juiz de referência e família não vista (T-1602) e nuvem (T-1603: Azure e Oracle) estão decididos; faltam o crédito, o tipo de VM e a licença da Meta.</li>
       </ul>
     </div>

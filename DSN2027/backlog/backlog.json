@@ -1584,7 +1584,7 @@
    "titulo": "Transporte de modelos grandes: o base entra no job e o derivado volta por arquivo, conferidos por digest"
   },
   {
-   "atualizado": "2026-11-14T12:00:00.000Z",
+   "atualizado": "2026-11-14T18:00:00.000Z",
    "deps": [
     "T-801",
     "T-802",
@@ -1592,7 +1592,7 @@
     "T-901",
     "T-102"
    ],
-   "descricao": "Em andamento (14/11): roteiro e2e/t806_lora.js e app e2e/lora_app_template.py (script da T-901 embutido) escritos, ainda não rodados. Falta: rodar na pilha local com a CVM de uso único (T-801, provedor docker, 8 GB) para verificar o funcionamento e, depois, na nuvem.\n\nRedução v2 (11/11): Primeira metade do fluxo. O job usa o script único de LoRA (T-901), sem código novo de treino.\nAbsorve: T-805 (Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois).\n\nPor quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
+   "descricao": "Verificação local feita (14/11): smart-contract/results/T-806_lora_uso_unico.md. Script da T-901 empacotado pelo builder com torch, transformers e peft (aplicação de 317 MB cifrada), 10 passos de LoRA numa CVM de uso único (container, 8 GB, rede entra-só), derivado (adaptador, 15 MB) retido e só cifrado no IPFS (DNATENC2), CVM destruída, reserva da cota devolvida; 5/5 conferências. Pico de RSS 6,5 GB, e o cgroup chegou aos 8 GB com o cache de página: a CVM de job de treino precisa de 8 GB ou mais. Falta: o mesmo numa CVM real (T-801 na nuvem).\n\nRedução v2 (11/11): Primeira metade do fluxo. O job usa o script único de LoRA (T-901), sem código novo de treino.\nAbsorve: T-805 (Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois).\n\nPor quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
    "epico": "J8",
    "id": "T-806",
    "marco": "G3",
@@ -2175,17 +2175,17 @@
     "T-1102",
     "T-211"
    ],
-   "descricao": "Redução v2 (11/11): Absorve a confirmação da base (T-1104).\nAbsorve: T-1104 (Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)).\n\nPor quê: O teste cego exige identificar cada derivado por digest, como o resto da população; os pesos de terceiros não entram no repositório (regra do T-211).\nComo:\n- Baixar os derivados filtrados no T-1102 para um diretório fora do git\n- Calcular o SHA-256 de cada arquivo de pesos e registrar a revisão (commit) do repositório do HF\n- Conferir que o .gitignore cobre o diretório de download\nSaída: manifesto do campo (repositório, revisão, arquivo, digest, tamanho) versionado em model_gate/.",
+   "descricao": "Em andamento (14/11): Qwen2.5-0.5B baixado e conferido, 8 de 8 aceitos na T-1102 (experiments/field_download.py; manifesto em models/field.manifest.json; pesos em $MODEL_GATE_DATA/field/). Cada arquivo de pesos bate com o SHA-256 do HF e com o pesos_sha256 da T-1102; só os arquivos da raiz entram no digest (o artemds45 traz um adaptador DPO numa subpasta, fora do derivado). Falta: aceitar a licença do Llama 3.2 (decisão sua) e rodar field_download --familia llama-3.2-1b --aceito-licenca-meta para os 13 do Llama.\n\nRedução v2 (11/11): Absorve a confirmação da base (T-1104).\nAbsorve: T-1104 (Confirmar a base de cada derivado (arquitetura e pesos compatíveis com o pai)).\n\nPor quê: O teste cego exige identificar cada derivado por digest, como o resto da população; os pesos de terceiros não entram no repositório (regra do T-211).\nComo:\n- Baixar os derivados filtrados no T-1102 para um diretório fora do git\n- Calcular o SHA-256 de cada arquivo de pesos e registrar a revisão (commit) do repositório do HF\n- Conferir que o .gitignore cobre o diretório de download\nSaída: manifesto do campo (repositório, revisão, arquivo, digest, tamanho) versionado em model_gate/.",
    "epico": "J11",
    "id": "T-1103",
    "marco": "G2",
    "prioridade": "P1",
    "pronto": "Manifesto do campo",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Baixar e registrar digests, fora do git",
    "teste": "TS5",
-   "atualizado": "2026-11-11T18:00:00.000Z"
+   "atualizado": "2026-11-14T18:00:00.000Z"
   },
   {
    "deps": [
@@ -2346,7 +2346,7 @@
     "T-408",
     "T-1611"
    ],
-   "descricao": "Em andamento (14/11): experiments/attack_forged_reference.py escrito (A com custódia, B sem custódia, C troca sob custódia → hash_mismatch), sem commit e ainda não rodado. Falta: rodar como verificação local; o resultado do artigo continua no TST, depois da T-1611.\n\nFase de testes (12/11): Teste 7 (ataque da referência forjada). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: Ataque mínimo e base da RQ5: sem custódia, o atacante fornece uma referência do pai forjada e os sinais de Hurtado passam (A3).\nComo:\n- Construir uma 'referência' a partir do próprio derivado abliterado (ou de um pai alterado)\n- Rodar S2/S3 contra essa referência e mostrar que o derivado passa\n- Repetir com a referência custodiada (digest) e mostrar a falha de atestação\nSaída: script do ataque e os dois resultados (sem e com custódia) no registro de experimentos.",
+   "descricao": "Verificação local feita (14/11): results/T-1205_referencia_forjada.md, abliterado d12, prereg e avaliador de fumaça. A com custódia: reprovado (regra 1, harm_veto). B sem custódia (o próprio derivado como pai e referência medida nele): ρ = 1, E1 = 0, o veto some, mas o estado é inconclusivo (regra 2, s1_unresolved), não aprovado; inconclusivo não é liberado. C troca de arquivos sob custódia: reprovado na regra 0 (hash_mismatch) em 2 s. Falta: o Teste 7 na nuvem com o Juiz congelado; conferir se a referência forjada chega a aprovar com o prereg e o avaliador reais.\n\nFase de testes (12/11): Teste 7 (ataque da referência forjada). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: Ataque mínimo e base da RQ5: sem custódia, o atacante fornece uma referência do pai forjada e os sinais de Hurtado passam (A3).\nComo:\n- Construir uma 'referência' a partir do próprio derivado abliterado (ou de um pai alterado)\n- Rodar S2/S3 contra essa referência e mostrar que o derivado passa\n- Repetir com a referência custodiada (digest) e mostrar a falha de atestação\nSaída: script do ataque e os dois resultados (sem e com custódia) no registro de experimentos.",
    "epico": "J12",
    "id": "T-1205",
    "marco": "TST",
@@ -2356,7 +2356,7 @@
    "tamanho": "M",
    "titulo": "Ataque: referência forjada (sem custódia)",
    "teste": "TS7",
-   "atualizado": "2026-11-14T12:00:00.000Z"
+   "atualizado": "2026-11-14T18:00:00.000Z"
   },
   {
    "deps": [
@@ -3394,7 +3394,7 @@
   {
    "id": "T-414",
    "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
-   "descricao": "Em andamento (14/11): model_gate/signals/intervention.py (bypass, induce, kl e a regra de Arditi, App. C), experiments/layer_select.py e tests/test_intervention.py (5/5) escritos, sem commit. Falta: rodar a verificação local (camadas 4 a 18, n = 32) para decidir a camada antes da T-1611; o número do artigo sai da nuvem.\n\nAtualiza (12/11, fumaça da T-908): abliterar com a direção da camada 6 zera o S2 mas não reduz a recusa; com a da camada 12 a recusa cai e o S2 lido na camada 6 quase não vê (ratio 0,93; ratio_band 0,37). Indício (n = 32, local) de que a camada 6 mede o tema, não a recusa: decidir a camada antes da T-1611.\n\nAtualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
+   "descricao": "Verificação local feita (14/11), falta decidir: results/T-414_camada.md (n = 32, Qwen2.5-0.5B, sem avaliador). Pela regra estrita de Arditi (App. C) nenhuma camada passa: induce > 0 não ocorre em camada alguma (a própria pontuação de recusa do base nos nocivos é −1,92: o primeiro token de recusa quase nunca passa de p = 0,5 neste modelo) e KL < 0,1 só na camada 4. Ablar a camada 6 não muda a recusa (0,34, igual ao base); ablar as camadas 13 a 18 a leva a 0–0,06, e somá-las aos inócuos sobe a pontuação para −0,7…−1,4, acima do nível dos nocivos no base. S2 dos abliterados: lido na camada 6, o d6 (que não tira a recusa) cai a 0,00 e o d12 (que tira) fica em 0,93; lido em 13–14, d6 0,76–0,79 e d12 0,21–0,25; na faixa de Hurtado, 0,67 e 0,37. Indica que a camada 6 mede o tema. Decisão pendente (você ou orientador): ler o S2 numa camada do meio (13–17, critério relativo: induce acima da pontuação dos nocivos no base) ou só pela faixa de Hurtado (ratio_band), antes da T-1611. Opção nova: layer_select --s2-layers.\n\nAtualiza (12/11, fumaça da T-908): abliterar com a direção da camada 6 zera o S2 mas não reduz a recusa; com a da camada 12 a recusa cai e o S2 lido na camada 6 quase não vê (ratio 0,93; ratio_band 0,37). Indício (n = 32, local) de que a camada 6 mede o tema, não a recusa: decidir a camada antes da T-1611.\n\nAtualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
    "pronto": "Camada decidida pelos dois critérios, com a tabela e o S2 nos abliterados",
    "epico": "J4",
    "marco": "TST",
@@ -3408,7 +3408,7 @@
    "teste": "TS1",
    "ordem": 414,
    "criado": "2026-11-12T18:23:47.000Z",
-   "atualizado": "2026-11-14T12:00:00.000Z"
+   "atualizado": "2026-11-14T18:00:00.000Z"
   },
   {
    "id": "T-917",

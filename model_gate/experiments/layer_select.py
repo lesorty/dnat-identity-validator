@@ -63,6 +63,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--layers", default="4-18")
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--s2-layers", default=None,
+                    help="ex.: 13-18; lê o S2 dos abliterados também nessas camadas, reaproveitando a varredura gravada")
     a = ap.parse_args(argv)
 
     import torch
@@ -81,15 +83,18 @@ def main(argv: list[str] | None = None) -> int:
     L = m.config.num_hidden_layers
     ids = refusal_token_ids(tok)
     t0 = time.perf_counter()
-    base_harm = first_token_logprobs(m, tok, harm, sp)
-    base_harmless = first_token_logprobs(m, tok, harmless, sp)
-    base = {"refusal_score_harmful": float(refusal_score(base_harm, ids).mean()),
-            "refusal_score_harmless": float(refusal_score(base_harmless, ids).mean()),
-            "refusal_rate_harmful": refusal_rate(m, tok, harm, sp)}
-    print("base:", base, flush=True)
-
     rows = []
-    for layer in parse_layers(a.layers):
+    prev = json.loads(OUT.with_suffix(".json").read_text()) if a.s2_layers and OUT.with_suffix(".json").exists() else None
+    if prev:  # reaproveita a varredura (cara) e só relê o S2
+        rows, base = prev["layers"], prev["base"]
+    else:
+        base_harm = first_token_logprobs(m, tok, harm, sp)
+        base_harmless = first_token_logprobs(m, tok, harmless, sp)
+        base = {"refusal_score_harmful": float(refusal_score(base_harm, ids).mean()),
+                "refusal_score_harmless": float(refusal_score(base_harmless, ids).mean()),
+                "refusal_rate_harmful": refusal_rate(m, tok, harm, sp)}
+    print("base:", base, flush=True)
+    for layer in ([] if prev else parse_layers(a.layers)):
         r_unit = pack["dirs"][layer]
         r_raw = r_unit * pack["raw_norm"][layer]
         t = time.perf_counter()
@@ -113,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # S2 nos abliterados da T-908, nas duas camadas
     s2_rows = []
-    layers_s2 = sorted({t402, chosen} - {None})
+    layers_s2 = sorted(({t402, chosen} | set(parse_layers(a.s2_layers) if a.s2_layers else [])) - {None})
     for name in ("base", *DERIVATIVES):
         root = local_root() if name == "base" else data_dir() / "derivatives" / name
         if not root.exists():
