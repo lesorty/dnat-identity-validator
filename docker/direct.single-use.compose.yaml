@@ -1,0 +1,18 @@
+# CVM de job de uso único na pilha direta (T-801). Por cima de direct.compose.yaml:
+#
+#   docker compose -f docker/direct.compose.yaml -f docker/direct.single-use.compose.yaml up -d --build
+#
+# A CVM1 cria um container novo da imagem do executor para cada job (warm pool de 1) e o destrói
+# depois dele; o dnat-executor fixo fica só para os testes T1–T5. Para isso a CVM1 fala com a API do
+# Docker pelo socket: é a emulação local da credencial de nuvem que, na nuvem, cria e destrói as CVMs
+# (provedor "command", ver RUN_COMPOSE.md). O socket dá à CVM1 poder sobre o host: só para a pilha local.
+services:
+  dnat-client:
+    environment:
+      DNAT_JOB_VM_PROVIDER: docker
+      DNAT_JOB_VM_POOL: ${DNAT_JOB_VM_POOL:-1}
+      DNAT_JOB_VM_MEMORY: ${DNAT_JOB_VM_MEMORY:-4g}
+      DNAT_JOB_VM_NETWORK: dnat-runtime
+      DNAT_JOB_VM_IMAGE: dnat-executor-direct:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

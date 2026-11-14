@@ -15,8 +15,32 @@ from packaging.version import Version
 
 MIN_IMAGE_BYTES = 16 * 1024 * 1024
 EXTRA_IMAGE_BYTES = 8 * 1024 * 1024
-IMAGE_HEADROOM_FACTOR = 4
+# Tamanho do ext4 (T-806): blocos de 4 KiB por arquivo + inodes, com folga para os metadados do ext4
+# e o journal (64 MiB a partir de 1 GiB). A folga antiga (4× o tamanho dos arquivos) dava 4 GB para
+# uma aplicação com torch, que a CVM1 cifra, guarda e entrega a cada job.
+BLOCK_BYTES = 4096
+INODE_BYTES = 256
+IMAGE_MARGIN = 1.25
+JOURNAL_BYTES = 64 * 1024 * 1024
 SITE_PACKAGES_DIRNAME = "site-packages"
+
+
+def estimate_image(root: Path) -> tuple[int, int]:
+    """(bytes da imagem, inodes) para o mkfs.ext4 -d caber com folga."""
+    blocks = 0
+    entries = 0
+    for entry in root.rglob("*"):
+        entries += 1
+        if entry.is_symlink():
+            continue
+        if entry.is_file():
+            blocks += max(1, -(-entry.stat().st_size // BLOCK_BYTES))
+        elif entry.is_dir():
+            blocks += 1
+    data = blocks * BLOCK_BYTES + entries * INODE_BYTES
+    size = int(data * IMAGE_MARGIN) + JOURNAL_BYTES + EXTRA_IMAGE_BYTES
+    size = max(MIN_IMAGE_BYTES, -(-size // BLOCK_BYTES) * BLOCK_BYTES)
+    return size, int(entries * 1.2) + 1024
 
 
 def compute_directory_size(root: Path) -> int:
@@ -297,8 +321,7 @@ def main() -> int:
             if frozen:
                 (app_dir / "requirements.installed.txt").write_text(frozen + "\n", encoding="utf-8")
 
-        dir_size = compute_directory_size(root_dir)
-        image_size = max(MIN_IMAGE_BYTES, dir_size * IMAGE_HEADROOM_FACTOR + EXTRA_IMAGE_BYTES)
+        image_size, inodes = estimate_image(root_dir)
 
         if output_image.exists():
             output_image.unlink()
@@ -308,7 +331,7 @@ def main() -> int:
 
         subprocess.run([truncate_bin, "-s", str(image_size), str(output_image)], check=True)
         subprocess.run(
-            [mkfs_ext4_bin, "-q", "-F", "-d", str(root_dir), str(output_image)],
+            [mkfs_ext4_bin, "-q", "-F", "-N", str(inodes), "-d", str(root_dir), str(output_image)],
             check=True,
         )
 

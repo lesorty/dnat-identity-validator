@@ -62,6 +62,7 @@ AGENT_ERRORS = (
     "runner_output_invalid",
     "runner_error",
     "base_modified",  # o script mexeu no modelo base (T-805): derivado descartado
+    "used",  # CVM de uso único que já rodou um job (T-801): o segundo é recusado
 )
 OUTPUT_KEYS = (
     "schema",

@@ -59,6 +59,7 @@ AGENT_ERRORS = (
     "busy", "bundle_not_found", "bundle_extract_failed", "workspace_missing", "microvm_failed",
     "microvm_timeout", "agent_timeout", "runner_output_invalid", "runner_error",
     "base_modified",  # T-805: o script mexeu no modelo base
+    "used",  # T-801: a CVM de uso único já rodou um job
 )
 DEFAULT_METRICS_SCHEMA = {"loss": "number", "steps": "integer", "train_seconds": "number"}
 # Teto da resposta do agente sem o derivado, em bytes do JSON compacto.
@@ -319,7 +320,7 @@ def submit_bundle(executor_url: str, bundle_path: pathlib.Path, *, job_timeout: 
             with urlopen(request, timeout=wait_seconds) as response:  # nosec B310 - trusted executor URL in this project
                 raw = response.read().decode("utf-8")
         except HTTPError as exc:
-            # O agente responde 503 "busy" no mesmo esquema fixo; outro erro HTTP sobe como antes.
+            # O agente responde 503 "busy" ou "used" no mesmo esquema fixo; outro erro HTTP sobe como antes.
             if exc.code != 503:
                 raise
             raw = exc.read().decode("utf-8", errors="replace")

@@ -1,0 +1,40 @@
+{
+  "note": "gasUsed na rede hardhat em processo (determinístico para as mesmas entradas); o número citado no artigo sai da execução na nuvem (T-709, fase de testes).",
+  "hardhat": "2.27.0",
+  "solc": "0.8.20",
+  "measuredAtUtc": "2026-11-13T18:43:46.355Z",
+  "rows": [
+    {
+      "fn": "registerAsset (dataset, bloom vazio)",
+      "gasUsed": 388980
+    },
+    {
+      "fn": "registerAsset (dataset, bloom 256 B)",
+      "gasUsed": 573487
+    },
+    {
+      "fn": "registerAsset (aplicação)",
+      "gasUsed": 326835
+    },
+    {
+      "fn": "purchaseAccess",
+      "gasUsed": 96703
+    },
+    {
+      "fn": "registerAsset (modelo base)",
+      "gasUsed": 351619
+    },
+    {
+      "fn": "registerDerivative (recibo, aprovado)",
+      "gasUsed": 493962
+    },
+    {
+      "fn": "registerDerivative (recibo, reprovado)",
+      "gasUsed": 474074
+    },
+    {
+      "fn": "revokeDerivative",
+      "gasUsed": 56222
+    }
+  ]
+}

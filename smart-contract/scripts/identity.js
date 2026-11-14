@@ -438,7 +438,35 @@ class IdentityRegistry {
   }
 }
 
+/**
+ * Rotas de identidade (T-1702, T-1704) num Router do Express: desafio, registro e consulta de saldo.
+ * O api-server monta este Router; os testes e a demonstração da T-1707 montam só ele, sem cadeia
+ * nem executor. A ordem importa: /challenge e /register antes de /:id.
+ */
+function identityRouter(registry) {
+  const express = require("express");
+  const router = express.Router();
+  router.get("/challenge", (_req, res) => {
+    res.json(registry.challenge());
+  });
+  router.post("/register", express.json(), (req, res) => {
+    try {
+      res.status(201).json(registry.register(req.body || {}));
+    } catch (e) {
+      res.status(e instanceof IdentityError ? e.status : 500).json({ error: e.message });
+    }
+  });
+  // Saldo e contagens por desfecho (T-1704): o que o auditor e o modelo do atacante leem.
+  router.get("/:id", (req, res) => {
+    const summary = registry.summary(req.params.id);
+    if (!summary) return res.status(404).json({ error: "unknown identity" });
+    res.json(summary);
+  });
+  return router;
+}
+
 module.exports = {
+  identityRouter,
   DEFAULT_DIFFICULTY,
   INITIAL_BALANCE,
   RESERVE_COST,

@@ -37,6 +37,10 @@ JOB_TIMEOUT_HEADER = "X-DNAT-Job-Timeout"
 
 # Um job por vez: o modo direto usa /tmp/exec, e na CVM de uso único só há um job.
 _EXECUTE_LOCK = threading.Lock()
+# CVM de uso único (T-801): depois do primeiro job aceito, todo /execute é recusado com "used".
+# A CVM1 destrói a CVM depois do job; isto é a segunda trava, dentro da própria CVM.
+SINGLE_USE = os.environ.get("DNAT_SINGLE_USE", "").lower() in ("1", "true", "yes")
+_jobs_accepted = 0
 # Depois de matar o grupo do runner, quanto esperar pelos pipes antes de desistir deles.
 _PIPE_GRACE_SECONDS = 5
 
@@ -71,6 +75,30 @@ def run_runner(argv, env, limit_seconds):
         return proc.returncode, "", True
 
 
+def memory_stats() -> dict:
+    """Memória de pico da CVM de job (T-801), para a CVM1 registrar antes de destruí-la.
+
+    peakRssBytes: maior RSS entre os processos do job já terminados (getrusage dos filhos; vale em
+    qualquer VM). cgroupPeakBytes: pico do cgroup inteiro (container ou VM com cgroup v2), se legível.
+    """
+    import resource
+
+    out = {"peakRssBytes": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss * 1024}
+    for name in ("memory.peak", "memory.max_usage_in_bytes"):
+        try:
+            out["cgroupPeakBytes"] = int(Path("/sys/fs/cgroup", name).read_text().strip())
+            break
+        except (OSError, ValueError):
+            continue
+    try:
+        for line in Path("/proc/meminfo").read_text().splitlines():
+            if line.startswith("MemTotal:"):
+                out["memTotalBytes"] = int(line.split()[1]) * 1024
+    except OSError:
+        pass
+    return out
+
+
 class Handler(http.server.BaseHTTPRequestHandler):
     def _send_json(self, status, body):
         encoded = json.dumps(body).encode()
@@ -98,6 +126,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             path.unlink(missing_ok=True)
 
     def do_GET(self):
+        if self.path == "/stats":
+            self._send_json(200, memory_stats() | {"jobsAccepted": _jobs_accepted, "singleUse": SINGLE_USE})
+            return
         if self.path.startswith("/derivative/"):
             self._send_derivative(self.path[len("/derivative/"):])
             return
@@ -111,6 +142,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             "mode": "direct" if NO_MICROVM else "microvm",
             "outputSchema": job_output.OUTPUT_SCHEMA_ID,
             "timeouts": TIMEOUTS,
+            "singleUse": SINGLE_USE,
+            "used": SINGLE_USE and _jobs_accepted > 0,
         }
         self._send_json(200, body)
 
@@ -123,10 +156,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
         job_timeout = job_output.effective_job_timeout(self.headers.get(JOB_TIMEOUT_HEADER), TIMEOUTS)
         agent_limit = job_timeout + TIMEOUTS["agent_margin_seconds"]
 
+        global _jobs_accepted
         if not _EXECUTE_LOCK.acquire(blocking=False):
             self.rfile.read(content_length)
             self._send_json(503, job_output.agent_output(status="agent_error", error="busy", job_timeout_seconds=job_timeout))
             return
+        if SINGLE_USE and _jobs_accepted > 0:
+            _EXECUTE_LOCK.release()
+            self.rfile.read(content_length)
+            self._send_json(503, job_output.agent_output(status="agent_error", error="used", job_timeout_seconds=job_timeout))
+            return
+        _jobs_accepted += 1
 
         try:
             # Save bundle to temp file

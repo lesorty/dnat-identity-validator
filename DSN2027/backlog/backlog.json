@@ -1483,17 +1483,17 @@
     "T-813",
     "T-1611"
    ],
-   "descricao": "Nuvem (12/11): mede o gás do recibo, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nOpcional (redução v2, 11/11): Custo do recibo em gás: o measure-gas.js já existe, então é 1 h se sobrar tempo; senão o recibo fica com custo estimado.\n\nPor quê: o custo do recibo on-chain entra na discussão de custo (RQ5) e ajuda a decidir se o recibo cai para desenho na ordem de corte.\nComo:\n- Estender smart-contract/scripts/measure-gas.js com registerDerivative, revokeDerivative e a compra de derivado\n- Rodar na rede local do hardhat com os mesmos parâmetros das medições existentes\nSaída: tabela de gás por função, para citar no artigo.",
+   "descricao": "Em andamento (14/11): measure-gas.js estendido com registerAsset de modelo base, registerDerivative (aprovado e reprovado) e revokeDerivative; tabela local em results/gas.md (registerDerivative ~494 mil de gás, revokeDerivative ~56 mil). Verificação, não dado do artigo. Falta: rodar na nuvem depois da T-1611.\n\nNuvem (12/11): mede o gás do recibo, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nOpcional (redução v2, 11/11): Custo do recibo em gás: o measure-gas.js já existe, então é 1 h se sobrar tempo; senão o recibo fica com custo estimado.\n\nPor quê: o custo do recibo on-chain entra na discussão de custo (RQ5) e ajuda a decidir se o recibo cai para desenho na ordem de corte.\nComo:\n- Estender smart-contract/scripts/measure-gas.js com registerDerivative, revokeDerivative e a compra de derivado\n- Rodar na rede local do hardhat com os mesmos parâmetros das medições existentes\nSaída: tabela de gás por função, para citar no artigo.",
    "epico": "J7",
    "id": "T-709",
    "marco": "TST",
    "prioridade": "P3",
    "pronto": "Tabela de gás",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "P",
    "titulo": "Medir o gás das novas funções (measure-gas.js)",
    "teste": "TS7",
-   "atualizado": "2026-11-12T18:54:30.000Z"
+   "atualizado": "2026-11-14T12:00:00.000Z"
   },
   {
    "deps": [
@@ -1511,15 +1511,15 @@
    "atualizado": "2026-11-11T18:00:00.000Z"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-14T12:00:00.000Z",
    "deps": [],
-   "descricao": "Redução v2 (11/11): CVM de uso único por job sem warm pool: um script cria a CVM, roda o job e a destrói. A execução em CVM real é argumento central.\n\nPor quê: a D4 e a T-102 tiram a microVM da arquitetura; cada job (fine-tuning, Juiz, medição do pai) roda numa CVM nova, destruída no fim. Hoje, numa CVM, o código roda os jobs em modo direto, sem isolamento entre eles (vm_runtime/vm/run-direct.sh).\nComo:\n- Imagem da CVM de job com o agente, sem shell de usuário.\n- Na CVM1, um warm pool de CVMs nunca usadas: tirar uma por job, entregar o job pelo agente (a CVM puxa, nunca escuta) e destruir a CVM no fim.\n- Tamanho da CVM que comporta o Qwen2.5-0.5B; registrar a memória de pico.\n- O script roda sem rede; só o agente fala com a CVM1, antes e depois.\nSaída: dois jobs seguidos em CVMs diferentes, com a memória de pico registrada.\nFora do escopo: container sem rede e gVisor (alvo da D4).",
+   "descricao": "Em andamento (14/11): código pronto e verificado na pilha local, sem commit ainda. smart-contract/scripts/job_vm.js com três provedores (static, docker e command para a nuvem), warm pool (DNAT_JOB_VM_POOL) e duas travas contra reuso (o pool não repete id; o agente com DNAT_SINGLE_USE=1 recusa o segundo job). A CVM1 lê /stats (pico do cgroup e RSS) e grava em jobVm no metadata.json. Na pilha local: três jobs em três containers diferentes, destruídos depois, pico de RSS de ~1,9 GB (results/e2e_direct_*_uso_unico.md); test/job_vm.test.js 6/6. Falta: rodar com o provedor command numa CVM real (precisa da T-1603 e da T-210).\n\nRedução v2 (11/11): CVM de uso único por job sem warm pool: um script cria a CVM, roda o job e a destrói. A execução em CVM real é argumento central.\n\nPor quê: a D4 e a T-102 tiram a microVM da arquitetura; cada job (fine-tuning, Juiz, medição do pai) roda numa CVM nova, destruída no fim. Hoje, numa CVM, o código roda os jobs em modo direto, sem isolamento entre eles (vm_runtime/vm/run-direct.sh).\nComo:\n- Imagem da CVM de job com o agente, sem shell de usuário.\n- Na CVM1, um warm pool de CVMs nunca usadas: tirar uma por job, entregar o job pelo agente (a CVM puxa, nunca escuta) e destruir a CVM no fim.\n- Tamanho da CVM que comporta o Qwen2.5-0.5B; registrar a memória de pico.\n- O script roda sem rede; só o agente fala com a CVM1, antes e depois.\nSaída: dois jobs seguidos em CVMs diferentes, com a memória de pico registrada.\nFora do escopo: container sem rede e gVisor (alvo da D4).",
    "epico": "J8",
    "id": "T-801",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Dois jobs seguidos nunca caem na mesma CVM",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "CVM de job de uso único: warm pool e ciclo de vida da CVM"
   },
@@ -1584,7 +1584,7 @@
    "titulo": "Transporte de modelos grandes: o base entra no job e o derivado volta por arquivo, conferidos por digest"
   },
   {
-   "atualizado": "2026-11-11T18:00:00.000Z",
+   "atualizado": "2026-11-14T12:00:00.000Z",
    "deps": [
     "T-801",
     "T-802",
@@ -1592,13 +1592,13 @@
     "T-901",
     "T-102"
    ],
-   "descricao": "Redução v2 (11/11): Primeira metade do fluxo. O job usa o script único de LoRA (T-901), sem código novo de treino.\nAbsorve: T-805 (Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois).\n\nPor quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
+   "descricao": "Em andamento (14/11): roteiro e2e/t806_lora.js e app e2e/lora_app_template.py (script da T-901 embutido) escritos, ainda não rodados. Falta: rodar na pilha local com a CVM de uso único (T-801, provedor docker, 8 GB) para verificar o funcionamento e, depois, na nuvem.\n\nRedução v2 (11/11): Primeira metade do fluxo. O job usa o script único de LoRA (T-901), sem código novo de treino.\nAbsorve: T-805 (Entregar o base (por digest) ao job de fine-tuning, conferido antes e depois).\n\nPor quê: demonstra a primeira metade do fluxo do T-101 dentro do DNAT real: o usuário treina e o derivado fica retido.\nComo:\n- Empacotar o script LoRA do T-901 e um dataset benigno pequeno, separado do app (T-102).\n- Rodar pela CVM1 com o T-801, o T-802 e o base do T-805.\n- Conferir que o derivado só aparece cifrado no IPFS, com digest.\nSaída: derivado de exemplo retido, com o tempo de execução registrado.",
    "epico": "J8",
    "id": "T-806",
    "marco": "G3",
    "prioridade": "P1",
    "pronto": "Derivado retido, cifrado no IPFS",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) numa CVM de uso único"
   },
@@ -2346,17 +2346,17 @@
     "T-408",
     "T-1611"
    ],
-   "descricao": "Fase de testes (12/11): Teste 7 (ataque da referência forjada). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: Ataque mínimo e base da RQ5: sem custódia, o atacante fornece uma referência do pai forjada e os sinais de Hurtado passam (A3).\nComo:\n- Construir uma 'referência' a partir do próprio derivado abliterado (ou de um pai alterado)\n- Rodar S2/S3 contra essa referência e mostrar que o derivado passa\n- Repetir com a referência custodiada (digest) e mostrar a falha de atestação\nSaída: script do ataque e os dois resultados (sem e com custódia) no registro de experimentos.",
+   "descricao": "Em andamento (14/11): experiments/attack_forged_reference.py escrito (A com custódia, B sem custódia, C troca sob custódia → hash_mismatch), sem commit e ainda não rodado. Falta: rodar como verificação local; o resultado do artigo continua no TST, depois da T-1611.\n\nFase de testes (12/11): Teste 7 (ataque da referência forjada). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: Ataque mínimo e base da RQ5: sem custódia, o atacante fornece uma referência do pai forjada e os sinais de Hurtado passam (A3).\nComo:\n- Construir uma 'referência' a partir do próprio derivado abliterado (ou de um pai alterado)\n- Rodar S2/S3 contra essa referência e mostrar que o derivado passa\n- Repetir com a referência custodiada (digest) e mostrar a falha de atestação\nSaída: script do ataque e os dois resultados (sem e com custódia) no registro de experimentos.",
    "epico": "J12",
    "id": "T-1205",
    "marco": "TST",
    "prioridade": "P0",
    "pronto": "Referência forjada que passa sem custódia",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Ataque: referência forjada (sem custódia)",
    "teste": "TS7",
-   "atualizado": "2026-11-12T11:22:40.000Z"
+   "atualizado": "2026-11-14T12:00:00.000Z"
   },
   {
    "deps": [
@@ -3306,21 +3306,21 @@
    "titulo": "Id da identidade no recibo"
   },
   {
-   "atualizado": "2026-11-12T11:22:40.000Z",
+   "atualizado": "2026-11-14T12:00:00.000Z",
    "deps": [
     "T-1703",
     "T-1704",
     "T-1705",
     "T-1611"
    ],
-   "descricao": "Fase de testes (12/11): Teste 9 (identidade e cota). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: a segunda camada só vale se cada regra da D7 for verificável; é o Teste 9.\nComo:\n- test/identity.test.js, no estilo do asset_envelope.test.js: prova válida, inválida e chave repetida; assinatura certa, errada e carimbo velho; reserva, acerto e esgotamento da cota; falha devolve a reserva.\n- Os testes montam um Express só com as rotas de identidade, sem blockchain nem executor.\n- Roteiro de demonstração: registra uma identidade, simula 4 reprovados e mostra o 5º job recusado.\nSaída: testes no package.json (npm run test:identity) e o roteiro.",
+   "descricao": "Em andamento (14/11): testes e demonstração prontos e passando localmente, sem commit: test/teste9_identity.test.js e npm run test:identity (67 testes), e e2e/demo_cota.js (npm run demo:cota), que registra a identidade (Q = 20), recusa sem assinatura e com carimbo velho (401), devolve a reserva na falha, esgota o saldo com 4 reprovados e recusa o 5º com 402 (results/demo_cota.md). Falta: repetir no commit congelado depois da T-1611.\n\nFase de testes (12/11): Teste 9 (identidade e cota). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nPor quê: a segunda camada só vale se cada regra da D7 for verificável; é o Teste 9.\nComo:\n- test/identity.test.js, no estilo do asset_envelope.test.js: prova válida, inválida e chave repetida; assinatura certa, errada e carimbo velho; reserva, acerto e esgotamento da cota; falha devolve a reserva.\n- Os testes montam um Express só com as rotas de identidade, sem blockchain nem executor.\n- Roteiro de demonstração: registra uma identidade, simula 4 reprovados e mostra o 5º job recusado.\nSaída: testes no package.json (npm run test:identity) e o roteiro.",
    "epico": "J17",
    "id": "T-1707",
    "marco": "TST",
    "ordem": 1707,
    "prioridade": "P0",
    "pronto": "Testes passam sem blockchain nem executor; a demonstração recusa o 5º job",
-   "status": "backlog",
+   "status": "em andamento",
    "tamanho": "M",
    "titulo": "Testes da identidade e da cota, e demonstração",
    "teste": "TS9"
@@ -3394,13 +3394,13 @@
   {
    "id": "T-414",
    "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
-   "descricao": "Atualiza (12/11, fumaça da T-908): abliterar com a direção da camada 6 zera o S2 mas não reduz a recusa; com a da camada 12 a recusa cai e o S2 lido na camada 6 quase não vê (ratio 0,93; ratio_band 0,37). Indício (n = 32, local) de que a camada 6 mede o tema, não a recusa: decidir a camada antes da T-1611.\n\nAtualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
+   "descricao": "Em andamento (14/11): model_gate/signals/intervention.py (bypass, induce, kl e a regra de Arditi, App. C), experiments/layer_select.py e tests/test_intervention.py (5/5) escritos, sem commit. Falta: rodar a verificação local (camadas 4 a 18, n = 32) para decidir a camada antes da T-1611; o número do artigo sai da nuvem.\n\nAtualiza (12/11, fumaça da T-908): abliterar com a direção da camada 6 zera o S2 mas não reduz a recusa; com a da camada 12 a recusa cai e o S2 lido na camada 6 quase não vê (ratio 0,93; ratio_band 0,37). Indício (n = 32, local) de que a camada 6 mede o tema, não a recusa: decidir a camada antes da T-1611.\n\nAtualiza (12/11): o ρ de Hurtado é o gap médio na faixa ⌊0,33·L⌋…⌊0,67·L⌋, não uma camada; o s2 já devolve as duas leituras (ratio, ratio_band). Comparar também essa leitura e os pares casados por tema de Hurtado (os nossos são de Arditi, com Alpaca).\n\nPor quê: a T-402 escolheu a camada 6 de 24 pela maior separação entre nocivos e inócuos na validação. Arditi escolhe pelo efeito da intervenção, que costuma cair no meio da rede, e separar nocivo de inócuo pode medir o tema e não a recusa. Se a abliteração (T-908) usar outra camada, a razão do S2 na camada 6 pode cair menos do que deveria.\nComo:\n- Para cada camada candidata (4 a 18), tirar a direção do resíduo em todas as camadas do base e medir a recusa nos 32 nocivos da validação (pontuação de recusa no primeiro token e detector de recusa), sem avaliador.\n- Somar a direção na camada aos 32 inócuos e medir se induz recusa; medir o KL no primeiro token dos inócuos com a ablação (Arditi descarta KL > 0,1).\n- Escolher pela regra de Arditi e comparar com a camada 6; rodar o S2 nos abliterados da T-908 nas duas camadas.\n- Se a camada mudar, atualizar o critério da T-402 e regerar o pacote antes de calibrar; se mudar depois do fechamento (T-1611), a calibração (TS2) se repete.\nSaída: tabela por camada em model_gate/results/ e decisão do critério no README dos sinais (§5).",
    "pronto": "Camada decidida pelos dois critérios, com a tabela e o S2 nos abliterados",
    "epico": "J4",
    "marco": "TST",
    "prioridade": "P1",
    "tamanho": "M",
-   "status": "backlog",
+   "status": "em andamento",
    "deps": [
     "T-402",
     "T-908"
@@ -3408,7 +3408,7 @@
    "teste": "TS1",
    "ordem": 414,
    "criado": "2026-11-12T18:23:47.000Z",
-   "atualizado": "2026-11-12T23:30:00.000Z"
+   "atualizado": "2026-11-14T12:00:00.000Z"
   },
   {
    "id": "T-917",

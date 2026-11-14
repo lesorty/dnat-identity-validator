@@ -37,11 +37,16 @@ const {
   DEFAULT_DIFFICULTY,
   RESERVE_COST,
   recordExecutionIdentity,
+  identityRouter,
 } = require("./identity");
 const { getDerivative, retainDerivative, userSummary } = require("./retention");
 const { MODEL_FORMAT } = require("./asset_envelope");
 const { extractVerified, modelDirDigest } = require("./model_store");
 const { judgeDerivative, loadAllowlist, ALLOWLIST_PATH } = require("./judge_flow");
+const { poolFromEnv } = require("./job_vm");
+
+// CVM de job de uso único (T-801): uma CVM nunca usada por job, destruída depois dele.
+const jobVms = poolFromEnv(process.env, (m) => console.error(`[job-vm] ${m}`));
 
 // Estado da CVM1 ao lado de executions/: identidades (T-1702) e derivados retidos (T-803).
 const IDENTITIES_PATH = process.env.DNAT_IDENTITIES_PATH || path.join(path.dirname(EXECUTIONS_ROOT), "identities.json");
@@ -338,8 +343,34 @@ async function uploadLocalFileToIpfs(localPath) {
 }
 
 function computeSha256Hex(localPath) {
-  const fileBuffer = fs.readFileSync(localPath);
-  return `0x${crypto.createHash("sha256").update(fileBuffer).digest("hex")}`;
+  const h = crypto.createHash("sha256");
+  const fd = fs.openSync(localPath, "r");
+  try {
+    const buf = Buffer.alloc(1 << 20);
+    let n;
+    while ((n = fs.readSync(fd, buf, 0, buf.length, null)) > 0) h.update(buf.subarray(0, n));
+  } finally {
+    fs.closeSync(fd);
+  }
+  return `0x${h.digest("hex")}`;
+}
+
+/** POST de um arquivo, resposta gravada em outro, em fluxo (http/https do Node, sem o undici do fetch). */
+function postFileToFile(url, srcPath, dstPath, timeoutMs) {
+  const target = new URL(url);
+  const mod = target.protocol === "https:" ? require("node:https") : require("node:http");
+  return new Promise((resolve, reject) => {
+    const req = mod.request(target, {
+      method: "POST",
+      headers: { "Content-Type": "application/gzip", "Content-Length": fs.statSync(srcPath).size },
+      timeout: timeoutMs,
+    }, (res) => {
+      pipeline(res, fs.createWriteStream(dstPath)).then(() => resolve({ status: res.statusCode }), reject);
+    });
+    req.on("timeout", () => req.destroy(new Error(`builder timeout after ${timeoutMs} ms`)));
+    req.on("error", reject);
+    fs.createReadStream(srcPath).on("error", reject).pipe(req);
+  });
 }
 
 function parseMultipartForm(req) {
@@ -504,15 +535,12 @@ async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
 
     await runCommand("tar", ["-czf", requestBundlePath, "-C", tempRoot, "source", "manifest.json"]);
 
-    const response = await fetch(normalizeBuilderUrl(BUILDER_URL), {
-      method: "POST",
-      headers: { "Content-Type": "application/gzip" },
-      body: fs.readFileSync(requestBundlePath),
-      signal: AbortSignal.timeout(2_100_000),
-    });
+    // Em fluxo de arquivo para arquivo e sem o limite de 300 s do fetch para os cabeçalhos: uma
+    // aplicação com torch leva minutos no builder e volta com centenas de MB (T-806).
+    const response = await postFileToFile(normalizeBuilderUrl(BUILDER_URL), requestBundlePath, responseBundlePath, 2_100_000);
 
-    if (!response.ok) {
-      const raw = await response.text();
+    if (response.status < 200 || response.status >= 300) {
+      const raw = fs.readFileSync(responseBundlePath, "utf8");
       let parsedError = null;
       try {
         const parsed = JSON.parse(raw);
@@ -522,8 +550,6 @@ async function buildApplicationArtifact({ sourceFilePath, manifest = {} }) {
       }
       throw new Error(`Builder request failed (${response.status}): ${parsedError}`);
     }
-
-    fs.writeFileSync(responseBundlePath, Buffer.from(await response.arrayBuffer()));
     await runCommand("tar", ["-xzf", responseBundlePath, "-C", responseDir]);
 
     const artifactPath = path.join(responseDir, "application.ext4");
@@ -707,18 +733,16 @@ async function registerAsset({ assetType, filePath, fileName, fileBase64, fileBu
         manifest,
       });
 
-      const artifactBuffer = fs.readFileSync(builtArtifact.artifactPath);
-      const encryptedBuffer = encryptBuffer(artifactBuffer, {
+      const uploadsDir = path.join(__dirname, "..", "uploads");
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      encryptedPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-application-artifact.enc`);
+      // Em fluxo (T-806): o ext4 de uma aplicação com torch passa de 1 GB; os blocos vazios comprimem.
+      await encryptFileToFile(builtArtifact.artifactPath, encryptedPath, {
         sourceFileName: path.basename(uploadedInput.localPath),
         artifactType: APP_ARTIFACT_FORMAT,
         framework: String(manifest?.framework || "python"),
         dependencies: String(manifest?.dependencies || ""),
-      });
-
-      const uploadsDir = path.join(__dirname, "..", "uploads");
-      fs.mkdirSync(uploadsDir, { recursive: true });
-      encryptedPath = path.join(uploadsDir, `${Date.now()}-${crypto.randomUUID()}-application-artifact.enc.json`);
-      fs.writeFileSync(encryptedPath, encryptedBuffer);
+      }, APP_ARTIFACT_FORMAT, { level: 6 });
 
       uploaded = await addFileToIpfsFlow({
         filePath: encryptedPath,
@@ -932,13 +956,15 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
 
   if (!fs.existsSync(RUNNER_PATH)) throw new Error(`Runner not found: ${RUNNER_PATH}`);
   const resolvedPythonBin = resolvePythonBin(pythonBin);
-  const executorProbe = await probeExecutor(EXECUTOR_URL);
-  if (!executorProbe.ok) {
-    throw new Error(
-      `Executor unreachable at ${executorProbe.url}. ` +
-        `Verify the VM/container is running and listening on port 5000. ` +
-        `Probe error: ${executorProbe.error}`,
-    );
+  if (!jobVms.provider.singleUse) {
+    const executorProbe = await probeExecutor(EXECUTOR_URL);
+    if (!executorProbe.ok) {
+      throw new Error(
+        `Executor unreachable at ${executorProbe.url}. ` +
+          `Verify the VM/container is running and listening on port 5000. ` +
+          `Probe error: ${executorProbe.error}`,
+      );
+    }
   }
 
   // Cota (T-1704, E14 §18.4): a reserva sai do saldo da identidade no aceite, depois das checagens
@@ -960,6 +986,8 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
   // O derivado em claro so passa por aqui, dentro do diretorio temporario (T-803).
   const derivativeArchivePath = path.join(preparationDir, "derivative.tar.gz");
   const baseModelDir = path.join(preparationDir, "base-model");
+  let jobVm = null;
+  let jobVmRecord = null;
 
   try {
     const datasetBytes = await downloadFromIpfsBytes(dataset.encryptedUri, ipfsApiUrl || IPFS_API_URL);
@@ -971,10 +999,14 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
         : datasetBytes,
     );
 
-    const encryptedApplicationBytes = await downloadFromIpfsBytes(application.encryptedUri, ipfsApiUrl || IPFS_API_URL);
-    const decryptedApplication = decryptBufferEnvelope(encryptedApplicationBytes);
-    fs.writeFileSync(applicationArtifactPath, decryptedApplication.plaintext);
+    // Aplicação em fluxo de arquivo para arquivo (T-806): o ext4 com as dependências passa de 1 GB.
+    const encryptedApplicationPath = path.join(preparationDir, "application.enc");
+    await downloadFromIpfsToFile(application.encryptedUri, encryptedApplicationPath, ipfsApiUrl || IPFS_API_URL);
+    await decryptFileToFile(encryptedApplicationPath, applicationArtifactPath, [APP_ARTIFACT_FORMAT]);
+    fs.rmSync(encryptedApplicationPath, { force: true });
     if (parent) await materializeParentModel(parent, baseModelDir, ipfsApiUrl);
+    // A CVM é tirada só com tudo pronto para o job, e destruída logo depois dele (T-801).
+    jobVm = await jobVms.take();
 
   const args = [
     RUNNER_PATH,
@@ -987,7 +1019,7 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
     "--application-cid",
     String(application.encryptedUri),
     "--executor-url",
-    EXECUTOR_URL,
+    jobVm.url,
     "--derivative-out",
     derivativeArchivePath,
     ...(parent ? ["--base-model-dir", baseModelDir] : []),
@@ -1008,6 +1040,9 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
       child.on("error", (err) => reject(err));
       child.on("close", (code) => resolve({ code, stdout, stderr }));
     });
+    // O runner já baixou o derivado: a CVM de job sai de cena antes do Juiz.
+    jobVmRecord = await jobVms.finish(jobVm);
+    jobVm = null;
 
     let parsed = null;
     try {
@@ -1020,7 +1055,7 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
     // Id da identidade que assinou o pedido, em toda execução (T-1703); a T-809 o leva ao recibo.
     if (executionId) {
       recordExecutionIdentity(path.join(EXECUTIONS_ROOT, executionId, "metadata.json"), identityId,
-        reservationId ? { quotaReservationId: reservationId } : {});
+        { ...(reservationId ? { quotaReservationId: reservationId } : {}), jobVm: jobVmRecord });
     }
     if (executionId && parsed.derivative?.status === "received") {
       parsed.derivative = await retainExecutionDerivative({
@@ -1088,6 +1123,7 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
 
     return {
       quota,
+      jobVm: jobVmRecord,
       judge: judge ? { outcome: judge.outcome, assetId: judge.assetId || null, alert: judge.alert || null } : null,
       exitCode: code,
       pythonBin: resolvedPythonBin,
@@ -1102,6 +1138,7 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
     settleFailure();
     throw e;
   } finally {
+    if (jobVm) await jobVms.finish(jobVm).catch((e) => console.error(`[job-vm] ${e.message}`));
     fs.rmSync(preparationDir, { recursive: true, force: true });
   }
 }
@@ -1199,7 +1236,9 @@ async function startServer() {
 
   app.get("/api/health", async (_req, res) => {
     const info = await showContractInfo();
-    const executor = await probeExecutor(EXECUTOR_URL);
+    const executor = jobVms.provider.singleUse
+      ? { ok: true, provider: jobVms.provider.name, singleUse: true, warm: jobVms.ready.length, poolSize: jobVms.size }
+      : await probeExecutor(EXECUTOR_URL);
     const builder = await probeBuilder(BUILDER_URL);
     res.json({
       ok: executor.ok && builder.ok,
@@ -1210,24 +1249,7 @@ async function startServer() {
   });
 
   // Identidade cara (T-1702, E14 §18): desafio da implantação e d; registro com prova de trabalho.
-  app.get("/api/identity/challenge", (_req, res) => {
-    res.json(identities.challenge());
-  });
-
-  // Saldo e contagens por desfecho (T-1704): o que o auditor e o modelo do atacante leem.
-  app.get("/api/identity/:id", (req, res) => {
-    const summary = identities.summary(req.params.id);
-    if (!summary) return res.status(404).json({ error: "unknown identity" });
-    res.json(summary);
-  });
-
-  app.post("/api/identity/register", (req, res) => {
-    try {
-      res.status(201).json(identities.register(req.body || {}));
-    } catch (e) {
-      res.status(e instanceof IdentityError ? e.status : 500).json({ error: e.message });
-    }
-  });
+  app.use("/api/identity", identityRouter(identities));
 
   app.post("/api/register-dataset", multipartParser, requireSignedRequest, async (req, res) => {
     try {
@@ -1368,6 +1390,14 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`DNAT Web UI running on http://localhost:${PORT}`);
   });
+  // Warm pool das CVMs de job (T-801): sobe as primeiras já no início; ao sair, destrói as não usadas.
+  jobVms.refill();
+  for (const sig of ["SIGTERM", "SIGINT"]) {
+    process.once(sig, () => {
+      jobVms.close().finally(() => process.exit(0));
+      setTimeout(() => process.exit(0), 15000).unref();
+    });
+  }
 }
 
 startServer().catch((err) => {

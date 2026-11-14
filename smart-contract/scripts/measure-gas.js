@@ -1,5 +1,7 @@
 // Measures gasUsed for the DNAT marketplace user journey:
 //   registerAsset(Dataset) + registerAsset(Application) + purchaseAccess
+// and, for the derivative receipt (T-709): registerAsset(Model), registerDerivative (approved and
+// rejected), revokeDerivative. Writes results/gas.{json,md} besides the RESULT lines.
 // Run: npx hardhat run scripts/measure-gas.js
 // Deterministic: deploys a fresh contract on the in-process hardhat network.
 // Same control plane is shared by M0/A/B, so these numbers apply to all three.
@@ -45,6 +47,26 @@ async function main() {
   const total = datasetPrice + appPrice;
   const r3 = await (await mkt.connect(buyer).purchaseAccess(1, 3, { value: total })).wait();
 
+  // 4) receipt path (T-709): custodied parent model, two derivatives, operator revocation.
+  //    The deployer is the operator here (constructor arg), as the CVM1 is in the real flow.
+  const r4 = await (await mkt.connect(provider).registerAsset(
+    2, "Qwen2.5-0.5B-Instruct", "Base model deposited by the operator",
+    cidUri, cidUri, contentHash, 0, "0x"
+  )).wait();
+  const parentId = await mkt.nextAssetId();
+  const h = (s) => ethers.keccak256(ethers.toUtf8Bytes(s));
+  const info = (verdict) => ({
+    parentId, parentReferenceHash: h("ref"), derivativeHash: h(`der-${verdict}`), judgeHash: h("judge"),
+    batteryCommitment: h("battery"), preregHash: h("prereg"), datasetHash: h("dataset"),
+    verdictHash: h(`verdict-${verdict}`), identityId: h("identity"), verdict, decidedAt: 1_794_528_000n,
+  });
+  // Title as the api-server writes it: "Derivado de <parent title> (<executionId>)".
+  const title = "Derivado de Qwen2.5-0.5B-Instruct (20261113T120000Z_0a1b2c3d)";
+  const r5 = await (await mkt.connect(provider).registerDerivative(info(1), buyer.address, title, cidUri)).wait(); // Approved = 1
+  const approvedId = await mkt.nextAssetId();
+  const r6 = await (await mkt.connect(provider).registerDerivative(info(2), buyer.address, title, cidUri)).wait(); // Rejected = 2
+  const r7 = await (await mkt.connect(provider).revokeDerivative(approvedId, "judge-version-changed")).wait();
+
   const g = (r) => r.gasUsed.toString();
   console.log("RESULT register_dataset_bloom0x    =", g(r1));
   console.log("RESULT register_dataset_bloom256B  =", g(r1b));
@@ -52,6 +74,29 @@ async function main() {
   console.log("RESULT purchase_access             =", g(r3));
   console.log("RESULT total_regDataset_regApp_buy =", (r1.gasUsed + r2.gasUsed + r3.gasUsed).toString());
   console.log("RESULT total_regDataset_buy        =", (r1.gasUsed + r3.gasUsed).toString());
+  console.log("RESULT register_model              =", g(r4));
+  console.log("RESULT register_derivative_approved =", g(r5));
+  console.log("RESULT register_derivative_rejected =", g(r6));
+  console.log("RESULT revoke_derivative           =", g(r7));
+
+  const rows = [
+    ["registerAsset (dataset, bloom vazio)", r1], ["registerAsset (dataset, bloom 256 B)", r1b],
+    ["registerAsset (aplicação)", r2], ["purchaseAccess", r3], ["registerAsset (modelo base)", r4],
+    ["registerDerivative (recibo, aprovado)", r5], ["registerDerivative (recibo, reprovado)", r6],
+    ["revokeDerivative", r7],
+  ].map(([fn, r]) => ({ fn, gasUsed: Number(r.gasUsed) }));
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const dir = path.join(__dirname, "..", "results");
+  fs.mkdirSync(dir, { recursive: true });
+  const meta = { note: "gasUsed na rede hardhat em processo (determinístico para as mesmas entradas); "
+    + "o número citado no artigo sai da execução na nuvem (T-709, fase de testes).",
+    hardhat: require("hardhat/package.json").version, solc: hre.config.solidity.compilers?.[0]?.version || hre.config.solidity.version,
+    measuredAtUtc: new Date().toISOString() };
+  fs.writeFileSync(path.join(dir, "gas.json"), JSON.stringify({ ...meta, rows }, null, 2) + "\n");
+  fs.writeFileSync(path.join(dir, "gas.md"), `# Gás por função do DnatMarketplace (T-709)\n\n${meta.note}\n\n`
+    + `Hardhat ${meta.hardhat} · solc ${meta.solc}\n\n| Função | gasUsed |\n|---|---|\n`
+    + rows.map((r) => `| ${r.fn} | ${r.gasUsed.toLocaleString("en-US")} |`).join("\n") + "\n");
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

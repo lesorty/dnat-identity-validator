@@ -123,6 +123,29 @@ T5 controle de acesso):
 bash assets/tests/run_all_tests.sh
 ```
 
+### CVM de job de uso único (T-801)
+
+Cada job roda numa CVM nunca usada, destruída depois dele (`smart-contract/scripts/job_vm.js`). A CVM1
+escolhe o provedor por `DNAT_JOB_VM_PROVIDER`:
+
+- `static` (padrão): o `EXECUTOR_URL` fixo, reaproveitado entre jobs; só para desenvolvimento.
+- `docker`: um container novo da imagem do executor por job, pela API do Docker no socket:
+
+  ```bash
+  docker compose -f docker/direct.compose.yaml -f docker/direct.single-use.compose.yaml up -d --build
+  ```
+
+- `command`: a nuvem. `DNAT_JOB_VM_CREATE_CMD` cria a CVM (imagem do executor com
+  `DNAT_SINGLE_USE=1`, grupo de segurança entra-só) e imprime na última linha
+  `{"id": "...", "url": "http://IP:5000"}`; `DNAT_JOB_VM_DESTROY_CMD` a destrói pelo id em
+  `DNAT_JOB_VM_ID`.
+
+`DNAT_JOB_VM_POOL` (padrão 0) é o tamanho do warm pool e `DNAT_JOB_VM_MEMORY` (docker) o limite
+de memória. Duas travas contra reuso: o pool nunca entrega o mesmo id duas vezes, e o agente com
+`DNAT_SINGLE_USE=1` recusa o segundo `/execute` com `used`. Antes de destruir, a CVM1 lê
+`GET /stats` do agente (pico do cgroup e RSS do job) e grava em `jobVm` no `metadata.json` da execução.
+Roteiro: `node e2e/run_direct.js --single-use [--base-dir DIR]` (precisa da imagem e da rede da pilha).
+
 Sem Docker, o mesmo fluxo roda como processos locais: `npm run e2e:direct` e `npm run e2e:teste8` em
 `smart-contract/` (T-811, T-814).
 

@@ -1,4 +1,4 @@
-"""Fila de execução do board (13/11; T-814 e T-815 feitas, o sistema fecha no modo direto): a ordem em que as tasks abertas serão pegas, por etapa.
+"""Fila de execução do board (14/11; T-801, T-1707 e T-709 verificadas na pilha local; T-414, T-1205 e T-806 com script pronto): a ordem em que as tasks abertas serão pegas, por etapa.
 
 Gera fila.json (para consumo automático) e FILA.md (para leitura) e confere a ordem contra o
 backlog.json: toda dependência aberta de uma task tem de aparecer antes dela na fila, e toda task
@@ -10,6 +10,9 @@ dependências estão feitas (status feito ou cortada no backlog). `executor`:
     humano   ação ou decisão sua ou do orientador (o agente só prepara)
     nuvem    o agente executa, mas precisa das VMs de nuvem (T-1603, T-210)
     artigo   escrita do artigo: só depois do sistema e dos resultados (preferência registrada)
+    local    a parte local (verificação de funcionamento, não dado do artigo) de uma task que volta
+             mais adiante na fila com o executor da parte final; não confere dependências e pode
+             repetir a task
 
     python3 DSN2027/backlog/fila.py
 """
@@ -22,6 +25,11 @@ HERE = Path(__file__).resolve().parent
 
 # (etapa, objetivo da etapa, [(task, executor, por que nesta posição / o que destrava)])
 ETAPAS = [
+    ("E1", "Verificações locais agora (agente)", [
+        ("T-414", "local", "Camada da direção pela intervenção (Arditi), verificação local n = 32: decide a camada do S2 antes de congelar o Juiz (T-1611)."),
+        ("T-1205", "local", "Referência forjada com o job da T-807: confere que sem custódia o veto some e que a troca sob custódia dá hash_mismatch."),
+        ("T-806", "local", "LoRA de verdade numa CVM de uso único da pilha local (T-801, provedor docker): primeira metade do fluxo com treino real."),
+    ]),
     ("E2", "Desbloqueios humanos da porta T-1611", [
         ("T-1603", "humano", "Nuvem e crédito: sem isso nada da fase de testes roda; destrava T-210, T-309, T-315, T-801, T-812."),
         ("T-210", "humano", "VM de 4 vCPU: medida de custo válida e máquina do piloto; dependência da T-1611 e da T-309."),
@@ -32,7 +40,7 @@ ETAPAS = [
         ("T-1604", "humano", "Natella pelo acesso institucional; destrava T-1108 e a seção 6 (T-1505)."),
     ]),
     ("E3", "Sistema na nuvem e congelamento", [
-        ("T-801", "nuvem", "CVM de job de uso único (criar, rodar, destruir); usa a imagem do executor da T-815."),
+        ("T-801", "nuvem", "CVM de job de uso único: código e pilha local prontos (provedor docker, 14/11); falta o provedor command numa CVM real."),
         ("T-806", "nuvem", "Fine-tuning LoRA de exemplo numa CVM de uso único: a primeira metade do fluxo no DNAT real."),
         ("T-1611", "humano", "Congelar o código do Juiz e do fluxo: abre a fase de testes; daqui em diante mudar o Juiz obriga a recalibrar."),
         ("T-309", "nuvem", "Avaliador do portão medido na VM (Gemma 4 E4B × Qwen3Guard): fixa o avaliador da liberação."),
@@ -43,9 +51,9 @@ ETAPAS = [
         ("T-313", "nuvem", "Teste 1: o Juiz real separa o abliterado público e não oscila no base (repete a verificação da T-807)."),
         ("T-314", "nuvem", "Custo do instrumento por configuração, com o avaliador: número do G1 e da RQ5."),
         ("T-813", "nuvem", "Teste 8 na nuvem com o Juiz real (o ensaio local é a T-814)."),
-        ("T-1707", "nuvem", "Teste 9: identidade e cota, com demonstração."),
+        ("T-1707", "nuvem", "Teste 9: testes e demonstração já passam localmente (14/11); repetir no commit congelado."),
         ("T-812", "nuvem", "Overhead VM comum × CVM; insumo da RQ5 (T-1409)."),
-        ("T-709", "nuvem", "Gás das funções novas do contrato (opcional, P3)."),
+        ("T-709", "nuvem", "Gás das funções novas: tabela local feita (14/11); o número do artigo sai da nuvem (opcional, P3)."),
     ]),
     ("E4", "População e verdade de referência (nuvem)", [
         ("T-914", "nuvem", "População do piloto (2 abliterações, 2 LoRA): primeiro sinal de separação e custo."),
@@ -115,7 +123,7 @@ def main() -> int:
     tasks = {t["id"]: t for t in backlog["tasks"]}
     closed = {k for k, t in tasks.items() if t["status"] in ("feito", "cortada")}
     open_ids = set(tasks) - closed
-    seen, problems, items = [], [], []
+    seen, problems, items, local = [], [], [], set()
     for etapa, objetivo, rows in ETAPAS:
         for tid, executor, motivo in rows:
             t = tasks.get(tid)
@@ -125,10 +133,13 @@ def main() -> int:
             if tid in closed:
                 problems.append(f"{tid} já está {t['status']}")
             pend = [d for d in t["deps"] if d in tasks and d not in closed]
-            late = [d for d in pend if d not in seen]
-            if late:
-                problems.append(f"{tid} aparece antes das dependências {late}")
-            seen.append(tid)
+            if executor == "local":
+                local.add(tid)
+            else:
+                late = [d for d in pend if d not in seen]
+                if late:
+                    problems.append(f"{tid} aparece antes das dependências {late}")
+                seen.append(tid)
             items.append({"ordem": len(items) + 1, "etapa": etapa, "task": tid, "titulo": t["titulo"],
                           "executor": executor, "prioridade": t["prioridade"], "tamanho": t["tamanho"],
                           "marco": t["marco"], "deps_abertas": pend, "motivo": motivo})
@@ -138,21 +149,25 @@ def main() -> int:
         problems.append(f"repetidas: {sorted(dup)}")
     if missing:
         problems.append(f"abertas fora da fila: {sorted(missing)}")
+    orphan = local - set(seen)
+    if orphan:
+        problems.append(f"parte local sem a parte final na fila: {sorted(orphan)}")
     if problems:
         print("\n".join(problems))
         return 1
 
-    doc = {"schema": "dnat.fila.v1", "gerado_em": "2026-11-13",
+    doc = {"schema": "dnat.fila.v1", "gerado_em": "2026-11-14",
            "regra": "pegar o primeiro item cujo executor está disponível e cujas dependências estão feitas",
            "etapas": [{"id": e, "objetivo": o} for e, o, _ in ETAPAS], "itens": items}
     (HERE / "fila.json").write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n")
 
     lines = ["# Fila de execução do board", "",
-             "Ordem em que as tasks abertas serão pegas (13/11). Gerada por `fila.py`, que confere a ordem contra o",
+             "Ordem em que as tasks abertas serão pegas (14/11). Gerada por `fila.py`, que confere a ordem contra o",
              "`backlog.json`: nenhuma task aparece antes das suas dependências abertas. Versão para máquina: `fila.json`.", "",
              "**Regra:** pegar o primeiro item cujo executor está disponível e cujas dependências estão feitas.",
              "**Executor:** `agente` roda aqui; `humano` é decisão ou ação sua ou do orientador; `nuvem` precisa das",
-             "VMs (T-1603, T-210); `artigo` fica para o fim, depois do sistema e dos resultados.", ""]
+             "VMs (T-1603, T-210); `artigo` fica para o fim, depois do sistema e dos resultados; `local` é a",
+             "verificação local de uma task que reaparece adiante com a parte final (não é dado do artigo).", ""]
     for etapa, objetivo, rows in ETAPAS:
         lines += [f"## {etapa} · {objetivo}", ""]
         for it in (x for x in items if x["etapa"] == etapa):

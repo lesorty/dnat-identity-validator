@@ -1,0 +1,272 @@
+{
+  "note": "Verificação de funcionamento (T-811), não é dado do artigo. B e C usam um Juiz SIMULADO.",
+  "machine": {
+    "cpuModel": "Intel(R) Core(TM) 7 150U",
+    "logicalCpus": 12,
+    "node": "v22.22.1",
+    "platform": "linux 7.0.0-43-generic",
+    "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
+    "startedAtUtc": "2026-11-13T18:36:40.284Z"
+  },
+  "judgeRelease": {
+    "judgeHash": "5706f8b58200dd5b8132e33e6b911b127d7f28f4ebb67c5ebb55fefe9ecb6806",
+    "preregSha256": "e2de3b5562ac39cd5b7363f04f9fbe95d193fcafb3d57f60383e1696b7f0ee9e",
+    "preregPath": "prereg.yaml",
+    "batteryCommitment": "9ac8c2affbeb3c262d62a089463694c9db8c2d70271814d696f1f8e96c6f6a60",
+    "evaluatorKind": "detector",
+    "batteryPackDigest": "f5f17e1a0ea530599f4c3edd4b7e73f3826f1491152c95e1d4267776597a1bc2",
+    "note": "roteiro T-811",
+    "allowedAtUtc": "2026-11-13T18:36:45.848Z"
+  },
+  "base": {
+    "dir": "minúsculo (tests/tiny.py)",
+    "digest": "43fd8a01c9ba628ad9ffe862cf0d16529cedbad916ca5d1cc93c4d15dd0976d0",
+    "archiveBytes": 86182
+  },
+  "assets": {
+    "model": "1",
+    "dataset": "2",
+    "application": "3"
+  },
+  "identity": {
+    "id": "c965b2a19d7d1734c2f46518a7a645c7963d331375a70a91c3fa408a9bf9ade7",
+    "difficulty": 12,
+    "proofSeconds": 0.053829962
+  },
+  "scenarios": {
+    "A": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 0.001
+      },
+      "derivative": {
+        "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
+        "status": "retained",
+        "verdict": "failure"
+      },
+      "judge": {
+        "outcome": "failure",
+        "assetId": null,
+        "alert": "judge_failure"
+      },
+      "quota": {
+        "reservationId": "c037e31d-da77-4e1f-a7c8-031514d25c2e",
+        "reserved": 0,
+        "balance": 20
+      },
+      "balanceAfter": 20,
+      "jobVm": {
+        "id": "dnat-job-231e9294-be3",
+        "provider": "docker",
+        "singleUse": true,
+        "fromPool": true,
+        "bootMs": 574,
+        "createdAt": "2026-11-13T18:36:46.862Z",
+        "takenAt": "2026-11-13T18:36:48.168Z",
+        "destroyedAt": "2026-11-13T18:36:48.741Z",
+        "peakRssBytes": 23326720,
+        "cgroupPeakBytes": 49094656,
+        "memTotalBytes": 32783138816,
+        "jobsAccepted": 1
+      }
+    },
+    "B": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 0.001
+      },
+      "derivative": {
+        "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
+        "status": "released",
+        "verdict": "approved",
+        "assetId": "4"
+      },
+      "judge": {
+        "outcome": "approved",
+        "assetId": "4",
+        "alert": null
+      },
+      "quota": {
+        "reservationId": "1a24b786-37ac-4d46-901c-7f5f78af1dfd",
+        "reserved": 0,
+        "balance": 19
+      },
+      "balanceAfter": 19,
+      "jobVm": {
+        "id": "dnat-job-76e43e7e-0f7",
+        "provider": "docker",
+        "singleUse": true,
+        "fromPool": false,
+        "bootMs": 480,
+        "createdAt": "2026-11-13T18:36:53.233Z",
+        "takenAt": "2026-11-13T18:36:53.233Z",
+        "destroyedAt": "2026-11-13T18:36:53.812Z",
+        "peakRssBytes": 23351296,
+        "cgroupPeakBytes": 48390144,
+        "memTotalBytes": 32783138816,
+        "jobsAccepted": 1
+      }
+    },
+    "C": {
+      "exitCode": 0,
+      "metrics": {
+        "loss": 0.25,
+        "steps": 3,
+        "train_seconds": 0.001
+      },
+      "derivative": {
+        "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
+        "status": "retained",
+        "verdict": "rejected",
+        "assetId": "5"
+      },
+      "judge": {
+        "outcome": "rejected",
+        "assetId": "5",
+        "alert": null
+      },
+      "quota": {
+        "reservationId": "22434886-2aef-4d24-af28-035ccc20af69",
+        "reserved": 0,
+        "balance": 14
+      },
+      "balanceAfter": 14,
+      "jobVm": {
+        "id": "dnat-job-e0ee391f-8c4",
+        "provider": "docker",
+        "singleUse": true,
+        "fromPool": false,
+        "bootMs": 1296,
+        "createdAt": "2026-11-13T18:36:56.512Z",
+        "takenAt": "2026-11-13T18:36:56.513Z",
+        "destroyedAt": "2026-11-13T18:36:57.110Z",
+        "peakRssBytes": 23539712,
+        "cgroupPeakBytes": 48246784,
+        "memTotalBytes": 32783138816,
+        "jobsAccepted": 1
+      }
+    }
+  },
+  "onChain": {
+    "B": {
+      "assetId": "4",
+      "active": true,
+      "usable": true,
+      "verdict": 1,
+      "verdictHash": "0x4fc59f9e13dba2581c80966af18371582723ccc2a6279b617e7e0a91f2c2568b",
+      "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    },
+    "C": {
+      "assetId": "5",
+      "active": false,
+      "usable": false,
+      "verdict": 2,
+      "verdictHash": "0x6806b2bea225a3b737d33c8cd307362faeaa359a734aaeda1a157e604417e0da",
+      "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    }
+  },
+  "timings": [
+    {
+      "step": "IPFS em memória",
+      "seconds": 0.014
+    },
+    {
+      "step": "hardhat node e implantação do contrato",
+      "seconds": 1.454
+    },
+    {
+      "step": "CVM2 (builder, modo direto)",
+      "seconds": 0.313
+    },
+    {
+      "step": "pacote da bateria depositado pelo operador (judge_cli battery)",
+      "seconds": 0.182
+    },
+    {
+      "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
+      "seconds": 0.17
+    },
+    {
+      "step": "CVM1 (api-server)",
+      "seconds": 0.623
+    },
+    {
+      "step": "identidade com prova de trabalho (d = 12)",
+      "seconds": 0.114
+    },
+    {
+      "step": "depósito do modelo base (register-model)",
+      "seconds": 0.275
+    },
+    {
+      "step": "dataset (register-dataset)",
+      "seconds": 0.168
+    },
+    {
+      "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
+      "seconds": 0.605
+    },
+    {
+      "step": "compra de acesso (purchase-access)",
+      "seconds": 0.164
+    },
+    {
+      "step": "referência do pai depositada pelo operador (judge_cli reference)",
+      "seconds": 0.185
+    },
+    {
+      "step": "A · fine-tuning + Juiz real (model_gate)",
+      "seconds": 3.948
+    },
+    {
+      "step": "B · fine-tuning + Juiz SIMULADO aprovando",
+      "seconds": 1.776
+    },
+    {
+      "step": "C · fine-tuning + Juiz SIMULADO reprovando",
+      "seconds": 2.758
+    }
+  ],
+  "checks": [
+    {
+      "name": "A: Juiz real termina em falha (prereg sem valores, T-606)",
+      "ok": true
+    },
+    {
+      "name": "A: reserva devolvida (saldo 20)",
+      "ok": true
+    },
+    {
+      "name": "B: aprovado, derivado usável no contrato",
+      "ok": true
+    },
+    {
+      "name": "B: cota 1 (saldo 19)",
+      "ok": true
+    },
+    {
+      "name": "C: reprovado, derivado inativo",
+      "ok": true
+    },
+    {
+      "name": "C: cota 5 (saldo 14)",
+      "ok": true
+    },
+    {
+      "name": "uso único: três jobs em três CVMs diferentes",
+      "ok": true
+    },
+    {
+      "name": "uso único: cada CVM destruída depois do job, com um job só",
+      "ok": true
+    },
+    {
+      "name": "uso único: memória de pico registrada",
+      "ok": true
+    }
+  ]
+}

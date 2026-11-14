@@ -1,6 +1,6 @@
 # Backlog do Juiz (kanban)
 
-**Atualizado:** 2026-11-13 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
+**Atualizado:** 2026-11-14 · **Quadro vivo:** <https://claude.ai/artifact/2CB9dWqRXKFdv7APZCtcbF>
 (privado; só abre para quem tiver acesso) · **Plano de alto nível:**
 [E13](../etapas/E13_plano_trabalho.md).
 
@@ -30,6 +30,26 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
+
+## Andamento (14/11)
+
+- **Placar:** 81 tasks feitas, 9 em andamento, 1 a fazer, 61 no backlog e 50 cortadas (202 no quadro).
+  O quadro vivo, este retrato, a fila e o [Mapa do Juiz](https://claude.ai/artifact/XU3q4z6gAyLXduqhZRvZRC)
+  foram conferidos e atualizados em 14/11.
+- **Passaram para em andamento (trabalho local depois do commit 95cb281, ainda sem commit):**
+  - **T-801:** CVM de job de uso único em `smart-contract/scripts/job_vm.js` (provedores static,
+    docker e command), warm pool e travas contra reuso; três jobs em três containers destruídos
+    depois; `test/job_vm.test.js` 6/6. Falta o provedor command numa CVM real.
+  - **T-1707:** Teste 9 local: `npm run test:identity` (67 testes) e `npm run demo:cota` (o 5º job é
+    recusado com 402). Falta repetir no commit congelado.
+  - **T-709:** gás de registerDerivative e revokeDerivative medido no hardhat local
+    (`results/gas.md`). Falta a nuvem.
+  - **T-414, T-1205 e T-806:** scripts escritos (`signals/intervention.py` com 5/5 testes,
+    `experiments/layer_select.py`, `experiments/attack_forged_reference.py`, `e2e/t806_lora.js`),
+    ainda não rodados.
+- **Fila:** nova etapa **E1 · Verificações locais agora**, com o executor `local` (verificação de
+  funcionamento, não dado do artigo) para T-414, T-1205 e T-806; a parte final de cada uma continua
+  adiante na fila. Fora disso, o que resta antes da T-1611 é humano ou nuvem.
 
 ## Andamento (13/11)
 

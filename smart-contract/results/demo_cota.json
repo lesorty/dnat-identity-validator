@@ -1,0 +1,97 @@
+{
+  "note": "Demonstração do Teste 9 (T-1707), sem cadeia nem executor; veredito SIMULADO no corpo do job.",
+  "steps": [
+    {
+      "step": "1. identidade registrada com prova de trabalho",
+      "status": 201,
+      "id": "49dab038c2c9a0a1",
+      "difficulty": 12,
+      "balance": 20
+    },
+    {
+      "step": "2a. job sem assinatura",
+      "status": 401
+    },
+    {
+      "step": "2b. job com carimbo de 10 min atrás",
+      "status": 401
+    },
+    {
+      "step": "3. job que falha: reserva devolvida",
+      "status": 200,
+      "charged": 0,
+      "balance": 20
+    },
+    {
+      "step": "4.1 job reprovado",
+      "status": 200,
+      "charged": 5,
+      "balance": 15
+    },
+    {
+      "step": "4.2 job reprovado",
+      "status": 200,
+      "charged": 5,
+      "balance": 10
+    },
+    {
+      "step": "4.3 job reprovado",
+      "status": 200,
+      "charged": 5,
+      "balance": 5
+    },
+    {
+      "step": "4.4 job reprovado",
+      "status": 200,
+      "charged": 5,
+      "balance": 0
+    },
+    {
+      "step": "5. 5º job, sem saldo para a reserva",
+      "status": 402,
+      "error": "insufficient quota: balance 0, a job reserves 5"
+    }
+  ],
+  "summary": {
+    "id": "49dab038c2c9a0a1e9e4e1e6769445f76b71051d1531d073e2ed8e739b548d31",
+    "publicKey": "8216c117d758e630dfc0c44f65778c176d08e50441b838b8c1d6cddac65fda1e",
+    "difficulty": 12,
+    "registeredAtUtc": "2026-11-13T18:42:20.450Z",
+    "initialBalance": 20,
+    "balance": 0,
+    "reserved": 0,
+    "spent": 20,
+    "counts": {
+      "approved": 0,
+      "inconclusive": 0,
+      "rejected": 4,
+      "failure": 1
+    }
+  },
+  "checks": [
+    {
+      "name": "registro abre saldo Q = 20",
+      "ok": true
+    },
+    {
+      "name": "sem assinatura e carimbo velho: 401",
+      "ok": true
+    },
+    {
+      "name": "falha devolve a reserva (saldo continua 20)",
+      "ok": true
+    },
+    {
+      "name": "4 reprovados esgotam o saldo",
+      "ok": true
+    },
+    {
+      "name": "o 5º job é recusado com 402",
+      "ok": true
+    },
+    {
+      "name": "contagens: 4 reprovados, 1 falha",
+      "ok": true
+    }
+  ]
+}

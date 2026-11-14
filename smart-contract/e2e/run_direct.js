@@ -23,10 +23,13 @@
  *      contrato, derivado usável, cota 1.
  *   C. Juiz SIMULADO reprovando: recibo gravado, derivado inativo, cota 5.
  *
- *   node e2e/run_direct.js [--keep] [--serve] [--base-dir DIR]
+ *   node e2e/run_direct.js [--keep] [--serve] [--base-dir DIR] [--single-use]
  *       resultados em results/e2e_direct.{json,md}; com --base-dir, results/e2e_direct_<nome>.{json,md}
  *   --base-dir: um modelo real como base (T-805), por exemplo o Qwen2.5-0.5B de $MODEL_GATE_DATA;
  *   sem ele, o modelo minúsculo dos testes do model_gate.
+ *   --single-use: CVM de job de uso único (T-801). Em vez do executor local, cada job roda num
+ *   container novo da imagem dnat-executor-direct (rede dnat-runtime da pilha direta, T-815),
+ *   tirado de um warm pool de 1 e destruído depois; resultados com o sufixo _uso_unico.
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -40,7 +43,8 @@ const BASE_DIR = (() => {
   const i = process.argv.indexOf("--base-dir");
   return i >= 0 ? path.resolve(process.argv[i + 1]) : null;
 })();
-const LABEL = BASE_DIR ? `_${path.basename(path.dirname(BASE_DIR)).replace(/[^A-Za-z0-9.-]+/g, "_")}` : "";
+const SINGLE_USE = process.argv.includes("--single-use");
+const LABEL = (BASE_DIR ? `_${path.basename(path.dirname(BASE_DIR)).replace(/[^A-Za-z0-9.-]+/g, "_")}` : "") + (SINGLE_USE ? "_uso_unico" : "");
 const stack = new Stack("e2e");
 const state = stack.state;
 const step = (name, fn) => stack.step(name, fn);
@@ -57,7 +61,7 @@ async function main() {
   const ipfsUrl = await step("IPFS em memória", () => stack.startIpfs());
   const chain = await step("hardhat node e implantação do contrato", () => stack.startChain());
   await step("CVM2 (builder, modo direto)", () => stack.startBuilder());
-  await step("CVM de job (executor, modo direto)", () => stack.startExecutor());
+  if (!SINGLE_USE) await step("CVM de job (executor, modo direto)", () => stack.startExecutor());
 
   const battery = sha("T-304 pendente: compromisso provisório da parte secreta");
   // Pacote da bateria (T-807), se já montado no notebook (experiments.battery_pack); fica fora do git.
@@ -69,7 +73,9 @@ async function main() {
   const release = await step("liberar o Juiz atual na lista permitida (judge_cli allow)", () =>
     stack.judgeCli(["allow", "--battery-commitment", battery, "--evaluator-kind", "detector", "--note", "roteiro T-811"]));
 
-  const cvmEnv = stack.cvmEnv();
+  const cvmEnv = stack.cvmEnv(SINGLE_USE
+    ? { DNAT_JOB_VM_PROVIDER: "docker", DNAT_JOB_VM_POOL: "1", DNAT_JOB_VM_MEMORY: process.env.DNAT_JOB_VM_MEMORY || "4g" }
+    : {});
   let cvm1 = await step("CVM1 (api-server)", () => stack.startCvm1("cvm1", cvmEnv));
 
   const who = await step("identidade com prova de trabalho (d = 12)", () => newClient(cvm1.api));
@@ -143,6 +149,7 @@ async function main() {
     judge: s.judge,
     quota: s.quota,
     balanceAfter: s.balanceAfter,
+    jobVm: s.jobVm ?? null,
   });
   const result = {
     note: "Verificação de funcionamento (T-811), não é dado do artigo. B e C usam um Juiz SIMULADO.",
@@ -166,6 +173,14 @@ async function main() {
     ["C: reprovado, derivado inativo", scenarios.C.judge?.outcome === "rejected" && onChain.C?.active === false],
     ["C: cota 5 (saldo 14)", scenarios.C.balanceAfter === 14],
   ];
+  if (SINGLE_USE) {
+    const vms = ["A", "B", "C"].map((k) => scenarios[k].jobVm);
+    checks.push(
+      ["uso único: três jobs em três CVMs diferentes", vms.every((v) => v?.singleUse) && new Set(vms.map((v) => v.id)).size === 3],
+      ["uso único: cada CVM destruída depois do job, com um job só", vms.every((v) => v?.destroyedAt && v.jobsAccepted === 1)],
+      ["uso único: memória de pico registrada", vms.every((v) => (v?.cgroupPeakBytes || 0) > 0)],
+    );
+  }
   result.checks = checks.map(([name, ok]) => ({ name, ok }));
   writeResults(result);
   for (const [name, ok] of checks) log(`${ok ? "ok  " : "FALHOU"} ${name}`);
@@ -207,7 +222,13 @@ ${sc("B")}
 ${sc("C")}
 
 A: Juiz real. B e C: Juiz SIMULADO (e2e/simulated_judge.js), só para exercitar recibo e cota.
+${r.scenarios.A.jobVm?.singleUse ? `
+## CVM de job de uso único (T-801)
 
+| Cenário | CVM | Do warm pool | Subida (s) | Pico do cgroup (MB, com cache de página) | Pico RSS do job (MB) | Destruída |
+|---|---|---|---|---|---|---|
+${["A", "B", "C"].map((k) => { const v = r.scenarios[k].jobVm; return `| ${k} | ${v.id} | ${v.fromPool ? "sim" : "não"} | ${(v.bootMs / 1000).toFixed(1)} | ${((v.cgroupPeakBytes || 0) / 2 ** 20).toFixed(0)} | ${((v.peakRssBytes || 0) / 2 ** 20).toFixed(0)} | ${v.destroyedAt ? "sim" : "NÃO"} |`; }).join("\n")}
+` : ""}
 ## Conferências
 
 ${r.checks.map((c) => `- ${c.ok ? "✅" : "❌"} ${c.name}`).join("\n")}
