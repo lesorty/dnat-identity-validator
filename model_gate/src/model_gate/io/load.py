@@ -36,16 +36,38 @@ class LoadedModel:
     files: list[dict] = field(default_factory=list)
 
 
+_DOC_SUFFIXES = {"", ".md", ".txt", ".rst"}
+
+
 def model_files(root: Path) -> list[str]:
-    """Arquivos que entram no digest: tudo, menos ocultos, README* e LICENSE*."""
+    """Arquivos que entram no digest: tudo, menos ocultos e a documentação (README*, LICENSE* em
+    .md, .txt, .rst ou sem extensão).
+
+    Revisão de 15/11: antes, README* e LICENSE* de qualquer extensão ficavam fora, e um shard
+    "README.safetensors" citado no índice era carregado sem entrar no digest; um diretório que é
+    link simbólico também ficava fora. Agora link simbólico é erro, e todo shard do índice dos
+    safetensors tem de estar entre os arquivos do digest.
+    """
+    root = Path(root)
     out = []
     for p in sorted(root.rglob("*")):
         rel = p.relative_to(root)
-        if not p.is_file() or any(part.startswith(".") for part in rel.parts):
+        if any(part.startswith(".") for part in rel.parts):
             continue
-        if rel.name.startswith(_IGNORED_PREFIXES):
+        if p.is_symlink():
+            raise DigestMismatch(f"{root}: link simbólico não é aceito ({rel.as_posix()})")
+        if not p.is_file():
+            continue
+        if rel.name.startswith(_IGNORED_PREFIXES) and p.suffix.lower() in _DOC_SUFFIXES:
             continue
         out.append(rel.as_posix())
+    listed = set(out)
+    for idx in [f for f in out if f.endswith(".safetensors.index.json")]:
+        import json
+        base = Path(idx).parent
+        for shard in set((json.loads((root / idx).read_text()).get("weight_map") or {}).values()):
+            if (base / shard).as_posix() not in listed:
+                raise DigestMismatch(f"{root}: {idx} cita {shard}, que não entra no digest")
     return out
 
 

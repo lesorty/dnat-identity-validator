@@ -36,9 +36,12 @@ const {
   RequestVerifier,
   DEFAULT_DIFFICULTY,
   RESERVE_COST,
+  INITIAL_BALANCE,
+  SETTLE_COSTS,
   recordExecutionIdentity,
   identityRouter,
 } = require("./identity");
+const { mountUiRoutes } = require("./ui_api");
 const { getDerivative, retainDerivative, userSummary } = require("./retention");
 const { MODEL_FORMAT } = require("./asset_envelope");
 const { extractVerified, modelDirDigest } = require("./model_store");
@@ -74,6 +77,7 @@ const abi = [
   "function registerDerivative((uint256 parentId, bytes32 parentReferenceHash, bytes32 derivativeHash, bytes32 judgeHash, bytes32 batteryCommitment, bytes32 preregHash, bytes32 datasetHash, bytes32 verdictHash, bytes32 identityId, uint8 verdict, uint64 decidedAt) info, address owner, string title, string encryptedUri) returns (uint256)",
   "function getDerivative(uint256 assetId) view returns ((uint256 parentId, bytes32 parentReferenceHash, bytes32 derivativeHash, bytes32 judgeHash, bytes32 batteryCommitment, bytes32 preregHash, bytes32 datasetHash, bytes32 verdictHash, bytes32 identityId, uint8 verdict, uint64 decidedAt))",
   "function isDerivativeUsable(uint256 assetId) view returns (bool)",
+  "function derivativeRevoked(uint256 assetId) view returns (bool)",
   "event DerivativeRegistered(uint256 indexed id, uint256 indexed parentId, (uint256 parentId, bytes32 parentReferenceHash, bytes32 derivativeHash, bytes32 judgeHash, bytes32 batteryCommitment, bytes32 preregHash, bytes32 datasetHash, bytes32 verdictHash, bytes32 identityId, uint8 verdict, uint64 decidedAt) info)",
 ];
 
@@ -81,7 +85,20 @@ const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 // A CVM1 manda transações em sequência rápida (registro, derivado); o provider guarda a contagem de
 // transações por alguns ms e duas seguidas sairiam com o mesmo nonce. O NonceManager conta localmente.
-const signer = new ethers.NonceManager(wallet);
+// Um revert na estimativa de gás deixava o nonce local um passo à frente e travava toda transação
+// seguinte da CVM1 ("Nonce too high"); qualquer pedido que revertesse bastava (revisão de 15/11).
+// Em erro, o contador volta a ser lido da cadeia.
+class ResettingNonceManager extends ethers.NonceManager {
+  async sendTransaction(tx) {
+    try {
+      return await super.sendTransaction(tx);
+    } catch (e) {
+      this.reset();
+      throw e;
+    }
+  }
+}
+const signer = new ResettingNonceManager(wallet);
 let contractAddress = CONTRACT_ADDRESS_ENV || "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 let contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -1226,6 +1243,16 @@ async function startServer() {
   });
   // Pedidos assinados pela identidade (T-1703, E14 §18.2): só nas rotas que criam trabalho.
   const requireSignedRequest = new RequestVerifier({ registry: identities }).middleware();
+  // Rotas do operador (revogar, alterar ativo, ler execuções com stdout): só com o token do
+  // operador (DNAT_OPERATOR_TOKEN, no cabeçalho X-Operator-Token). Sem a variável, ficam fechadas.
+  // Antes eram abertas, e qualquer cliente revogava ou reativava um modelo com a carteira da CVM1.
+  const operatorToken = process.env.DNAT_OPERATOR_TOKEN || "";
+  const requireOperator = (req, res, next) => {
+    const got = Buffer.from(String(req.headers["x-operator-token"] || ""));
+    const want = Buffer.from(operatorToken);
+    if (operatorToken && got.length === want.length && crypto.timingSafeEqual(got, want)) return next();
+    res.status(403).json({ error: operatorToken ? "operator token required" : "operator routes disabled (DNAT_OPERATOR_TOKEN unset)" });
+  };
 
   const app = express();
   app.use(cors());
@@ -1250,6 +1277,16 @@ async function startServer() {
 
   // Identidade cara (T-1702, E14 §18): desafio da implantação e d; registro com prova de trabalho.
   app.use("/api/identity", identityRouter(identities));
+
+  // Leitura da interface: modelos e derivados, o Juiz e os jobs da identidade (ui_api.js).
+  mountUiRoutes(app, {
+    contract,
+    listAssets: listAssetsByScanningIds,
+    requireSignedRequest,
+    loadAllowlist,
+    paths: { references: REFERENCES_PATH, battery: BATTERY_PACK_PATH, allowlist: ALLOWLIST_PATH, executions: EXECUTIONS_ROOT },
+    quota: { initialBalance: INITIAL_BALANCE, reserve: RESERVE_COST, costs: SETTLE_COSTS, difficulty: IDENTITY_DIFFICULTY },
+  });
 
   app.post("/api/register-dataset", multipartParser, requireSignedRequest, async (req, res) => {
     try {
@@ -1310,7 +1347,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/update-asset", async (req, res) => {
+  app.post("/api/update-asset", requireOperator, async (req, res) => {
     try {
       res.json(
         await updateAsset({
@@ -1323,7 +1360,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/revoke-asset", async (req, res) => {
+  app.post("/api/revoke-asset", requireOperator, async (req, res) => {
     try {
       res.json(await revokeAsset(req.body));
     } catch (e) {
@@ -1341,7 +1378,10 @@ async function startServer() {
 
   app.post("/api/run-from-cids", requireSignedRequest, async (req, res) => {
     try {
-      res.json(await runFromCids({ ...req.body, identityId: req.identity.id, ledger: identities }));
+      // Só os ids vêm da rede. user, pythonBin e ipfsApiUrl vindos do cliente escolhiam o dono do
+      // derivado, o executável do spawn e o nó IPFS para onde a CVM1 manda os CIDs custodiados.
+      const { datasetId, applicationId, parentModelId } = req.body || {};
+      res.json(await runFromCids({ datasetId, applicationId, parentModelId, identityId: req.identity.id, ledger: identities }));
     } catch (e) {
       res.status(e instanceof IdentityError ? e.status : 400).json({ error: e.message });
     }
@@ -1371,7 +1411,7 @@ async function startServer() {
     }
   });
 
-  app.get("/api/executions", (_req, res) => {
+  app.get("/api/executions", requireOperator, (_req, res) => {
     try {
       res.json(listExecutions());
     } catch (e) {
@@ -1379,8 +1419,9 @@ async function startServer() {
     }
   });
 
-  app.get("/api/executions/:executionId", (req, res) => {
+  app.get("/api/executions/:executionId", requireOperator, (req, res) => {
     try {
+      if (!/^[0-9A-Za-z_-]+$/.test(req.params.executionId)) throw new Error("invalid execution id");
       res.json(getExecutionById(req.params.executionId));
     } catch (e) {
       res.status(404).json({ error: e.message });

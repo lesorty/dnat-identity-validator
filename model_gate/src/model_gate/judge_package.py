@@ -41,7 +41,12 @@ def package_files(root: Path = ROOT) -> list[str]:
     files = []
     for p in pkg.rglob("*"):
         rel = p.relative_to(root)
-        if p.is_symlink() or not p.is_file():
+        if "__pycache__" in rel.parts or any(x.startswith(".") for x in rel.parts):
+            continue
+        if p.is_symlink():
+            # Um .py que é link seria importado sem entrar no hash (revisão de 15/11).
+            raise ValueError(f"link simbólico no pacote do Juiz: {rel.as_posix()}")
+        if not p.is_file():
             continue
         if "__pycache__" in rel.parts or p.suffix in (".pyc", ".pyo") or any(x.startswith(".") for x in rel.parts):
             continue

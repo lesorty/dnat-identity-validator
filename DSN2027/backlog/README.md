@@ -31,6 +31,12 @@ atende), **Como** (passos verificáveis), **Saída** (o que fica gravado e onde)
 Tamanho: **P** até 1 h, **M** cerca de 2 h, **G** cerca de 4 h. Total estimado: ~436 h. Os marcos são ESP (30/out),
 G1 (01/nov), G0 (02/nov), G2 (09/nov), G3 (16/nov), G4 (23/nov), RES (25/nov) e SUB (02/dez).
 
+## Revisão do sistema (15/11)
+
+Varredura de bugs, remake da interface e requisitos × código em [REVISAO_SISTEMA.md](../REVISAO_SISTEMA.md):
+12 bugs corrigidos com teste, 7 deixados com proposta, 11 lacunas para o sistema funcionar como proposto
+e 5 decisões pedidas. Nenhuma task nova foi criada no quadro ainda; elas saem das decisões.
+
 ## Andamento (14/11)
 
 - **Placar (fim do dia):** 81 tasks feitas, 10 em andamento, 1 a fazer, 60 no backlog e 50 cortadas (202 no quadro).

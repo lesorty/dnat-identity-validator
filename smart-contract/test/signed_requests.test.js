@@ -280,10 +280,14 @@ describe("api-server: rotas que criam trabalho exigem pedido assinado (T-1703)",
     }
   });
 
-  it("leitura e rotas do operador seguem sem assinatura", async function () {
+  it("leitura pública segue sem assinatura; rotas do operador fechadas sem o token", async function () {
     const res = await fetch(`${base}/api/identity/challenge`);
     assert.strictEqual(res.status, 200);
-    const execs = await fetch(`${base}/api/executions`);
-    assert.strictEqual(execs.status, 200);
+    for (const [method, route] of [["GET", "/api/executions"], ["POST", "/api/revoke-asset"], ["POST", "/api/update-asset"]]) {
+      const r = await fetch(`${base}${route}`, { method, headers: { "Content-Type": "application/json" }, body: method === "POST" ? "{}" : undefined });
+      assert.strictEqual(r.status, 403, route);
+    }
+    const proto = await fetch(`${base}/api/identity/__proto__`);
+    assert.strictEqual(proto.status, 404);
   });
 });

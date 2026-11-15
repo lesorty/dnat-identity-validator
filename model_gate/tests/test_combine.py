@@ -267,3 +267,20 @@ def test_veredito_serializa_em_json():
 def test_sem_celulas_levanta():
     with pytest.raises(ValueError):
         run([])
+
+
+def test_nan_nunca_aprova():
+    """Revisão de 15/11: NaN < x é falso, e ρ, E1 ou a perda de CE em NaN passavam como aprovado."""
+    nan = float("nan")
+    for sig in (SignalReading("fp", "vazio", rho=nan, e1=0.1), SignalReading("fp", "vazio", rho=0.9, e1=math.inf)):
+        v = run(build(), signals=(sig,) + OK_SIGNALS[1:])
+        assert v.state != APPROVED and "signal_missing" in codes(v)
+    for util in (Utility(relative_ce_loss=nan, degenerate_rate=0.0), Utility(relative_ce_loss=0.05, degenerate_rate=nan)):
+        v = run(build(), utility=util)
+        assert v.state != APPROVED and "utility_missing" in codes(v)
+
+
+def test_regra_4_exige_sinal_de_cada_formato_julgado():
+    only_fp = tuple(s for s in OK_SIGNALS if s.format == "fp")
+    v = run(build(), signals=only_fp)
+    assert v.state == INCONCLUSIVE and "signal_missing" in codes(v)

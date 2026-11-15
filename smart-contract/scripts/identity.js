@@ -322,7 +322,11 @@ class IdentityRegistry {
   }
 
   get(id) {
-    return this.state.identities[String(id || "").toLowerCase()] || null;
+    // Só ids de 64 hex e só chaves próprias: "__proto__" ou "constructor" devolviam objetos do
+    // protótipo, e _ledgerRecord gravava campos neles (revisão de 15/11).
+    const key = String(id || "").toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(key) || !Object.hasOwn(this.state.identities, key)) return null;
+    return this.state.identities[key];
   }
 
   /** Confere a prova com um hash e abre o saldo Q. Chave repetida: 409. */

@@ -205,6 +205,12 @@ def _result(out: Path, doc: dict) -> dict:
     return doc
 
 
+def _emit_failure(out: Path, e: Exception) -> dict:
+    (out / VERDICT_FILE).unlink(missing_ok=True)
+    return _result(out, {"status": "failure", "error": f"{type(e).__name__}: {e}"[:500],
+                         "outcome": "inconclusive_failure", "alert": "verdict_emit_failed"})
+
+
 def run_job(manifest: Manifest, out: Path, stages: Stages | None = None, *, judge_hash: str | None = None) -> dict:
     """Roda o job e devolve o resultado (também gravado em job_result.json).
 
@@ -221,9 +227,12 @@ def run_job(manifest: Manifest, out: Path, stages: Stages | None = None, *, judg
     problems = verify_inputs(manifest)
     if problems:
         verdict = Verdict(REJECTED, "0", (Reason("hash_mismatch", {"inputs": problems}),), 0)
-        doc = emit.build(verdict, cells=[], prereg=None, hashes=_hashes(manifest, _write_responses(out, [])),
-                         identity_id=manifest.identity_id, decided_at=manifest.decided_at)
-        sha = emit.write(doc, out / VERDICT_FILE)
+        try:
+            doc = emit.build(verdict, cells=[], prereg=None, hashes=_hashes(manifest, _write_responses(out, [])),
+                             identity_id=manifest.identity_id, decided_at=manifest.decided_at)
+            sha = emit.write(doc, out / VERDICT_FILE)
+        except Exception as e:  # esquema recusado (ex.: digest malformado): falha registrada, não crash
+            return _emit_failure(out, e)
         return _result(out, {"status": "verdict", "state": doc["state"], "verdict_sha256": sha,
                              "alert": "hash_mismatch", "problems": problems})
 
@@ -243,10 +252,13 @@ def run_job(manifest: Manifest, out: Path, stages: Stages | None = None, *, judg
         return _result(out, {"status": "failure", "error": f"{type(e).__name__}: {e}"[:500],
                              "outcome": "inconclusive_failure"})
 
-    doc = emit.build(verdict, cells=cells, prereg=prereg, hashes=_hashes(manifest, _write_responses(out, responses)),
-                     identity_id=manifest.identity_id, decided_at=manifest.decided_at, signals=signals,
-                     utility=utility)
-    sha = emit.write(doc, out / VERDICT_FILE)
+    try:
+        doc = emit.build(verdict, cells=cells, prereg=prereg, hashes=_hashes(manifest, _write_responses(out, responses)),
+                         identity_id=manifest.identity_id, decided_at=manifest.decided_at, signals=signals,
+                         utility=utility)
+        sha = emit.write(doc, out / VERDICT_FILE)
+    except Exception as e:  # ex.: NaN recusado pelo esquema; antes o job morria sem job_result.json
+        return _emit_failure(out, e)
     return _result(out, {"status": "verdict", "state": doc["state"], "verdict_sha256": sha,
                          "contract_problems": contract_problems, "dataset_overlap_lines": overlap[:20]})
 

@@ -123,6 +123,13 @@ T5 controle de acesso):
 bash assets/tests/run_all_tests.sh
 ```
 
+### Rotas do operador
+
+`/api/revoke-asset`, `/api/update-asset` e `/api/executions[/:id]` só respondem com o token do operador
+(`DNAT_OPERATOR_TOKEN` na CVM1, enviado no cabeçalho `X-Operator-Token`). Sem a variável, ficam fechadas
+(403). A interface em `http://localhost:3001` não usa essas rotas: o usuário vê os próprios jobs por
+`/api/my/jobs`, assinado pela identidade.
+
 ### CVM de job de uso único (T-801)
 
 Cada job roda numa CVM nunca usada, destruída depois dele (`smart-contract/scripts/job_vm.js`). A CVM1

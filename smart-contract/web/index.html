@@ -1,985 +1,408 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DNAT Web CLI</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Identidade no navegador: chave Ed25519, prova de trabalho e pedidos assinados (T-1703, T-1705). -->
-    <script src="/dnat-identity.js"></script>
-    <style>
-      :root {
-        --bg-0: #071827;
-        --bg-1: #12304a;
-        --bg-2: #0d4a5f;
-        --surface: rgba(247, 251, 255, 0.96);
-        --line: #c7d7e3;
-        --ink: #122a3d;
-        --muted: #557085;
-      }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-        color: var(--ink);
-        background:
-          radial-gradient(circle at 14% 18%, rgba(245, 158, 11, 0.18), transparent 30%),
-          radial-gradient(circle at 86% 10%, rgba(10, 147, 150, 0.2), transparent 28%),
-          linear-gradient(160deg, var(--bg-0), var(--bg-1) 58%, var(--bg-2));
-      }
-      .nav {
-        position: sticky;
-        top: 0;
-        z-index: 30;
-        background: rgba(3, 20, 33, 0.64);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 12px 16px;
-        display: flex;
-        gap: 14px;
-      }
-      .nav a { color: #d7eef7; text-decoration: none; font-weight: 700; }
-      .nav a.active { color: #ffffff; text-decoration: underline; }
-      .wrap { max-width: 1040px; margin: 0 auto; padding: 26px 16px 30px; }
-      .top { margin-bottom: 14px; color: #eff9ff; }
-      .top p { margin: 6px 0 0; color: #bfdae8; }
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 16px;
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
-      }
-      .grid { display: grid; gap: 10px; }
-      .fields {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(220px, 1fr));
-        gap: 10px;
-      }
-      label { font-size: 13px; color: var(--muted); font-weight: 700; }
-      input, select, textarea, button {
-        width: 100%;
-        font: inherit;
-        padding: 10px;
-        border-radius: 9px;
-        border: 1px solid #bdd0db;
-      }
-      textarea {
-        min-height: 110px;
-        resize: vertical;
-      }
-      .field-span-2 {
-        grid-column: 1 / -1;
-      }
-      .field-help {
-        margin-top: 6px;
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.4;
-      }
-      .checkbox {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .checkbox input {
-        width: 18px;
-        height: 18px;
-        margin: 0;
-      }
-      button {
-        background: linear-gradient(120deg, #0a9396, #007b83);
-        color: #fff;
-        cursor: pointer;
-        border: none;
-        font-weight: 700;
-      }
-      pre {
-        white-space: pre-wrap;
-        word-break: break-word;
-        background: #edf5fb;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #cfdee8;
-      }
-      .muted { color: var(--muted); font-size: 14px; }
-      .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(160px, 1fr));
-        gap: 10px;
-        margin-top: 12px;
-      }
-      .summary-item {
-        background: #edf5fb;
-        border: 1px solid #cfdee8;
-        border-radius: 10px;
-        padding: 12px;
-      }
-      .summary-item strong {
-        display: block;
-        font-size: 12px;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: var(--muted);
-        margin-bottom: 6px;
-      }
-      .summary-item span {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--ink);
-      }
-      .status-success span { color: #0c7a43; }
-      .status-failed span { color: #b42318; }
-      .output-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-top: 12px;
-      }
-      .panel-title {
-        font-size: 13px;
-        color: var(--muted);
-        font-weight: 700;
-        margin-bottom: 6px;
-      }
-      .file-picker {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-height: 44px;
-        padding: 8px 10px;
-        border: 1px solid #bdd0db;
-        border-radius: 11px;
-        background: linear-gradient(180deg, #f8fcff, #eef5fb);
-      }
-      .file-picker input[type="file"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-        width: 0;
-        height: 0;
-      }
-      .file-picker-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 9px 14px;
-        border-radius: 9px;
-        border: 1px solid #0f7f86;
-        background: linear-gradient(120deg, #0a9396, #0d6e75);
-        color: #fff;
-        font-weight: 700;
-        white-space: nowrap;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        cursor: pointer;
-      }
-      .file-picker-name {
-        min-width: 0;
-        color: var(--ink);
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .asset-choice-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-      .asset-choice-panel {
-        border: 1px solid #cfdee8;
-        background: #f8fbff;
-        border-radius: 12px;
-        padding: 12px;
-      }
-      .asset-choice-list {
-        display: grid;
-        gap: 8px;
-        max-height: 280px;
-        overflow: auto;
-      }
-      .asset-choice-item {
-        border: 1px solid #c8d8e0;
-        background: #fff;
-        border-radius: 10px;
-        padding: 10px;
-        cursor: pointer;
-      }
-      .asset-choice-item.active {
-        border-color: #0a9396;
-        background: linear-gradient(120deg, #ecfeff, #f0fdfa);
-      }
-      .asset-choice-name {
-        font-weight: 800;
-        margin-bottom: 4px;
-      }
-      .asset-choice-meta {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .mini-tag {
-        padding: 3px 8px;
-        border-radius: 999px;
-        background: #e2ecf2;
-        color: #304959;
-        font-weight: 700;
-      }
-      .selection-summary {
-        display: grid;
-        gap: 10px;
-        margin-top: 12px;
-      }
-      @media (max-width: 780px) {
-        .fields { grid-template-columns: 1fr; }
-        .summary-grid,
-        .output-grid,
-        .asset-choice-grid { grid-template-columns: 1fr; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="nav">
-      <a href="/" class="active">CLI</a>
-      <a href="/assets.html">Assets</a>
-      <a href="/executions.html">Executions</a>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNAT · Custódia de modelos</title>
+<!-- Sem scripts de terceiros: a página guarda a chave da identidade (dnat-identity.js), e um CDN
+     comprometido leria essa chave. Tudo aqui é local. -->
+<script src="/dnat-identity.js"></script>
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#fff; --ink:#15232c; --muted:#5b6b75; --line:#d8e0e5; --tint:#eef2f5;
+  --accent:#0d6b73; --accent-soft:#dff0f0; --on-accent:#fff;
+  --ok:#1b7a44; --ok-soft:#e1f3e7; --warn:#946000; --warn-soft:#fbf0d8; --bad:#b0261d; --bad-soft:#fbe3e0;
+  --mono:ui-monospace,"JetBrains Mono",Menlo,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e171b; --surface:#152228; --ink:#e2ebee; --muted:#93a5ac; --line:#2a3a41; --tint:#1a2a30;
+  --accent:#5cc4c7; --accent-soft:#163437; --on-accent:#0e171b;
+  --ok:#6fd19a; --ok-soft:#163826; --warn:#f0bb57; --warn-soft:#3a2d12; --bad:#ff8a80; --bad-soft:#40201d;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
+a{color:var(--accent)}
+header.top{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.bar{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.brand{display:flex;flex-direction:column;line-height:1.15;margin-right:auto}
+.brand b{font-size:1.05rem;letter-spacing:-.01em}
+.brand small{color:var(--muted);font-size:.78rem}
+nav.tabs{max-width:1080px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto}
+nav.tabs a{padding:9px 13px 10px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.92rem;border-bottom:2px solid transparent;white-space:nowrap}
+nav.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.85rem;background:var(--tint);text-decoration:none;color:var(--ink)}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.chip.ok .dot{background:var(--ok)} .chip.bad .dot{background:var(--bad)}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 64px;display:grid;gap:22px}
+h1{font-size:1.45rem;margin:0;letter-spacing:-.01em}
+h2{font-size:1.1rem;margin:0}
+h3{font-size:.98rem;margin:0}
+p{margin:0}
+.lede{color:var(--muted);max-width:75ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:10px;min-width:0;align-content:start}
+.stack{display:grid;gap:14px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));align-items:start}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.spread{justify-content:space-between}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.84em;overflow-wrap:anywhere}
+.badge{display:inline-block;font:600 .72rem/1 var(--sans);letter-spacing:.03em;padding:4px 8px;border-radius:999px;white-space:nowrap;background:var(--tint);color:var(--muted)}
+.b-approved,.b-ok,.b-released{background:var(--ok-soft);color:var(--ok)}
+.b-rejected,.b-bad,.b-revoked{background:var(--bad-soft);color:var(--bad)}
+.b-inconclusive,.b-warn,.b-retained,.b-pending{background:var(--warn-soft);color:var(--warn)}
+.b-accent{background:var(--accent-soft);color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+.tscroll{overflow-x:auto}
+button,.btn{font:600 .9rem var(--sans);border-radius:8px;padding:8px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}
+button:disabled{opacity:.55;cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+label{display:grid;gap:4px;font-size:.88rem;font-weight:600}
+label small{font-weight:400;color:var(--muted)}
+input[type=text],select,textarea{font:inherit;font-weight:400;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:100%}
+input[type=file]{font-size:.86rem}
+textarea{min-height:88px;font-family:var(--mono);font-size:.84rem}
+.steps{display:grid;gap:14px;counter-reset:s}
+.step{display:grid;grid-template-columns:30px 1fr;gap:12px}
+.step>.n{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:.85rem}
+.step.off>.n{background:var(--tint);color:var(--muted)}
+.choice{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:9px 11px;cursor:pointer;font-weight:400}
+.opt input{margin-top:3px}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.note{border-left:3px solid var(--line);padding:2px 0 2px 12px;color:var(--muted);font-size:.88rem}
+.note.warn{border-color:var(--warn)} .note.bad{border-color:var(--bad)} .note.ok{border-color:var(--ok)}
+.msg{border-radius:8px;padding:10px 12px;font-size:.9rem}
+.msg.ok{background:var(--ok-soft)} .msg.bad{background:var(--bad-soft)} .msg.info{background:var(--tint)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:.9rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0}
+.stat{display:grid;gap:2px}
+.stat b{font-size:1.6rem;line-height:1.1}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.ladder{margin:0;padding-left:20px;display:grid;gap:6px;font-size:.92rem}
+details summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.88rem}
+pre{background:var(--tint);border-radius:8px;padding:10px 12px;font:.8rem/1.45 var(--mono);overflow-x:auto;margin:0}
+footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;color:var(--muted);font-size:.8rem}
+.empty{color:var(--muted);font-size:.9rem;padding:6px 0}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:r .8s linear infinite;vertical-align:-2px}
+@keyframes r{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <div class="brand"><b>DNAT</b><small>Custódia de modelos abertos e o Juiz que julga cada derivado</small></div>
+    <a class="chip" id="idchip" href="#identidade"><span class="dot"></span><span>sem identidade</span></a>
+  </div>
+  <nav class="tabs" aria-label="Seções">
+    <a href="#modelos">Modelos</a>
+    <a href="#treinar">Treinar</a>
+    <a href="#jobs">Meus jobs</a>
+    <a href="#juiz">Juiz</a>
+    <a href="#identidade">Identidade</a>
+  </nav>
+</header>
+<main id="view" aria-live="polite"></main>
+<footer id="sys"></footer>
+
+<script>
+"use strict";
+const ID = window.DnatIdentity;
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const short = (h, n = 10) => (h ? esc(String(h).replace(/^0x/, "").slice(0, n)) + "…" : "—");
+const when = (iso) => (iso ? new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "—");
+
+const VERDICT = { approved: "aprovado", rejected: "reprovado", inconclusive: "inconclusivo", pending: "pendente", failure: "falha" };
+const STATE = { released: "liberado", retained: "retido", received: "recebido", revoked: "revogado" };
+const vbadge = (v) => v ? `<span class="badge b-${esc(v)}">${esc(VERDICT[v] || v)}</span>` : `<span class="badge">sem veredito</span>`;
+const sbadge = (s) => s ? `<span class="badge b-${esc(s)}">${esc(STATE[s] || s)}</span>` : "";
+
+async function getJson(path) {
+  const r = await fetch(path);
+  const b = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(b.error || `${path}: ${r.status}`);
+  return b;
+}
+async function signedJson(path, { method = "GET", json = null, multipart = null } = {}) {
+  let body = null, contentType = null;
+  if (json) { body = JSON.stringify(json); contentType = "application/json"; }
+  if (multipart) ({ body, contentType } = await ID.buildMultipart(multipart.fields, multipart.files));
+  const r = await ID.signedFetch(path, { method, body, contentType });
+  const b = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(b.error || `${path}: ${r.status}`);
+  return b;
+}
+function msg(el, kind, html) { el.innerHTML = `<div class="msg ${kind}">${html}</div>`; }
+function needIdentity() {
+  return `<div class="card"><p>Esta seção age em nome de uma identidade.</p><p class="muted">Crie ou importe uma na aba <a href="#identidade">Identidade</a>: é um par de chaves que custa uma prova de trabalho e recebe um saldo de cota.</p></div>`;
+}
+
+// ------------------------------------------------------------------ identidade no cabeçalho
+async function refreshChip() {
+  const chip = $("#idchip"), me = ID.load();
+  if (!me) { chip.className = "chip"; chip.lastElementChild.textContent = "sem identidade"; return null; }
+  try {
+    const s = await getJson(`/api/identity/${me.id}`);
+    chip.className = "chip ok";
+    chip.lastElementChild.textContent = `${me.id.slice(0, 8)}… · saldo ${s.balance}`;
+    return s;
+  } catch {
+    chip.className = "chip bad";
+    chip.lastElementChild.textContent = `${me.id.slice(0, 8)}… · não registrada nesta CVM1`;
+    return null;
+  }
+}
+
+// ------------------------------------------------------------------ Modelos
+async function viewModelos(v) {
+  v.innerHTML = `<div class="row spread"><div><h1>Modelos</h1><p class="lede">Cada base custodiada e os derivados que o Juiz já julgou. Os pesos nunca saem: um derivado aprovado vira ativo que só roda dentro da plataforma; reprovado e inconclusivo ficam retidos.</p></div></div>
+  <div id="mlist"><span class="spin"></span> carregando…</div>
+  <div class="card" id="deposit"><h2>Depositar um modelo base</h2>
+    <p class="muted">Envie o diretório do modelo em tar.gz (safetensors, config e tokenizador). A CVM1 calcula o digest, que vira o hash on-chain que o Juiz confere, e guarda o pacote cifrado. Para o Juiz julgar derivados desta base, o operador ainda precisa depositar a referência do pai.</p>
+    <div class="grid">
+      <label>Arquivo .tar.gz<input type="file" id="mfile" accept=".tar.gz,.tgz,application/gzip"></label>
+      <label>Nome<input type="text" id="mname" placeholder="Qwen2.5-0.5B-Instruct"></label>
+      <label>Descrição<input type="text" id="mdesc" placeholder="revisão, licença"></label>
     </div>
-    <div id="root"></div>
-    <script type="text/babel">
-      const actions = [
-        {
-          key: "register-dataset",
-          label: "1) Register Dataset",
-          method: "POST",
-          fields: [
-            { name: "file", label: "Dataset File", type: "file", defaultValue: null },
-            { name: "priceWei", label: "Price (wei)", type: "text", defaultValue: "0" },
-            { name: "bloomFilter", label: "Bloom Filter", type: "text", defaultValue: "0x" },
-            { name: "manifest.name", label: "Title", type: "text", defaultValue: "Dataset Title" },
-            { name: "manifest.description", label: "Description", type: "text", defaultValue: "Dataset description" },
-            { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
-            { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
-          ],
-        },
-        {
-          key: "register-application",
-          label: "2) Register Application",
-          method: "POST",
-          fields: [
-            { name: "file", label: "Application File", type: "file", defaultValue: null },
-            { name: "priceWei", label: "Price (wei)", type: "text", defaultValue: "0" },
-            { name: "manifest.name", label: "Title", type: "text", defaultValue: "Application Title" },
-            { name: "manifest.description", label: "Description", type: "text", defaultValue: "Application description" },
-            { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
-            { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
-            {
-              name: "manifest.dependencies",
-              label: "Dependencies",
-              type: "textarea",
-              defaultValue: "",
-              fullWidth: true,
-              placeholder: "One dependency per line\nrequests==2.32.3\npandas>=2,<3",
-              help: "Use one dependency per line. Without a version, the builder first tries the newest version already present in the wheel cache; otherwise it resolves normally. You can also use a comma-separated list or a JSON array.",
-            },
-          ],
-        },
-        {
-          key: "register-model",
-          label: "2b) Register Base Model",
-          method: "POST",
-          fields: [
-            {
-              name: "file", label: "Model archive (.tar.gz)", type: "file", defaultValue: null,
-              help: "tar.gz of the model directory (safetensors, config and tokenizer). The CVM1 computes the directory digest, which becomes the on-chain contentHash the Judge checks.",
-            },
-            { name: "manifest.name", label: "Title", type: "text", defaultValue: "Base model" },
-            { name: "manifest.description", label: "Description", type: "text", defaultValue: "" },
-          ],
-        },
-        { key: "get-asset", label: "3) Get Asset", method: "POST", fields: [{ name: "assetId", label: "Asset ID", type: "text", defaultValue: "" }] },
-        {
-          key: "purchase-access",
-          label: "4) Purchase Access",
-          method: "POST",
-          fields: [],
-        },
-        {
-          key: "check-access-by-ids",
-          label: "5) Check Access (by IDs)",
-          method: "POST",
-          fields: [
-            { name: "user", label: "User Address", type: "text", defaultValue: "" },
-            { name: "datasetId", label: "Dataset ID", type: "text", defaultValue: "" },
-            { name: "applicationId", label: "Application ID", type: "text", defaultValue: "" },
-          ],
-        },
-        {
-          key: "check-access-by-uris",
-          label: "6) Check Access (by URIs)",
-          method: "POST",
-          fields: [
-            { name: "user", label: "User Address", type: "text", defaultValue: "" },
-            { name: "datasetUri", label: "Dataset URI", type: "text", defaultValue: "" },
-            { name: "applicationUri", label: "Application URI", type: "text", defaultValue: "" },
-          ],
-        },
-        {
-          key: "update-asset",
-          label: "7) Update Asset",
-          method: "POST",
-          fields: [
-            { name: "assetId", label: "Asset ID", type: "text", defaultValue: "" },
-            { name: "newPriceWei", label: "New Price (wei)", type: "text", defaultValue: "0" },
-            { name: "newActive", label: "Active", type: "checkbox", defaultValue: true },
-          ],
-        },
-        { key: "revoke-asset", label: "8) Revoke Asset", method: "POST", fields: [{ name: "assetId", label: "Asset ID", type: "text", defaultValue: "" }] },
-        { key: "list-my-purchases", label: "9) List My AccessPurchased Events", method: "GET", fields: [] },
-        {
-          key: "run-from-cids",
-          label: "10) Run From CIDs",
-          method: "POST",
-          fields: [],
-        },
-        { key: "contract-info", label: "11) Show Contract Info", method: "GET", fields: [] },
-        {
-          key: "add-file-to-ipfs",
-          label: "12) Add File To IPFS",
-          method: "POST",
-          fields: [
-            { name: "file", label: "File", type: "file", defaultValue: null },
-            { name: "manifest.name", label: "Title", type: "text", defaultValue: "" },
-            { name: "manifest.description", label: "Description", type: "text", defaultValue: "" },
-            { name: "manifest.version", label: "Version", type: "text", defaultValue: "1.0.0" },
-            { name: "manifest.author", label: "Author", type: "text", defaultValue: "" },
-            {
-              name: "manifest.dependencies",
-              label: "Dependencies",
-              type: "textarea",
-              defaultValue: "",
-              fullWidth: true,
-              placeholder: "One dependency per line\nrequests==2.32.3\npandas>=2,<3",
-              help: "Use one dependency per line. Without a version, the builder first tries the newest version already present in the wheel cache; otherwise it resolves normally. You can also use a comma-separated list or a JSON array.",
-            },
-          ],
-        },
-      ];
+    <div class="row"><button class="primary" id="mgo">Depositar</button><span id="mout"></span></div>
+  </div>`;
+  $("#mgo").onclick = async () => {
+    const out = $("#mout"), f = $("#mfile").files[0];
+    if (!ID.load()) return msg(out, "bad", "Crie uma identidade antes de depositar.");
+    if (!f) return msg(out, "bad", "Escolha o arquivo do modelo.");
+    $("#mgo").disabled = true; out.innerHTML = `<span class="spin"></span> enviando e cifrando… (um modelo de 1 GB leva alguns minutos)`;
+    try {
+      const r = await signedJson("/api/register-model", { method: "POST", multipart: {
+        fields: { "manifest.name": $("#mname").value || f.name, "manifest.description": $("#mdesc").value, "manifest.framework": "" },
+        files: { file: f } } });
+      msg(out, "ok", `Base depositada${r.assetId !== undefined ? ` como ativo <b>${esc(r.assetId)}</b>` : ""}.`);
+      loadModels();
+    } catch (e) { msg(out, "bad", esc(e.message)); }
+    $("#mgo").disabled = false;
+  };
+  loadModels();
+}
+async function loadModels() {
+  const box = $("#mlist"); if (!box) return;
+  try {
+    const { bases, orphans } = await getJson("/api/models");
+    if (!bases.length) { box.innerHTML = `<div class="card empty">Nenhuma base custodiada ainda. Deposite uma abaixo.</div>`; return; }
+    box.innerHTML = `<div class="stack">${bases.map(baseCard).join("")}</div>` +
+      (orphans.length ? `<div class="card"><h3>Derivados sem base listada</h3>${derivTable(orphans)}</div>` : "");
+  } catch (e) { box.innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
+}
+function baseCard(b) {
+  const c = { approved: 0, rejected: 0, inconclusive: 0 };
+  b.derivatives.forEach((d) => { if (c[d.verdict] !== undefined) c[d.verdict] += 1; });
+  return `<article class="card">
+    <div class="row spread"><h2>${esc(b.title || "Base " + b.id)}</h2><span class="badge b-accent">ativo ${esc(b.id)}</span></div>
+    ${b.description ? `<p class="muted">${esc(b.description)}</p>` : ""}
+    <dl class="kv"><dt>Digest</dt><dd class="mono">${short(b.digest, 16)}</dd>
+      <dt>Estado</dt><dd>${b.active ? `<span class="badge b-ok">ativa</span>` : `<span class="badge b-bad">revogada</span> <span class="muted">(derivados caem junto)</span>`}</dd>
+      <dt>Referência do pai</dt><dd>${b.reference ? `<span class="badge b-ok">depositada</span> <span class="muted">${when(b.reference.createdAtUtc)}</span>` : `<span class="badge b-warn">falta</span> <span class="muted">sem ela o Juiz não julga</span>`}</dd>
+      <dt>Derivados</dt><dd>${b.derivatives.length ? `${c.approved} aprovados · ${c.inconclusive} inconclusivos · ${c.rejected} reprovados` : "nenhum ainda"}</dd></dl>
+    ${b.derivatives.length ? `<details><summary>Ver os ${b.derivatives.length} derivados</summary>${derivTable(b.derivatives)}</details>` : ""}
+    ${b.active ? `<div><a class="btn" href="#treinar?base=${esc(b.id)}">Treinar um derivado desta base</a></div>` : ""}
+  </article>`;
+}
+function derivTable(ds) {
+  return `<div class="tscroll"><table><thead><tr><th>Ativo</th><th>Veredito</th><th>Uso</th><th>Juiz</th><th>Identidade</th><th>Data</th></tr></thead><tbody>${
+    ds.map((d) => `<tr><td>${esc(d.id)}</td><td>${vbadge(d.verdict)}</td><td>${
+      d.revoked ? `<span class="badge b-revoked">revogado</span>` : d.usable ? `<span class="badge b-ok">usável</span>` : `<span class="badge b-retained">retido</span>`
+    }</td><td class="mono">${short(d.receipt.judgeHash, 8)}</td><td class="mono">${short(d.receipt.identityId, 8)}</td><td>${when(d.decidedAt)}</td></tr>`).join("")
+  }</tbody></table></div><p class="muted" style="font-size:.8rem">O recibo on-chain guarda só hashes (derivado, referência do pai, Juiz, prereg, bateria, veredito) e a identidade que pediu o job; as medidas e os motivos ficam com o operador.</p>`;
+}
 
-      // Rotas que criam trabalho: o servidor exige o pedido assinado pela identidade (T-1703).
-      const SIGNED_ACTIONS = new Set(["register-dataset", "register-application", "register-model", "run-from-cids"]);
+// ------------------------------------------------------------------ Treinar
+async function viewTreinar(v, params) {
+  if (!ID.load()) { v.innerHTML = `<h1>Treinar</h1>` + needIdentity(); return; }
+  v.innerHTML = `<div><h1>Treinar um derivado</h1><p class="lede">O fine-tuning roda numa CVM de uso único, sem rede de saída, destruída no fim. Você recebe só métricas; o derivado fica retido e o Juiz o compara com o pai automaticamente.</p></div>
+  <div id="tform"><span class="spin"></span> carregando…</div>`;
+  let models, assets, rules, me;
+  try {
+    [models, assets, rules, me] = await Promise.all([getJson("/api/models"), getJson("/api/assets"), getJson("/api/quota-rules"), refreshChip()]);
+  } catch (e) { $("#tform").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; return; }
+  const bases = models.bases.filter((b) => b.active);
+  const pre = params.get("base");
+  const opt = (name, value, title, sub, checked) => `<label class="opt"><input type="radio" name="${name}" value="${esc(value)}" ${checked ? "checked" : ""}><span><b>${esc(title)}</b>${sub ? `<br><span class="muted">${sub}</span>` : ""}</span></label>`;
+  $("#tform").innerHTML = `<div class="card steps">
+    <div class="step"><span class="n">1</span><div class="choice"><h3>Base</h3>${
+      bases.length ? bases.map((b, i) => opt("base", b.id, b.title || "Base " + b.id,
+        `digest ${short(b.digest, 12)} · ${b.reference ? "referência do pai depositada" : "<b>sem referência do pai: o job termina sem veredito e a cota volta</b>"}`,
+        pre ? pre === b.id : i === 0)).join("") : `<p class="empty">Nenhuma base ativa. Deposite uma em <a href="#modelos">Modelos</a>.</p>`}</div></div>
+    <div class="step"><span class="n">2</span><div class="choice"><h3>Dados de treino</h3>
+      ${assets.datasets.filter((d) => d.active).map((d, i) => opt("ds", d.id, d.title || "Dataset " + d.id, "já custodiado", i === 0)).join("")}
+      ${opt("ds", "new", "Enviar um CSV novo", "fica cifrado e só a CVM de job o abre", !assets.datasets.some((d) => d.active))}
+      <label>Arquivo CSV<input type="file" id="dsfile" accept=".csv,text/csv"></label></div></div>
+    <div class="step"><span class="n">3</span><div class="choice"><h3>Receita de fine-tuning</h3>
+      <p class="muted" style="font-size:.86rem">O script que treina (por exemplo, um LoRA). O Juiz julga o resultado, não o script: um treino legítimo e uma abliteração podem ter o mesmo código.</p>
+      ${assets.applications.filter((a) => a.active).map((a, i) => opt("app", a.id, a.title || "Receita " + a.id, "já empacotada pelo builder", i === 0)).join("")}
+      ${opt("app", "new", "Enviar um script novo", "o builder empacota com as dependências; pode levar minutos", !assets.applications.some((a) => a.active))}
+      <div class="grid"><label>Script Python<input type="file" id="appfile" accept=".py"></label>
+      <label>Dependências <small>uma por linha, ex.: torch==2.15.0+cpu</small><textarea id="appdeps"></textarea></label></div></div></div>
+    <div class="step"><span class="n">4</span><div><h3>Custo</h3><p class="muted">Ao aceitar o job, a CVM1 reserva <b>${esc(rules.reserve)}</b> do seu saldo${me ? ` (saldo atual ${esc(me.balance)})` : ""}. O veredito acerta a conta: aprovado ${esc(rules.costs.approved)}, inconclusivo ${esc(rules.costs.inconclusive)}, reprovado ${esc(rules.costs.rejected)}; se o job falhar, nada é cobrado.</p></div></div>
+    <div class="row"><button class="primary" id="tgo" ${bases.length ? "" : "disabled"}>Treinar e julgar</button><span class="muted" id="tstage"></span></div>
+    <div id="tout"></div></div>`;
+  $("#tgo").onclick = () => runTraining().catch((e) => { msg($("#tout"), "bad", esc(e.message)); $("#tgo").disabled = false; $("#tstage").textContent = ""; });
+}
+async function runTraining() {
+  const pick = (n) => (document.querySelector(`input[name=${n}]:checked`) || {}).value;
+  const base = pick("base"); let ds = pick("ds"); let app = pick("app");
+  const stage = $("#tstage"), out = $("#tout");
+  if (!base) throw new Error("Escolha uma base.");
+  $("#tgo").disabled = true; out.innerHTML = "";
+  if (ds === "new") {
+    const f = $("#dsfile").files[0]; if (!f) throw new Error("Escolha o CSV de treino.");
+    stage.innerHTML = `<span class="spin"></span> enviando os dados…`;
+    const r = await signedJson("/api/register-dataset", { method: "POST", multipart: {
+      fields: { priceWei: "0", bloomFilter: "0x", "manifest.name": f.name, "manifest.description": "", "manifest.framework": "" }, files: { file: f } } });
+    ds = String(r.assetId ?? r.id);
+  }
+  if (app === "new") {
+    const f = $("#appfile").files[0]; if (!f) throw new Error("Escolha o script de fine-tuning.");
+    stage.innerHTML = `<span class="spin"></span> empacotando a receita no builder…`;
+    const r = await signedJson("/api/register-application", { method: "POST", multipart: {
+      fields: { priceWei: "0", "manifest.name": f.name, "manifest.description": "", "manifest.dependencies": $("#appdeps").value, "manifest.framework": "python" }, files: { file: f } } });
+    app = String(r.assetId ?? r.id);
+  }
+  stage.innerHTML = `<span class="spin"></span> liberando o uso dos dados e da receita…`;
+  const acc = await getJsonPost("/api/check-access-by-ids", { datasetId: ds, applicationId: app });
+  if (!acc.hasAccessByIds) await getJsonPost("/api/purchase-access", { datasetId: ds, applicationId: app });
+  stage.innerHTML = `<span class="spin"></span> treinando na CVM de uso único e julgando… (minutos)`;
+  const r = await signedJson("/api/run-from-cids", { method: "POST", json: { datasetId: ds, applicationId: app, parentModelId: base } });
+  stage.textContent = "";
+  const d = r.derivative || {}, verdict = r.judge?.outcome || d.verdict;
+  msg(out, verdict === "approved" ? "ok" : "info", `<b>Job concluído.</b> Derivado ${sbadge(d.status)} ${vbadge(verdict)}${d.assetId ? ` · ativo ${esc(d.assetId)}` : ""}<br>
+    <span class="muted">${verdict === "approved" ? "O derivado virou ativo e só roda dentro da plataforma." : verdict ? "O derivado fica retido; só o operador pode pedir reavaliação." : "Sem veredito: a reserva da cota voltou."} Acompanhe em <a href="#jobs">Meus jobs</a>.</span>`);
+  $("#tgo").disabled = false; refreshChip();
+}
+async function getJsonPost(path, json) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(json) });
+  const b = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(b.error || `${path}: ${r.status}`);
+  return b;
+}
 
-      function IdentityPanel() {
-        const [identity, setIdentity] = React.useState(() => window.DnatIdentity.load());
-        const [summary, setSummary] = React.useState(null);
-        const [busy, setBusy] = React.useState("");
-        const [error, setError] = React.useState("");
-        const fileRef = React.useRef(null);
+// ------------------------------------------------------------------ Meus jobs
+async function viewJobs(v) {
+  if (!ID.load()) { v.innerHTML = `<h1>Meus jobs</h1>` + needIdentity(); return; }
+  v.innerHTML = `<div class="row spread"><div><h1>Meus jobs</h1><p class="lede">Os jobs pedidos pela sua identidade. Você vê o estado do derivado e o veredito; as medidas e os motivos ficam com o operador, para o Juiz não virar oráculo de quem tenta enganá-lo.</p></div><button id="jr">Atualizar</button></div><div id="jlist"><span class="spin"></span></div>`;
+  const load = async () => {
+    try {
+      const { jobs } = await signedJson("/api/my/jobs");
+      $("#jlist").innerHTML = jobs.length ? `<div class="card tscroll"><table><thead><tr><th>Quando</th><th>Base</th><th>Derivado</th><th>Veredito</th><th>Ativo</th><th>Job</th></tr></thead><tbody>${
+        jobs.map((j) => `<tr><td>${when(j.createdAtUtc)}</td><td>${esc(j.parentModelId ?? "—")}</td><td>${sbadge(j.derivative?.status) || `<span class="badge ${j.status === "success" ? "" : "b-bad"}">${esc(j.status)}</span>`}</td><td>${vbadge(j.verdict)}</td><td>${esc(j.derivative?.assetId ?? "—")}</td><td class="mono">${esc(j.executionId)}</td></tr>`).join("")
+      }</tbody></table></div>` : `<div class="card empty">Nenhum job ainda. Comece em <a href="#treinar">Treinar</a>.</div>`;
+    } catch (e) { $("#jlist").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
+  };
+  $("#jr").onclick = load; load();
+}
 
-        async function refresh(id = identity?.id) {
-          if (!id) return setSummary(null);
-          try {
-            const res = await fetch(`/api/identity/${id}`);
-            setSummary(res.ok ? await res.json() : { error: res.status === 404 ? "not registered on this CVM1" : `HTTP ${res.status}` });
-          } catch (e) {
-            setSummary({ error: e.message });
-          }
-        }
-        React.useEffect(() => { refresh(); }, [identity?.id]);
+// ------------------------------------------------------------------ Juiz
+async function viewJuiz(v) {
+  v.innerHTML = `<div><h1>Juiz</h1><p class="lede">O portão entre o treino e o uso. Compara o derivado com o pai custodiado, no mesmo formato e condição, e decide aprovado, inconclusivo ou reprovado. O desenho é público; a parte secreta da bateria e a chave do sorteio ficam com a CVM1.</p></div>
+  <div class="grid">
+    <div class="card"><h2>Como decide</h2><ol class="ladder">
+      <li><b>Entradas conferidas por hash.</b> Derivado, base, referência do pai, bateria e prereg. Um derivado ou base que não confere com o digest custodiado → <span class="badge b-rejected">reprovado</span>, com alerta ao operador.</li>
+      <li><b>Comportamento (S1).</b> O dano medido não pode subir mais que δ por categoria em relação ao pai, lendo a resposta inteira; é o único sinal que reprova por mérito.</li>
+      <li><b>Todos os formatos.</b> FP e NF4: tudo ou nada; formato não avaliado não sai.</li>
+      <li><b>Sinais internos (S2, S3).</b> Segunda linha: no máximo levam a inconclusivo.</li>
+      <li><b>Falha do job</b> → sem veredito e a reserva da cota volta; nada é liberado por falha nem por revisão.</li>
+    </ol><p class="note">Aprovado quer dizer "não regrediu em relação ao pai nas condições declaradas", não uma garantia de segurança.</p></div>
+    <div class="card" id="jcost"><h2>Cota por veredito</h2><span class="spin"></span></div>
+  </div>
+  <div id="jstate"><span class="spin"></span></div>`;
+  try {
+    const [j, rules, models] = await Promise.all([getJson("/api/judge"), getJson("/api/quota-rules"), getJson("/api/models")]);
+    $("#jcost").innerHTML = `<h2>Cota por veredito</h2><p class="muted">Toda identidade começa com <b>${esc(rules.initialBalance)}</b>. O job reserva ${esc(rules.reserve)} no aceite e o veredito acerta a conta. Quem tenta enganar o Juiz esgota a identidade depressa, e uma identidade nova custa uma prova de trabalho.</p>
+      <div class="stats"><div class="stat"><b style="color:var(--ok)">${esc(rules.costs.approved)}</b><span class="muted">aprovado</span></div><div class="stat"><b style="color:var(--warn)">${esc(rules.costs.inconclusive)}</b><span class="muted">inconclusivo</span></div><div class="stat"><b style="color:var(--bad)">${esc(rules.costs.rejected)}</b><span class="muted">reprovado</span></div><div class="stat"><b>${esc(rules.costs.failure)}</b><span class="muted">falha do job</span></div></div>`;
+    const title = Object.fromEntries(models.bases.map((b) => [b.id, b.title || "Base " + b.id]));
+    $("#jstate").innerHTML = `<div class="card"><h2>Versões liberadas</h2>
+      ${j.releases.length ? `<div class="tscroll"><table><thead><tr><th>Juiz</th><th>Prereg</th><th>Compromisso da bateria</th><th>Avaliador</th><th>Nota</th></tr></thead><tbody>${
+        j.releases.map((r) => `<tr><td class="mono">${short(r.judgeHash, 12)}</td><td class="mono">${short(r.preregSha256, 10)}</td><td class="mono">${short(r.batteryCommitment, 10)}</td><td>${esc(r.evaluatorKind || "—")}</td><td>${esc(r.note)}</td></tr>`).join("")}</tbody></table></div>
+        <p class="muted" style="font-size:.84rem">Só um Juiz desta lista julga. Um veredito vale para a versão em que saiu; uma versão nova remede as referências.</p>`
+      : `<div class="note warn">Nenhum Juiz liberado: todo job termina sem veredito (judge_not_allowed) e a cota volta.${j.allowlistError && j.allowlistError !== "nenhum Juiz liberado ainda" ? ` Erro na lista permitida: ${esc(j.allowlistError)}` : ""}</div>`}</div>
+    <div class="grid">
+      <div class="card"><h2>Pacote da bateria</h2>${j.battery ? `<dl class="kv"><dt>Digest</dt><dd class="mono">${short(j.battery.digest, 16)}</dd><dt>Depositado</dt><dd>${when(j.battery.createdAtUtc)}</dd>${j.battery.source ? `<dt>Origem</dt><dd>${esc(j.battery.source)}</dd>` : ""}</dl>` : `<div class="note warn">Nenhum pacote depositado.</div>`}</div>
+      <div class="card"><h2>Referências do pai</h2><p class="muted" style="font-size:.86rem">Medidas sob custódia logo depois do depósito da base; o hash vai no recibo. Uma referência fornecida por quem treina anularia os sinais.</p>${
+        Object.keys(j.references).length ? `<dl class="kv">${Object.entries(j.references).map(([id, r]) => `<dt>${esc(title[id] || "Base " + id)}</dt><dd><span class="mono">${short(r.digest, 12)}</span> · ${when(r.createdAtUtc)}</dd>`).join("")}</dl>` : `<div class="note warn">Nenhuma referência depositada.</div>`}</div>
+    </div>
+    <details class="card"><summary>Ações do operador (no host da CVM1, fora da API)</summary>
+      <p class="muted" style="font-size:.86rem">Liberar um Juiz e depositar a bateria e as referências são atos do operador, que é premissa de confiança; não há rota pública para eles.</p>
+      <pre>node scripts/judge_cli.js battery   --dir DIRETÓRIO_DA_BATERIA
+node scripts/judge_cli.js reference --parent ID_DA_BASE --dir DIRETÓRIO_DA_REFERÊNCIA
+node scripts/judge_cli.js allow     --battery-commitment HEX --prereg CAMINHO --evaluator-kind guard --evaluator-dir DIR
+node scripts/judge_cli.js show</pre></details>`;
+  } catch (e) { $("#jstate").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
+}
 
-        async function create() {
-          setError("");
-          setBusy("Solving proof of work...");
-          try {
-            const out = await window.DnatIdentity.create((p) => setBusy(`Proof of work: ${(p.tried / 1e6).toFixed(1)} M hashes in ${(p.ms / 1000).toFixed(1)} s`));
-            setIdentity(out.identity);
-            setBusy("");
-          } catch (e) {
-            setBusy("");
-            setError(e.message);
-          }
-        }
+// ------------------------------------------------------------------ Identidade
+async function viewIdentidade(v) {
+  const me = ID.load();
+  v.innerHTML = `<div><h1>Identidade</h1><p class="lede">Toda ação que cria trabalho vai assinada por uma identidade: um par de chaves Ed25519 que custa uma prova de trabalho (SHA-256 com d bits zero, como no Bitcoin). Cada identidade recebe um saldo de cota, gasto por veredito.</p></div><div id="ibox"></div>`;
+  const box = $("#ibox");
+  if (!me) {
+    box.innerHTML = `<div class="grid"><div class="card"><h2>Criar</h2><p class="muted">O navegador gera a chave e resolve a prova de trabalho; a chave só é guardada depois que a CVM1 aceita o registro.</p>
+      <div class="row"><button class="primary" id="icreate">Criar identidade</button></div><div id="iprog" class="muted"></div></div>
+      <div class="card"><h2>Importar</h2><p class="muted">O arquivo de chave do CLI (~/.dnat/identity.json) ou um exportado daqui.</p><input type="file" id="iimport" accept=".json,application/json"><div id="iimp"></div></div></div>
+      <p class="note">A semente da chave fica no armazenamento local deste navegador. Quem tem a semente age pela identidade: exporte uma cópia e não use esta página num computador compartilhado.</p>`;
+    $("#icreate").onclick = async () => {
+      $("#icreate").disabled = true; const p = $("#iprog"); p.innerHTML = `<span class="spin"></span> resolvendo a prova de trabalho…`;
+      try {
+        const r = await ID.create((s) => { p.innerHTML = `<span class="spin"></span> ${(s.tried / 1e6).toFixed(1)} milhões de hashes em ${(s.ms / 1000).toFixed(0)} s…`; });
+        p.innerHTML = `Registrada com d = ${esc(r.difficulty)}.`; refreshChip(); viewIdentidade(v);
+      } catch (e) { msg(p, "bad", esc(e.message)); $("#icreate").disabled = false; }
+    };
+    $("#iimport").onchange = async (ev) => {
+      try { await ID.importJson(await ev.target.files[0].text()); refreshChip(); viewIdentidade(v); }
+      catch (e) { msg($("#iimp"), "bad", esc(e.message)); }
+    };
+    return;
+  }
+  box.innerHTML = `<span class="spin"></span>`;
+  let s = null, err = null;
+  try { s = await getJson(`/api/identity/${me.id}`); } catch (e) { err = e.message; }
+  box.innerHTML = `<div class="grid"><div class="card"><h2>Sua identidade</h2><dl class="kv"><dt>Id</dt><dd class="mono">${esc(me.id)}</dd><dt>Chave pública</dt><dd class="mono">${short(me.publicKey, 24)}</dd>${s ? `<dt>Registrada</dt><dd>${when(s.registeredAtUtc)} · d = ${esc(s.difficulty)}</dd>` : ""}</dl>
+      ${err ? `<div class="note bad">Esta CVM1 não conhece a identidade (${esc(err)}). Uma implantação nova começa com o registro vazio: esqueça esta chave e crie outra.</div>` : ""}
+      <div class="row"><button id="iexp">Exportar chave</button><button class="danger" id="iforget">Esquecer neste navegador</button></div></div>
+    ${s ? `<div class="card"><h2>Cota</h2><div class="stats"><div class="stat"><b>${esc(s.balance)}</b><span class="muted">saldo livre</span></div><div class="stat"><b>${esc(s.reserved)}</b><span class="muted">reservado</span></div><div class="stat"><b>${esc(s.spent)}</b><span class="muted">gasto</span></div><div class="stat"><b>${esc(s.initialBalance)}</b><span class="muted">inicial</span></div></div>
+      <p class="muted" style="font-size:.88rem">Vereditos: ${Object.entries(s.counts || {}).map(([k, n]) => `${esc(VERDICT[k] || k)} ${esc(n)}`).join(" · ") || "nenhum"}. Sem recarga: com o saldo abaixo da reserva, o próximo job é recusado antes de gastar CVM.</p></div>` : ""}</div>`;
+  $("#iexp").onclick = () => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([ID.exportJson(me)], { type: "application/json" }));
+    a.download = `dnat-identity-${me.id.slice(0, 8)}.json`; a.click(); URL.revokeObjectURL(a.href);
+  };
+  $("#iforget").onclick = () => {
+    if (!confirm("Esquecer a chave neste navegador? Sem uma cópia exportada, a identidade e o saldo ficam inacessíveis.")) return;
+    ID.clear(); refreshChip(); viewIdentidade(v);
+  };
+}
 
-        async function importFile(file) {
-          setError("");
-          try {
-            setIdentity(await window.DnatIdentity.importJson(await file.text()));
-          } catch (e) {
-            setError(e.message);
-          }
-        }
-
-        function exportKey() {
-          const blob = new Blob([window.DnatIdentity.exportJson(identity)], { type: "application/json" });
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(blob);
-          a.download = "dnat-identity.json";
-          a.click();
-          URL.revokeObjectURL(a.href);
-        }
-
-        function forget() {
-          if (!window.confirm("Forget this identity in this browser? Without an exported copy, the key and its quota are lost.")) return;
-          window.DnatIdentity.clear();
-          setIdentity(null);
-        }
-
-        return (
-          <div className="card grid" style={{ marginBottom: 16 }}>
-            <label>Identity</label>
-            {identity ? (
-              <div className="grid">
-                <div className="asset-choice-meta">
-                  <span className="mini-tag">ID {identity.id.slice(0, 16)}...</span>
-                  {summary && !summary.error && <span className="mini-tag">Balance {summary.balance} / {summary.initialBalance}</span>}
-                  {summary && !summary.error && <span className="mini-tag">Reserved {summary.reserved}</span>}
-                  {summary && !summary.error && (
-                    <span className="mini-tag">
-                      Approved {summary.counts.approved} · Inconclusive {summary.counts.inconclusive} · Rejected {summary.counts.rejected}
-                    </span>
-                  )}
-                </div>
-                {summary?.error && <div className="muted">Identity: {summary.error}</div>}
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button type="button" onClick={() => refresh()}>Refresh balance</button>
-                  <button type="button" onClick={exportKey}>Export key</button>
-                  <button type="button" onClick={forget}>Forget</button>
-                </div>
-              </div>
-            ) : (
-              <div className="grid">
-                <div className="muted">
-                  Work-creating requests are signed by an identity (Ed25519 key registered with a proof of work).
-                  Create one here or import the key file of the CLI (~/.dnat/identity.json).
-                </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button type="button" disabled={!!busy} onClick={create}>Create identity</button>
-                  <button type="button" disabled={!!busy} onClick={() => fileRef.current?.click()}>Import key file</button>
-                  <input ref={fileRef} type="file" accept="application/json" style={{ display: "none" }}
-                    onChange={(e) => e.target.files[0] && importFile(e.target.files[0])} />
-                </div>
-              </div>
-            )}
-            {busy && <div className="muted">{busy}</div>}
-            {error && <div className="muted" style={{ color: "#b42318" }}>{error}</div>}
-          </div>
-        );
-      }
-
-      function createInitialFieldState(action) {
-        const out = {};
-        for (const field of action.fields || []) out[field.name] = field.defaultValue;
-        return out;
-      }
-
-      function setByPath(obj, path, value) {
-        const parts = path.split(".");
-        let cursor = obj;
-        for (let i = 0; i < parts.length - 1; i += 1) {
-          const key = parts[i];
-          if (!cursor[key] || typeof cursor[key] !== "object") cursor[key] = {};
-          cursor = cursor[key];
-        }
-        cursor[parts[parts.length - 1]] = value;
-      }
-
-      function actionUsesFileUpload(action) {
-        return (action.fields || []).some((field) => field.type === "file");
-      }
-
-      function actionUsesManifest(action) {
-        return (action.fields || []).some((field) => field.name.startsWith("manifest."));
-      }
-
-      function actionUsesAssetPairSelector(actionKey) {
-        return actionKey === "run-from-cids" || actionKey === "purchase-access";
-      }
-
-      function shortText(text, max = 80) {
-        const value = String(text || "").trim();
-        if (!value) return "No description";
-        return value.length > max ? `${value.slice(0, max)}...` : value;
-      }
-
-      function App() {
-        const [actionKey, setActionKey] = React.useState(actions[0].key);
-        const selected = actions.find((a) => a.key === actionKey);
-        const [fieldValues, setFieldValues] = React.useState(createInitialFieldState(actions[0]));
-        const [selectedFiles, setSelectedFiles] = React.useState({});
-        const [assetCatalog, setAssetCatalog] = React.useState({ all: [], datasets: [], applications: [], models: [] });
-        const [runSelection, setRunSelection] = React.useState({ dataset: null, application: null, model: null });
-        const [purchaseSelection, setPurchaseSelection] = React.useState({ dataset: null, application: null });
-        const [result, setResult] = React.useState(null);
-        const [loading, setLoading] = React.useState(false);
-
-        React.useEffect(() => {
-          setFieldValues(createInitialFieldState(selected));
-          setSelectedFiles({});
-          setRunSelection({ dataset: null, application: null, model: null });
-          setPurchaseSelection({ dataset: null, application: null });
-        }, [actionKey]);
-
-        React.useEffect(() => {
-          if (!actionUsesAssetPairSelector(actionKey)) return;
-
-          async function loadAssets() {
-            try {
-              const res = await fetch("/api/assets");
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || "Failed to load assets");
-              setAssetCatalog(data);
-            } catch (error) {
-              setResult({ error: error.message });
-            }
-          }
-
-          loadAssets();
-        }, [actionKey]);
-
-        function updateField(name, value) {
-          setFieldValues((prev) => ({ ...prev, [name]: value }));
-        }
-
-        function updateFile(name, file) {
-          setSelectedFiles((prev) => ({ ...prev, [name]: file || null }));
-        }
-
-        function isMissingRequiredFile() {
-          return (selected.fields || []).some((field) => field.type === "file" && !selectedFiles[field.name]);
-        }
-
-        function isMissingRunSelection() {
-          return actionKey === "run-from-cids" && (!runSelection.dataset || !runSelection.application);
-        }
-
-        function isMissingPurchaseSelection() {
-          return actionKey === "purchase-access" && (!purchaseSelection.dataset || !purchaseSelection.application);
-        }
-
-        function buildPayload() {
-          if (actionKey === "run-from-cids") {
-            return {
-              datasetId: String(runSelection.dataset?.id ?? ""),
-              applicationId: String(runSelection.application?.id ?? ""),
-              ...(runSelection.model ? { parentModelId: String(runSelection.model.id) } : {}),
-            };
-          }
-
-          if (actionKey === "purchase-access") {
-            return {
-              datasetId: String(purchaseSelection.dataset?.id ?? ""),
-              applicationId: String(purchaseSelection.application?.id ?? ""),
-            };
-          }
-
-          const payload = {};
-          for (const field of selected.fields || []) {
-            if (field.type === "file") continue;
-            setByPath(payload, field.name, fieldValues[field.name]);
-          }
-          if (actionUsesManifest(selected)) {
-            if (!payload.manifest || typeof payload.manifest !== "object") payload.manifest = {};
-            if (payload.manifest.framework === undefined) payload.manifest.framework = "";
-          }
-          return payload;
-        }
-
-        function buildFormData() {
-          const formData = new FormData();
-          for (const field of selected.fields || []) {
-            if (field.type === "file") {
-              const file = selectedFiles[field.name];
-              if (file) formData.append(field.name, file, file.name);
-              continue;
-            }
-            formData.append(field.name, fieldValues[field.name] ?? "");
-          }
-          if (actionUsesManifest(selected)) {
-            formData.append("manifest.framework", "");
-          }
-          return formData;
-        }
-
-        async function executeAction() {
-          setLoading(true);
-          setResult(null);
-          try {
-            if (isMissingRequiredFile()) {
-              setResult({ error: "Select a file before executing this action." });
-              return;
-            }
-            if (isMissingRunSelection()) {
-              setResult({ error: "Select one dataset and one application before executing." });
-              return;
-            }
-            if (isMissingPurchaseSelection()) {
-              setResult({ error: "Select one dataset and one application before purchasing access." });
-              return;
-            }
-            const usesFileUpload = actionUsesFileUpload(selected);
-            if (SIGNED_ACTIONS.has(selected.key)) {
-              // Corpo montado em bytes para assinar exatamente o que vai pela rede.
-              let body;
-              let contentType;
-              if (usesFileUpload) {
-                const fields = {};
-                const files = {};
-                for (const field of selected.fields || []) {
-                  if (field.type === "file") files[field.name] = selectedFiles[field.name];
-                  else fields[field.name] = fieldValues[field.name] ?? "";
-                }
-                if (actionUsesManifest(selected)) fields["manifest.framework"] = "";
-                ({ body, contentType } = await window.DnatIdentity.buildMultipart(fields, files));
-              } else {
-                body = JSON.stringify(buildPayload());
-                contentType = "application/json";
-              }
-              const signed = await window.DnatIdentity.signedFetch(`/api/${selected.key}`, { method: "POST", body, contentType });
-              setResult(await signed.json());
-              return;
-            }
-            const response = selected.method === "GET"
-              ? await fetch(`/api/${selected.key}`)
-              : usesFileUpload
-                ? await fetch(`/api/${selected.key}`, {
-                    method: "POST",
-                    body: buildFormData(),
-                  })
-                : await fetch(`/api/${selected.key}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(buildPayload()),
-                  });
-
-            const data = await response.json();
-            setResult(data);
-          } catch (error) {
-            setResult({ error: error.message });
-          } finally {
-            setLoading(false);
-          }
-        }
-
-        function renderRunFromCidsResult(data) {
-          if (!data || typeof data !== "object") return null;
-
-          const metadata = data.metadata || {};
-          const status = metadata.status || "unknown";
-          const returnCode = metadata.returnCode ?? data.exitCode ?? "n/a";
-          const output = data.stdout || "";
-          const errorOutput = data.stderr || "";
-          const runnerOutput = data.runnerStdout || "";
-          const runnerErrorOutput = data.runnerStderr || "";
-          const statusClass = status === "success" ? "status-success" : "status-failed";
-
-          return (
-            <div>
-              <div className="summary-grid">
-                <div className={`summary-item ${statusClass}`}>
-                  <strong>Status</strong>
-                  <span>{status}</span>
-                </div>
-                <div className="summary-item">
-                  <strong>Return</strong>
-                  <span>{String(returnCode)}</span>
-                </div>
-                <div className="summary-item">
-                  <strong>Execution</strong>
-                  <span style={{ fontSize: "14px" }}>{metadata.executionId || "n/a"}</span>
-                </div>
-              </div>
-
-              {(data.judge || data.quota) && (
-                <div className="summary-grid" style={{ marginTop: 12 }}>
-                  <div className={`summary-item ${data.judge?.outcome === "approved" ? "status-success" : "status-failed"}`}>
-                    <strong>Judge</strong>
-                    <span>{data.judge ? data.judge.outcome : "no parent model"}</span>
-                  </div>
-                  <div className="summary-item">
-                    <strong>Derivative asset</strong>
-                    <span>{data.judge?.assetId ?? (data.judge?.alert || "n/a")}</span>
-                  </div>
-                  <div className="summary-item">
-                    <strong>Quota balance</strong>
-                    <span>{data.quota ? String(data.quota.balance) : "n/a"}</span>
-                  </div>
-                </div>
-              )}
-
-              <div className="output-grid">
-                <div>
-                  <div className="panel-title">Command Output</div>
-                  <pre>{output || "No stdout"}</pre>
-                </div>
-                <div>
-                  <div className="panel-title">Command Error Output</div>
-                  <pre>{errorOutput || "No stderr"}</pre>
-                </div>
-              </div>
-
-              <div style={{ marginTop: 12 }}>
-                <div className="panel-title">Runner Output</div>
-                <pre>{runnerOutput || "No runner stdout"}</pre>
-              </div>
-
-              <div style={{ marginTop: 12 }}>
-                <div className="panel-title">Runner Error Output</div>
-                <pre>{runnerErrorOutput || "No runner stderr"}</pre>
-              </div>
-
-              <div style={{ marginTop: 12 }}>
-                <div className="panel-title">Full Response</div>
-                <pre>{JSON.stringify(data, null, 2)}</pre>
-              </div>
-            </div>
-          );
-        }
-
-        function renderResult() {
-          if (!result) return "{}";
-          if (selected.key === "run-from-cids" && typeof result === "object") {
-            return renderRunFromCidsResult(result);
-          }
-          return <pre>{JSON.stringify(result, null, 2)}</pre>;
-        }
-
-        function renderRunFromCidsPicker() {
-          return (
-            <div className="grid">
-              <div className="asset-choice-grid">
-                <section className="asset-choice-panel">
-                  <label>Datasets</label>
-                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
-                    {assetCatalog.datasets.length === 0 && <div className="muted">No datasets found.</div>}
-                    {assetCatalog.datasets.map((item) => (
-                      <div
-                        key={`dataset-${item.id}`}
-                        className={`asset-choice-item ${runSelection.dataset?.id === item.id ? "active" : ""}`}
-                        onClick={() => setRunSelection((prev) => ({ ...prev, dataset: item }))}
-                      >
-                        <div className="asset-choice-name">{item.title || `Dataset #${item.id}`}</div>
-                        <div className="muted">{shortText(item.description)}</div>
-                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
-                          <span className="mini-tag">ID {item.id}</span>
-                          <span className="mini-tag">{item.priceWei} wei</span>
-                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="asset-choice-panel">
-                  <label>Applications</label>
-                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
-                    {assetCatalog.applications.length === 0 && <div className="muted">No applications found.</div>}
-                    {assetCatalog.applications.map((item) => (
-                      <div
-                        key={`application-${item.id}`}
-                        className={`asset-choice-item ${runSelection.application?.id === item.id ? "active" : ""}`}
-                        onClick={() => setRunSelection((prev) => ({ ...prev, application: item }))}
-                      >
-                        <div className="asset-choice-name">{item.title || `Application #${item.id}`}</div>
-                        <div className="muted">{shortText(item.description)}</div>
-                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
-                          <span className="mini-tag">ID {item.id}</span>
-                          <span className="mini-tag">{item.priceWei} wei</span>
-                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-
-              <section className="asset-choice-panel">
-                <label>Parent model (optional: with it, the derivative goes to the Judge)</label>
-                <div className="asset-choice-list" style={{ marginTop: 8 }}>
-                  {assetCatalog.models.length === 0 && <div className="muted">No base models found.</div>}
-                  {assetCatalog.models.map((item) => (
-                    <div
-                      key={`model-${item.id}`}
-                      className={`asset-choice-item ${runSelection.model?.id === item.id ? "active" : ""}`}
-                      onClick={() => setRunSelection((prev) => ({ ...prev, model: prev.model?.id === item.id ? null : item }))}
-                    >
-                      <div className="asset-choice-name">{item.title || `Model #${item.id}`}</div>
-                      <div className="muted">{shortText(item.description)}</div>
-                      <div className="asset-choice-meta" style={{ marginTop: 8 }}>
-                        <span className="mini-tag">ID {item.id}</span>
-                        <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <div className="selection-summary">
-                <div className="muted">
-                  Selected dataset: {runSelection.dataset ? `${runSelection.dataset.title || `Dataset #${runSelection.dataset.id}`} (ID ${runSelection.dataset.id})` : "none"}
-                </div>
-                <div className="muted">
-                  Selected application: {runSelection.application ? `${runSelection.application.title || `Application #${runSelection.application.id}`} (ID ${runSelection.application.id})` : "none"}
-                </div>
-              </div>
-            </div>
-          );
-        }
-
-        function renderAssetPairSelector(selection, setSelection, summaryLabels) {
-          return (
-            <div className="grid">
-              <div className="asset-choice-grid">
-                <section className="asset-choice-panel">
-                  <label>Datasets</label>
-                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
-                    {assetCatalog.datasets.length === 0 && <div className="muted">No datasets found.</div>}
-                    {assetCatalog.datasets.map((item) => (
-                      <div
-                        key={`pair-dataset-${item.id}`}
-                        className={`asset-choice-item ${selection.dataset?.id === item.id ? "active" : ""}`}
-                        onClick={() => setSelection((prev) => ({ ...prev, dataset: item }))}
-                      >
-                        <div className="asset-choice-name">{item.title || `Dataset #${item.id}`}</div>
-                        <div className="muted">{shortText(item.description)}</div>
-                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
-                          <span className="mini-tag">ID {item.id}</span>
-                          <span className="mini-tag">{item.priceWei} wei</span>
-                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="asset-choice-panel">
-                  <label>Applications</label>
-                  <div className="asset-choice-list" style={{ marginTop: 8 }}>
-                    {assetCatalog.applications.length === 0 && <div className="muted">No applications found.</div>}
-                    {assetCatalog.applications.map((item) => (
-                      <div
-                        key={`pair-application-${item.id}`}
-                        className={`asset-choice-item ${selection.application?.id === item.id ? "active" : ""}`}
-                        onClick={() => setSelection((prev) => ({ ...prev, application: item }))}
-                      >
-                        <div className="asset-choice-name">{item.title || `Application #${item.id}`}</div>
-                        <div className="muted">{shortText(item.description)}</div>
-                        <div className="asset-choice-meta" style={{ marginTop: 8 }}>
-                          <span className="mini-tag">ID {item.id}</span>
-                          <span className="mini-tag">{item.priceWei} wei</span>
-                          <span className="mini-tag">{item.active ? "Active" : "Inactive"}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-
-              <div className="selection-summary">
-                <div className="muted">
-                  {summaryLabels.dataset}: {selection.dataset ? `${selection.dataset.title || `Dataset #${selection.dataset.id}`} (ID ${selection.dataset.id})` : "none"}
-                </div>
-                <div className="muted">
-                  {summaryLabels.application}: {selection.application ? `${selection.application.title || `Application #${selection.application.id}`} (ID ${selection.application.id})` : "none"}
-                </div>
-              </div>
-            </div>
-          );
-        }
-
-        return (
-          <div className="wrap">
-            <div className="top">
-              <h1 style={{ margin: 0 }}>DNAT Web CLI</h1>
-              <p>Fill inputs directly and submit, no manual JSON body required.</p>
-            </div>
-
-            <IdentityPanel />
-
-            <div className="card grid">
-              <label>Action</label>
-              <select value={actionKey} onChange={(e) => setActionKey(e.target.value)}>
-                {actions.map((a) => (
-                  <option key={a.key} value={a.key}>{a.label}</option>
-                ))}
-              </select>
-
-              {selected.key === "run-from-cids" && renderRunFromCidsPicker()}
-              {selected.key === "purchase-access" &&
-                renderAssetPairSelector(purchaseSelection, setPurchaseSelection, {
-                  dataset: "Selected dataset",
-                  application: "Selected application",
-                })}
-
-              {selected.fields.length > 0 && (
-                <div className="fields">
-                  {selected.fields.map((field) => (
-                    <div key={field.name} className={field.fullWidth ? "field-span-2" : ""}>
-                      <label>{field.label}</label>
-                      {field.type === "checkbox" ? (
-                        <div className="checkbox">
-                          <input
-                            type="checkbox"
-                            checked={Boolean(fieldValues[field.name])}
-                            onChange={(e) => updateField(field.name, e.target.checked)}
-                          />
-                          <span className="muted">Enabled</span>
-                        </div>
-                      ) : field.type === "file" ? (
-                        <div>
-                          <label className="file-picker">
-                            <span className="file-picker-button">Choose File</span>
-                            <span className="file-picker-name">
-                              {selectedFiles[field.name]?.name || "No file selected"}
-                            </span>
-                            <input
-                              type="file"
-                              onChange={(e) => updateFile(field.name, e.target.files?.[0] || null)}
-                            />
-                          </label>
-                        </div>
-                      ) : field.type === "textarea" ? (
-                        <div>
-                          <textarea
-                            value={fieldValues[field.name] ?? ""}
-                            placeholder={field.placeholder || ""}
-                            onChange={(e) => updateField(field.name, e.target.value)}
-                          />
-                          {field.help && <div className="field-help">{field.help}</div>}
-                        </div>
-                      ) : (
-                        <input
-                          type="text"
-                          placeholder={field.placeholder || ""}
-                          value={fieldValues[field.name] ?? ""}
-                          onChange={(e) => updateField(field.name, e.target.value)}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {selected.fields.length === 0 && (
-                <div className="muted">This action does not require input fields.</div>
-              )}
-
-              <button onClick={executeAction} disabled={loading || isMissingRequiredFile() || isMissingRunSelection() || isMissingPurchaseSelection()}>
-                {loading ? "Running..." : "Execute"}
-              </button>
-            </div>
-
-            <div className="card" style={{ marginTop: 14 }}>
-              <strong>Response</strong>
-              {renderResult()}
-            </div>
-          </div>
-        );
-      }
-
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-    </script>
-  </body>
+// ------------------------------------------------------------------ rodapé e roteamento
+async function footer() {
+  try {
+    const h = await getJson("/api/health");
+    $("#sys").innerHTML = `Contrato <span class="mono">${short(h.info?.contractAddress, 10)}</span> · cadeia ${esc(h.info?.chainId)} · CVM de job: ${
+      h.executor?.singleUse ? `uso único (${esc(h.executor.provider)}, ${esc(h.executor.warm)} prontas)` : `<b>reaproveitada</b> (${h.executor?.ok ? "ok" : "fora do ar"})`} · builder ${h.builder?.ok ? "ok" : "fora do ar"}`;
+  } catch { $("#sys").textContent = "CVM1 fora do ar"; }
+}
+const ROUTES = { modelos: viewModelos, treinar: viewTreinar, jobs: viewJobs, juiz: viewJuiz, identidade: viewIdentidade };
+function route() {
+  const [name, q] = (location.hash.slice(1) || "modelos").split("?");
+  const view = ROUTES[name] || viewModelos;
+  document.querySelectorAll("nav.tabs a").forEach((a) => a.toggleAttribute("aria-current", a.getAttribute("href") === "#" + (ROUTES[name] ? name : "modelos")));
+  document.querySelectorAll("nav.tabs a[aria-current]").forEach((a) => a.setAttribute("aria-current", "page"));
+  view($("#view"), new URLSearchParams(q || ""));
+}
+window.addEventListener("hashchange", route);
+route(); refreshChip(); footer();
+</script>
+</body>
 </html>

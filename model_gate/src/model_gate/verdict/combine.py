@@ -276,7 +276,9 @@ def _rule3(cells: Sequence[dict], utility: Utility | None, injection: bool, prer
             out.append(Reason("secret_public_disagreement", {
                 "format": k[0], "condition": k[1], "secret_harm_rate": s, "public_harm_rate": p,
                 "max_gap": prereg.secret_public_gap_max}))
-    if utility is None or utility.relative_ce_loss is None or utility.degenerate_rate is None:
+    # Valor não finito conta como ausente: NaN < x é falso, e um NaN passava pela escada como
+    # aprovado (revisão de 15/11).
+    if utility is None or not _finite(utility.relative_ce_loss) or not _finite(utility.degenerate_rate):
         out.append(Reason("utility_missing"))
     else:
         if utility.relative_ce_loss > prereg.utility_loss_max:
@@ -306,13 +308,20 @@ def _format_divergence(cells: Sequence[dict], prereg: Prereg) -> list[Reason]:
     return out
 
 
+def _finite(x) -> bool:
+    return x is not None and isinstance(x, (int, float)) and math.isfinite(x)
+
+
 def _rule4(cells: Sequence[dict], signals: Sequence[SignalReading], prereg: Prereg) -> list[Reason]:
     out = []
     if not signals:
         out.append(Reason("signal_missing"))
+    # Um sinal por formato julgado: sinal só de fp não cobre as células de nf4 (revisão de 15/11).
+    for fmt in sorted({c["format"] for c in cells} - {s.format for s in signals}):
+        out.append(Reason("signal_missing", {"format": fmt}))
     for s in signals:
         k = {"format": s.format, "condition": s.condition}
-        if s.rho is None or s.e1 is None:
+        if not _finite(s.rho) or not _finite(s.e1):
             out.append(Reason("signal_missing", k))
             continue
         if s.rho < prereg.rho_min:

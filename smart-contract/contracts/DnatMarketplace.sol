@@ -96,6 +96,17 @@ contract DnatMarketplace {
     // Campos de cada derivado, por assetId (só para assets do tipo Derivative).
     mapping(uint256 => DerivativeInfo) internal derivatives;
 
+    // Ativos revogados pelo dono (revokeAsset): a marca é definitiva, como a de derivativeRevoked.
+    // Sem ela, updateAsset(newActive=true) desfazia a revogação de um Model e trazia de volta os
+    // derivados que a cascata (T-707) tinha derrubado (revisão de 15/11).
+    mapping(uint256 => bool) public assetRevoked;
+
+    // URI cifrado -> id, para datasets e aplicações: um URI só entra uma vez. A chave de acesso é
+    // por ids; o URI identifica o ativo só nesta consulta (revisão de 15/11: com a chave por URIs
+    // em abi.encodePacked, um ativo de mesmo URI, ou de URIs que se concatenam igual, comprado a
+    // preço zero dava acesso ao par da vítima).
+    mapping(bytes32 => uint256) public assetIdByUri;
+
     // Derivados retirados pelo operador (T-705). Fica fora de DerivativeInfo para não mudar o recibo.
     // A marca é definitiva: o dono não reativa um derivado revogado (T-704).
     mapping(uint256 => bool) public derivativeRevoked;
@@ -226,6 +237,12 @@ contract DnatMarketplace {
         require(assetType != AssetType.Derivative, "Derivative only via executor");
         id = ++nextAssetId;
 
+        if (assetType == AssetType.Dataset || assetType == AssetType.Application) {
+            bytes32 u = keccak256(bytes(encryptedUri));
+            require(assetIdByUri[u] == 0, "URI already registered");
+            assetIdByUri[u] = id;
+        }
+
         bytes memory bf;
         if (assetType == AssetType.Dataset) {
             // For datasets we keep the Bloom filter on-chain (Executor can read it off-chain).
@@ -259,6 +276,7 @@ contract DnatMarketplace {
         Asset storage a = assets[assetId];
         require(a.id != 0, "Asset does not exist");
         require(a.owner == msg.sender, "Only owner");
+        require(!(newActive && assetRevoked[assetId]), "Asset revoked");
 
         // O dono do derivado é o adversário (T-105): reprovado, inconclusivo, pendente ou revogado
         // pelo operador nunca volta a ficar ativo por aqui (C1, T-704).
@@ -283,9 +301,10 @@ contract DnatMarketplace {
         Asset storage a = assets[assetId];
         require(a.id != 0, "Asset does not exist");
         require(a.owner == msg.sender, "Only owner");
-        require(a.active, "Already revoked");
+        require(!assetRevoked[assetId], "Already revoked");
 
         a.active = false;
+        assetRevoked[assetId] = true;
         emit AssetRevoked(assetId);
     }
 
@@ -395,9 +414,7 @@ contract DnatMarketplace {
 
         // Mark access right using encrypted hashes (IPFS CIDs), not asset IDs
         // Access rights key: keccak256(encryptedDatasetHash, encryptedApplicationHash, user)
-        bytes32 key = keccak256(
-            abi.encodePacked(d.encryptedUri, a.encryptedUri, msg.sender)
-        );
+        bytes32 key = accessKey(datasetId, applicationId, msg.sender);
         accessRights[key] = true;
 
         emit AccessPurchased(
@@ -447,10 +464,10 @@ contract DnatMarketplace {
         string calldata encryptedDatasetHash,
         string calldata encryptedApplicationHash
     ) external view returns (bool) {
-        bytes32 key = keccak256(
-            abi.encodePacked(encryptedDatasetHash, encryptedApplicationHash, user)
-        );
-        return accessRights[key];
+        uint256 datasetId = assetIdByUri[keccak256(bytes(encryptedDatasetHash))];
+        uint256 applicationId = assetIdByUri[keccak256(bytes(encryptedApplicationHash))];
+        if (datasetId == 0 || applicationId == 0) return false;
+        return accessRights[accessKey(datasetId, applicationId, user)];
     }
 
     /**
@@ -466,11 +483,12 @@ contract DnatMarketplace {
         Asset storage a = assets[applicationId];
         
         require(d.id != 0 && a.id != 0, "Asset not found");
-        
-        bytes32 key = keccak256(
-            abi.encodePacked(d.encryptedUri, a.encryptedUri, user)
-        );
-        return accessRights[key];
+        return accessRights[accessKey(datasetId, applicationId, user)];
+    }
+
+    /// Chave do direito de acesso: ids e usuário em abi.encode (sem colisão por concatenação).
+    function accessKey(uint256 datasetId, uint256 applicationId, address user) public pure returns (bytes32) {
+        return keccak256(abi.encode(datasetId, applicationId, user));
     }
 
     /**

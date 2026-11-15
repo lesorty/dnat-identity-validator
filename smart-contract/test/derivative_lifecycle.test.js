@@ -145,15 +145,21 @@ describe("DnatMarketplace: ciclo de vida do derivado (T-704, T-705)", function (
       await assert.rejects(contract.connect(third).revokeAsset(parentId), /Only owner/);
     });
 
-    it("o dono que revoga o próprio derivado não o reativa depois sem aprovação válida", async function () {
+    it("o dono que revoga o próprio derivado não o reativa (revogação definitiva, E14: o dono retira e nunca reativa)", async function () {
       const id = await registerDerivative(Verdict.Approved);
       await (await contract.connect(owner).revokeAsset(id)).wait();
-      // Aprovado e sem marca do operador: o dono pode reativar o que ele mesmo desativou.
-      await (await contract.connect(owner).updateAsset(id, 0n, true)).wait();
-      assert.strictEqual(await isActive(id), true);
-      // O operador retira de vez.
-      await (await contract.connect(operator).revokeDerivative(id, "x")).wait();
-      await assert.rejects(contract.connect(owner).updateAsset(id, 0n, true), /Derivative revoked/);
+      await assert.rejects(contract.connect(owner).updateAsset(id, 0n, true), /Asset revoked/);
+      assert.strictEqual(await isActive(id), false);
+      assert.strictEqual(await contract.isDerivativeUsable(id), false);
+      await assert.rejects(contract.connect(owner).revokeAsset(id), /Already revoked/);
+    });
+
+    it("revogar o pai é definitivo: reativá-lo não traz os derivados de volta (revisão de 15/11)", async function () {
+      const id = await registerDerivative(Verdict.Approved);
+      await (await contract.connect(parentOwner).revokeAsset(parentId)).wait();
+      assert.strictEqual(await contract.isDerivativeUsable(id), false);
+      await assert.rejects(contract.connect(parentOwner).updateAsset(parentId, 0n, true), /Asset revoked/);
+      assert.strictEqual(await contract.isDerivativeUsable(id), false);
     });
   });
 });

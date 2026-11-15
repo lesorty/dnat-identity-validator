@@ -328,6 +328,10 @@ class RealStages:
             raise ValueError(f"referência pontuada por outro avaliador: {ref['judge_id']} != {evaluator.judge_id}")
         if ref["battery_sha256"] != battery_sha256(self._battery(m)):
             raise ValueError("referência medida com outro pacote da bateria")
+        # A perda de CE relativa só compara o mesmo corpus (revisão de 15/11).
+        ref_n = (ref.get("utility") or {}).get("n")
+        if ref_n is not None and ref_n != min(settings.utility_n, len(self._battery(m).utility)):
+            raise ValueError(f"referência com outro tamanho do corpus de utilidade: {ref_n} != {settings.utility_n}")
 
     # -- interface do job
     def contract(self, m) -> list[str]:
@@ -350,7 +354,7 @@ class RealStages:
         key = bytes.fromhex(m.extra.get("sampling_key") or "")
         if len(key) < 16:
             raise StageNotReady("manifesto sem sampling_key (chave do sorteio da CVM1)")
-        _, der = self._models(m)
+        base, der = self._models(m)
         digest = m.inputs["derivative"]["digest"]
         blocks = DERIVATIVE_BLOCKS_ENCODED if settings.encoded else DERIVATIVE_BLOCKS
         prompts = {"anchors": battery.harmful, "safe": battery.safe, "encoded": battery.harmful}
@@ -365,7 +369,12 @@ class RealStages:
                                    n_anchors=min(settings.n_anchors, available) or None, n_safe=settings.n_safe,
                                    harmful_texts=battery.harmful if settings.encoded else None)
             model_f = model_in_format(der.model, fmt)
-            run = derivative_responses(model_f, der.tokenizer, battery.harmful, battery.safe, plan,
+            # Sempre o tokenizador (template) e a configuração de geração do BASE, como na referência
+            # do pai: um chat_template.jinja ou um generation_config.json do derivado (repetition
+            # penalty, bad_words_ids, sequence_bias, eos) mudaria as respostas que o S1 lê
+            # (revisão de 15/11; E14 §6.1, o serviço trava o template do base).
+            model_f.generation_config = copy.deepcopy(base.model.generation_config)
+            run = derivative_responses(model_f, base.tokenizer, battery.harmful, battery.safe, plan,
                                        cfg_for=settings.gen_cfg)
             rows += score_run(run, blocks, prompts, ev.judges(), model_digest=digest, fmt=fmt)
             flat = flatten_responses(run, fmt)
@@ -398,8 +407,8 @@ class RealStages:
             d_f = model_in_format(der.model, fmt)
             b_f = model_in_format(base.model, fmt)
             sp = settings.system_prompt(cond)
-            h = last_token_resid(d_f, der.tokenizer, battery.pairs["harmful_val"], sp, self.threads)
-            n = last_token_resid(d_f, der.tokenizer, battery.pairs["harmless_val"], sp, self.threads)
+            h = last_token_resid(d_f, base.tokenizer, battery.pairs["harmful_val"], sp, self.threads)
+            n = last_token_resid(d_f, base.tokenizer, battery.pairs["harmless_val"], sp, self.threads)
             pkg = {"dirs": direction["dirs"], "layer": direction["layer"],
                    "gap_base": torch.tensor(ref["gap_base"][fmt])}
             rho = s2(h, n, pkg).ratio_band  # provisório: ρ de Hurtado (T-414)
@@ -413,8 +422,8 @@ class RealStages:
         battery, ref = self._battery(m), self._reference(m)
         if not battery.utility:
             raise StageNotReady("pacote da bateria sem corpus de utilidade")
-        _, der = self._models(m)
-        ce = response_ce(der.model, der.tokenizer, battery.utility[:settings.utility_n], self.threads)
+        base, der = self._models(m)
+        ce = response_ce(der.model, base.tokenizer, battery.utility[:settings.utility_n], self.threads)
         parent_ce = ref["utility"]["ce"]
         responses = self._cache.get("responses_fp") or []
         degenerate = sum(is_degenerate(r["text"]) for r in responses) / len(responses) if responses else None
