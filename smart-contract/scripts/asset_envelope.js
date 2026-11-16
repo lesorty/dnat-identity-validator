@@ -23,6 +23,9 @@ const MODEL_FORMAT = "dnat-model-v1";
 const REFERENCE_FORMAT = "dnat-reference-v1";
 // Pacote da bateria do Juiz (T-807): textos dos pedidos, pares do S2, corpus de utilidade.
 const BATTERY_FORMAT = "dnat-battery-v1";
+// Registro do Juiz de um veredito (revisão de 15/11): verdict.json, responses.jsonl e job_result.json,
+// cifrados para o operador e a auditoria; o recibo on-chain guarda o hash do verdict.json.
+const JUDGE_RECORD_FORMAT = "dnat-judge-record-v1";
 const APP_ARTIFACT_ENVELOPE_MAGIC = Buffer.from("DNATENC2");
 
 function deriveAssetEncryptionKey() {
@@ -179,6 +182,7 @@ module.exports = {
   MODEL_FORMAT,
   REFERENCE_FORMAT,
   BATTERY_FORMAT,
+  JUDGE_RECORD_FORMAT,
   APP_ARTIFACT_ENVELOPE_MAGIC,
   deriveAssetEncryptionKey,
   encryptBuffer,

@@ -394,6 +394,20 @@ class IdentityRegistry {
   }
 
   /**
+   * Na partida da CVM1 nenhum job está rodando: toda reserva ainda "reserved" sobrou de uma queda no meio de
+   * um job e volta inteira, como falha do job (T-107). Devolve quantas foram acertadas.
+   */
+  releaseStaleReservations() {
+    const stale = Object.values(this.state.ledger).filter((e) => e.status === "reserved");
+    for (const e of stale) {
+      this.settle(e.reservationId, "failure");
+      this.state.ledger[e.reservationId].reconciledAtStartup = true;
+    }
+    if (stale.length) this._save();
+    return stale.length;
+  }
+
+  /**
    * Acerta a reserva pelo desfecho (E14 §18.4): aprovado cobra 1, inconclusivo 2, reprovado 5 e
    * devolve a diferença; falha do job (T-107) devolve tudo e não entra na contagem. Conta uma vez
    * por reserva: o segundo acerto devolve o primeiro, com repeated = true, sem cobrar de novo.

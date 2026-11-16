@@ -20,7 +20,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
-const { BATTERY_FORMAT, DERIVATIVE_FORMAT, MODEL_FORMAT, REFERENCE_FORMAT, decryptFileToFile } = require("./asset_envelope");
+const { BATTERY_FORMAT, DERIVATIVE_FORMAT, JUDGE_RECORD_FORMAT, MODEL_FORMAT, REFERENCE_FORMAT, decryptFileToFile } = require("./asset_envelope");
 const { extractVerified, fileSha256, modelDirDigest, packModelDir } = require("./model_store");
 const { getDerivative, sealAndUpload, updateDerivative } = require("./retention");
 
@@ -440,6 +440,7 @@ async function judgeDerivative({
   modelGateDir = MODEL_GATE_DIR,
   owner,
   title,
+  upload = null,
 }) {
   const record = getDerivative(derivativesPath, executionId);
   if (!record) throw new JudgeFlowError("not_retained", `derivative of ${executionId} not retained`);
@@ -511,13 +512,46 @@ async function judgeDerivative({
     });
     const outDir = path.join(work, "out");
     const jobResult = await runJudgeJob({ manifestPath, outDir, cmd, cwd: modelGateDir });
-    return await applyJudgeResult({
+    const result = await applyJudgeResult({
       contract, ledger, derivativesPath, executionId, outDir, jobResult, allowlist, parentId, parentContentHash, owner, title,
     });
+    // O registro do Juiz sai cifrado antes de o diretório ser apagado; sem ele, o hash do verdict.json no
+    // recibo apontaria para um arquivo que não existe mais. Falhar aqui não muda o veredito: fica anotado.
+    if (upload && fs.existsSync(outDir) && fs.readdirSync(outDir).length) {
+      try {
+        updateDerivative(derivativesPath, executionId, { judgeRecord: await sealJudgeRecord(outDir, executionId, upload) });
+      } catch (e) {
+        updateDerivative(derivativesPath, executionId, { judgeRecordError: errorText(e) });
+      }
+    }
+    return result;
   } finally {
     // Pesos em claro só existem aqui, durante o job.
     fs.rmSync(work, { recursive: true, force: true });
   }
+}
+
+/** Cifra e guarda o diretório de saída do job (verdict.json, responses.jsonl, job_result.json). */
+async function sealJudgeRecord(outDir, executionId, upload) {
+  const { digest, files } = modelDirDigest(outDir);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-jrec-"));
+  try {
+    const archive = packModelDir(outDir, path.join(tmp, "judge_record.tar.gz"));
+    const cid = await sealAndUpload(archive, { executionId: String(executionId), digest }, JUDGE_RECORD_FORMAT, upload);
+    if (!cid) throw new Error("upload returned no CID for the judge record");
+    const verdict = path.join(outDir, VERDICT_FILE);
+    return { encryptedUri: `ipfs://${cid}`, digest, files: files.map((f) => f.path || f),
+      verdictSha256: fs.existsSync(verdict) ? fileSha256(verdict) : null, createdAtUtc: new Date().toISOString() };
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+/** Abre o registro do Juiz de uma execução em destDir (operador), conferindo o digest. */
+async function openJudgeRecord(record, fetchToFile, destDir) {
+  if (!record?.judgeRecord) throw new Error("this execution has no sealed judge record");
+  await openToDir(record.judgeRecord.encryptedUri, fetchToFile, [JUDGE_RECORD_FORMAT], destDir, record.judgeRecord.digest);
+  return record.judgeRecord;
 }
 
 module.exports = {
@@ -527,6 +561,8 @@ module.exports = {
   OUTCOME,
   VERDICT_ENUM,
   applyJudgeResult,
+  openJudgeRecord,
+  sealJudgeRecord,
   computeJudgeHash,
   computeJudgeHashAsync,
   decidedAtNow,

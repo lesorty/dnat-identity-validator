@@ -116,12 +116,15 @@ def data() -> None:
         "" if refs else "taskset -c 0-3 uv run python -m experiments.judge_local (mede o pai; ~10 min)")
     fm = MG / "models" / "field.manifest.json"
     if fm.exists():
-        pf = json.loads(fm.read_text()).get("por_familia", {})
-        for fam, v in pf.items():
-            lvl = "ok" if v.get("baixados_ok") == v.get("aceitos") else "aviso"
+        man = json.loads(fm.read_text())
+        for fam, v in man.get("por_familia", {}).items():
+            # o manifesto é versionado: conta o que está NESTA máquina, não o que foi baixado onde ele foi gerado
+            here = sum(1 for d in man.get("derivados", []) if d.get("familia") == fam and not d.get("problems")
+                       and d.get("path") and all((DATA / d["path"] / f["path"]).exists() for f in d.get("files", [])))
+            lvl = "ok" if here == v.get("aceitos") else "aviso"
             fix = "" if lvl == "ok" else ("aceitar a licença da Meta e rodar field_download --familia llama-3.2-1b --aceito-licenca-meta"
-                                          if fam.startswith("llama") else f"uv run python -m experiments.field_download --familia {fam}")
-            add(s, lvl, f"campo {fam}: {v.get('baixados_ok', 0)} de {v.get('aceitos', 0)} baixados", fix)
+                                          if fam.startswith("llama") else f"cd model_gate && uv run python -m experiments.field_download --familia {fam}")
+            add(s, lvl, f"campo {fam}: {here} de {v.get('aceitos', 0)} nesta máquina", fix)
     add(s, "info", f"{DATA}: {gb(size(DATA))}")
 
 
@@ -199,6 +202,9 @@ def hygiene() -> None:
 def git() -> None:
     s = "Git"
     code, br = run("git", "rev-parse", "--abbrev-ref", "HEAD", cwd=REPO)
+    if code != 0:
+        add(s, "aviso", "não é um repositório git: as runs gravam commit desconhecido", "clone com git (não copie os arquivos)")
+        return
     _, st = run("git", "status", "--porcelain", cwd=REPO)
     _, ahead = run("git", "rev-list", "--count", "@{u}..HEAD", cwd=REPO)
     n = len([x for x in st.splitlines() if x])

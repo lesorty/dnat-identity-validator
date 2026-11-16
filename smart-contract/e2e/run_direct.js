@@ -141,6 +141,16 @@ async function main() {
     const d = await chain.contract.getDerivative(BigInt(id));
     onChain[k] = { assetId: id, active: a.active, usable: await chain.contract.isDerivativeUsable(BigInt(id)), verdict: Number(d.verdict), verdictHash: d.verdictHash, judgeHash: d.judgeHash };
   }
+  // Registro do Juiz selado (revisão de 15/11): o operador o abre e o hash do verdict.json bate com o recibo.
+  const records = JSON.parse(fs.readFileSync(path.join(state, "derivatives.json"), "utf8")).derivatives;
+  const sealed = {};
+  for (const k of ["B", "C"]) {
+    const exec = scenarios[k].metadata?.executionId;
+    if (!exec || !records[exec]?.judgeRecord) continue;
+    const out = path.join(state, `judge_record_${k}`);
+    const r = await stack.judgeCli(["record", "--execution", exec, "--out", out]);
+    sealed[k] = { files: r.files, matchesReceipt: r.matchesReceipt };
+  }
 
   const summary = (s) => ({
     exitCode: s.exitCode,
@@ -161,6 +171,7 @@ async function main() {
     identity: { id: reg.record.id, difficulty: reg.difficulty, proofSeconds: reg.proofSeconds },
     scenarios: { A: summary(scenarios.A), B: summary(scenarios.B), C: summary(scenarios.C) },
     onChain,
+    judgeRecords: sealed,
     timings: stack.timings,
   };
 
@@ -172,6 +183,7 @@ async function main() {
     ["B: cota 1 (saldo 19)", scenarios.B.balanceAfter === 19],
     ["C: reprovado, derivado inativo", scenarios.C.judge?.outcome === "rejected" && onChain.C?.active === false],
     ["C: cota 5 (saldo 14)", scenarios.C.balanceAfter === 14],
+    ["B e C: registro do Juiz selado, aberto pelo operador e igual ao hash do recibo", ["B", "C"].every((k) => sealed[k]?.matchesReceipt === true)],
   ];
   if (SINGLE_USE) {
     const vms = ["A", "B", "C"].map((k) => scenarios[k].jobVm);

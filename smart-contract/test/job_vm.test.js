@@ -157,6 +157,24 @@ describe("CVM de job de uso único (T-801)", function () {
     });
   });
 
+  describe("desligar e voltar (revisão de 15/11)", function () {
+    it("o close destrói também a CVM que ainda está com um job", async function () {
+      const provider = new FakeProvider();
+      const pool = new JobVmPool({ provider, size: 1 });
+      await pool.refill();
+      const running = await pool.take(); // um job em curso quando a CVM1 é desligada
+      await pool.close();
+      assert.ok(provider.destroyed.includes(running.id), "a CVM com o job em curso tem de ser destruída");
+      assert.strictEqual(provider.live.size, 0);
+    });
+
+    it("a varredura da partida delega ao provedor, e o provedor sem listagem devolve 0", async function () {
+      const pool = new JobVmPool({ provider: { ...new FakeProvider(), singleUse: true, sweep: async () => 3 } });
+      assert.strictEqual(await pool.sweep(), 3);
+      assert.strictEqual(await new JobVmPool({ provider: new FakeProvider() }).sweep(), 0);
+    });
+  });
+
   describe("Docker (pilha local, T-815)", function () {
     const socketPath = "/var/run/docker.sock";
     let provider;
@@ -198,6 +216,21 @@ describe("CVM de job de uso único (T-801)", function () {
       // nenhum container criado por este pool (os dois do job e o de reposição) sobrou
       assert.ok(created.length >= 2);
       for (const id of created) assert.strictEqual(await provider.exists(id), false, id);
+    });
+
+    it("a varredura apaga só as CVMs órfãs do próprio dono", async function () {
+      const mine = new DockerProvider({ socketPath, image: "dnat-executor-direct:latest", network: "dnat-runtime", memory: "1g", owner: "teste-sweep-a" });
+      const other = new DockerProvider({ socketPath, image: "dnat-executor-direct:latest", network: "dnat-runtime", memory: "1g", owner: "teste-sweep-b" });
+      const orphan = await mine.create();
+      const foreign = await other.create();
+      try {
+        assert.strictEqual(await mine.sweep(), 1);
+        assert.strictEqual(await mine.exists(orphan.id), false);
+        assert.strictEqual(await other.exists(foreign.id), true);
+      } finally {
+        await other.destroy(foreign);
+        await mine.destroy(orphan);
+      }
     });
   });
 });

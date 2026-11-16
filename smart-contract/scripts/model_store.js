@@ -33,6 +33,8 @@ function fileSha256(p) {
 }
 
 /** Caminhos relativos (com "/") que entram no digest, em ordem de código. */
+const DOC_SUFFIXES = new Set(["", ".md", ".txt", ".rst"]);
+
 function modelFiles(root) {
   const out = [];
   const walk = (dir, rel) => {
@@ -41,9 +43,11 @@ function modelFiles(root) {
       const abs = path.join(dir, name);
       const r = rel ? `${rel}/${name}` : name;
       const st = fs.lstatSync(abs);
-      if (st.isSymbolicLink()) continue;
+      // A mesma regra do model_gate.io.load.model_files (revisão de 15/11): link simbólico é erro, e
+      // README*/LICENSE* só ficam fora quando são documentação (.md, .txt, .rst ou sem extensão).
+      if (st.isSymbolicLink()) throw new Error(`${root}: symbolic link not accepted (${r})`);
       if (st.isDirectory()) walk(abs, r);
-      else if (st.isFile() && !IGNORED_PREFIXES.some((p) => name.startsWith(p))) out.push(r);
+      else if (st.isFile() && !(IGNORED_PREFIXES.some((p) => name.startsWith(p)) && DOC_SUFFIXES.has(path.extname(name).toLowerCase()))) out.push(r);
     }
   };
   walk(root, "");

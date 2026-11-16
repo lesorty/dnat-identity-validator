@@ -62,6 +62,9 @@ describe("model_store.js: digest e extração (T-809)", function () {
     fs.mkdirSync(path.join(d, "sub"));
     fs.writeFileSync(path.join(d, "sub", "tokenizer.json"), "{}");
     fs.writeFileSync(path.join(d, ".oculto"), "x");
+    // documentação fica fora; um shard com nome de README entra (a mesma regra nos dois lados)
+    fs.writeFileSync(path.join(d, "README.md"), "doc");
+    fs.writeFileSync(path.join(d, "README.safetensors"), "pesos");
     const node = modelDirDigest(d).digest;
     const mg = path.resolve(__dirname, "..", "..", "model_gate");
     const r = spawnSync("uv", ["run", "--project", mg, "--frozen", "--quiet", "python", "-c",
@@ -424,5 +427,27 @@ fs.writeFileSync(path.join(out, "job_result.json"), JSON.stringify({ status: "ve
     process.env.FAKE_JUDGE_HASH = JUDGE;
     const res = await judge(s);
     assert.deepStrictEqual([res.outcome, res.alert], ["failure", "parent_inactive"]);
+  });
+});
+
+
+describe("registro do Juiz selado (revisão de 15/11)", function () {
+  it("sela o diretório de saída, abre de volta conferindo o digest e recusa digest trocado", async function () {
+    const flow = require("../scripts/judge_flow");
+    const store = new Map();
+    const upload = async (file) => { const cid = `cid${store.size}`; store.set(cid, fs.readFileSync(file)); return cid; };
+    const fetchToFile = async (uri, dest) => fs.writeFileSync(dest, store.get(uri.replace("ipfs://", "")));
+    const out = tmp("out");
+    fs.writeFileSync(path.join(out, "verdict.json"), JSON.stringify({ state: "reprovado" }));
+    fs.writeFileSync(path.join(out, "responses.jsonl"), "{}\n");
+    fs.writeFileSync(path.join(out, "job_result.json"), "{}");
+    const rec = await flow.sealJudgeRecord(out, "exec1", upload);
+    assert.deepStrictEqual(rec.files.sort(), ["job_result.json", "responses.jsonl", "verdict.json"]);
+    assert.match(rec.encryptedUri, /^ipfs:\/\/cid/);
+    const back = tmp("back");
+    await flow.openJudgeRecord({ judgeRecord: rec }, fetchToFile, back);
+    assert.strictEqual(fs.readFileSync(path.join(back, "verdict.json"), "utf8"), JSON.stringify({ state: "reprovado" }));
+    await assert.rejects(flow.openJudgeRecord({ judgeRecord: { ...rec, digest: "0".repeat(64) } }, fetchToFile, tmp("bad")), /digest mismatch/);
+    await assert.rejects(flow.openJudgeRecord({}, fetchToFile, tmp("none")), /no sealed judge record/);
   });
 });

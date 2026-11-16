@@ -19,6 +19,7 @@
  * do job, com ou sem sucesso), e o agente com DNAT_SINGLE_USE=1 recusa o segundo /execute ("used").
  */
 const crypto = require("node:crypto");
+const path = require("node:path");
 const http = require("node:http");
 const { spawn } = require("node:child_process");
 
@@ -105,8 +106,9 @@ function parseBytes(v) {
 }
 
 class DockerProvider {
-  constructor({ socketPath, image, network, memory, env = {} }) {
+  constructor({ socketPath, image, network, memory, env = {}, owner = "cvm1" }) {
     this.name = "docker";
+    this.owner = owner;
     this.singleUse = true;
     this.socketPath = socketPath;
     this.image = image;
@@ -121,7 +123,8 @@ class DockerProvider {
     const created = await dockerRequest(this.socketPath, "POST", `/containers/create?name=${name}`, {
       Image: this.image,
       Env: Object.entries(env).map(([k, v]) => `${k}=${v}`),
-      Labels: { "dnat.role": "job-vm" },
+      // dnat.owner: a CVM1 dona; na partida ela apaga só as próprias CVMs órfãs (sweep), não as de outra pilha.
+      Labels: { "dnat.role": "job-vm", "dnat.owner": this.owner },
       HostConfig: {
         // Só para a regra de saída do start-direct.sh; o agente e o job rodam sem capability.
         CapAdd: ["NET_ADMIN"],
@@ -148,6 +151,14 @@ class DockerProvider {
     await dockerRequest(this.socketPath, "DELETE", `/containers/${vm.id}?force=true&v=true`).catch((e) => {
       if (!/404/.test(e.message)) throw e;
     });
+  }
+
+  /** CVMs de job desta CVM1 que sobraram de uma queda (com os dados de um job dentro): destrói e conta. */
+  async sweep() {
+    const filters = encodeURIComponent(JSON.stringify({ label: ["dnat.role=job-vm", `dnat.owner=${this.owner}`] }));
+    const list = await dockerRequest(this.socketPath, "GET", `/containers/json?all=1&filters=${filters}`);
+    for (const c of list || []) await this.destroy({ id: c.Id });
+    return (list || []).length;
   }
 
   /** O container ainda existe? (para os testes conferirem a destruição) */
@@ -215,6 +226,9 @@ function providerFromEnv(env = process.env) {
       memory: env.DNAT_JOB_VM_MEMORY || "",
       // Variáveis a mais para o agente da CVM de job, em JSON (ex.: teto de tempo, threads do treino).
       env: env.DNAT_JOB_VM_ENV ? JSON.parse(env.DNAT_JOB_VM_ENV) : {},
+      // Dono: o diretório de execuções identifica a CVM1 (duas pilhas no mesmo host têm diretórios diferentes).
+      owner: env.DNAT_JOB_VM_OWNER || `cvm1-${crypto.createHash("sha256")
+        .update(path.resolve(env.DNAT_EXECUTIONS_ROOT || path.join(__dirname, "..", "executions"))).digest("hex").slice(0, 16)}`,
     });
   }
   if (kind === "command") return new CommandProvider({ createCmd: env.DNAT_JOB_VM_CREATE_CMD, destroyCmd: env.DNAT_JOB_VM_DESTROY_CMD });
@@ -230,6 +244,7 @@ class JobVmPool {
     this.log = log;
     this.ready = [];
     this.handed = new Set(); // ids já entregues a um job: nunca de novo
+    this.active = new Map(); // entregues e ainda não destruídos: o close() os destrói (desligar no meio de um job)
     this.filling = null;
     this.closed = false;
   }
@@ -267,6 +282,7 @@ class JobVmPool {
     if (this.provider.singleUse) {
       if (this.handed.has(vm.id)) throw new Error(`job VM ${vm.id} was already handed to a job`);
       this.handed.add(vm.id);
+      this.active.set(vm.id, vm);
     }
     this.refill();
     return { ...vm, fromPool, takenAt: new Date().toISOString() };
@@ -282,6 +298,7 @@ class JobVmPool {
     }
     let destroyError = null;
     if (this.provider.singleUse) {
+      this.active.delete(vm.id);
       try {
         await this.provider.destroy(vm);
       } catch (e) {
@@ -306,8 +323,15 @@ class JobVmPool {
   async close() {
     this.closed = true;
     await this.filling;
-    const left = this.ready.splice(0);
+    const left = [...this.ready.splice(0), ...this.active.values()];
+    if (this.active.size) this.log(`closing with ${this.active.size} job VM(s) still running a job: destroying them`);
+    this.active.clear();
     await Promise.all(left.map((vm) => this.provider.destroy(vm).catch(() => {})));
+  }
+
+  /** Na partida: destrói as CVMs que esta CVM1 deixou de uma queda anterior (se o provedor souber listar). */
+  async sweep() {
+    return typeof this.provider.sweep === "function" ? this.provider.sweep() : 0;
   }
 }
 

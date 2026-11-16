@@ -1123,6 +1123,7 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
           allowlist: loadJudgeAllowlist(),
           owner: user || wallet.address,
           title: `Derivado de ${parent.title} (${executionId})`,
+          upload: uploadEnvelopeFile,
         });
         quotaSettled = true;
         parsed.derivative = userSummary(getDerivative(DERIVATIVES_PATH, executionId));
@@ -1438,7 +1439,20 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`DNAT Web UI running on http://localhost:${PORT}`);
   });
-  // Warm pool das CVMs de job (T-801): sobe as primeiras já no início; ao sair, destrói as não usadas.
+  // Partida depois de uma queda (revisão de 15/11): CVMs de job desta CVM1 ainda vivas, reservas presas e
+  // pastas de preparação em claro com mais de 6 h (o teto de um job é 4 h) não podem ficar.
+  const swept = await jobVms.sweep().catch((e) => { console.error(`[job-vm] sweep failed: ${e.message}`); return 0; });
+  if (swept) console.error(`[job-vm] destroyed ${swept} job VM(s) left by a previous run`);
+  const released = identities.releaseStaleReservations();
+  if (released) console.error(`[quota] released ${released} reservation(s) left by a previous run`);
+  for (const d of fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith("dnat-execution-"))) {
+    const p = path.join(os.tmpdir(), d);
+    try {
+      if (Date.now() - fs.statSync(p).mtimeMs > 6 * 3600 * 1000) fs.rmSync(p, { recursive: true, force: true });
+    } catch { /* outra CVM1 pode ter apagado */ }
+  }
+  // Warm pool das CVMs de job (T-801): sobe as primeiras já no início; ao sair, destrói as não usadas e as
+  // que ainda estavam com um job.
   jobVms.refill();
   for (const sig of ["SIGTERM", "SIGINT"]) {
     process.once(sig, () => {

@@ -6,7 +6,7 @@
     "node": "v22.22.1",
     "platform": "linux 7.0.0-43-generic",
     "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210",
-    "startedAtUtc": "2026-11-15T19:06:43.445Z"
+    "startedAtUtc": "2026-11-16T17:27:48.213Z"
   },
   "judgeRelease": {
     "judgeHash": "957f0ec05637eee3d8629cab36dbf5a3f69cc23426bb1cc2285c9be51cc32392",
@@ -16,12 +16,12 @@
     "evaluatorKind": "detector",
     "batteryPackDigest": "f5f17e1a0ea530599f4c3edd4b7e73f3826f1491152c95e1d4267776597a1bc2",
     "note": "roteiro T-811",
-    "allowedAtUtc": "2026-11-15T19:06:52.582Z"
+    "allowedAtUtc": "2026-11-16T17:27:57.495Z"
   },
   "base": {
     "dir": "minúsculo (tests/tiny.py)",
     "digest": "43fd8a01c9ba628ad9ffe862cf0d16529cedbad916ca5d1cc93c4d15dd0976d0",
-    "archiveBytes": 86181
+    "archiveBytes": 86182
   },
   "assets": {
     "model": "1",
@@ -29,9 +29,9 @@
     "application": "3"
   },
   "identity": {
-    "id": "f0586be05ceefbce91384b1456b62d820c45273a913831588e266d9c01ed1d88",
+    "id": "6b7a4f2d3f54fe6d51ac09c4fe2f231ac1d851664d5f022bcd4f5fd5bfa322e8",
     "difficulty": 12,
-    "proofSeconds": 0.112731731
+    "proofSeconds": 0.007724038
   },
   "scenarios": {
     "A": {
@@ -39,7 +39,7 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 0.003
+        "train_seconds": 0.002
       },
       "derivative": {
         "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
@@ -52,21 +52,21 @@
         "alert": "judge_failure"
       },
       "quota": {
-        "reservationId": "eb0da762-36ae-4b90-a702-8ef143d99ed1",
+        "reservationId": "fab09c0b-af84-4715-8c3c-a684a75ec047",
         "reserved": 0,
         "balance": 20
       },
       "balanceAfter": 20,
       "jobVm": {
-        "id": "static:http://127.0.0.1:39985",
+        "id": "static:http://127.0.0.1:44511",
         "provider": "static",
         "singleUse": false,
         "fromPool": false,
-        "bootMs": 7,
-        "createdAt": "2026-11-15T19:06:59.053Z",
-        "takenAt": "2026-11-15T19:06:59.053Z",
+        "bootMs": 6,
+        "createdAt": "2026-11-16T17:28:02.485Z",
+        "takenAt": "2026-11-16T17:28:02.486Z",
         "destroyedAt": null,
-        "peakRssBytes": 25264128,
+        "peakRssBytes": 25284608,
         "cgroupPeakBytes": null,
         "memTotalBytes": 32783138816,
         "jobsAccepted": 1
@@ -91,21 +91,21 @@
         "alert": null
       },
       "quota": {
-        "reservationId": "e34bab29-c33f-4902-b712-85f0da3abf5e",
+        "reservationId": "001e33a9-f06a-43cb-b9bf-5cdbd8def10f",
         "reserved": 0,
         "balance": 19
       },
       "balanceAfter": 19,
       "jobVm": {
-        "id": "static:http://127.0.0.1:39985",
+        "id": "static:http://127.0.0.1:44511",
         "provider": "static",
         "singleUse": false,
         "fromPool": false,
-        "bootMs": 11,
-        "createdAt": "2026-11-15T19:07:08.909Z",
-        "takenAt": "2026-11-15T19:07:08.909Z",
+        "bootMs": 9,
+        "createdAt": "2026-11-16T17:28:10.808Z",
+        "takenAt": "2026-11-16T17:28:10.808Z",
         "destroyedAt": null,
-        "peakRssBytes": 25395200,
+        "peakRssBytes": 25415680,
         "cgroupPeakBytes": null,
         "memTotalBytes": 32783138816,
         "jobsAccepted": 2
@@ -116,7 +116,7 @@
       "metrics": {
         "loss": 0.25,
         "steps": 3,
-        "train_seconds": 0.001
+        "train_seconds": 0.002
       },
       "derivative": {
         "digest": "9b8aafd69ba8cdeec52b042da33c900ad07c252ba7b2730a7a41af63dc179ce4",
@@ -130,21 +130,21 @@
         "alert": null
       },
       "quota": {
-        "reservationId": "b52e877e-5777-4508-9ddf-ebf9020e6cec",
+        "reservationId": "f33e6c6a-e244-4215-a7df-b7581294ab9e",
         "reserved": 0,
         "balance": 14
       },
       "balanceAfter": 14,
       "jobVm": {
-        "id": "static:http://127.0.0.1:39985",
+        "id": "static:http://127.0.0.1:44511",
         "provider": "static",
         "singleUse": false,
         "fromPool": false,
-        "bootMs": 7,
-        "createdAt": "2026-11-15T19:07:13.691Z",
-        "takenAt": "2026-11-15T19:07:13.691Z",
+        "bootMs": 5,
+        "createdAt": "2026-11-16T17:28:14.451Z",
+        "takenAt": "2026-11-16T17:28:14.451Z",
         "destroyedAt": null,
-        "peakRssBytes": 25395200,
+        "peakRssBytes": 25415680,
         "cgroupPeakBytes": null,
         "memTotalBytes": 32783138816,
         "jobsAccepted": 3
@@ -157,7 +157,7 @@
       "active": true,
       "usable": true,
       "verdict": 1,
-      "verdictHash": "0x1ae428dc3443f53ac4f3a63c53785f292f7e000f734ab0c64c15a5baef27deeb",
+      "verdictHash": "0x5b41e980fc1263e6a6ed232075ec02728c1d4100bce05db5bdeb548049ab9bb7",
       "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
     },
     "C": {
@@ -165,74 +165,90 @@
       "active": false,
       "usable": false,
       "verdict": 2,
-      "verdictHash": "0x650bfdb0c0b5b69f2db055cee28cd1d5448c9cb5b72d91442adc45e9f146fe5a",
+      "verdictHash": "0x68a6c230f1724cb40b40127dd888dd962b88acf2b10f6ca2f6009be24246a0f5",
       "judgeHash": "0x8c359e8cdd1d004c4968a6d5e0524731be5053cba3c83bcd1bc15e9b05f8d678"
+    }
+  },
+  "judgeRecords": {
+    "B": {
+      "files": [
+        "job_result.json",
+        "verdict.json"
+      ],
+      "matchesReceipt": true
+    },
+    "C": {
+      "files": [
+        "job_result.json",
+        "verdict.json"
+      ],
+      "matchesReceipt": true
     }
   },
   "timings": [
     {
       "step": "IPFS em memória",
-      "seconds": 0.017
+      "seconds": 0.021
     },
     {
       "step": "hardhat node e implantação do contrato",
-      "seconds": 2.215
+      "seconds": 2.299
     },
     {
       "step": "CVM2 (builder, modo direto)",
-      "seconds": 0.328
+      "seconds": 0.32
     },
     {
       "step": "CVM de job (executor, modo direto)",
-      "seconds": 0.317
+      "seconds": 0.315
     },
     {
       "step": "pacote da bateria depositado pelo operador (judge_cli battery)",
-      "seconds": 0.547
+      "seconds": 0.36
     },
     {
       "step": "liberar o Juiz atual na lista permitida (judge_cli allow)",
-      "seconds": 0.273
+      "seconds": 0.305
     },
     {
       "step": "CVM1 (api-server)",
-      "seconds": 1.272
+      "seconds": 0.934
     },
     {
       "step": "identidade com prova de trabalho (d = 12)",
-      "seconds": 0.167
+      "seconds": 0.037
     },
     {
       "step": "depósito do modelo base (register-model)",
-      "seconds": 0.45
+      "seconds": 0.415
     },
     {
       "step": "dataset (register-dataset)",
-      "seconds": 0.216
+      "seconds": 0.204
     },
     {
       "step": "aplicação de fine-tuning simulado (register-application, build no CVM2)",
-      "seconds": 2.865
+      "seconds": 2.343
     },
     {
       "step": "compra de acesso (purchase-access)",
-      "seconds": 0.163
+      "seconds": 0.172
     },
     {
       "step": "referência do pai depositada pelo operador (judge_cli reference)",
-      "seconds": 0.599
+      "seconds": 0.335
     },
     {
       "step": "A · fine-tuning + Juiz real (model_gate)",
-      "seconds": 8.627
+      "seconds": 7.204
     },
     {
       "step": "B · fine-tuning + Juiz SIMULADO aprovando",
-      "seconds": 3.789
+      "seconds": 2.71
     },
     {
       "step": "C · fine-tuning + Juiz SIMULADO reprovando",
-      "seconds": 3.096
+      "seconds": 2.569
     }
   ],
   "checks": [
@@ -258,6 +274,10 @@
     },
     {
       "name": "C: cota 5 (saldo 14)",
+      "ok": true
+    },
+    {
+      "name": "B e C: registro do Juiz selado, aberto pelo operador e igual ao hash do recibo",
       "ok": true
     }
   ]

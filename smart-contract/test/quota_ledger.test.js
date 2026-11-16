@@ -45,6 +45,19 @@ describe("identity.js: livro de cotas (T-1704)", function () {
 
   const balance = () => registry.summary(alice.id).balance;
 
+  it("na partida, as reservas presas por uma queda voltam inteiras como falha (revisão de 15/11)", function () {
+    registry.reserve(alice.id, "job-preso");
+    registry.reserve(alice.id, "job-acertado");
+    registry.settle("job-acertado", "rejected");
+    assert.strictEqual(balance(), 10);
+    // a CVM1 cai e volta: um registro novo lido do mesmo arquivo
+    const again = new IdentityRegistry({ statePath, difficulty: 0 });
+    assert.strictEqual(again.releaseStaleReservations(), 1);
+    assert.strictEqual(again.summary(alice.id).balance, 15);
+    assert.strictEqual(again.summary(alice.id).reserved, 0);
+    assert.strictEqual(again.releaseStaleReservations(), 0);
+  });
+
   it("valores do protótipo: Q = 20, reserva 5 e custos 1, 2 e 5; falha não cobra", function () {
     assert.strictEqual(INITIAL_BALANCE, 20);
     assert.strictEqual(RESERVE_COST, 5);

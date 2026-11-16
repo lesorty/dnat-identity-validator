@@ -29,6 +29,18 @@ passos:
     congelado: false
     cpus: null
 
+  - id: bateria
+    task: T-301
+    titulo: Pacote da bateria do Juiz, com a composição final (âncoras, seguros, parte secreta)
+    cmd: cd model_gate && uv run --frozen python -m experiments.battery_pack --out "${MODEL_GATE_DATA:-$HOME/model_gate_data}/battery/campanha"
+    bloqueio: composição final da bateria e parte secreta (T-301, T-304)
+
+  - id: direcao-s2
+    task: T-402
+    titulo: Direção de recusa do base e referência do S2
+    cmd: cd model_gate && uv run --frozen python -m experiments.s2_reference
+    bloqueio: decisão do papel do S2 no veredito (T-414)
+
   - id: determinismo
     task: T-205
     titulo: Determinismo do base na VM (10 respostas iguais em duas execuções)
