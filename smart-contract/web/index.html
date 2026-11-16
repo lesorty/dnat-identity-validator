@@ -415,14 +415,17 @@ async function viewResultados(v, params) {
         <p class="muted" style="font-size:.86rem">${esc(e.tasks.join(", "))} · ${esc(e.teste)} · última run ${when(e.ultima)}</p>
         <p><b>Responde:</b> ${esc(e.pergunta)}</p>
         ${e.destaques.length ? `<div class="hl">${e.destaques.map((x) => `<div><span>${esc(x.rotulo)}</span><b>${esc(x.valor)}</b>${x.nota ? `<small>${esc(x.nota)}</small>` : ""}</div>`).join("")}</div>` : ""}
-        <div class="files">${e.arquivos.map(fileLink).join("")}</div></article>`).join("")}
-        ${r.avulsos.length ? `<div class="card"><h2>Fora do catálogo</h2><div class="files">${r.avulsos.map(fileLink).join("")}</div></div>` : ""}</div>`;
+        <div class="files">${e.arquivos.map(fileLink).join("")}</div>
+        ${e.nuvem?.length ? `<div class="files"><span class="badge b-ok">na nuvem</span>${e.nuvem.map(fileLink).join("")}</div>` : ""}</article>`).join("")}
+        ${r.avulsos.length ? `<div class="card"><h2>Fora do catálogo</h2><div class="files">${r.avulsos.map(fileLink).join("")}</div></div>` : ""}
+        ${r.nuvemAvulsos?.length ? `<div class="card"><h2>Da nuvem, fora do catálogo</h2><div class="files">${r.nuvemAvulsos.map(fileLink).join("")}</div></div>` : ""}</div>`;
+      if (r.pacotes?.length) $("#rbox").insertAdjacentHTML("afterbegin", `<div class="note ok" style="margin-bottom:14px">Pacotes da nuvem importados: ${r.pacotes.map((p) => `${esc(p.host)} · ${short(p.commit, 8)} · ${p.congelado ? "congelado" : "<b>ensaio</b>"}`).join("; ")}</div>`);
       return;
     }
     const { runs, runsDir } = await getJson("/api/runs");
     const exps = [...new Set(runs.map((r) => r.experiment).filter(Boolean))].sort();
     $("#rbox").innerHTML = `<div class="card">
-      <div class="filters"><select id="fk" aria-label="Tipo"><option value="">todos os tipos</option><option value="resultado">arquivos de resultado</option><option value="registro">registro de execuções</option></select>
+      <div class="filters"><select id="fk" aria-label="Tipo"><option value="">todos os tipos</option><option value="resultado">arquivos de resultado</option><option value="registro">registro de execuções</option><option value="nuvem">resultados da nuvem</option></select>
       <select id="fe" aria-label="Experimento"><option value="">todos os experimentos</option>${exps.map((e) => `<option>${esc(e)}</option>`).join("")}</select>
       <input type="text" id="fq" placeholder="buscar (task, título, run)" aria-label="Buscar"><span class="muted" id="fn"></span></div>
       ${runsDir ? "" : `<div class="note warn">O registro de execuções ($MODEL_GATE_DATA/runs) não está acessível daqui; só os arquivos de resultado aparecem.</div>`}
@@ -433,11 +436,12 @@ async function viewResultados(v, params) {
         (!q || [r.task, r.title, r.runId, r.stem].join(" ").toLowerCase().includes(q)));
       $("#fn").textContent = `${rows.length} de ${runs.length}`;
       $("#rt").innerHTML = rows.map((r) => {
-        const href = r.kind === "resultado" ? `#resultados?f=${encodeURIComponent(r.key)}` : `#resultados?run=${encodeURIComponent(r.runId)}`;
-        const what = r.kind === "resultado" ? esc(r.title) : `<span class="mono">${esc(r.runId)}</span>`;
-        const info = r.kind === "resultado" ? (chk(r.checks) || `<span class="muted">${r.hasMd ? "relatório" : "só JSON"}</span>`)
+        const isFile = r.kind !== "registro";
+        const href = isFile ? `#resultados?f=${encodeURIComponent(r.key)}` : `#resultados?run=${encodeURIComponent(r.runId)}`;
+        const what = isFile ? esc(r.title) : `<span class="mono">${esc(r.runId)}</span>`;
+        const info = isFile ? (chk(r.checks) || `<span class="muted">${r.hasMd ? "relatório" : "só JSON"}</span>`)
           : `${esc(r.lines)} ${r.lines === 1 ? "linha" : "linhas"} · ${esc(r.preview.slice(0, 2).map((p) => `${p.metric}=${typeof p.value === "number" ? num(p.value) : String(p.value ?? "—").slice(0, 24)}`).join(", "))}`;
-        return `<tr class="click" data-href="${href}"><td>${when(r.date)}</td><td><span class="badge ${r.kind === "resultado" ? "b-accent" : ""}">${r.kind}</span></td><td>${esc(r.task || "—")}</td><td>${what}</td><td>${info}</td><td class="mono">${r.commit ? short(r.commit, 7) : "—"}${r.dirty ? ` <span class="badge b-warn">sujo</span>` : ""}</td></tr>`;
+        return `<tr class="click" data-href="${href}"><td>${when(r.date)}</td><td><span class="badge ${r.kind === "resultado" ? "b-accent" : r.kind === "nuvem" ? "b-ok" : ""}">${r.kind}</span></td><td>${esc(r.task || "—")}</td><td>${what}</td><td>${info}</td><td class="mono">${r.commit ? short(r.commit, 7) : "—"}${r.dirty ? ` <span class="badge b-warn">sujo</span>` : ""}</td></tr>`;
       }).join("") || `<tr><td colspan="6" class="empty">Nada com esse filtro.</td></tr>`;
     };
     ["fk", "fe"].forEach((id) => ($("#" + id).onchange = draw)); $("#fq").oninput = draw;
@@ -455,7 +459,9 @@ async function resultFile(v, key) {
       <dl class="kv"><dt>Task</dt><dd>${esc(meta.task || "—")}</dd><dt>Quando</dt><dd>${when(meta.date)}</dd>
       ${meta.runId ? `<dt>Run</dt><dd><a class="mono" href="#resultados?run=${encodeURIComponent(meta.runId)}">${esc(meta.runId)}</a></dd>` : ""}
       ${meta.commit ? `<dt>Commit</dt><dd class="mono">${short(meta.commit, 10)}${meta.dirty ? ` <span class="badge b-warn">repositório sujo</span>` : ""}</dd>` : ""}
-      <dt>Arquivo</dt><dd class="mono">${meta.root === "smart_contract" ? "smart-contract" : esc(meta.root)}/results/${esc(meta.stem)}.${meta.hasMd ? "md" : "json"}</dd></dl>
+      ${meta.origem === "nuvem" && meta.pacote ? `<dt>Origem</dt><dd><span class="badge b-ok">nuvem</span> ${esc(meta.pacote.host)}${meta.pacote.maquina ? ` · ${esc(meta.pacote.maquina.tipo || meta.pacote.maquina.cpu || "")} · ${meta.pacote.maquina.cpus} vCPU · BF16 ${meta.pacote.maquina.bf16 ? "sim" : "não"} · ${esc(meta.pacote.maquina.confidencial || "não confidencial")}` : ""} · ${meta.pacote.congelado ? "commit congelado" : `<span class="badge b-warn">ensaio: commit não congelado</span>`}</dd>`
+        : `<dt>Origem</dt><dd>verificação local</dd>`}
+      <dt>Arquivo</dt><dd class="mono">${meta.origem === "nuvem" && meta.pacote ? `resultados_nuvem/${esc(meta.pacote.nome)}/results/${meta.baseKey.startsWith("smart_contract") ? "smart-contract" : "model_gate"}` : (meta.root === "smart_contract" ? "smart-contract" : esc(meta.root)) + "/results"}/${esc(meta.stem)}.${meta.hasMd ? "md" : "json"}</dd></dl>
       ${meta.checks?.failed?.length ? `<div class="note bad">Falhou: ${meta.checks.failed.map(esc).join("; ")}</div>` : ""}</div>
       ${md ? `<div class="card md">${mdToHtml(md.replace(/^#\s+.*\n/, ""))}</div>` : ""}
       ${json ? `<details class="card" ${md ? "" : "open"}><summary>JSON completo</summary><pre>${esc(JSON.stringify(json, null, 2))}</pre></details>` : ""}`;

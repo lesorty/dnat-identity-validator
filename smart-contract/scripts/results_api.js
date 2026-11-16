@@ -20,6 +20,38 @@ const ROOTS = {
   model_gate: path.join(REPO, "model_gate", "results"),
   smart_contract: path.join(REPO, "smart-contract", "results"),
 };
+// Pacotes da campanha na nuvem importados (tools/cloud/importar.sh): resultados_nuvem/<pacote>/.
+const CLOUD = path.join(REPO, "resultados_nuvem");
+
+/** Raízes de resultado: as locais e, por pacote importado, results/model_gate e results/smart-contract. */
+function roots() {
+  const out = Object.entries(ROOTS).map(([id, dir]) => ({ id, dir, base: id, origem: "local", pacote: null }));
+  if (!fs.existsSync(CLOUD)) return out;
+  for (const name of fs.readdirSync(CLOUD).sort()) {
+    const meta = readJson(path.join(CLOUD, name, "pacote.json"));
+    if (!meta) continue;
+    for (const [base, sub] of [["model_gate", "model_gate"], ["smart_contract", "smart-contract"]]) {
+      const dir = path.join(CLOUD, name, "results", sub);
+      if (fs.existsSync(dir)) out.push({ id: `nuvem.${name}.${base}`, dir, base, origem: "nuvem",
+        pacote: { nome: name, host: meta.host, commit: meta.head?.commit, congelado: Boolean(meta.congelado),
+          maquina: machineSummary(path.join(CLOUD, name, "machine")) } });
+    }
+  }
+  return out;
+}
+
+function machineSummary(dir) {
+  try {
+    const f = fs.readdirSync(dir).find((x) => x.endsWith(".json"));
+    const c = f && readJson(path.join(dir, f));
+    if (!c) return null;
+    return { cpu: c.cpu?.model, cpus: c.cpu?.logical_cpus, bf16: Boolean(c.cpu?.flags?.avx512_bf16 || c.cpu?.flags?.amx_bf16),
+      confidencial: c.confidential?.kind || null, nuvem: c.cloud?.provider || null, tipo: c.cloud?.vm_size || c.cloud?.shape || null };
+  } catch {
+    return null;
+  }
+}
+
 const RUNS_DIR = () =>
   path.join(process.env.MODEL_GATE_DATA || path.join(os.homedir(), "model_gate_data"), "runs");
 
@@ -166,10 +198,10 @@ function readJson(p) {
 
 function listResultFiles() {
   const out = [];
-  for (const [root, dir] of Object.entries(ROOTS)) {
-    if (!fs.existsSync(dir)) continue;
-    const stems = new Set(fs.readdirSync(dir).filter((f) => /\.(json|md)$/.test(f)).map((f) => f.replace(/\.(json|md)$/, "")));
-    for (const stem of stems) out.push({ root, stem, key: `${root}/${stem}`, dir });
+  for (const r of roots()) {
+    if (!fs.existsSync(r.dir)) continue;
+    const stems = new Set(fs.readdirSync(r.dir).filter((f) => /\.(json|md)$/.test(f)).map((f) => f.replace(/\.(json|md)$/, "")));
+    for (const stem of stems) out.push({ root: r.id, stem, key: `${r.id}/${stem}`, dir: r.dir, baseKey: `${r.base}/${stem}`, origem: r.origem, pacote: r.pacote });
   }
   return out;
 }
@@ -210,7 +242,8 @@ function meta(f) {
     date: fileDate(json, md, fs.existsSync(jsonPath) ? jsonPath : mdPath),
     runId: json?.run_id || null, commit: json?.git_commit || null, dirty: json?.dirty ?? null,
     checks: checksOf(json), hasMd: Boolean(md), hasJson: Boolean(json),
-    origem: json?.origem || json?.note || null,
+    nota: json?.origem || json?.note || null,
+    origem: f.origem || "local", pacote: f.pacote || null, baseKey: f.baseKey || f.key,
   };
 }
 
@@ -259,11 +292,14 @@ function aggregateRuns(lines) {
 }
 
 const experimentOf = (key) => EXPERIMENTS.find((e) => e.arquivos.includes(key))?.id || null;
+const rootById = (id) => roots().find((r) => r.id === id) || null;
 
 function mountResultsRoutes(app) {
   app.get("/api/results", (_req, res) => {
     try {
-      const files = listResultFiles().map(meta);
+      const all = listResultFiles().map(meta);
+      const files = all.filter((f) => f.origem === "local");
+      const cloud = all.filter((f) => f.origem === "nuvem");
       const byKey = Object.fromEntries(files.map((f) => [f.key, f]));
       const cache = {};
       const d = (key) => {
@@ -285,10 +321,13 @@ function mountResultsRoutes(app) {
         const total = fs_.reduce((a, f) => a + (f.checks?.total || 0), 0);
         const dates = fs_.map((f) => f.date).filter(Boolean).sort();
         return { id: e.id, titulo: e.titulo, tasks: e.tasks, teste: e.teste, objetivo: e.objetivo, pergunta: e.pergunta,
-          destaques, checks: total ? { ok, total } : null, ultima: dates.at(-1) || null, arquivos: fs_ };
+          destaques, checks: total ? { ok, total } : null, ultima: dates.at(-1) || null, arquivos: fs_,
+          nuvem: cloud.filter((f) => e.arquivos.includes(f.baseKey)) };
       });
       const known = new Set(EXPERIMENTS.flatMap((e) => e.arquivos));
-      res.json({ experiments, avulsos: files.filter((f) => !known.has(f.key)) });
+      res.json({ experiments, avulsos: files.filter((f) => !known.has(f.key)),
+        nuvemAvulsos: cloud.filter((f) => !known.has(f.baseKey)), pacotes: roots().filter((r) => r.pacote).map((r) => r.pacote)
+          .filter((p, i, a) => a.findIndex((q) => q.nome === p.nome) === i) });
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
@@ -296,12 +335,13 @@ function mountResultsRoutes(app) {
 
   app.get("/api/results/file/:root/:stem", (req, res) => {
     const { root, stem } = req.params;
-    if (!ROOTS[root] || !/^[\w.+-]+$/.test(stem)) return res.status(404).json({ error: "resultado desconhecido" });
-    const f = { root, stem, key: `${root}/${stem}`, dir: ROOTS[root] };
+    const r = rootById(root);
+    if (!r || !/^[\w.+-]+$/.test(stem)) return res.status(404).json({ error: "resultado desconhecido" });
+    const f = { root, stem, key: `${root}/${stem}`, dir: r.dir, baseKey: `${r.base}/${stem}`, origem: r.origem, pacote: r.pacote };
     const m = meta(f);
     if (!m.hasJson && !m.hasMd) return res.status(404).json({ error: "resultado desconhecido" });
     res.json({
-      meta: { ...m, experiment: experimentOf(f.key) },
+      meta: { ...m, experiment: experimentOf(f.baseKey) },
       md: m.hasMd ? fs.readFileSync(path.join(f.dir, `${stem}.md`), "utf8") : null,
       json: m.hasJson ? readJson(path.join(f.dir, `${stem}.json`)) : null,
     });
@@ -309,7 +349,7 @@ function mountResultsRoutes(app) {
 
   app.get("/api/runs", (_req, res) => {
     try {
-      const results = listResultFiles().map(meta).map((m) => ({ kind: "resultado", ...m, experiment: experimentOf(m.key) }));
+      const results = listResultFiles().map(meta).map((m) => ({ kind: m.origem === "nuvem" ? "nuvem" : "resultado", ...m, experiment: experimentOf(m.baseKey) }));
       const fileByRun = Object.fromEntries(results.filter((r) => r.runId).map((r) => [r.runId, r]));
       const log = aggregateRuns(readRunLog()).map((r) => {
         const f = fileByRun[r.runId];

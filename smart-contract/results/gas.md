@@ -6,11 +6,11 @@ Hardhat 2.27.0 · solc 0.8.20
 
 | Função | gasUsed |
 |---|---|
-| registerAsset (dataset, bloom vazio) | 388,980 |
-| registerAsset (dataset, bloom 256 B) | 573,487 |
-| registerAsset (aplicação) | 326,835 |
-| purchaseAccess | 96,703 |
-| registerAsset (modelo base) | 351,619 |
-| registerDerivative (recibo, aprovado) | 493,962 |
-| registerDerivative (recibo, reprovado) | 474,074 |
-| revokeDerivative | 56,222 |
+| registerAsset (dataset, bloom vazio) | 411,779 |
+| registerAsset (dataset, bloom 256 B) | 596,286 |
+| registerAsset (aplicação) | 349,676 |
+| purchaseAccess | 83,135 |
+| registerAsset (modelo base) | 351,811 |
+| registerDerivative (recibo, aprovado) | 494,028 |
+| registerDerivative (recibo, reprovado) | 474,140 |
+| revokeDerivative | 56,288 |

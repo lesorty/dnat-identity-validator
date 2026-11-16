@@ -18,7 +18,8 @@ async function main() {
   // Representative inputs mirroring api-server.js registerAsset():
   //   assetUri/manifestUri = "ipfs://<CIDv0>" (53 chars), contentHash = bytes32,
   //   bloomFilter = "0x" (common case; contract stores it only for datasets).
-  const cidUri = "ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"; // 53 chars
+  const cidUri = "ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
+  const otherUri = (k) => cidUri.slice(0, -1) + String(k); // 53 chars
   const contentHash = ethers.keccak256(ethers.toUtf8Bytes("plaintext-asset-sha256"));
   const datasetPrice = ethers.parseEther("0.01");
   const appPrice = ethers.parseEther("0.005");
@@ -31,15 +32,16 @@ async function main() {
 
   // 1b) same dataset register but WITH a 256-byte bloom filter (to show scaling)
   const bloom256 = "0x" + "ab".repeat(256);
+  // URI do mesmo tamanho, mas outro: o contrato recusa URI de dataset ou aplicação repetido.
   const r1b = await (await mkt.connect(provider).registerAsset(
     0, "Synthetic Customers 60", "Synthetic customer dataset, 60 rows",
-    cidUri, cidUri, contentHash, datasetPrice, bloom256
+    otherUri(1), cidUri, contentHash, datasetPrice, bloom256
   )).wait();
 
   // 2) register application (AssetType.Application = 1), bloom ignored for apps
   const r2 = await (await mkt.connect(provider).registerAsset(
     1, "Mean Aggregator", "Computes per-column means",
-    cidUri, cidUri, contentHash, appPrice, "0x"
+    otherUri(2), cidUri, contentHash, appPrice, "0x"
   )).wait();
 
   // datasetId = 1 (the empty-bloom one), applicationId = 3 (nextAssetId increments per call)

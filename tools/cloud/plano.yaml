@@ -1,0 +1,113 @@
+# Plano da fase de testes na nuvem (TST): os passos, na ordem da fila (DSN2027/backlog/FILA.md, E3).
+# Cada passo: id, task, título, o comando (rodado da raiz do repositório) e o que ainda o bloqueia.
+#   cmd: null        ainda não há script: o passo aparece como "sem script" (trabalho local a fazer)
+#   bloqueio: texto  há script, mas falta algo (decisão, prereg congelado, dado): só roda com --forcar
+#   congelado: false roda também fora do commit congelado (ficha, testes, conferências)
+#   cpus             conjunto do taskset; a medida de custo vale em 4 vCPU (G1)
+# Rodar: make campanha-status | make campanha | make campanha PASSOS="ficha vazao" | make pacote
+nome: tst
+cpus: "0-3"
+passos:
+  - id: ficha
+    task: T-210
+    titulo: Ficha da máquina (CPU, BF16/AMX, confidencial, tipo de VM)
+    cmd: python3 -I tools/cloud/machine_card.py
+    congelado: false
+    cpus: null
+
+  - id: testes
+    task: T-1611
+    titulo: Testes rápidos no commit da campanha
+    cmd: make test
+    congelado: false
+    cpus: null
+
+  - id: dados
+    task: T-203
+    titulo: Dados conferidos pelos digests (base, datasets, avaliadores, população)
+    cmd: tools/cloud/fetch_data.sh --judges --population
+    congelado: false
+    cpus: null
+
+  - id: determinismo
+    task: T-205
+    titulo: Determinismo do base na VM (10 respostas iguais em duas execuções)
+    cmd: cd model_gate && uv run --frozen python -m experiments.check_determinism
+
+  - id: vazao
+    task: T-314
+    titulo: Vazão de geração em 4 vCPU e custo estimado do S1
+    cmd: cd model_gate && uv run --frozen python -m experiments.bench_throughput && uv run --frozen python -m experiments.estimate_s1
+
+  - id: avaliador-qwen3guard
+    task: T-309
+    titulo: Avaliador do portão Qwen3Guard-Gen-4B na VM (custo e reprodutibilidade)
+    cmd: cd model_gate && uv run --frozen python -m experiments.judge_bench --only qwen3guard
+
+  - id: avaliador-gemma
+    task: T-309
+    titulo: Avaliador do portão Gemma na VM
+    cmd: cd model_gate && uv run --frozen python -m experiments.judge_bench --only gemma
+
+  - id: direcao
+    task: T-414
+    titulo: Direção de recusa pelo procedimento de Arditi
+    cmd: cd model_gate && uv run --frozen python -m experiments.direction_select --threads 4
+    bloqueio: decisão do papel do S2 no veredito (T-414)
+
+  - id: referencia
+    task: T-312
+    titulo: Referência custodiada do pai com o prereg congelado
+    cmd: null
+    bloqueio: prereg.yaml com valores (T-606) e avaliador escolhido (T-309)
+
+  - id: formatos
+    task: T-505
+    titulo: Instrumento reduzido em cada formato (FP e NF4)
+    cmd: null
+
+  - id: sanidade
+    task: T-313
+    titulo: "Teste 1: o abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda"
+    cmd: null
+
+  - id: custo-veredito
+    task: T-314
+    titulo: Custo do veredito inteiro com o avaliador (G1, RQ5)
+    cmd: null
+
+  - id: teste8
+    task: T-813
+    titulo: "Teste 8: reprovado não sai, aprovado vira ativo com recibo, operador revoga"
+    cmd: cd smart-contract && node e2e/teste8.js
+    bloqueio: o roteiro usa o prereg e o avaliador de fumaça; trocar pelos congelados (T-606, T-309)
+
+  - id: identidade
+    task: T-1707
+    titulo: "Teste 9: identidade e cota, com a demonstração"
+    cmd: cd smart-contract && npm run --silent test:identity && node e2e/demo_cota.js
+
+  - id: gas
+    task: T-709
+    titulo: Gás do recibo e da revogação
+    cmd: cd smart-contract && npx hardhat run scripts/measure-gas.js
+    cpus: null
+
+  - id: overhead
+    task: T-812
+    titulo: Overhead VM comum × CVM (uma célula por máquina; LABEL=B_vm_direct ou C_cvm_direct)
+    cmd: LABEL=${LABEL:-C_cvm_direct} REPEATS=10 bash assets/tests/run_cvm_overhead_campaign.sh
+    bloqueio: precisa da pilha Docker no ar (make stack-up) e de uma VM de cada tipo
+    cpus: null
+
+  - id: referencia-forjada
+    task: T-1205
+    titulo: "Teste 7: ataque da referência forjada (com e sem custódia)"
+    cmd: cd model_gate && uv run --frozen python -m experiments.attack_forged_reference
+    bloqueio: o roteiro usa o prereg e o avaliador de fumaça; trocar pelos congelados (T-606, T-309)
+
+  - id: populacao-piloto
+    task: T-914
+    titulo: "População do piloto: 2 abliterações e 2 LoRA benignos"
+    cmd: null
+    bloqueio: inventário da população (T-916) e receitas da varredura

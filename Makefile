@@ -9,7 +9,8 @@ CPUS ?= 0-3
 
 .DEFAULT_GOAL := help
 .PHONY: help setup doctor check test test-contract test-judge test-identity e2e teste8 lora demo-cota \
-        dev dev-tiny ui-check stack-up stack-seed stack-down stack-tests clean clean-executions board
+        dev dev-tiny ui-check stack-up stack-seed stack-down stack-tests clean clean-executions board \
+        nuvem-bootstrap dados ficha congelar campanha-status campanha pacote importar
 
 help: ## lista as rotinas
 	@awk 'BEGIN{FS=":.*## "} /^[a-z0-9-]+:.*## /{printf "  \033[1m%-17s\033[0m %s\n", $$1, $$2} /^## /{printf "\n%s\n", substr($$0,4)}' $(MAKEFILE_LIST)
@@ -71,6 +72,31 @@ stack-down: ## derruba a pilha Docker
 
 stack-tests: ## testes de segurança T1–T5 contra a pilha Docker
 	bash assets/tests/run_all_tests.sh
+
+## Nuvem (fase de testes; o passo a passo está em tools/cloud/README.md)
+nuvem-bootstrap: ## prepara uma VM Ubuntu nova: ferramentas fixas, make setup, dados, ficha e doctor
+	tools/cloud/bootstrap.sh $(ARGS)
+
+dados: ## baixa e confere os dados do model_gate pelos manifestos (ARGS="--judges --population")
+	tools/cloud/fetch_data.sh $(ARGS)
+
+ficha: ## ficha da máquina (CPU, BF16/AMX, confidencial, tipo de VM), para o artigo e o pacote
+	python3 -I tools/cloud/machine_card.py
+
+congelar: ## fecha o sistema (T-1611): tag congelado-* com os hashes do Juiz e do prereg (ARGS=--ensaio)
+	tools/congelar.sh $(ARGS)
+
+campanha-status: ## o que a campanha vai rodar, o que já rodou e o que está bloqueado ou sem script
+	uv run --project $(MG) --frozen --quiet python tools/cloud/campanha.py status
+
+campanha: ## roda os passos pendentes da campanha (PASSOS="ficha vazao", ARGS="--forcar --sem-congelamento")
+	uv run --project $(MG) --frozen --quiet python tools/cloud/campanha.py run $(PASSOS) $(ARGS)
+
+pacote: ## empacota resultados, registro, fichas e logs da campanha para trazer de volta
+	uv run --project $(MG) --frozen --quiet python tools/cloud/campanha.py pacote
+
+importar: ## no notebook: importa um pacote da nuvem para resultados_nuvem/ (PACOTE=arquivo.tar.gz)
+	tools/cloud/importar.sh $(PACOTE)
 
 ## Manutenção
 clean: ## apaga temporários antigos, CVMs de job órfãs e processos de pilhas e2e esquecidos
