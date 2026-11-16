@@ -42,6 +42,7 @@ const {
   identityRouter,
 } = require("./identity");
 const { mountUiRoutes } = require("./ui_api");
+const { mountResultsRoutes } = require("./results_api");
 const { getDerivative, retainDerivative, userSummary } = require("./retention");
 const { MODEL_FORMAT } = require("./asset_envelope");
 const { extractVerified, modelDirDigest } = require("./model_store");
@@ -1277,6 +1278,9 @@ async function startServer() {
 
   // Identidade cara (T-1702, E14 §18): desafio da implantação e d; registro com prova de trabalho.
   app.use("/api/identity", identityRouter(identities));
+
+  // Resultados das verificações locais (aba Resultados; results_api.js).
+  mountResultsRoutes(app);
 
   // Leitura da interface: modelos e derivados, o Juiz e os jobs da identidade (ui_api.js).
   mountUiRoutes(app, {

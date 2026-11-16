@@ -19,6 +19,7 @@ versão fixa, numa página que guarda a chave da identidade). Cinco abas:
 | Meus jobs | Só os jobs da identidade que pede (rota assinada): estado do derivado e veredito, sem stdout, motivos nem alertas. |
 | Juiz | A escada de decisão como o código a aplica hoje, a cota por veredito, as versões liberadas, o pacote da bateria e as referências por base, e as ações do operador (CLI no host). |
 | Identidade | Criar (prova de trabalho no navegador), importar, exportar e esquecer; saldo, reservado, gasto e vereditos. |
+| Resultados (16/11) | Verificações locais em duas visões: por experimento (o que responde, teste e objetivo, números de destaque, conferências e arquivos) e todas as runs (arquivos de resultado e o registro de execuções agrupado por run, com filtros). Cada arquivo abre o relatório renderizado ou o JSON; cada run, as métricas. Rotas em `scripts/results_api.js`. |
 
 Rotas novas de leitura em `scripts/ui_api.js`: `GET /api/models`, `GET /api/judge`,
 `GET /api/quota-rules` e `GET /api/my/jobs` (assinada). As páginas antigas `assets.html` e

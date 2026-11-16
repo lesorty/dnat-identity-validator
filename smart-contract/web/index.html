@@ -87,6 +87,26 @@ textarea{min-height:88px;font-family:var(--mono);font-size:.84rem}
 .ladder{margin:0;padding-left:20px;display:grid;gap:6px;font-size:.92rem}
 details summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.88rem}
 pre{background:var(--tint);border-radius:8px;padding:10px 12px;font:.8rem/1.45 var(--mono);overflow-x:auto;margin:0}
+/* resultados */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.seg a{padding:6px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.88rem}
+.seg a[aria-current]{background:var(--accent);color:var(--on-accent)}
+.hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:8px}
+.hl div{background:var(--tint);border-radius:8px;padding:9px 11px;display:grid;gap:2px;min-width:0}
+.hl b{font-size:1.02rem;overflow-wrap:anywhere}
+.hl span{font-size:.78rem;color:var(--muted)}
+.hl small{font-size:.74rem;color:var(--muted)}
+.files{display:flex;flex-wrap:wrap;gap:6px}
+.files a{font-size:.8rem;border:1px solid var(--line);border-radius:6px;padding:3px 8px;text-decoration:none;color:var(--ink);background:var(--surface)}
+.files a:hover{border-color:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters select,.filters input{width:auto;min-width:150px}
+tr.click{cursor:pointer} tr.click:hover td{background:var(--tint)}
+.md{display:grid;gap:10px;font-size:.92rem;min-width:0}
+.md h1{font-size:1.25rem} .md h2{font-size:1.05rem;margin-top:6px} .md h3{font-size:.95rem}
+.md ul{margin:0;padding-left:20px;display:grid;gap:3px}
+.md code{font-family:var(--mono);font-size:.84em;background:var(--tint);padding:1px 4px;border-radius:4px}
+.md table td,.md table th{font-size:.84rem}
 footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;color:var(--muted);font-size:.8rem}
 .empty{color:var(--muted);font-size:.9rem;padding:6px 0}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:r .8s linear infinite;vertical-align:-2px}
@@ -105,6 +125,7 @@ footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;color:var(--muted);fon
     <a href="#treinar">Treinar</a>
     <a href="#jobs">Meus jobs</a>
     <a href="#juiz">Juiz</a>
+    <a href="#resultados">Resultados</a>
     <a href="#identidade">Identidade</a>
   </nav>
 </header>
@@ -343,6 +364,110 @@ node scripts/judge_cli.js show</pre></details>`;
   } catch (e) { $("#jstate").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
 }
 
+// ------------------------------------------------------------------ Resultados
+// Markdown mínimo e seguro: tudo é escapado antes; só títulos, tabelas, listas, código e ênfase.
+function mdToHtml(text) {
+  const inline = (t) => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  const lines = String(text || "").split("\n"), out = [];
+  for (let i = 0; i < lines.length; ) {
+    const l = lines[i];
+    if (/^```/.test(l)) { const buf = []; i++; while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]); i++; out.push(`<pre>${esc(buf.join("\n"))}</pre>`); continue; }
+    const h = l.match(/^(#{1,4})\s+(.*)$/);
+    if (h) { const n = Math.min(h[1].length, 3); out.push(`<h${n}>${inline(h[2])}</h${n}>`); i++; continue; }
+    if (/^\s*\|/.test(l)) {
+      const rows = []; while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
+      const cells = (r) => r.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+      const body = rows.filter((r, k) => !(k === 1 && /^[\s|:-]+$/.test(r)));
+      out.push(`<div class="tscroll"><table><thead><tr>${cells(body[0]).map((c) => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${
+        body.slice(1).map((r) => `<tr>${cells(r).map((c) => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+      continue;
+    }
+    if (/^\s*[-*]\s+/.test(l)) { const items = []; while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) items.push(lines[i++].replace(/^\s*[-*]\s+/, "")); out.push(`<ul>${items.map((x) => `<li>${inline(x)}</li>`).join("")}</ul>`); continue; }
+    if (!l.trim()) { i++; continue; }
+    const para = []; while (i < lines.length && lines[i].trim() && !/^(#|\s*\||\s*[-*]\s|```)/.test(lines[i])) para.push(lines[i++]);
+    out.push(`<p>${inline(para.join(" "))}</p>`);
+  }
+  return out.join("");
+}
+const chk = (c) => c ? `<span class="badge ${c.ok === c.total ? "b-ok" : "b-bad"}">${c.ok}/${c.total} conferências</span>` : "";
+const fileLink = (f) => `<a href="#resultados?f=${encodeURIComponent(f.key)}">${esc(f.title)}${f.checks ? ` · ${f.checks.ok}/${f.checks.total}` : ""}</a>`;
+
+async function viewResultados(v, params) {
+  if (params.get("f")) return resultFile(v, params.get("f"));
+  if (params.get("run")) return runDetail(v, params.get("run"));
+  const mode = params.get("v") === "runs" ? "runs" : "exp";
+  v.innerHTML = `<div class="row spread"><div><h1>Resultados</h1><p class="lede">O que já rodou na máquina local e o que cada experimento se propõe a responder. Tudo aqui é verificação de funcionamento: pela regra de 12/11, todo número do artigo sai das VMs de nuvem, com o sistema congelado.</p></div>
+    <nav class="seg" aria-label="Visão"><a href="#resultados" ${mode === "exp" ? 'aria-current="page"' : ""}>Experimentos</a><a href="#resultados?v=runs" ${mode === "runs" ? 'aria-current="page"' : ""}>Todas as runs</a></nav></div>
+    <div id="rbox"><span class="spin"></span></div>`;
+  try {
+    if (mode === "exp") {
+      const r = await getJson("/api/results");
+      $("#rbox").innerHTML = `<div class="stack">${r.experiments.map((e) => `<article class="card">
+        <div class="row spread"><h2>${esc(e.titulo)}</h2><div class="row">${chk(e.checks)}<span class="badge b-accent">${esc(e.objetivo)}</span></div></div>
+        <p class="muted" style="font-size:.86rem">${esc(e.tasks.join(", "))} · ${esc(e.teste)} · última run ${when(e.ultima)}</p>
+        <p><b>Responde:</b> ${esc(e.pergunta)}</p>
+        ${e.destaques.length ? `<div class="hl">${e.destaques.map((x) => `<div><span>${esc(x.rotulo)}</span><b>${esc(x.valor)}</b>${x.nota ? `<small>${esc(x.nota)}</small>` : ""}</div>`).join("")}</div>` : ""}
+        <div class="files">${e.arquivos.map(fileLink).join("")}</div></article>`).join("")}
+        ${r.avulsos.length ? `<div class="card"><h2>Fora do catálogo</h2><div class="files">${r.avulsos.map(fileLink).join("")}</div></div>` : ""}</div>`;
+      return;
+    }
+    const { runs, runsDir } = await getJson("/api/runs");
+    const exps = [...new Set(runs.map((r) => r.experiment).filter(Boolean))].sort();
+    $("#rbox").innerHTML = `<div class="card">
+      <div class="filters"><select id="fk" aria-label="Tipo"><option value="">todos os tipos</option><option value="resultado">arquivos de resultado</option><option value="registro">registro de execuções</option></select>
+      <select id="fe" aria-label="Experimento"><option value="">todos os experimentos</option>${exps.map((e) => `<option>${esc(e)}</option>`).join("")}</select>
+      <input type="text" id="fq" placeholder="buscar (task, título, run)" aria-label="Buscar"><span class="muted" id="fn"></span></div>
+      ${runsDir ? "" : `<div class="note warn">O registro de execuções ($MODEL_GATE_DATA/runs) não está acessível daqui; só os arquivos de resultado aparecem.</div>`}
+      <div class="tscroll"><table><thead><tr><th>Quando</th><th>Tipo</th><th>Task</th><th>O quê</th><th>Conferências / métricas</th><th>Commit</th></tr></thead><tbody id="rt"></tbody></table></div></div>`;
+    const draw = () => {
+      const k = $("#fk").value, e = $("#fe").value, q = $("#fq").value.toLowerCase();
+      const rows = runs.filter((r) => (!k || r.kind === k) && (!e || r.experiment === e) &&
+        (!q || [r.task, r.title, r.runId, r.stem].join(" ").toLowerCase().includes(q)));
+      $("#fn").textContent = `${rows.length} de ${runs.length}`;
+      $("#rt").innerHTML = rows.map((r) => {
+        const href = r.kind === "resultado" ? `#resultados?f=${encodeURIComponent(r.key)}` : `#resultados?run=${encodeURIComponent(r.runId)}`;
+        const what = r.kind === "resultado" ? esc(r.title) : `<span class="mono">${esc(r.runId)}</span>`;
+        const info = r.kind === "resultado" ? (chk(r.checks) || `<span class="muted">${r.hasMd ? "relatório" : "só JSON"}</span>`)
+          : `${esc(r.lines)} ${r.lines === 1 ? "linha" : "linhas"} · ${esc(r.preview.slice(0, 2).map((p) => `${p.metric}=${typeof p.value === "number" ? num(p.value) : String(p.value ?? "—").slice(0, 24)}`).join(", "))}`;
+        return `<tr class="click" data-href="${href}"><td>${when(r.date)}</td><td><span class="badge ${r.kind === "resultado" ? "b-accent" : ""}">${r.kind}</span></td><td>${esc(r.task || "—")}</td><td>${what}</td><td>${info}</td><td class="mono">${r.commit ? short(r.commit, 7) : "—"}${r.dirty ? ` <span class="badge b-warn">sujo</span>` : ""}</td></tr>`;
+      }).join("") || `<tr><td colspan="6" class="empty">Nada com esse filtro.</td></tr>`;
+    };
+    ["fk", "fe"].forEach((id) => ($("#" + id).onchange = draw)); $("#fq").oninput = draw;
+    $("#rt").onclick = (ev) => { const tr = ev.target.closest("tr[data-href]"); if (tr) location.hash = tr.dataset.href; };
+    draw();
+  } catch (e) { $("#rbox").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
+}
+const num = (x, d = 3) => Number(x).toLocaleString("pt-BR", { maximumFractionDigits: d });
+async function resultFile(v, key) {
+  v.innerHTML = `<p><a href="#resultados">← Resultados</a></p><div id="rf"><span class="spin"></span></div>`;
+  try {
+    const [root, stem] = key.split("/");
+    const { meta, md, json } = await getJson(`/api/results/file/${encodeURIComponent(root)}/${encodeURIComponent(stem)}`);
+    $("#rf").innerHTML = `<div class="card"><div class="row spread"><h1>${esc(meta.title)}</h1>${chk(meta.checks)}</div>
+      <dl class="kv"><dt>Task</dt><dd>${esc(meta.task || "—")}</dd><dt>Quando</dt><dd>${when(meta.date)}</dd>
+      ${meta.runId ? `<dt>Run</dt><dd><a class="mono" href="#resultados?run=${encodeURIComponent(meta.runId)}">${esc(meta.runId)}</a></dd>` : ""}
+      ${meta.commit ? `<dt>Commit</dt><dd class="mono">${short(meta.commit, 10)}${meta.dirty ? ` <span class="badge b-warn">repositório sujo</span>` : ""}</dd>` : ""}
+      <dt>Arquivo</dt><dd class="mono">${meta.root === "smart_contract" ? "smart-contract" : esc(meta.root)}/results/${esc(meta.stem)}.${meta.hasMd ? "md" : "json"}</dd></dl>
+      ${meta.checks?.failed?.length ? `<div class="note bad">Falhou: ${meta.checks.failed.map(esc).join("; ")}</div>` : ""}</div>
+      ${md ? `<div class="card md">${mdToHtml(md.replace(/^#\s+.*\n/, ""))}</div>` : ""}
+      ${json ? `<details class="card" ${md ? "" : "open"}><summary>JSON completo</summary><pre>${esc(JSON.stringify(json, null, 2))}</pre></details>` : ""}`;
+  } catch (e) { $("#rf").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
+}
+async function runDetail(v, runId) {
+  v.innerHTML = `<p><a href="#resultados?v=runs">← Todas as runs</a></p><div id="rr"><span class="spin"></span></div>`;
+  try {
+    const { lines } = await getJson(`/api/runs/${encodeURIComponent(runId)}`);
+    const f = lines[0];
+    $("#rr").innerHTML = `<div class="card"><h1 class="mono" style="font-size:1.1rem">${esc(runId)}</h1>
+      <dl class="kv"><dt>Instrumento</dt><dd>${esc(f.instrument)}</dd><dt>Início</dt><dd>${when(f.date)}</dd><dt>Commit</dt><dd class="mono">${short(f.commit, 10)}${lines.some((l) => l.dirty) ? ` <span class="badge b-warn">repositório sujo</span>` : ""}</dd>
+      <dt>Modelo</dt><dd class="mono">${short(f.modelDigest, 16)}</dd><dt>Linhas</dt><dd>${lines.length}</dd></dl>
+      <p class="muted" style="font-size:.84rem">O registro guarda só métricas, nunca texto gerado (T-211).</p></div>
+      <div class="card tscroll"><table><thead><tr><th>#</th><th>Métrica</th><th>Valor</th><th>Extra</th><th>Seed</th></tr></thead><tbody>${
+        lines.map((l, i) => `<tr><td>${i + 1}</td><td>${esc(l.metric)}</td><td class="mono">${esc(typeof l.value === "number" ? num(l.value, 4) : JSON.stringify(l.value))}</td><td class="mono">${l.extra ? esc(JSON.stringify(l.extra)).slice(0, 160) : ""}</td><td>${esc(l.seed ?? "")}</td></tr>`).join("")
+      }</tbody></table></div>`;
+  } catch (e) { $("#rr").innerHTML = `<div class="msg bad">${esc(e.message)}</div>`; }
+}
+
 // ------------------------------------------------------------------ Identidade
 async function viewIdentidade(v) {
   const me = ID.load();
@@ -393,7 +518,7 @@ async function footer() {
       h.executor?.singleUse ? `uso único (${esc(h.executor.provider)}, ${esc(h.executor.warm)} prontas)` : `<b>reaproveitada</b> (${h.executor?.ok ? "ok" : "fora do ar"})`} · builder ${h.builder?.ok ? "ok" : "fora do ar"}`;
   } catch { $("#sys").textContent = "CVM1 fora do ar"; }
 }
-const ROUTES = { modelos: viewModelos, treinar: viewTreinar, jobs: viewJobs, juiz: viewJuiz, identidade: viewIdentidade };
+const ROUTES = { modelos: viewModelos, treinar: viewTreinar, jobs: viewJobs, juiz: viewJuiz, resultados: viewResultados, identidade: viewIdentidade };
 function route() {
   const [name, q] = (location.hash.slice(1) || "modelos").split("?");
   const view = ROUTES[name] || viewModelos;
