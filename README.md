@@ -23,6 +23,20 @@ tag git `archive/juiz-bounty-2026-10`.
 
 ## Como rodar
 
+As rotinas estão no `Makefile` da raiz; `make` lista todas. As do dia a dia:
+
+| Comando | O que faz |
+|---|---|
+| `make doctor` | Confere ferramentas, dados do model_gate, pilha Docker e higiene, e diz o comando que resolve cada pendência |
+| `make test` | Testes rápidos do contrato, da CVM1 e do Juiz (cerca de 1 min) |
+| `make dev` | Pilha local já semeada (Qwen, bateria, Juiz real de fumaça liberado, referência do pai, dataset e duas receitas) com a interface em http://localhost:3002; `make dev-tiny` sobe em segundos, sem Juiz que julgue |
+| `make ui-check` | Confere a interface num Chrome headless, em todas as abas, contra a pilha no ar |
+| `make e2e`, `make teste8` | Fluxo inteiro e Teste 8 local numa pilha descartável |
+| `make stack-up`, `make stack-seed` | Pilha Docker reconstruída e com o Juiz atual liberado (testes T1–T5: `make stack-tests`) |
+| `make clean` | Temporários antigos, CVMs de job órfãs e processos de pilhas esquecidas |
+
+Tudo isso é verificação local: pela regra de 12/11, todo dado do artigo sai da nuvem.
+
 - Subir os planos e testar o fluxo: [RUN_COMPOSE.md](RUN_COMPOSE.md).
 - Arquitetura: a definida é a D4 em [DSN2027/DECISOES.md](DSN2027/DECISOES.md) (CVM1 plano de controle,
   builder numa CVM, uma CVM de uso único por job, sem microVM). [ARCHITECTURE.md](ARCHITECTURE.md)

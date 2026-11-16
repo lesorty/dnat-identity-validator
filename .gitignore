@@ -75,3 +75,6 @@ vm_runtime/output/
 *.safetensors
 *.gguf
 *.bin
+
+# Pilha de desenvolvimento no ar (e2e/dev_stack.js)
+smart-contract/.dev_stack.json

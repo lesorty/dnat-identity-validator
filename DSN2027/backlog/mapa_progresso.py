@@ -2,7 +2,7 @@
    python3 -I progresso.py <backlog.json> <mapa_vivo.html> <saida.html>"""
 import collections, datetime as dt, functools, html, json, sys
 BK, SRC, OUT = sys.argv[1:4]
-TODAY = dt.date(2026, 11, 14)
+TODAY = dt.date.fromisoformat(sys.argv[4]) if len(sys.argv) > 4 else dt.date.today()  # data do retrato (padrão: hoje)
 H = {"P": 1, "M": 2, "G": 4}
 e = html.escape
 b = json.load(open(BK)); T = b["tasks"]; t = {x["id"]: x for x in T}

@@ -145,8 +145,16 @@ const STATE = { released: "liberado", retained: "retido", received: "recebido", 
 const vbadge = (v) => v ? `<span class="badge b-${esc(v)}">${esc(VERDICT[v] || v)}</span>` : `<span class="badge">sem veredito</span>`;
 const sbadge = (s) => s ? `<span class="badge b-${esc(s)}">${esc(STATE[s] || s)}</span>` : "";
 
-async function getJson(path) {
-  const r = await fetch(path);
+// Leituras com tempo limite: com um job de treino e o Juiz rodando, a CVM1 pode demorar a responder,
+// e a página não deve girar para sempre.
+async function getJson(path, timeoutMs = 20000) {
+  let r;
+  try {
+    r = await fetch(path, { signal: AbortSignal.timeout(timeoutMs) });
+  } catch (e) {
+    if (e.name === "TimeoutError") throw new Error(`a CVM1 não respondeu em ${timeoutMs / 1000} s (um job de treino ou o Juiz pode estar rodando); tente de novo em instantes`);
+    throw new Error(`sem conexão com a CVM1 (${e.message})`);
+  }
   const b = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(b.error || `${path}: ${r.status}`);
   return b;

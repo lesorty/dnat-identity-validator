@@ -1,6 +1,18 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+// `hardhat test`: as pastas temporárias dos testes (os.tmpdir(), que lê TMPDIR a cada chamada, e os
+// processos filhos que herdam o ambiente) vão para uma pasta só desta execução, apagada no fim.
+// Antes, cada execução da suíte deixava dezenas de /tmp/dnat-* (720 em 16/11).
+if (process.argv.includes("test") && !process.env.DNAT_KEEP_TEST_TMP) {
+  const fs = require("node:fs");
+  const os = require("node:os");
+  const path = require("node:path");
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "dnat-test-"));
+  process.env.TMPDIR = root;
+  process.on("exit", () => fs.rmSync(root, { recursive: true, force: true }));
+}
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {

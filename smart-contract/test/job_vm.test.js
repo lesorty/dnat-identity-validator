@@ -123,7 +123,7 @@ describe("CVM de job de uso único (T-801)", function () {
       const port = await freePort();
       agent = spawn("python3", [path.join(REPO, "vm_runtime", "executor.py"), String(port)], {
         cwd: path.join(REPO, "vm_runtime"),
-        env: { ...process.env, DNAT_NO_MICROVM: "1", DNAT_SINGLE_USE: "1", DNAT_DERIVATIVE_OUTBOX: fs.mkdtempSync("/tmp/dnat-outbox-") },
+        env: { ...process.env, DNAT_NO_MICROVM: "1", DNAT_SINGLE_USE: "1", DNAT_DERIVATIVE_OUTBOX: fs.mkdtempSync(path.join(require("node:os").tmpdir(), "dnat-outbox-")) },
         stdio: "ignore",
       });
       url = `http://127.0.0.1:${port}`;

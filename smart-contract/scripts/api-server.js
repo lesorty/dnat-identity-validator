@@ -18,7 +18,8 @@ const CONTRACT_ADDRESS_ENV = process.env.CONTRACT_ADDRESS;
 const IPFS_API_URL = process.env.IPFS_API_URL || "http://localhost:5001";
 const EXECUTOR_URL = process.env.EXECUTOR_URL || "http://localhost:5000";
 const PORT = Number(process.env.WEB_PORT || "3001");
-const EXECUTIONS_ROOT = path.resolve(__dirname, "..", "executions");
+// DNAT_EXECUTIONS_ROOT: as pilhas descartáveis (e2e/stack.js) gravam no próprio estado, não no repositório.
+const EXECUTIONS_ROOT = path.resolve(process.env.DNAT_EXECUTIONS_ROOT || path.join(__dirname, "..", "executions"));
 const RUNNER_PATH = path.resolve(__dirname, "run_from_cids.py");
 const BUILDER_URL = process.env.BUILDER_URL || "http://dnat-builder:5100";
 const {
@@ -1040,6 +1041,8 @@ async function runFromCids({ datasetId, applicationId, parentModelId, pythonBin,
     jobVm.url,
     "--derivative-out",
     derivativeArchivePath,
+    "--executions-dir",
+    EXECUTIONS_ROOT,
     ...(parent ? ["--base-model-dir", baseModelDir] : []),
   ];
 

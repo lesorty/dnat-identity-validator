@@ -189,14 +189,15 @@ class Stack {
       DNAT_JUDGE_ALLOWLIST: path.join(this.state, "judge_allowlist.json"),
       DNAT_BATTERY_PACK_PATH: path.join(this.state, "battery_pack.json"),
       DNAT_SAMPLING_KEY_PATH: path.join(this.state, "sampling_key"),
+      DNAT_EXECUTIONS_ROOT: path.join(this.state, "executions"),
       DNAT_IDENTITY_DIFFICULTY: "12",
       DNAT_UPLOAD_LIMIT: "4gb",
       ...extra,
     };
   }
 
-  async startCvm1(name, env) {
-    const port = await freePort();
+  async startCvm1(name, env, fixedPort = null) {
+    const port = fixedPort || (await freePort());
     const p = this.start(name, process.execPath, [path.join(SC, "scripts", "api-server.js")], { env: { ...env, WEB_PORT: String(port) } });
     const api = `http://127.0.0.1:${port}`;
     await this.waitFor(name, httpOk(`${api}/api/identity/challenge`));
