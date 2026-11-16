@@ -1,0 +1,101 @@
+# Testes rápidos a cada push e pull request: os mesmos de `make test`, mais o fluxo de ponta a ponta
+# com o base minúsculo e a interface no Chrome headless. Não usa dados do model_gate nem nuvem:
+# os testes que precisam de pesos reais se pulam sozinhos. Tudo aqui é verificação de funcionamento.
+name: testes
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  MODEL_GATE_DATA: ${{ github.workspace }}/.model_gate_data
+
+jobs:
+  contrato:
+    name: contrato, CVM1, identidade e CVM de job
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: smart-contract
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: smart-contract/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npx hardhat compile
+      # Sem uv aqui: o teste que compara o digest com o Python do Juiz se pula (fica no job juiz).
+      - run: npx hardhat test
+
+  juiz:
+    name: Juiz (model_gate)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: model_gate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.20"
+          enable-cache: true
+          cache-dependency-glob: model_gate/uv.lock
+      - run: uv sync --frozen
+      - run: uv run --frozen pytest -q
+
+  ponta-a-ponta:
+    name: fluxo inteiro e interface (base minúsculo)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    needs: [contrato, juiz]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: smart-contract/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.20"
+          enable-cache: true
+          cache-dependency-glob: model_gate/uv.lock
+      - run: sudo apt-get install -y --no-install-recommends e2fsprogs
+      - run: cd model_gate && uv sync --frozen
+      - run: cd smart-contract && npm ci && npx hardhat compile
+      - name: fluxo inteiro (make e2e)
+        run: cd smart-contract && node e2e/run_direct.js
+      - name: pilha de desenvolvimento e interface (make dev-tiny, make ui-check)
+        run: |
+          cd smart-contract
+          node e2e/dev_stack.js --tiny --port 3002 > ../dev_stack.log 2>&1 &
+          for i in $(seq 1 90); do [ -f .dev_stack.json ] && break; sleep 2; done
+          test -f .dev_stack.json || { cat ../dev_stack.log; exit 1; }
+          cd .. && node tools/ui_check.js http://localhost:3002/ --out ui-check
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: interface-e-logs
+          path: |
+            ui-check/
+            dev_stack.log
+            smart-contract/results/e2e_direct.md
+          if-no-files-found: ignore

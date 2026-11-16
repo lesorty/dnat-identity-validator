@@ -19,7 +19,8 @@ const opt = (n, f) => (argv.includes(n) ? argv[argv.indexOf(n) + 1] : f);
 const statusFile = path.join(__dirname, "..", "smart-contract", ".dev_stack.json");
 const URL_ = argv.find((a) => /^https?:/.test(a)) ||
   (fs.existsSync(statusFile) ? JSON.parse(fs.readFileSync(statusFile, "utf8")).url : "http://localhost:3001/");
-const OUT = opt("--out", fs.mkdtempSync(path.join(os.tmpdir(), "dnat-ui-check-")));
+const OUT = path.resolve(opt("--out", fs.mkdtempSync(path.join(os.tmpdir(), "dnat-ui-check-"))));
+fs.mkdirSync(OUT, { recursive: true });
 const WIDTHS = opt("--width", "1280,390").split(",").map(Number);
 const TABS = ["#modelos", "#treinar", "#jobs", "#juiz", "#resultados", "#resultados?v=runs", "#identidade"];
 const CHROME = ["google-chrome", "chromium", "chromium-browser"].find((c) => {
