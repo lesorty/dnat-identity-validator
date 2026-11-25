@@ -49,7 +49,7 @@ def delta_weights(base: Mapping[str, torch.Tensor], derivative: Mapping[str, tor
         wb, wd = base[name], derivative[name]
         if wb.shape != wd.shape:
             raise ArchitectureMismatch(f"{name}: forma {tuple(wd.shape)} != base {tuple(wb.shape)}")
-        out[name] = wb.detach().to(torch.float64) - wd.detach().to(torch.float64)
+        out[name] = wb.detach().cpu().to(torch.float64) - wd.detach().cpu().to(torch.float64)  # conta na CPU
     return out
 
 

@@ -24,7 +24,8 @@ class GenConfig:
 
     def record(self) -> dict:
         """Parâmetros para gravar junto com cada geração."""
-        return {**asdict(self), "decoding": "greedy", "dtype": "float32", "torch": torch.__version__}
+        from model_gate.io.device import describe
+        return {**asdict(self), "decoding": "greedy", "dtype": "float32", "torch": torch.__version__, **describe()}
 
 
 def fix_runtime(cfg: GenConfig) -> None:
@@ -34,7 +35,8 @@ def fix_runtime(cfg: GenConfig) -> None:
     except RuntimeError:  # só pode ser chamado antes do primeiro trabalho paralelo
         pass
     torch.manual_seed(cfg.seed)
-    torch.use_deterministic_algorithms(True)
+    from model_gate.io.device import deterministic
+    deterministic()
 
 
 def render(tokenizer: PreTrainedTokenizerBase, prompt: str, system_prompt: str | None) -> str:
@@ -60,7 +62,7 @@ def generate(
     out: list[dict] = []
     for i in range(0, len(prompts), cfg.batch_size):
         chunk = [render(tokenizer, p, cfg.system_prompt) for p in prompts[i : i + cfg.batch_size]]
-        enc = tokenizer(chunk, return_tensors="pt", padding=True, add_special_tokens=False)
+        enc = tokenizer(chunk, return_tensors="pt", padding=True, add_special_tokens=False).to(model.device)
         gen = model.generate(
             **enc,
             do_sample=False,

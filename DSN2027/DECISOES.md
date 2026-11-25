@@ -39,6 +39,15 @@ formato de modelo também resolve a exposição de código confidencial na saíd
 - **Orçamento:** tudo em CPU com modelos pequenos. Uma GPU confidencial entra como **segunda
   bancada** (T-111): uma amostra de derivados roda também nela, com o kernel real de 4 e 8 bits,
   para conferir os vereditos da CPU e medir o custo.
+- **25/11, GPU na campanha (proposta, aguardando confirmação):** a campanha só em CPU (~130 h numa VM
+  de 4 vCPU) não cabe até 02/12, e há cota de GPU confidencial no GCP (a3-highgpu-1g: H100 com TDX, só
+  Spot ou flex-start). O código passou a aceitar `MODEL_GATE_DISPOSITIVO=cuda`. O Juiz continua em float32,
+  guloso e determinístico. As contas dos sinais (direção do S2, ΔW e SVD do S3, arredondamento dos
+  formatos) continuam na CPU. O Juiz recusa pai e derivado medidos em dispositivos diferentes. Na CPU,
+  o veredito ficou idêntico bit a bit ao de antes (conferido em 25/11). A proposta é **medir a campanha
+  na GPU** e manter a CPU como referência de custo (G1, em 4 vCPU) e como conferência: o T1 julga o
+  mesmo derivado nos dois e exige o mesmo estado e a mesma regra. Os kernels reais de 4 e 8 bits da
+  segunda bancada ficam como estavam: o NF4 continua simulado em float32, igual na CPU e na GPU.
 
 *Substitui o D2 do Juiz de código (histórico no git).*
 
@@ -178,7 +187,12 @@ quadro e na nota "Feito em 12/11" do backlog.
   Enquanto o Juiz não roda como segundo job (T-807), nenhum job bom é acertado.
 - **Juiz de referência (T-1002), proposta:** gpt-oss-20b na revisão 6cee5e8, guloso, raciocínio
   low, data fixada no prompt, só o canal final. **Confirmar com o orientador.** Alternativa:
-  Mistral-Small-3.2-24B.
+  Mistral-Small-3.2-24B. Em 24/11, comparado com Sonnet e Opus por API, fica decidido o tipo:
+  modelo aberto rodando dentro da CVM, com o hash dos pesos fixado, para o rótulo também ser
+  atestável e o texto nocivo não sair da nossa infraestrutura (a API daria rótulo mais forte e
+  barato, mas sem determinismo, com recusas e com dependência do fornecedor). **O modelo
+  específico fica em aberto**: o gpt-oss-20b é só o configurado hoje, e a escolha pode mudar com a
+  máquina confidencial disponível.
 - **Dados que degradam a recusa (T-903):** só a receita benigna de Qi 2024 (Alpaca e Dolly-15k);
   AOA fica de fora por ser jailbreak intencional.
 - **Job do Juiz (T-807, parte local):** entradas conferidas por hash antes de abrir pesos; estágio

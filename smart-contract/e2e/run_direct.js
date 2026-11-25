@@ -207,7 +207,7 @@ async function main() {
 }
 
 function writeResults(r) {
-  const dir = path.join(SC, "results");
+  const dir = process.env.E2E_RESULTS_DIR || path.join(SC, "results"); // o Teste 8 (tools/testes) grava na pasta do passo
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, `e2e_direct${LABEL}.json`), JSON.stringify(r, null, 2) + "\n");
   const rows = r.timings.map((t) => `| ${t.step} | ${t.seconds.toFixed(2)} |`).join("\n");

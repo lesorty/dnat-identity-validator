@@ -121,9 +121,12 @@ def train_lora(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, examp
                recipe: LoraRecipe, out_dir: Path, base_digest: str, threads: int = 4,
                batch_size: int = FIXED["batch_size"]) -> TrainResult:
     """Treina o adaptador sobre o base já carregado (conferido por digest) e grava em out_dir."""
+    from model_gate.io.device import describe, name
     torch.set_num_threads(threads)
     torch.manual_seed(recipe.seed)
-    torch.use_deterministic_algorithms(True)
+    # Na GPU, o treino só avisa quando uma operação não tem versão determinística (o retropasso de algumas
+    # não tem); o adaptador vale pelo digest gravado, não por ser refeito bit a bit em outra placa.
+    torch.use_deterministic_algorithms(True, warn_only=name() == "cuda")
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     enc = [encode_example(tokenizer, e["prompt"], e["response"]) for e in examples]
@@ -135,7 +138,7 @@ def train_lora(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, examp
     opt = torch.optim.AdamW(params, lr=recipe.lr, betas=(0.9, 0.999), weight_decay=0.0)
     losses = []
     for idx in batches(len(enc), recipe.steps, batch_size, recipe.seed):
-        b = collate([enc[i] for i in idx], tokenizer.pad_token_id)
+        b = {k: v.to(model.device) for k, v in collate([enc[i] for i in idx], tokenizer.pad_token_id).items()}
         loss = peft_model(**b).loss
         if not torch.isfinite(loss):
             raise FloatingPointError(f"perda não finita no passo {len(losses)}")
@@ -157,7 +160,7 @@ def train_lora(model: PreTrainedModel, tokenizer: PreTrainedTokenizerBase, examp
     fixed = {**FIXED, "batch_size": batch_size}
     (out_dir / "recipe.json").write_text(json.dumps(
         {"recipe": asdict(recipe), "fixed": fixed, "base_digest": base_digest, "data_sha256": data_hash,
-         "n_examples": len(examples)},
+         "n_examples": len(examples), **({"dispositivo": describe()} if name() != "cpu" else {})},
         indent=1, ensure_ascii=False) + "\n")
     digest, _ = dir_digest(out_dir)
     return TrainResult(asdict(recipe), fixed, data_hash, len(examples), str(out_dir), digest, losses)

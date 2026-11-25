@@ -8,9 +8,10 @@ COMPOSE := docker compose -f docker/direct.compose.yaml -f docker/direct.single-
 CPUS ?= 0-3
 
 .DEFAULT_GOAL := help
-.PHONY: help setup doctor check test test-contract test-judge test-identity e2e teste8 lora demo-cota \
+.PHONY: help setup doctor check test test-contract test-judge test-identity e2e teste8 lora demo-cota t10 t11 \
+        testes testes-verificar teste testes-status testes-pacote testes-executor \
         dev dev-tiny ui-check stack-up stack-seed stack-down stack-tests clean clean-executions board \
-        nuvem-bootstrap dados ficha congelar campanha-status campanha pacote importar
+        nuvem-enviar nuvem-preparar nuvem-bootstrap dados ficha congelar campanha-status campanha pacote importar
 
 help: ## lista as rotinas
 	@awk 'BEGIN{FS=":.*## "} /^[a-z0-9-]+:.*## /{printf "  \033[1m%-17s\033[0m %s\n", $$1, $$2} /^## /{printf "\n%s\n", substr($$0,4)}' $(MAKEFILE_LIST)
@@ -50,6 +51,33 @@ lora: ## LoRA real numa CVM de uso único (precisa da pilha Docker no ar); ~25 m
 demo-cota: ## demonstração da identidade e da cota (o 5º job recusado)
 	cd $(SC) && node e2e/demo_cota.js
 
+t10: ## Teste 10, o preço da identidade (d de 16 a 22 aqui; ARGS="--max 27 --reps 3" na nuvem); ~3 min
+	cd $(SC) && node e2e/t10_preco_identidade.js $(ARGS)
+
+t11: ## Teste 11, o atacante com muitas identidades (usa o resultado do t10, se houver); ~10 s
+	cd $(SC) && node e2e/t11_atacante_sybil.js $(ARGS)
+
+## Testes T1 a T11 (tools/testes; PERFIL=mini no notebook, PERFIL=nuvem na VM com FASE=1 ou 2)
+PERFIL ?= mini
+FASE ?= todas
+testes-verificar: ## pré-voo de todos os testes, sem rodar nada (antes de ligar a VM cara)
+	python3 -I tools/testes/todos.py verificar --perfil $(PERFIL) --fase $(FASE) $(ARGS)
+
+testes: ## roda os testes na ordem, retomando (mini: ~20 min; ensaio: na GPU da VM; nuvem: FASE=1, depois FASE=2)
+	python3 -I tools/testes/todos.py rodar --perfil $(PERFIL) --fase $(FASE) $(ARGS)
+
+teste: ## um teste só: make teste T=3 [PERFIL=nuvem] [ARGS="--refazer vereditos"]
+	python3 -I tools/testes/$$(ls tools/testes | grep -E "^t0?$(T)_" | head -1) --perfil $(PERFIL) $(ARGS)
+
+testes-status: ## situação de cada teste da campanha (passos e conferências)
+	python3 -I tools/testes/todos.py status --perfil $(PERFIL)
+
+testes-pacote: ## .tar.gz da campanha de testes (sem textos gerados), com o acompanhamento e a ficha
+	python3 -I tools/testes/todos.py pacote --perfil $(PERFIL)
+
+testes-executor: ## testes do próprio executor (retomada, falha, tempo esgotado, pré-voo)
+	python3 -I tools/testes/test_executor.py
+
 ## Usar a interface
 dev: ## pilha semeada com o Qwen e o Juiz real de fumaça na porta 3002 (Ctrl+C encerra); depósito em ~2 min
 	cd $(SC) && node e2e/dev_stack.js
@@ -74,6 +102,12 @@ stack-tests: ## testes de segurança T1–T5 contra a pilha Docker
 	bash assets/tests/run_all_tests.sh
 
 ## Nuvem (fase de testes; o passo a passo está em tools/cloud/README.md)
+nuvem-enviar: ## no notebook: código (git bundle) e os 2 arquivos locais para a VM (make nuvem-enviar VM=usuario@host)
+	tools/cloud/enviar.sh $(VM) $(ARGS)
+
+nuvem-preparar: ## na VM: tudo o que os testes precisam, GPU inclusive (ARGS="--docker" ou "--sem-gpu"), e o pré-voo
+	tools/cloud/preparar_testes.sh $(ARGS)
+
 nuvem-bootstrap: ## prepara uma VM Ubuntu nova: ferramentas fixas, make setup, dados, ficha e doctor
 	tools/cloud/bootstrap.sh $(ARGS)
 

@@ -76,6 +76,18 @@ def confidential() -> dict:
     return out
 
 
+def gpu() -> dict:
+    """Placas da NVIDIA, driver e o modo confidencial da placa (Hopper em CC: o tráfego CPU↔GPU cifrado)."""
+    q = sh("nvidia-smi", "--query-gpu=name,memory.total,driver_version,serial", "--format=csv,noheader")
+    if not q:
+        return {"present": False}
+    cards = [dict(zip(("name", "memory", "driver", "serial"), [x.strip() for x in l.split(",")])) for l in q.splitlines()]
+    cc = sh("nvidia-smi", "conf-compute", "-f") or ""
+    ready = sh("nvidia-smi", "conf-compute", "-grs") or ""
+    return {"present": True, "cards": cards, "cc_mode": cc.strip() or None, "cc_ready_state": ready.strip() or None,
+            "cc_on": "ON" in cc.upper(), "attestation": "não verificada pelo DNAT (verificador local da NVIDIA fora do escopo)"}
+
+
 def metadata(url: str, headers: dict) -> dict | None:
     try:
         req = urllib.request.Request(url, headers=headers)
@@ -94,6 +106,13 @@ def cloud() -> dict:
     if oci:
         return {"provider": "oracle", "shape": oci.get("shape"), "region": oci.get("canonicalRegionName") or oci.get("region"),
                 "shape_config": oci.get("shapeConfig")}
+    gcp = metadata("http://metadata.google.internal/computeMetadata/v1/instance/?recursive=true", {"Metadata-Flavor": "Google"})
+    if gcp:
+        sched = gcp.get("scheduling") or {}
+        return {"provider": "gcp", "vm_size": str(gcp.get("machineType", "")).rsplit("/", 1)[-1],
+                "location": str(gcp.get("zone", "")).rsplit("/", 1)[-1],
+                "provisioning": sched.get("provisioningModel") or ("SPOT" if sched.get("preemptible") == "TRUE" else None),
+                "on_preempt": sched.get("instanceTerminationAction")}
     return {"provider": None}
 
 
@@ -101,7 +120,8 @@ def software() -> dict:
     mg = REPO / "model_gate"
     commit = sh("git", "rev-parse", "HEAD", cwd=REPO)
     torch = sh("uv", "run", "--frozen", "--quiet", "python", "-c",
-               "import torch; print(torch.__version__, torch.backends.mkldnn.is_available(), torch.get_num_threads())", cwd=mg, timeout=180)
+               "import torch; print(torch.__version__, torch.backends.mkldnn.is_available(), torch.get_num_threads(), "
+               "'cuda', torch.version.cuda, torch.cuda.is_available())", cwd=mg, timeout=180)
     jh = sh("uv", "run", "--frozen", "--quiet", "python", "-c",
             "from model_gate.judge_package import judge_hash; print(judge_hash()[0])", cwd=mg, timeout=180)
     return {
@@ -125,7 +145,7 @@ def main() -> int:
     card = {
         "schema": "dnat.machine-card.v1", "host": host, "measured_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "os": os_release.get("PRETTY_NAME", "").strip('"'), "kernel": platform.release(),
-        "cpu": cpu(), "memory": memory(), "confidential": confidential(), "cloud": cloud(), "software": software(),
+        "cpu": cpu(), "memory": memory(), "confidential": confidential(), "gpu": gpu(), "cloud": cloud(), "software": software(),
         "disk_free_gb": round(shutil.disk_usage(DATA if DATA.exists() else Path.home()).free / 2**30, 1),
         "model_gate_data": str(DATA),
     }
@@ -139,6 +159,10 @@ def main() -> int:
         print(f"  bf16 acelerado: {'sim' if f.get('avx512_bf16') or f.get('amx_bf16') else 'NÃO (o avaliador em bf16 fica lento: escolha outra família de VM)'}")
         print(f"  confidencial: {card['confidential']['kind'] or 'não detectado'} · nuvem: {card['cloud'].get('provider') or 'nenhuma'} "
               f"{card['cloud'].get('vm_size') or card['cloud'].get('shape') or ''}")
+        g = card["gpu"]
+        if g.get("present"):
+            print(f"  GPU: {', '.join(c['name'] + ' ' + c['memory'] for c in g['cards'])} · driver {g['cards'][0]['driver']} · "
+                  f"modo confidencial da placa: {'LIGADO' if g['cc_on'] else 'desligado'}")
         s = card["software"]
         print(f"  commit {str(s['git_commit'])[:12]}{' (sujo)' if s['git_dirty'] else ''} · Juiz {str(s['judge_hash'])[:12]} · {s['torch'] or 'torch ?'}")
         print(f"  ficha em {out}")

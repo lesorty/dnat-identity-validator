@@ -205,7 +205,7 @@ def response_ce(model, tokenizer, corpus: Sequence[Mapping], threads: int = 4) -
             r_ids = tokenizer(item["response"], return_tensors="pt", add_special_tokens=False)["input_ids"]
             if r_ids.shape[1] == 0:
                 continue
-            ids = torch.cat([p_ids, r_ids], dim=1)
+            ids = torch.cat([p_ids, r_ids], dim=1).to(model.device)
             logits = model(ids).logits[0, p_ids.shape[1] - 1:-1].float()
             loss = torch.nn.functional.cross_entropy(logits, ids[0, p_ids.shape[1]:], reduction="sum")
             total += float(loss)
@@ -328,6 +328,10 @@ class RealStages:
             raise ValueError(f"referência pontuada por outro avaliador: {ref['judge_id']} != {evaluator.judge_id}")
         if ref["battery_sha256"] != battery_sha256(self._battery(m)):
             raise ValueError("referência medida com outro pacote da bateria")
+        from model_gate.io.device import name as device_name
+        if ref.get("device", "cpu") != device_name():
+            # pai na CPU e derivado na GPU (ou o contrário) mudariam as medidas pela placa, não pelo modelo
+            raise ValueError(f"referência medida em {ref.get('device', 'cpu')}, derivado em {device_name()}")
         # A perda de CE relativa só compara o mesmo corpus (revisão de 15/11).
         ref_n = (ref.get("utility") or {}).get("n")
         if ref_n is not None and ref_n != min(settings.utility_n, len(self._battery(m).utility)):

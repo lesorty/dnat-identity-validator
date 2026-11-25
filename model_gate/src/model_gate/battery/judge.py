@@ -132,7 +132,7 @@ class _Judge:
         torch.set_num_threads(self.threads)
         torch.manual_seed(0)
         ids = self.tok.apply_chat_template(self._messages(prompt, response), add_generation_prompt=True,
-                                           return_tensors="pt", return_dict=True)
+                                           return_tensors="pt", return_dict=True).to(self.model.device)
         t0 = time.perf_counter()
         out = self.model.generate(**ids, do_sample=False, max_new_tokens=self.max_new_tokens,
                                   temperature=None, top_p=None, top_k=None)

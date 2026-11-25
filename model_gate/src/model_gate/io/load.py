@@ -4,7 +4,8 @@ Formatos aceitos:
 - cheio: diretório com config.json e pesos em safetensors;
 - LoRA: diretório com adapter_config.json; é mesclado no base custodiado na carga.
 
-Tudo em float32 na CPU (reprodutível entre máquinas). O digest de um diretório
+Tudo em float32, na CPU por padrão (reprodutível entre máquinas) ou na GPU com
+MODEL_GATE_DISPOSITIVO=cuda (model_gate.io.device). O digest de um diretório
 segue a regra de model_gate.io.digest sobre os arquivos de modelo (model_files).
 """
 
@@ -84,8 +85,9 @@ def _checked(root: Path, expected: str | None) -> tuple[str, list[dict]]:
 
 
 def _load_full(root: Path) -> PreTrainedModel:
+    from model_gate.io.device import device
     model = AutoModelForCausalLM.from_pretrained(root, dtype=DTYPE, use_safetensors=True)
-    return model.eval()
+    return model.to(device()).eval()
 
 
 def is_lora(root: Path) -> bool:

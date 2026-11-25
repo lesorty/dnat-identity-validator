@@ -16,7 +16,10 @@
  *      outro, que deixa de ser usável e também não volta; a cota acerta (5 e 2, ou 1).
  *
  *   node e2e/teste8.js [--base-dir DIR] [--reference-dir DIR] [--keep]
- *   (resultados em results/T-814_teste8_local.{json,md})
+ *                      [--prereg FILE] [--battery DIR] [--evaluator-kind detector|guard|rubric] [--evaluator-dir DIR] [--out PREFIXO]
+ *   (resultados em results/T-814_teste8_local.{json,md}, ou no --out)
+ *   Os padrões são os de fumaça; o Teste 8 da nuvem (tools/testes/t08) passa o prereg congelado, a bateria
+ *   da campanha, o avaliador do portão e a referência do pai medida com o mesmo desenho (passo do T1).
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -29,12 +32,14 @@ const arg = (name, fallback) => {
 };
 const KEEP = process.argv.includes("--keep");
 const BASE_DIR = arg("--base-dir", path.join(MODEL_GATE_DATA, "models", "Qwen__Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775"));
-const PREREG = path.join(MODEL_GATE, "experiments", "judge_local_prereg.yaml");
-const BATTERY = path.join(MODEL_GATE_DATA, "battery", "local_t807");
+const PREREG = arg("--prereg", path.join(MODEL_GATE, "experiments", "judge_local_prereg.yaml"));
+const BATTERY = arg("--battery", path.join(MODEL_GATE_DATA, "battery", "local_t807"));
+const EVALUATOR_KIND = (() => { const i = process.argv.indexOf("--evaluator-kind"); return i >= 0 ? process.argv[i + 1] : "detector"; })();
+const EVALUATOR_DIR = arg("--evaluator-dir", null);
 const REFERENCE_DIR = arg("--reference-dir", null);
 const DIRECTION = path.join(MODEL_GATE_DATA, "references", "base_05b61d72bec3", "refusal_dirs.safetensors");
 const DIRECTION_LAYER = 12; // a mesma da receita de fumaça d12
-const OUT = path.join(SC, "results", "T-814_teste8_local");
+const OUT = arg("--out", path.join(SC, "results", "T-814_teste8_local"));
 const stack = new Stack("teste8");
 
 /** Linha `layer` do tensor dirs [L, d] F32 do pacote da direção (safetensors lido à mão). */
@@ -74,7 +79,8 @@ async function main() {
   await stack.step("CVM de job (executor, modo direto)", () => stack.startExecutor());
   await stack.step("pacote da bateria (judge_cli battery)", () => stack.judgeCli(["battery", "--dir", BATTERY, "--source", "T-814"]));
   const release = await stack.step("liberar o Juiz com o prereg de fumaça (judge_cli allow)", () =>
-    stack.judgeCli(["allow", "--battery-commitment", sha("T-304 pendente"), "--prereg", PREREG, "--evaluator-kind", "detector", "--note", "T-814 fumaça"]));
+    stack.judgeCli(["allow", "--battery-commitment", sha("T-304 pendente"), "--prereg", PREREG, "--evaluator-kind", EVALUATOR_KIND,
+      ...(EVALUATOR_DIR ? ["--evaluator-dir", EVALUATOR_DIR] : []), "--note", `T-814 ${EVALUATOR_KIND}`]));
   const cvm1 = await stack.step("CVM1 (api-server)", () => stack.startCvm1("cvm1", stack.cvmEnv()));
   const who = await stack.step("identidade com prova de trabalho", () => newClient(cvm1.api));
 

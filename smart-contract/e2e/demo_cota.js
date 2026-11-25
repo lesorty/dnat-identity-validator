@@ -96,7 +96,7 @@ async function main() {
     for (const [n, ok] of checks) console.log(`${ok ? "ok  " : "FALHOU"} ${n}`);
     const result = { note: "Demonstração do Teste 9 (T-1707), sem cadeia nem executor; veredito SIMULADO no corpo do job.", steps, summary,
       checks: checks.map(([name, ok]) => ({ name, ok })) };
-    const dir = path.join(__dirname, "..", "results");
+    const dir = process.env.DEMO_COTA_DIR || path.join(__dirname, "..", "results"); // o Teste 9 (tools/testes) grava na pasta do passo
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, "demo_cota.json"), JSON.stringify(result, null, 2) + "\n");
     fs.writeFileSync(path.join(dir, "demo_cota.md"), `# Demonstração da identidade e da cota (T-1707)

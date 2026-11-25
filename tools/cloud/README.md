@@ -3,6 +3,42 @@
 Todo número do artigo sai daqui (regra de 12/11): VMs de nuvem, código congelado (T-1611), cada
 pacote com a ficha da máquina. O que roda no notebook é verificação de funcionamento.
 
+## Caminho com GPU confidencial no GCP (desde 25/11)
+
+Do notebook à campanha em quatro comandos. Os detalhes de cada um estão no próprio script.
+
+```bash
+# no notebook (repositório limpo, no commit que vai rodar)
+tools/cloud/enviar.sh usuario@vm             # código por git bundle (sem chave do GitHub na VM) e 2 arquivos locais
+# na VM
+cd dnat-identity-validator
+tools/cloud/preparar_testes.sh --docker      # dados, campo, juiz de referência, driver, torch com CUDA, ficha, pré-voo
+tools/cloud/campanha_gpu.sh iniciar ensaio   # ~30 min: os 11 testes nos tamanhos do mini, na GPU
+tools/cloud/campanha_gpu.sh iniciar nuvem 1  # depois do ensaio: fase 1 (T1, T9, T10, T11, T2)
+#   revisar a proposta do T2, preencher prereg.yaml, commit, make congelar; no notebook: enviar.sh de novo
+tools/cloud/campanha_gpu.sh iniciar nuvem 2  # fase 2 (T3, T5, T6, T7, T8, T11, T4)
+tools/cloud/campanha_gpu.sh estado | log | parar
+```
+
+- **VM:** `a3-highgpu-1g` (1 H100 80 GB, Intel TDX, 26 vCPU, ~234 GB de RAM) com Confidential VM e GPU
+  confidencial, nas zonas us-central1-a, us-east5-a ou europe-west4-c. Só existe em **Spot** ou
+  **flex-start**: crie com a ação de término **STOP** (não DELETE), para o disco sobreviver à preempção.
+  Disco de 200 GB. Imagem Ubuntu 22.04/24.04 com suporte a TDX.
+- **Preempção:** a campanha roda como serviço do systemd (`dnat-testes`). Quando a VM volta, o serviço
+  volta sozinho e os roteiros retomam do item em que pararam. Uma rodada que terminou não roda de novo.
+- **GPU:** o model_gate roda em float32 na GPU, guloso e determinístico (`MODEL_GATE_DISPOSITIVO=cuda`).
+  As contas dos sinais (direção do S2, ΔW e SVD do S3, arredondamento dos formatos) continuam na CPU. O
+  Juiz recusa comparar um derivado medido na GPU com um pai medido na CPU. O T1 compara o mesmo
+  veredito na CPU e na GPU.
+- **Paralelo:** dois vereditos ao mesmo tempo na placa (`MG_PARALELO`); o rótulo usa lotes de 16 no
+  juiz de referência. O sinal de vida de cada passo grava a memória e o uso da GPU, para ajustar.
+- **Travado:** um passo que fica 60 min sem escrever nada (30 no ensaio) é morto e conta como falha,
+  em vez de deixar a GPU parada cobrando.
+- **O ensaio primeiro.** Ele não é dado do artigo: serve para ver, em meia hora, que tudo carrega e roda
+  na GPU e quanto cada passo leva, antes das horas da campanha.
+
+O caminho em CPU abaixo continua valendo (VM sem GPU: `preparar_testes.sh --sem-gpu`).
+
 ## 0. Antes, no notebook
 
 ```bash
@@ -38,6 +74,19 @@ gastar horas.
 
 ## 3. Rodar (dentro de tmux: a campanha leva horas e não pode cair com o SSH)
 
+**Testes T1 a T11 (caminho principal desde 24/11):** `tools/testes/README.md`. Em resumo:
+
+```bash
+tmux new -s campanha
+make testes-verificar PERFIL=nuvem FASE=1     # pré-voo; nada roda
+make testes PERFIL=nuvem FASE=1               # T1, T9, T10, T11, T2
+#   revisar a proposta do T2, preencher model_gate/prereg.yaml (T-606), commit, make congelar, git pull na VM
+make testes PERFIL=nuvem FASE=2               # T3, T5, T6, T7, T8, T11, T4
+make testes-pacote PERFIL=nuvem
+```
+
+O executor de passos soltos abaixo (plano.yaml) continua para as medidas avulsas:
+
 ```bash
 tmux new -s campanha
 make campanha-status      # o que vai rodar, o que está bloqueado, o que não tem script
@@ -69,6 +118,10 @@ Destrua a VM (ou desaloque) assim que o pacote estiver no notebook: o custo corr
 
 | Arquivo | O que faz |
 |---|---|
+| `enviar.sh` | No notebook: código (git bundle) e os 2 arquivos locais para a VM |
+| `preparar_testes.sh` | Na VM: tudo o que os testes T1–T11 precisam, GPU inclusive, e o pré-voo |
+| `campanha_gpu.sh` | Na VM: a rodada como serviço do systemd (sobrevive a SSH e preempção) |
+| `../../model_gate/gpu/torch-cuda.txt` | torch 2.15.0 com CUDA 13.2 e as bibliotecas da NVIDIA, com hashes |
 | `bootstrap.sh` | Prepara a VM (ferramentas fixas, ambientes, dados, ficha, doctor) |
 | `fetch_data.sh` | Baixa e confere os dados pelos manifestos (`make dados`) |
 | `machine_card.py` | Ficha da máquina (`make ficha`) |

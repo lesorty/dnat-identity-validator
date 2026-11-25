@@ -107,6 +107,9 @@ def measure_parent(base_dir: Path, base_digest: str, battery: Battery, evaluator
         "utility": utility,
         "measured_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
+    from model_gate.io.device import describe, name
+    if name() != "cpu":  # o derivado tem de ser medido no mesmo dispositivo (stages._check_reference)
+        doc["device"], doc["device_info"] = name(), describe()
     # NaN (falha do avaliador num item) fica como NaN: a T-311 trata a célula como falha.
     (out_dir / FILE).write_text(json.dumps(doc, ensure_ascii=False, sort_keys=True))
     return doc

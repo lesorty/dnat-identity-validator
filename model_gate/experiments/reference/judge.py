@@ -74,28 +74,63 @@ class ReferenceJudge:
         self.rubric_template, self.xstest_template = rubric_template, xstest_template
 
     def _generate(self, messages: list[dict]) -> tuple[str | None, float, int, int]:
+        return self._generate_many([messages])[0]
+
+    def _generate_many(self, batch: list[list[dict]]) -> list[tuple[str | None, float, int, int]]:
+        """Um lote de conversas, gulosas, com preenchimento à esquerda. O lote 1 é o mesmo de antes; um lote
+        maior (na GPU) dá a mesma saída sempre que o lote for o mesmo, e o tamanho fica no desenho do rótulo."""
         import torch
         torch.set_num_threads(self.cfg.threads)
-        prompt = render(self.tok, messages, self.cfg)
-        ids = self.tok(prompt, return_tensors="pt", add_special_tokens=False)
+        self.tok.padding_side = "left"
+        if self.tok.pad_token is None:
+            self.tok.pad_token = self.tok.eos_token
+        prompts = [render(self.tok, m, self.cfg) for m in batch]
+        ids = self.tok(prompts, return_tensors="pt", add_special_tokens=False, padding=len(prompts) > 1)
+        ids = {k: v.to(self.model.device) for k, v in ids.items()}
         t0 = time.perf_counter()
-        with torch.inference_mode():
-            out = self.model.generate(**ids, do_sample=False, max_new_tokens=self.cfg.max_new_tokens,
-                                      temperature=None, top_p=None, top_k=None)
-        dt = time.perf_counter() - t0
-        new = out[0, ids["input_ids"].shape[1]:]
-        raw = self.tok.decode(new, skip_special_tokens=False)
-        return final_channel(raw), dt, int(ids["input_ids"].shape[1]), int(new.numel())
+        # O gpt-oss é MoE: na GPU, algumas operações do roteamento não têm versão determinística. O juiz de
+        # referência não é o Juiz (não entra no hash, T-808): aqui só avisa; o modo de quem chamou volta depois.
+        det, warn = torch.are_deterministic_algorithms_enabled(), torch.is_deterministic_algorithms_warn_only_enabled()
+        torch.use_deterministic_algorithms(det, warn_only=True)
+        try:
+            with torch.inference_mode():
+                out = self.model.generate(**ids, do_sample=False, max_new_tokens=self.cfg.max_new_tokens,
+                                          temperature=None, top_p=None, top_k=None, pad_token_id=self.tok.pad_token_id)
+        finally:
+            torch.use_deterministic_algorithms(det, warn_only=warn)
+        dt = (time.perf_counter() - t0) / len(prompts)
+        n_in = ids["input_ids"].shape[1]
+        res = []
+        for i, row in enumerate(out[:, n_in:]):
+            keep = row[row != self.tok.pad_token_id] if len(prompts) > 1 else row
+            raw = self.tok.decode(keep, skip_special_tokens=False)
+            res.append((final_channel(raw), dt, int(ids["attention_mask"][i].sum()), int(keep.numel())))
+        return res
+
+    def _rubric_msgs(self, prompt: str, response: str) -> list[dict]:
+        return [{"role": "user", "content": self.rubric_template.format(prompt=prompt, response=response)}]
+
+    def _xstest_msgs(self, prompt: str, response: str) -> list[dict]:
+        return [{"role": "system", "content": XSTEST_SYSTEM},
+                {"role": "user", "content": self.xstest_template.format(prompt=prompt, response=response)}]
+
+    def score_many(self, pairs: list[tuple[str, str]]) -> list[Score]:
+        out = []
+        for text, dt, n_in, n_new in self._generate_many([self._rubric_msgs(p, r) for p, r in pairs]):
+            harm, refused = parse_rubric(text) if text is not None else (float("nan"), None)
+            out.append(Score(harm, refused, text or "", dt, n_in, n_new))
+        return out
+
+    def classify_many(self, pairs: list[tuple[str, str]]) -> list[XSTestLabel]:
+        return [XSTestLabel(parse_xstest(text) if text is not None else None, text or "", dt, n_in, n_new)
+                for text, dt, n_in, n_new in self._generate_many([self._xstest_msgs(p, r) for p, r in pairs])]
 
     def score(self, prompt: str, response: str) -> Score:
         """Sem canal final (o raciocínio estourou max_new_tokens): falha do avaliador, nota NaN."""
-        msgs = [{"role": "user", "content": self.rubric_template.format(prompt=prompt, response=response)}]
-        text, dt, n_in, n_new = self._generate(msgs)
+        text, dt, n_in, n_new = self._generate(self._rubric_msgs(prompt, response))
         harm, refused = parse_rubric(text) if text is not None else (float("nan"), None)
         return Score(harm, refused, text or "", dt, n_in, n_new)
 
     def classify(self, prompt: str, response: str) -> XSTestLabel:
-        msgs = [{"role": "system", "content": XSTEST_SYSTEM},
-                {"role": "user", "content": self.xstest_template.format(prompt=prompt, response=response)}]
-        text, dt, n_in, n_new = self._generate(msgs)
+        text, dt, n_in, n_new = self._generate(self._xstest_msgs(prompt, response))
         return XSTestLabel(parse_xstest(text) if text is not None else None, text or "", dt, n_in, n_new)

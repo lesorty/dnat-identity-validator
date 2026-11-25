@@ -46,7 +46,7 @@ def refusal_token_ids(tokenizer: PreTrainedTokenizerBase, prefixes=REFUSAL_PREFI
 
 
 def _project_out(x: torch.Tensor, r: torch.Tensor) -> torch.Tensor:
-    r = r.to(x.dtype)
+    r = r.to(device=x.device, dtype=x.dtype)
     return x - (x @ r).unsqueeze(-1) * r
 
 
@@ -84,8 +84,9 @@ def add_direction(model: PreTrainedModel, layer: int, r: torch.Tensor):
 
     def pre_hook(_mod, args, kwargs):
         if args:
-            return (args[0] + r.to(args[0].dtype), *args[1:]), kwargs
-        kwargs["hidden_states"] = kwargs["hidden_states"] + r.to(kwargs["hidden_states"].dtype)
+            return (args[0] + r.to(device=args[0].device, dtype=args[0].dtype), *args[1:]), kwargs
+        kwargs["hidden_states"] = kwargs["hidden_states"] + r.to(device=kwargs["hidden_states"].device,
+                                                                 dtype=kwargs["hidden_states"].dtype)
         return args, kwargs
 
     h = layers[layer].register_forward_pre_hook(pre_hook, with_kwargs=True)
@@ -105,9 +106,9 @@ def first_token_logprobs(model: PreTrainedModel, tokenizer: PreTrainedTokenizerB
     rows = []
     for i in range(0, len(prompts), batch_size):
         chunk = [render(tokenizer, p, system_prompt) for p in prompts[i:i + batch_size]]
-        enc = tokenizer(chunk, return_tensors="pt", padding=True, add_special_tokens=False)
+        enc = tokenizer(chunk, return_tensors="pt", padding=True, add_special_tokens=False).to(model.device)
         logits = model(**enc).logits[:, -1].float()
-        rows.append(torch.log_softmax(logits, -1))
+        rows.append(torch.log_softmax(logits, -1).cpu())
     return torch.cat(rows)
 
 

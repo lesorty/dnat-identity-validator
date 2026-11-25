@@ -201,6 +201,9 @@ def _write_responses(out: Path, responses: list[dict]) -> str:
 
 
 def _result(out: Path, doc: dict) -> dict:
+    from model_gate.io.device import describe, name
+    if name() != "cpu":  # onde foi medido; na CPU (padrão, D2) o resultado fica como sempre foi
+        doc = {**doc, "device": describe()}
     (out / RESULT_FILE).write_text(json.dumps(doc, indent=2, ensure_ascii=False))
     return doc
 

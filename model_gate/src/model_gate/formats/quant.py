@@ -155,6 +155,7 @@ def quantize_model_(model: torch.nn.Module, fmt: str, skip: tuple[str, ...] = ("
     with torch.no_grad():
         for name, mod in model.named_modules():
             if isinstance(mod, torch.nn.Linear) and not any(name == s or name.endswith("." + s) for s in skip):
-                mod.weight.copy_(round_trip(mod.weight, fmt))
+                # arredonda na CPU (o mesmo número em qualquer placa) e devolve ao dispositivo do modelo
+                mod.weight.copy_(round_trip(mod.weight.detach().cpu(), fmt).to(mod.weight.device))
                 done.append(name)
     return done

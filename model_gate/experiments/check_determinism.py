@@ -13,6 +13,7 @@ import argparse
 import csv
 import hashlib
 import json
+from pathlib import Path
 import sys
 import time
 from dataclasses import replace
@@ -41,6 +42,7 @@ def main() -> int:
     ap.add_argument("--n", type=int, default=10)
     ap.add_argument("--max-new-tokens", type=int, default=128)
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--out", type=Path, default=None, help="pasta onde gravar determinismo.json (resumo, sem textos)")
     args = ap.parse_args()
 
     digest = json.loads(MANIFEST.read_text())["digest"]
@@ -75,6 +77,12 @@ def main() -> int:
     print(f"lote 4 x lote 1    {'iguais' if not diff_batch else f'diferem em {diff_batch}'}")
     print(f"tokens gerados     {tokens} em {t1 - t0:.1f} s ({tokens / (t1 - t0):.1f} tok/s, lote 1)")
     print(f"gerações em        {run}")
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
+        (args.out / "determinismo.json").write_text(json.dumps(
+            {"identical": not diff, "differ": diff, "batch4_identical": not diff_batch, "batch4_differ": diff_batch,
+             "texts_sha256": texts_hash(a), "tokens": tokens, "tok_s_lote1": round(tokens / (t1 - t0), 2),
+             "config": cfg.record(), "geracoes": str(run)}, ensure_ascii=False, indent=1) + "\n")
     return 1 if diff else 0
 
 
