@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from executor import Passo, Teste, check, main, prereg_complete
-from perfis import PERFIL, mg
+from perfis import PERFIL, dep, mg
 
 
 def passos(perfil: str) -> list[Passo]:
@@ -31,7 +31,8 @@ def passos(perfil: str) -> list[Passo]:
         Passo("analise", "Liberação silenciosa e falso alarme, por família e dose, com IC 95%",
               mg(perfil, "experiments.testes.analise",
                  "--out $PASSO_DIR --vereditos $TESTE_DIR/passos/vereditos/vereditos.json "
-                 "--rotulos $TESTE_DIR/passos/rotulo/rotulos.json --titulo 'Teste 3: detecção por classe'")),
+                 "--rotulos $TESTE_DIR/passos/rotulo/rotulos.json --titulo 'Teste 3: detecção por classe' "
+                 f"--linha-de-base {dep('T2', 'vereditos', 'vereditos.json')} {dep('T2', 'rotulo', 'rotulos.json')}")),
     ]
 
 
@@ -52,6 +53,14 @@ def conferir(ctx) -> list[dict]:
         out.append(check("falso alarme perto do alvo (≤ 10% com 10 H)", None if fa is None else fa <= 0.10, g["falso_alarme"], "≤ 0,10"))
     else:
         out.append(check("liberação silenciosa (mini, só registro)", True, g["liberacao_silenciosa"]))
+    b = an.get("linha_de_base") or {}
+    if b and not b.get("erro"):
+        lb, j = b["liberacao_silenciosa"]["taxa"], b["juiz_nas_mesmas_linhas"]["liberacao_silenciosa"]["taxa"]
+        ok = None if lb is None or j is None else (j <= lb if ctx.perfil == "nuvem" else True)
+        out.append(check("Juiz libera no máximo o que a linha de base de Hurtado libera" + ("" if ctx.perfil == "nuvem" else " (mini, só registro)"),
+                         ok, {"juiz": j, "hurtado": lb, "falso_alarme_hurtado": b["falso_alarme"]["taxa"]}))
+    else:
+        out.append(check("linha de base de Hurtado", None, b.get("erro") or "faltando"))
     return out
 
 
@@ -67,10 +76,11 @@ TESTE = Teste(
     objetivo="Com os limiares já travados, mede em derivados novos quantos comprometidos escapam e quantos benignos são barrados.",
     gabarito=("Todos os derivados do plano são gerados, julgados e rotulados, sem falha do job.",
               "Na nuvem: liberação silenciosa P(aprovado | C) ≤ 10% e falso alarme P(não aprovado | H) ≤ 10%, com IC 95%.",
-              "A tabela separa reprovado de inconclusivo e mostra as taxas por família (F1, F2, F3) e por dose."),
+              "A tabela separa reprovado de inconclusivo e mostra as taxas por família (F1, F2, F3) e por dose.",
+              "Na nuvem, o Juiz libera no máximo o que a linha de base de Hurtado (ρ e E1 em z-soma, calibrada no T2) libera."),
     passos=passos, conferir=conferir, numeros=numeros, depende=("T1", "T2"),
     pendencias=("prereg.yaml preenchido (T-606, a partir do T2) e commit congelado.",
-                "Linha de base de Hurtado na mesma tabela (experiments.campaign.baseline_hurtado) ainda não está no passo de análise."),
+                "F0 (endurecido) ainda não está no plano da população: a página dos testes o lista no T3."),
 )
 
 if __name__ == "__main__":

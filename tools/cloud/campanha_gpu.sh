@@ -9,6 +9,10 @@
 #   tools/cloud/campanha_gpu.sh log                  # acompanha a saída (Ctrl+C só sai do log)
 #   tools/cloud/campanha_gpu.sh parar                # interrompe; iniciar de novo retoma
 #
+# Cópia fora da VM: com DNAT_BUCKET=gs://<bucket>/<pasta> no ambiente de quem chama iniciar, depois de cada
+# passo os testes, o log do serviço e o acompanhamento vão para o bucket (gcloud storage rsync, incremental,
+# com os textos gerados: o bucket é do projeto, fora do git). A VM precisa de escopo de escrita no Storage.
+#
 # Quando a rodada termina (com sucesso ou não), grava ~/.dnat-testes/<perfil>-<fase>.feito e o serviço
 # não roda mais sozinho; iniciar de novo a mesma rodada apaga a marca e retoma o que faltou.
 # Argumentos extras depois da fase vão para o make (ex.: ARGS=--sem-congelamento).
@@ -30,6 +34,11 @@ rodar() {   # chamado pelo serviço
   if [ "$code" != 143 ] && [ "$code" != 130 ]; then
     echo "$(date -Is) código $code" > "$marca"
     make -C "$REPO" testes-pacote PERFIL="$perfil" || true
+    make -C "$REPO" testes-pacote PERFIL="$perfil" ARGS=--completo || true
+    if [ -n "${DNAT_BUCKET:-}" ]; then
+      "$TESTES_BACKUP" || true
+      gcloud storage rsync -r -q "${MODEL_GATE_DATA:-$HOME/model_gate_data}/pacotes" "$DNAT_BUCKET/pacotes" || true
+    fi
   fi
   echo "== $(date -Is) · fim da rodada $perfil/$fase com código $code"
   exit "$code"
@@ -40,6 +49,24 @@ case "${1:-}" in
     perfil=${2:?perfil: ensaio ou nuvem}; fase=${3:-todas}; shift $(( $# >= 3 ? 3 : 2 ))
     [ "$perfil" = nuvem ] && [ "$fase" = todas ] && { echo "na nuvem, diga a fase: 1 ou 2" >&2; exit 2; }
     rm -f "$STATE/$perfil-$fase.feito"
+    backup_env=""
+    if [ -n "${DNAT_BUCKET:-}" ]; then
+      data="${MODEL_GATE_DATA:-$HOME/model_gate_data}"
+      cat > "$STATE/backup.sh" <<EOB
+#!/usr/bin/env bash
+set -euo pipefail
+gcloud storage rsync -r -q "$data/testes" "$DNAT_BUCKET/testes"
+gcloud storage rsync -r -q "$REPO/DSN2027/testes" "$DNAT_BUCKET/acompanhamento"
+gcloud storage cp -q "$STATE/servico.log" "$DNAT_BUCKET/servico.log" || true
+gcloud storage rsync -r -q "$data/machine" "$DNAT_BUCKET/maquina" || true
+EOB
+      chmod +x "$STATE/backup.sh"
+      "$STATE/backup.sh" || { echo "a cópia para $DNAT_BUCKET falhou (escopo do Storage? gcloud auth?)" >&2; exit 1; }
+      backup_env="Environment=TESTES_BACKUP=$STATE/backup.sh DNAT_BUCKET=$DNAT_BUCKET"
+      echo "cópia de segurança depois de cada passo: $DNAT_BUCKET"
+    else
+      echo "sem DNAT_BUCKET: sem cópia fora da VM (o disco sobrevive à preempção, mas não a apagar a VM)"
+    fi
     python3 -I "$REPO/tools/testes/todos.py" verificar --perfil "$perfil" --fase "$fase" "${@#ARGS=}" || {
       echo; echo "o pré-voo achou pendências (acima). Rodar mesmo assim? [s/N]"; read -r r; [ "$r" = s ] || exit 1; }
     $SUDO tee /etc/systemd/system/$UNIT.service >/dev/null <<EOF
@@ -56,6 +83,7 @@ Environment=HOME=$HOME
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
 Environment=UV_NO_SYNC=1
 Environment=MODEL_GATE_DATA=${MODEL_GATE_DATA:-$HOME/model_gate_data}
+$backup_env
 ExecStart=$REPO/tools/cloud/campanha_gpu.sh _rodar $perfil $fase $*
 KillMode=control-group
 KillSignal=SIGTERM

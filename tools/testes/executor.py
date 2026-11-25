@@ -422,6 +422,10 @@ class Runner:
                     msg = f"conferência falhou: {type(e).__name__}: {e}"
                 if msg:
                     msgs.append(msg)
+            if p.opcional and msgs:   # passo opcional não segura o teste: vira aviso
+                for m in msgs:
+                    self.say(f"  aviso: {p.id} (opcional) vai falhar: {m}")
+                continue
             for m in msgs:
                 by_msg.setdefault(m, []).append(p.id)
         return problems + [f"{', '.join(ids)}: {m}" for m, ids in by_msg.items()]
@@ -454,6 +458,26 @@ class Runner:
             self.save()
             if n % 10 == 0:  # a cada ~5 min, também no eventos.jsonl
                 self.event("sinal", passo=pid, **sig)
+
+    _backup_proc = None
+
+    def backup(self, motivo: str) -> None:
+        """Cópia de segurança fora da VM depois de cada passo (TESTES_BACKUP: um comando de shell, por exemplo
+        gcloud storage rsync para um bucket). Roda em segundo plano, sem segurar a campanha, e não empilha:
+        se a anterior ainda está rodando, esta fica para o próximo passo. A saída vai para logs/backup.log."""
+        cmd = os.environ.get("TESTES_BACKUP")
+        if not cmd:
+            return
+        if self._backup_proc is not None and self._backup_proc.poll() is None:
+            return
+        log = self.dir / "logs" / "backup.log"
+        log.parent.mkdir(parents=True, exist_ok=True)
+        fh = open(log, "a")
+        fh.write(f"\n##### {now()} · {motivo}\n")
+        fh.flush()
+        self._backup_proc = subprocess.Popen(["bash", "-c", cmd], cwd=REPO, stdout=fh, stderr=subprocess.STDOUT,
+                                             env={**os.environ, "TESTE_DIR": str(self.dir)}, start_new_session=True)
+        self.event("backup", motivo=motivo)
 
     def run_step(self, p: Passo) -> int:
         pd = self.ctx.passo_dir(p.id)
@@ -612,6 +636,7 @@ class Runner:
                          + (f" no commit {prev['commit'][:12]}, não no atual" if other else "") + ", pulando")
                 continue
             code = self.run_step(p)
+            self.backup(f"depois do passo {p.id} (código {code})")
             if code != 0:
                 if p.opcional:
                     self.say(f"  ({p.id} é opcional: o teste segue)")
@@ -651,6 +676,18 @@ class Runner:
             print(f"  [{mark}] {c['nome']}: {c['valor']}" + (f" (esperado {c['esperado']})" if c.get("esperado") is not None else ""))
         if estado == "divergiu" and rc == 0:
             rc = 4
+        if os.environ.get("TESTES_BACKUP"):   # a última cópia, com o resumo e o acompanhamento, antes de sair
+            if self._backup_proc is not None:
+                try:
+                    self._backup_proc.wait(timeout=600)
+                except subprocess.TimeoutExpired:
+                    pass
+            self._backup_proc = None
+            self.backup(f"fim do {self.t.id} ({resumo.get('estado')})")
+            try:
+                self._backup_proc.wait(timeout=600)
+            except (subprocess.TimeoutExpired, AttributeError):
+                pass
         return rc
 
 

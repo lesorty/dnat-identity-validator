@@ -34,6 +34,12 @@ tools/cloud/campanha_gpu.sh estado | log | parar
   juiz de referência. O sinal de vida de cada passo grava a memória e o uso da GPU, para ajustar.
 - **Travado:** um passo que fica 60 min sem escrever nada (30 no ensaio) é morto e conta como falha,
   em vez de deixar a GPU parada cobrando.
+- **Cópia fora da VM:** `DNAT_BUCKET=gs://<bucket>/<pasta> tools/cloud/campanha_gpu.sh iniciar ...` copia
+  os testes, o acompanhamento, a ficha e o log do serviço para o bucket depois de cada passo. No fim,
+  sobem os dois pacotes: o leve, sem textos gerados, que vai para o git, e o completo, com textos,
+  referências e adaptadores, que fica fora do git. Crie a VM com escopo de escrita no Storage.
+- **Estado da ida ao GCP:** o que está pronto, o que falta decidir e o que fica salvo onde estão em
+  `DSN2027/testes/IDA_AO_GCP.md`.
 - **O ensaio primeiro.** Ele não é dado do artigo: serve para ver, em meia hora, que tudo carrega e roda
   na GPU e quanto cada passo leva, antes das horas da campanha.
 

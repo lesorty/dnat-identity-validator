@@ -152,6 +152,9 @@ async function main() {
     sealed[k] = { files: r.files, matchesReceipt: r.matchesReceipt };
   }
 
+  // T8: revogação do base em cascata (depois de tudo que usa o base)
+  const cascade = onChain.B?.usable ? await baseCascade(chain.contract, model.assetId, onChain.B.assetId) : null;
+
   const summary = (s) => ({
     exitCode: s.exitCode,
     metrics: s.result?.metrics ?? null,
@@ -171,6 +174,7 @@ async function main() {
     identity: { id: reg.record.id, difficulty: reg.difficulty, proofSeconds: reg.proofSeconds },
     scenarios: { A: summary(scenarios.A), B: summary(scenarios.B), C: summary(scenarios.C) },
     onChain,
+    cascade,
     judgeRecords: sealed,
     timings: stack.timings,
   };
@@ -184,6 +188,7 @@ async function main() {
     ["C: reprovado, derivado inativo", scenarios.C.judge?.outcome === "rejected" && onChain.C?.active === false],
     ["C: cota 5 (saldo 14)", scenarios.C.balanceAfter === 14],
     ["B e C: registro do Juiz selado, aberto pelo operador e igual ao hash do recibo", ["B", "C"].every((k) => sealed[k]?.matchesReceipt === true)],
+    ["base revogado: o derivado aprovado deixa de valer em cascata e o base não volta", cascade?.ok === true],
   ];
   if (SINGLE_USE) {
     const vms = ["A", "B", "C"].map((k) => scenarios[k].jobVm);
@@ -204,6 +209,25 @@ async function main() {
     });
   }
   return checks.every(([, ok]) => ok) ? 0 : 1;
+}
+
+/** T8 (página dos testes): o base revogado derruba o derivado aprovado, em cascata, e nada volta.
+ *  O base é de quem o registrou (a CVM1, com a chave do operador); revokeAsset é do dono. */
+async function baseCascade(contract, baseId, derivId) {
+  const reverts = async (p) => {
+    try { await (await p).wait(); return null; } catch (e) { return e.shortMessage || e.reason || e.message; }
+  };
+  const me = (await contract.runner.getAddress()).toLowerCase();
+  const owner = (await contract.getAsset(BigInt(baseId))).owner.toLowerCase();
+  const out = { baseId, derivId, baseOwnerIsSigner: owner === me,
+    usableBefore: await contract.isDerivativeUsable(BigInt(derivId)) };
+  out.revokeBase = await reverts(contract.revokeAsset(BigInt(baseId)));
+  out.usableAfter = await contract.isDerivativeUsable(BigInt(derivId));
+  out.baseReactivate = await reverts(contract.updateAsset(BigInt(baseId), 0n, true));
+  out.usableAfterReactivateTry = await contract.isDerivativeUsable(BigInt(derivId));
+  out.ok = out.usableBefore === true && out.revokeBase === null && out.usableAfter === false
+    && typeof out.baseReactivate === "string" && out.usableAfterReactivateTry === false;
+  return out;
 }
 
 function writeResults(r) {

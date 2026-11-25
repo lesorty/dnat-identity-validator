@@ -139,6 +139,8 @@ async function main() {
   const ajId = runs.ajuste.judge?.assetId;
   if (ajId) {
     const before = await c.isDerivativeUsable(BigInt(ajId));
+    // Cascata (página dos testes, T8): com o ajuste aprovado, o base é revogado; o ajuste cai e o base não volta.
+    if (before) contract.cascata = await baseCascade(c, model.assetId, ajId);
     const revoke = await reverts(c.revokeDerivative(BigInt(ajId), "T-814: revogação pelo operador"));
     contract.ajuste = { usableBefore: before, revoke, usableAfter: await c.isDerivativeUsable(BigInt(ajId)),
       reactivate: await reverts(c.updateAsset(BigInt(ajId), 0n, true)) };
@@ -153,6 +155,9 @@ async function main() {
     ["o operador revoga o ajuste; deixa de ser usável e não volta",
       contract.ajuste?.revoke === null && contract.ajuste?.usableAfter === false && typeof contract.ajuste?.reactivate === "string"],
     [`cota: 20 − 5 − ${ajusteCost} = ${20 - 5 - ajusteCost}`, runs.ajuste.balanceAfter === 20 - 5 - ajusteCost],
+    // Só cabe com o ajuste aprovado (prereg congelado, na nuvem); com o de fumaça ele pode sair inconclusivo.
+    ["base revogado: o ajuste aprovado deixa de valer em cascata e o base não volta",
+      runs.ajuste.judge?.outcome === "approved" ? contract.cascata?.ok === true : true],
   ];
   const result = {
     note: "Ensaio local do Teste 8 (T-814) com o Juiz real; avaliador e prereg de FUMAÇA. Não é dado do artigo.",
@@ -163,6 +168,25 @@ async function main() {
   writeResults(result);
   for (const [name, ok] of checks) stack.log(`${ok ? "ok  " : "FALHOU"} ${name}`);
   return checks.every(([, ok]) => ok) ? 0 : 1;
+}
+
+/** T8 (página dos testes): o base revogado derruba o derivado aprovado, em cascata, e nada volta.
+ *  O base é de quem o registrou (a CVM1, com a chave do operador); revokeAsset é do dono. */
+async function baseCascade(contract, baseId, derivId) {
+  const reverts = async (p) => {
+    try { await (await p).wait(); return null; } catch (e) { return e.shortMessage || e.reason || e.message; }
+  };
+  const me = (await contract.runner.getAddress()).toLowerCase();
+  const owner = (await contract.getAsset(BigInt(baseId))).owner.toLowerCase();
+  const out = { baseId, derivId, baseOwnerIsSigner: owner === me,
+    usableBefore: await contract.isDerivativeUsable(BigInt(derivId)) };
+  out.revokeBase = await reverts(contract.revokeAsset(BigInt(baseId)));
+  out.usableAfter = await contract.isDerivativeUsable(BigInt(derivId));
+  out.baseReactivate = await reverts(contract.updateAsset(BigInt(baseId), 0n, true));
+  out.usableAfterReactivateTry = await contract.isDerivativeUsable(BigInt(derivId));
+  out.ok = out.usableBefore === true && out.revokeBase === null && out.usableAfter === false
+    && typeof out.baseReactivate === "string" && out.usableAfterReactivateTry === false;
+  return out;
 }
 
 function writeResults(r) {

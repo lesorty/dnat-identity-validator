@@ -78,6 +78,9 @@ if [ "$GPU" = 1 ]; then
     exit 4
   fi
 
+  command -v hashcat >/dev/null || $SUDO apt-get install -y -qq --no-install-recommends hashcat ocl-icd-libopencl1 >/dev/null \
+    || echo "hashcat não instalado: o T10 segue sem a taxa da GPU"
+
   step "6b. modo confidencial da GPU"
   cc=$(nvidia-smi conf-compute -f 2>&1 || true); echo "$cc"
   rs=$(nvidia-smi conf-compute -grs 2>&1 || true); echo "$rs"

@@ -93,6 +93,21 @@ class ExecutorTest(unittest.TestCase):
         self.assertLess(st["passos"]["mudo"]["segundos"], 30)
         self.assertIn("SEM SAÍDA", (r.dir / "logs" / "mudo.log").read_text())
 
+    def test_copia_de_seguranca_depois_de_cada_passo(self):
+        ex = self.ex
+        dest = Path(self.tmp.name) / "bucket"
+        os.environ["TESTES_BACKUP"] = f'mkdir -p {dest} && cp -r "$TESTE_DIR"/. {dest}/'
+        try:
+            t = self.fazer([ex.Passo("a", "um", "echo um"), ex.Passo("b", "dois", "echo dois")])
+            r, rc = self.run_t(t)
+        finally:
+            del os.environ["TESTES_BACKUP"]
+        self.assertEqual(rc, 0)
+        self.assertTrue((dest / "resumo.json").exists())          # a última cópia leva o resumo
+        self.assertIn("fim do T99", (dest / "logs" / "backup.log").read_text())
+        ev = [json.loads(x)["evento"] for x in (r.dir / "eventos.jsonl").read_text().splitlines()]
+        self.assertGreaterEqual(ev.count("backup"), 2)
+
     def test_preflight(self):
         ex = self.ex
         t = self.fazer([ex.Passo("p", "pendente", None, pendente="falta X"),

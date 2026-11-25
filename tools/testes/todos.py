@@ -115,19 +115,48 @@ def status(a) -> int:
     return 0
 
 
+GRANDE_MB = 50   # no pacote completo, arquivo de pesos maior que isto fica de fora (o derivado se refaz pela receita)
+
+
+def insumos(d: Path) -> list[Path]:
+    """O que os vereditos e rótulos da campanha usaram fora da pasta dela: as referências do pai (testes_*,
+    rotulo_*, forjada_*) e os derivados que a população montou (adaptadores LoRA, receitas, carimbos)."""
+    refs, ders = set(), set()
+    for f in d.rglob("contexto.json"):
+        r = (read_json(f) or {}).get("referencia")
+        if r:
+            refs.add(Path(r))
+    for f in d.rglob("populacao.json"):
+        for row in read_json(f) or []:
+            c = str(row.get("caminho") or "")
+            if c.startswith("derivatives/"):
+                ders.add(DATA / c)
+    if (DATA / "references").is_dir():
+        refs |= set((DATA / "references").glob("rotulo_*")) | set((DATA / "references").glob("forjada_*"))
+    return sorted(p for p in refs | ders if p.exists())
+
+
 def pacote(a) -> int:
-    """Tudo da campanha, menos os textos gerados (T-211) e as respostas dos jobs, mais o acompanhamento."""
+    """Leve (padrão): tudo da campanha menos os textos gerados (T-211) e as respostas dos jobs, mais o
+    acompanhamento e a ficha. É o que vai para resultados_nuvem/ e para o git.
+    Completo (--completo): também os textos, as respostas, as referências do pai, os adaptadores e o log do
+    serviço; só pesos grandes ficam de fora. Para guardar fora do git (notebook, bucket), para investigar."""
     d = campaign_dir(a.perfil, a.campanha)
     if not d.exists():
         raise SystemExit(f"nada em {d}")
     out_dir = DATA / "pacotes"
     out_dir.mkdir(parents=True, exist_ok=True)
     import socket
-    name = f"testes_{a.perfil}_{d.name}_{socket.gethostname()}_{time.strftime('%Y%m%dT%H%M%S')}"
+    completo = getattr(a, "completo", False)
+    name = (f"testes_{a.perfil}_{d.name}_{socket.gethostname()}_{time.strftime('%Y%m%dT%H%M%S')}"
+            + ("_completo" if completo else ""))
     out = out_dir / f"{name}.tar.gz"
-    skip_names = ("_texts.json", "_texts.jsonl", "responses.jsonl")
+    skip_names = () if completo else ("_texts.json", "_texts.jsonl", "responses.jsonl")
 
     def keep(ti):
+        if completo:
+            big = ti.isfile() and ti.size > GRANDE_MB * 2**20 and ti.name.endswith((".safetensors", ".bin", ".pt"))
+            return None if big else ti
         return None if ti.name.endswith(skip_names) else ti
 
     machine = sorted((DATA / "machine").glob("*.json")) if (DATA / "machine").is_dir() else []
@@ -137,7 +166,14 @@ def pacote(a) -> int:
             tar.add(f, arcname=f"{name}/acompanhamento/{f.name}")
         for f in machine:
             tar.add(f, arcname=f"{name}/maquina/{f.name}")
-        meta = {"perfil": a.perfil, "campanha": d.name, "criado": now(), "head": head(), "host": socket.gethostname()}
+        if completo:
+            for p in insumos(d):
+                tar.add(p, arcname=f"{name}/insumos/{p.relative_to(DATA)}", filter=keep)
+            svc = Path.home() / ".dnat-testes" / "servico.log"
+            if svc.exists():
+                tar.add(svc, arcname=f"{name}/servico.log")
+        meta = {"perfil": a.perfil, "campanha": d.name, "criado": now(), "head": head(), "host": socket.gethostname(),
+                "completo": completo, "aviso": "contém textos gerados: fora do git (T-211)" if completo else None}
         mf = out_dir / f"{name}.json"
         mf.write_text(json.dumps(meta, indent=1, ensure_ascii=False))
         tar.add(mf, arcname=f"{name}/pacote.json")
@@ -152,6 +188,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--perfil", choices=("mini", "ensaio", "nuvem"), default=os.environ.get("PERFIL", "mini"))
     ap.add_argument("--fase", choices=("1", "2", "todas"), default=os.environ.get("FASE", "todas"))
     ap.add_argument("--campanha", default=os.environ.get("TESTES_CAMPANHA"))
+    ap.add_argument("--completo", action="store_true", help="pacote: com textos, referências e adaptadores (fora do git)")
     a, extra = ap.parse_known_args(argv)
     a.extra = extra + (["--campanha", a.campanha] if a.campanha else [])
     return {"verificar": verificar, "rodar": rodar, "status": status, "pacote": pacote}[a.acao](a)

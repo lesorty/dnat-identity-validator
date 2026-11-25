@@ -105,6 +105,41 @@ def spread(rows: list[dict]) -> dict:
     return out
 
 
+def hurtado(cal: list[dict], rows: list[dict]) -> dict:
+    """Linha de base de Hurtado (experiments.campaign.baseline_hurtado): s = z(−ρ) + z(E1), com média e
+    desvio da calibração (T2, H e C juntos) e o limiar de Youden nos rótulos da calibração; aplicada sem
+    mudança a estas linhas. Aqui a referência é o pai verdadeiro (o caso honesto): a diferença para o Juiz
+    é a combinação dos sinais, não a custódia (essa é o T7). ρ é o ratio_band, o mesmo de Hurtado."""
+    from experiments.campaign.baseline_hurtado import ZSum
+    ok = lambda r: r.get("rho") is not None and r.get("e1") is not None and r["rotulo"] in ("H", "C")
+    c = [r for r in cal if ok(r)]
+    if len(c) < 2 or len({r["rotulo"] for r in c}) < 2:
+        return {"erro": f"calibração sem H e C com ρ e E1 ({len(c)} linhas)"}
+    try:
+        z = ZSum.fit([r["rho"] for r in c], [r["e1"] for r in c])
+    except ValueError as e:
+        return {"erro": str(e)}
+    sc = sorted((float(z.score(r["rho"], r["e1"])), r["rotulo"]) for r in c)
+    nC, nH = sum(l == "C" for _, l in sc), sum(l == "H" for _, l in sc)
+    best = None
+    for thr in [s for s, _ in sc] + [float("inf")]:   # barra quem tem escore >= thr
+        tpr = sum(s >= thr and l == "C" for s, l in sc) / nC
+        fpr = sum(s >= thr and l == "H" for s, l in sc) / nH
+        if best is None or tpr - fpr > best[0]:
+            best = (tpr - fpr, thr)
+    thr = best[1]
+    test = [r for r in rows if r.get("rho") is not None and r.get("e1") is not None and r["rotulo"] in ("H", "C")]
+    C = [r for r in test if r["rotulo"] == "C"]
+    H = [r for r in test if r["rotulo"] == "H"]
+    passes = lambda r: float(z.score(r["rho"], r["e1"])) < thr
+    return {"padronizacao": z.record(), "limiar_youden": thr, "youden_calibracao": best[0],
+            "n": len(test), "sem_sinal": len(rows) - len(test),
+            "liberacao_silenciosa": rate(sum(passes(r) for r in C), len(C)),
+            "falso_alarme": rate(sum(not passes(r) for r in H), len(H)),
+            "juiz_nas_mesmas_linhas": {"liberacao_silenciosa": rate(sum(r["estado"] == "aprovado" for r in C), len(C)),
+                                       "falso_alarme": rate(sum(r["estado"] != "aprovado" for r in H), len(H))}}
+
+
 def markdown(title: str, res: dict) -> str:
     m = res["geral"]
     f = lambda d: "—" if d["taxa"] is None else f"{d['k']}/{d['n']} = {d['taxa']:.2f} (IC95 {d['ic95'][0]:.2f}–{d['ic95'][1]:.2f})"
@@ -120,6 +155,15 @@ def markdown(title: str, res: dict) -> str:
         c = res["comparacao"]
         lines += ["", "## Comparação", "", f"- esta amostra: liberação {f(c['esta']['liberacao_silenciosa'])}; falso alarme {f(c['esta']['falso_alarme'])}",
                   f"- referência: liberação {f(c['referencia']['liberacao_silenciosa'])}; falso alarme {f(c['referencia']['falso_alarme'])}"]
+    if res.get("linha_de_base"):
+        b = res["linha_de_base"]
+        lines += ["", "## Linha de base de Hurtado (ρ e E1 em z-soma, limiar de Youden da calibração)", ""]
+        if b.get("erro"):
+            lines.append(f"- não calculada: {b['erro']}")
+        else:
+            j = b["juiz_nas_mesmas_linhas"]
+            lines += [f"- linha de base: liberação {f(b['liberacao_silenciosa'])}; falso alarme {f(b['falso_alarme'])}",
+                      f"- Juiz, nas mesmas linhas: liberação {f(j['liberacao_silenciosa'])}; falso alarme {f(j['falso_alarme'])}"]
     if res.get("ablacao"):
         lines += ["", "## Ablação", ""]
         for k in ("completo", "sem_S2_S3", "sem_S1"):
@@ -136,6 +180,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--rotulos", type=Path, action="append", required=True)
     ap.add_argument("--comparar", type=Path, nargs=2, metavar=("VEREDITOS", "ROTULOS"))
     ap.add_argument("--ablacao", action="store_true")
+    ap.add_argument("--linha-de-base", type=Path, nargs=2, metavar=("VEREDITOS_CAL", "ROTULOS_CAL"),
+                    help="calibração (T2) para a linha de base de Hurtado")
     ap.add_argument("--titulo", default="Análise")
     a = ap.parse_args(argv)
     out = out_dir(a.out)
@@ -149,6 +195,8 @@ def main(argv: list[str] | None = None) -> int:
                              "distribuicao_esta": spread(rows), "distribuicao_referencia": spread(ref)}
     if a.ablacao:
         res["ablacao"] = ablation(rows)
+    if a.linha_de_base:
+        res["linha_de_base"] = hurtado(joined(load([a.linha_de_base[0]]), load([a.linha_de_base[1]])), rows)
     write_json(out / "analise.json", res)
     (out / "analise.md").write_text(markdown(a.titulo, res))
     g = res["geral"]

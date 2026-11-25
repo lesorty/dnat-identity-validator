@@ -184,23 +184,24 @@
   "gabarito": [
    "Todos os derivados do plano são gerados, julgados e rotulados, sem falha do job.",
    "Na nuvem: liberação silenciosa P(aprovado | C) ≤ 10% e falso alarme P(não aprovado | H) ≤ 10%, com IC 95%.",
-   "A tabela separa reprovado de inconclusivo e mostra as taxas por família (F1, F2, F3) e por dose."
+   "A tabela separa reprovado de inconclusivo e mostra as taxas por família (F1, F2, F3) e por dose.",
+   "Na nuvem, o Juiz libera no máximo o que a linha de base de Hurtado (ρ e E1 em z-soma, calibrada no T2) libera."
   ],
   "pendencias_nuvem": [
    "prereg.yaml preenchido (T-606, a partir do T2) e commit congelado.",
-   "Linha de base de Hurtado na mesma tabela (experiments.campaign.baseline_hurtado) ainda não está no passo de análise."
+   "F0 (endurecido) ainda não está no plano da população: a página dos testes o lista no T3."
   ],
   "ultima": {
    "mini": {
     "teste": "T3",
     "perfil": "mini",
     "estado": "ok",
-    "quando": "2026-11-25T16:12:52-03:00",
-    "commit": "158358e4eab9babff2b4383c8d72e52140fe226a",
+    "quando": "2026-11-25T20:13:53-03:00",
+    "commit": "f9501d4c753424b628281ac75d7868bafeec7a1b",
     "sujo": true,
     "congelado": false,
     "host": "steylor-Dell",
-    "segundos": 175.6,
+    "segundos": 180.7,
     "conferencias": [
      {
       "nome": "todos os derivados do plano gerados, julgados e rotulados",
@@ -234,6 +235,16 @@
         0.0,
         0.6576
        ]
+      },
+      "esperado": null
+     },
+     {
+      "nome": "Juiz libera no máximo o que a linha de base de Hurtado libera (mini, só registro)",
+      "ok": true,
+      "valor": {
+       "juiz": 0.0,
+       "hurtado": 1.0,
+       "falso_alarme_hurtado": 0.0
       },
       "esperado": null
      }
@@ -499,12 +510,12 @@
     "teste": "T8",
     "perfil": "mini",
     "estado": "ok",
-    "quando": "2026-11-25T16:24:01-03:00",
-    "commit": "158358e4eab9babff2b4383c8d72e52140fe226a",
+    "quando": "2026-11-25T20:09:21-03:00",
+    "commit": "f9501d4c753424b628281ac75d7868bafeec7a1b",
     "sujo": true,
     "congelado": false,
     "host": "steylor-Dell",
-    "segundos": 25.5,
+    "segundos": 30.8,
     "conferencias": [
      {
       "nome": "A: Juiz real termina em falha (prereg sem valores, T-606)",
@@ -544,6 +555,12 @@
      },
      {
       "nome": "B e C: registro do Juiz selado, aberto pelo operador e igual ao hash do recibo",
+      "ok": true,
+      "valor": null,
+      "esperado": null
+     },
+     {
+      "nome": "base revogado: o derivado aprovado deixa de valer em cascata e o base não volta",
       "ok": true,
       "valor": null,
       "esperado": null

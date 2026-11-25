@@ -72,8 +72,8 @@ teste: ## um teste só: make teste T=3 [PERFIL=nuvem] [ARGS="--refazer vereditos
 testes-status: ## situação de cada teste da campanha (passos e conferências)
 	python3 -I tools/testes/todos.py status --perfil $(PERFIL)
 
-testes-pacote: ## .tar.gz da campanha de testes (sem textos gerados), com o acompanhamento e a ficha
-	python3 -I tools/testes/todos.py pacote --perfil $(PERFIL)
+testes-pacote: ## .tar.gz da campanha (sem textos gerados); ARGS=--completo: com textos, referências e adaptadores (fora do git)
+	python3 -I tools/testes/todos.py pacote --perfil $(PERFIL) $(ARGS)
 
 testes-executor: ## testes do próprio executor (retomada, falha, tempo esgotado, pré-voo)
 	python3 -I tools/testes/test_executor.py
