@@ -1,0 +1,678 @@
+{
+  "note": "Teste 11 (P6): o atacante com muitas identidades. Rotas reais de identidade e cota da CVM1 por HTTP; veredito SIMULADO no corpo do job. A taxa de escape e é uma faixa até o Teste 6 medir a do Juiz.",
+  "measuredAtUtc": "2026-11-24T23:30:09.593Z",
+  "params": {
+    "difficulty": 16,
+    "attackers": 10,
+    "honest": 2,
+    "escapeRates": [
+      0.005,
+      0.01,
+      0.02,
+      0.05
+    ],
+    "modelDifficulties": [
+      20,
+      24,
+      28,
+      30,
+      32,
+      34,
+      36
+    ],
+    "budgetsHours": [
+      24,
+      168
+    ],
+    "quota": {
+      "initialBalance": 20,
+      "reserve": 5,
+      "costs": {
+        "approved": 1,
+        "inconclusive": 2,
+        "rejected": 5,
+        "failure": 0
+      }
+    }
+  },
+  "attackerRows": [
+    {
+      "identity": "c02a51f5039c",
+      "registerSeconds": 0.23363299,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "fb742dc0bec2",
+      "registerSeconds": 0.194861175,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "f8bcca725a78",
+      "registerSeconds": 0.082572361,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "1702e9aee343",
+      "registerSeconds": 0.558524546,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "a28dc71c7a9c",
+      "registerSeconds": 0.385888132,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "38877ded35ed",
+      "registerSeconds": 0.190961913,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "439fc49e6e41",
+      "registerSeconds": 0.040992581,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "294e0cb74ec7",
+      "registerSeconds": 0.096039542,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "1b0c76882b5c",
+      "registerSeconds": 0.479850836,
+      "accepted": 4,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "0ae485145c98",
+      "registerSeconds": 0.692593948,
+      "accepted": 4,
+      "stoppedWith": 402
+    }
+  ],
+  "inconclusive": {
+    "accepted": 8,
+    "stoppedWith": 402
+  },
+  "tricks": [
+    {
+      "name": "a prova da chave A registra A",
+      "status": 201,
+      "expected": 201,
+      "ok": true
+    },
+    {
+      "name": "a prova de A não registra a chave B",
+      "status": 400,
+      "expected": 400,
+      "ok": true
+    },
+    {
+      "name": "a chave A não registra de novo",
+      "status": 409,
+      "expected": 409,
+      "ok": true
+    },
+    {
+      "name": "job sem assinatura",
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    },
+    {
+      "name": "o pedido assinado, primeira vez",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "name": "o mesmo pedido assinado, repetido",
+      "status": 401,
+      "expected": 401,
+      "ok": true
+    }
+  ],
+  "failureBalances": [
+    15,
+    15,
+    15
+  ],
+  "honestRows": [
+    {
+      "identity": "d27db3497df1",
+      "registerSeconds": 0.529569679,
+      "accepted": 16,
+      "stoppedWith": 402
+    },
+    {
+      "identity": "dba9c82f3398",
+      "registerSeconds": 0.005556748,
+      "accepted": 16,
+      "stoppedWith": 402
+    }
+  ],
+  "perIdentity": {
+    "rejected": 4,
+    "inconclusive": 8,
+    "approved": 16
+  },
+  "rates": {
+    "source": "results/T10_preco_identidade.json",
+    "oneCore": 252053.12323659504,
+    "allCores": 1072429.1681358109,
+    "workers": 12,
+    "machine": {
+      "cpuModel": "Intel(R) Core(TM) 7 150U",
+      "logicalCpus": 12,
+      "node": "v22.22.1",
+      "platform": "linux 7.0.0-43-generic",
+      "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210"
+    }
+  },
+  "economics": {
+    "perD": [
+      {
+        "difficulty": 20,
+        "identitySeconds": 4.160138888720422,
+        "honestPerApprovalSeconds": 0.26000868054502635,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 208.0069444360211,
+            "perEscapeSecondsBestCase": 104.00347221801054,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 104.00347221801054,
+            "perEscapeSecondsBestCase": 52.00173610900527,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 52.00173610900527,
+            "perEscapeSecondsBestCase": 26.000868054502636,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 20.800694443602108,
+            "perEscapeSecondsBestCase": 10.400347221801054,
+            "ratioToHonest": 80
+          }
+        ]
+      },
+      {
+        "difficulty": 24,
+        "identitySeconds": 66.56222221952675,
+        "honestPerApprovalSeconds": 4.160138888720422,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 3328.1111109763374,
+            "perEscapeSecondsBestCase": 1664.0555554881687,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 1664.0555554881687,
+            "perEscapeSecondsBestCase": 832.0277777440843,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 832.0277777440843,
+            "perEscapeSecondsBestCase": 416.0138888720422,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 332.8111110976337,
+            "perEscapeSecondsBestCase": 166.40555554881686,
+            "ratioToHonest": 80
+          }
+        ]
+      },
+      {
+        "difficulty": 28,
+        "identitySeconds": 1064.995555512428,
+        "honestPerApprovalSeconds": 66.56222221952675,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 53249.7777756214,
+            "perEscapeSecondsBestCase": 26624.8888878107,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 26624.8888878107,
+            "perEscapeSecondsBestCase": 13312.44444390535,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 13312.44444390535,
+            "perEscapeSecondsBestCase": 6656.222221952675,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 5324.97777756214,
+            "perEscapeSecondsBestCase": 2662.48888878107,
+            "ratioToHonest": 80
+          }
+        ]
+      },
+      {
+        "difficulty": 30,
+        "identitySeconds": 4259.982222049712,
+        "honestPerApprovalSeconds": 266.248888878107,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 212999.1111024856,
+            "perEscapeSecondsBestCase": 106499.5555512428,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 106499.5555512428,
+            "perEscapeSecondsBestCase": 53249.7777756214,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 53249.7777756214,
+            "perEscapeSecondsBestCase": 26624.8888878107,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 21299.91111024856,
+            "perEscapeSecondsBestCase": 10649.95555512428,
+            "ratioToHonest": 80
+          }
+        ]
+      },
+      {
+        "difficulty": 32,
+        "identitySeconds": 17039.928888198847,
+        "honestPerApprovalSeconds": 1064.995555512428,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 851996.4444099424,
+            "perEscapeSecondsBestCase": 425998.2222049712,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 425998.2222049712,
+            "perEscapeSecondsBestCase": 212999.1111024856,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 212999.1111024856,
+            "perEscapeSecondsBestCase": 106499.5555512428,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 85199.64444099423,
+            "perEscapeSecondsBestCase": 42599.82222049712,
+            "ratioToHonest": 80
+          }
+        ]
+      },
+      {
+        "difficulty": 34,
+        "identitySeconds": 68159.71555279539,
+        "honestPerApprovalSeconds": 4259.982222049712,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 3407985.7776397695,
+            "perEscapeSecondsBestCase": 1703992.8888198847,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 1703992.8888198847,
+            "perEscapeSecondsBestCase": 851996.4444099424,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 851996.4444099424,
+            "perEscapeSecondsBestCase": 425998.2222049712,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 340798.57776397694,
+            "perEscapeSecondsBestCase": 170399.28888198847,
+            "ratioToHonest": 80
+          }
+        ]
+      },
+      {
+        "difficulty": 36,
+        "identitySeconds": 272638.86221118155,
+        "honestPerApprovalSeconds": 17039.928888198847,
+        "attacker": [
+          {
+            "e": 0.005,
+            "perEscapeSeconds": 13631943.110559078,
+            "perEscapeSecondsBestCase": 6815971.555279539,
+            "ratioToHonest": 800
+          },
+          {
+            "e": 0.01,
+            "perEscapeSeconds": 6815971.555279539,
+            "perEscapeSecondsBestCase": 3407985.7776397695,
+            "ratioToHonest": 400
+          },
+          {
+            "e": 0.02,
+            "perEscapeSeconds": 3407985.7776397695,
+            "perEscapeSecondsBestCase": 1703992.8888198847,
+            "ratioToHonest": 200
+          },
+          {
+            "e": 0.05,
+            "perEscapeSeconds": 1363194.3110559077,
+            "perEscapeSecondsBestCase": 681597.1555279539,
+            "ratioToHonest": 80
+          }
+        ]
+      }
+    ],
+    "budgets": [
+      {
+        "difficulty": 28,
+        "hours": 24,
+        "workers": 12,
+        "identities": 345,
+        "attempts": 1380,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.9990095069579067
+          },
+          {
+            "e": 0.01,
+            "p": 0.9999990525232872
+          },
+          {
+            "e": 0.02,
+            "p": 0.9999999999992202
+          },
+          {
+            "e": 0.05,
+            "p": 1
+          }
+        ]
+      },
+      {
+        "difficulty": 28,
+        "hours": 168,
+        "workers": 12,
+        "identities": 2416,
+        "attempts": 9664,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 1
+          },
+          {
+            "e": 0.01,
+            "p": 1
+          },
+          {
+            "e": 0.02,
+            "p": 1
+          },
+          {
+            "e": 0.05,
+            "p": 1
+          }
+        ]
+      },
+      {
+        "difficulty": 30,
+        "hours": 24,
+        "workers": 12,
+        "identities": 86,
+        "attempts": 344,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.8217047486338622
+          },
+          {
+            "e": 0.01,
+            "p": 0.9684857524931841
+          },
+          {
+            "e": 0.02,
+            "p": 0.999041107242949
+          },
+          {
+            "e": 0.05,
+            "p": 0.9999999782769792
+          }
+        ]
+      },
+      {
+        "difficulty": 30,
+        "hours": 168,
+        "workers": 12,
+        "identities": 604,
+        "attempts": 2416,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.9999944974616042
+          },
+          {
+            "e": 0.01,
+            "p": 0.9999999999715141
+          },
+          {
+            "e": 0.02,
+            "p": 1
+          },
+          {
+            "e": 0.05,
+            "p": 1
+          }
+        ]
+      },
+      {
+        "difficulty": 32,
+        "hours": 24,
+        "workers": 12,
+        "identities": 21,
+        "attempts": 84,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.34364502317115686
+          },
+          {
+            "e": 0.01,
+            "p": 0.5701109864761065
+          },
+          {
+            "e": 0.02,
+            "p": 0.8167726256637123
+          },
+          {
+            "e": 0.05,
+            "p": 0.9865481243423165
+          }
+        ]
+      },
+      {
+        "difficulty": 32,
+        "hours": 168,
+        "workers": 12,
+        "identities": 151,
+        "attempts": 604,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.9515670669348731
+          },
+          {
+            "e": 0.01,
+            "p": 0.9976897576707536
+          },
+          {
+            "e": 0.02,
+            "p": 0.999994981779754
+          },
+          {
+            "e": 0.05,
+            "p": 0.9999999999999649
+          }
+        ]
+      },
+      {
+        "difficulty": 34,
+        "hours": 24,
+        "workers": 12,
+        "identities": 5,
+        "attempts": 20,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.09538951972538245
+          },
+          {
+            "e": 0.01,
+            "p": 0.18209306240276923
+          },
+          {
+            "e": 0.02,
+            "p": 0.33239202824490577
+          },
+          {
+            "e": 0.05,
+            "p": 0.6415140775914581
+          }
+        ]
+      },
+      {
+        "difficulty": 34,
+        "hours": 168,
+        "workers": 12,
+        "identities": 37,
+        "attempts": 148,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.5237708770771589
+          },
+          {
+            "e": 0.01,
+            "p": 0.7740518444660127
+          },
+          {
+            "e": 0.02,
+            "p": 0.9497125976223577
+          },
+          {
+            "e": 0.05,
+            "p": 0.9994952299451705
+          }
+        ]
+      },
+      {
+        "difficulty": 36,
+        "hours": 24,
+        "workers": 12,
+        "identities": 1,
+        "attempts": 4,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.019850499375000052
+          },
+          {
+            "e": 0.01,
+            "p": 0.039403990000000055
+          },
+          {
+            "e": 0.02,
+            "p": 0.07763184000000001
+          },
+          {
+            "e": 0.05,
+            "p": 0.18549375000000012
+          }
+        ]
+      },
+      {
+        "difficulty": 36,
+        "hours": 168,
+        "workers": 12,
+        "identities": 9,
+        "attempts": 36,
+        "pEscape": [
+          {
+            "e": 0.005,
+            "p": 0.16510683268127369
+          },
+          {
+            "e": 0.01,
+            "p": 0.30358678195042654
+          },
+          {
+            "e": 0.02,
+            "p": 0.5167868717942836
+          },
+          {
+            "e": 0.05,
+            "p": 0.8422207852117732
+          }
+        ]
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "cada identidade de atacante aceita exatamente 4 reprovados e depois recebe 402",
+      "ok": true
+    },
+    {
+      "name": "10 identidades dão 40 tentativas, nem uma a mais",
+      "ok": true
+    },
+    {
+      "name": "só com inconclusivos, 8 tentativas e depois 402",
+      "ok": true
+    },
+    {
+      "name": "o honesto faz 16 aprovações por identidade e depois recebe 402",
+      "ok": true
+    },
+    {
+      "name": "os truques são recusados (prova reaproveitada, chave repetida, sem assinatura, repetição)",
+      "ok": true
+    },
+    {
+      "name": "jobs que falham não gastam cota",
+      "ok": true
+    }
+  ]
+}

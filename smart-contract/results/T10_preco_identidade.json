@@ -1,0 +1,408 @@
+{
+  "note": "Teste 10 (P6): o preço da identidade. Medido na máquina onde rodou; o d acima do medido é extrapolado de 2^d ÷ taxa.",
+  "measuredAtUtc": "2026-11-24T23:30:05.228Z",
+  "commit": "183d193",
+  "machine": {
+    "cpuModel": "Intel(R) Core(TM) 7 150U",
+    "logicalCpus": 12,
+    "node": "v22.22.1",
+    "platform": "linux 7.0.0-43-generic",
+    "note": "medido numa máquina local; a medida em VM de 4 vCPU fica para a T-210"
+  },
+  "params": {
+    "minBits": 16,
+    "maxBits": 24,
+    "reps": 5,
+    "workers": 12,
+    "gpuRate": null
+  },
+  "bench": {
+    "hashesPerSecond": 252053.12323659504,
+    "rows": [
+      {
+        "difficulty": 16,
+        "reps": 5,
+        "seconds": [
+          0.166323981,
+          0.224129869,
+          0.028336778,
+          0.2796844,
+          0.046994159
+        ],
+        "meanSeconds": 0.1490938374,
+        "medianSeconds": 0.166323981,
+        "minSeconds": 0.028336778,
+        "maxSeconds": 0.2796844,
+        "expectedHashes": 65536,
+        "expectedSeconds": 0.26000868054502635,
+        "hashes": [
+          35434,
+          55145,
+          6676,
+          68749,
+          12105
+        ]
+      },
+      {
+        "difficulty": 17,
+        "reps": 5,
+        "seconds": [
+          0.741317091,
+          0.533141785,
+          0.093084027,
+          0.082161976,
+          0.258471423
+        ],
+        "meanSeconds": 0.34163526040000003,
+        "medianSeconds": 0.258471423,
+        "minSeconds": 0.082161976,
+        "maxSeconds": 0.741317091,
+        "expectedHashes": 131072,
+        "expectedSeconds": 0.5200173610900527,
+        "hashes": [
+          185099,
+          137463,
+          23555,
+          20452,
+          67061
+        ]
+      },
+      {
+        "difficulty": 18,
+        "reps": 5,
+        "seconds": [
+          0.661500359,
+          0.171333457,
+          3.877234969,
+          0.402033017,
+          1.124649497
+        ],
+        "meanSeconds": 1.2473502598,
+        "medianSeconds": 0.661500359,
+        "minSeconds": 0.171333457,
+        "maxSeconds": 3.877234969,
+        "expectedHashes": 262144,
+        "expectedSeconds": 1.0400347221801054,
+        "hashes": [
+          169832,
+          43885,
+          984690,
+          100765,
+          285996
+        ]
+      },
+      {
+        "difficulty": 19,
+        "reps": 5,
+        "seconds": [
+          2.771328522,
+          5.229782422,
+          3.541086026,
+          1.188092486,
+          1.327289347
+        ],
+        "meanSeconds": 2.8115157606000003,
+        "medianSeconds": 2.771328522,
+        "minSeconds": 1.188092486,
+        "maxSeconds": 5.229782422,
+        "expectedHashes": 524288,
+        "expectedSeconds": 2.080069444360211,
+        "hashes": [
+          681665,
+          1347905,
+          908454,
+          308133,
+          338797
+        ]
+      },
+      {
+        "difficulty": 20,
+        "reps": 5,
+        "seconds": [
+          4.878668296,
+          2.91121249,
+          9.29003459,
+          2.66692617,
+          0.383948094
+        ],
+        "meanSeconds": 4.026157928,
+        "medianSeconds": 2.91121249,
+        "minSeconds": 0.383948094,
+        "maxSeconds": 9.29003459,
+        "expectedHashes": 1048576,
+        "expectedSeconds": 4.160138888720422,
+        "hashes": [
+          1222719,
+          731077,
+          2298414,
+          658646,
+          99626
+        ]
+      },
+      {
+        "difficulty": 21,
+        "reps": 5,
+        "seconds": [
+          8.021389685,
+          22.043478951,
+          0.623062517,
+          8.689740039,
+          14.786349662
+        ],
+        "meanSeconds": 10.8328041708,
+        "medianSeconds": 8.689740039,
+        "minSeconds": 0.623062517,
+        "maxSeconds": 22.043478951,
+        "expectedHashes": 2097152,
+        "expectedSeconds": 8.320277777440843,
+        "hashes": [
+          2134734,
+          5654301,
+          161182,
+          2251554,
+          3830457
+        ]
+      },
+      {
+        "difficulty": 22,
+        "reps": 5,
+        "seconds": [
+          32.431245264,
+          0.751990828,
+          17.005593035,
+          3.928942818,
+          11.294385975
+        ],
+        "meanSeconds": 13.082431584,
+        "medianSeconds": 11.294385975,
+        "minSeconds": 0.751990828,
+        "maxSeconds": 32.431245264,
+        "expectedHashes": 4194304,
+        "expectedSeconds": 16.640555554881686,
+        "hashes": [
+          8295398,
+          181662,
+          4369427,
+          1012336,
+          2883828
+        ]
+      },
+      {
+        "difficulty": 23,
+        "reps": 5,
+        "seconds": [
+          1.049878821,
+          11.773669964,
+          19.137128125,
+          12.065413812,
+          61.127465781
+        ],
+        "meanSeconds": 21.0307113006,
+        "medianSeconds": 12.065413812,
+        "minSeconds": 1.049878821,
+        "maxSeconds": 61.127465781,
+        "expectedHashes": 8388608,
+        "expectedSeconds": 33.28111110976337,
+        "hashes": [
+          253358,
+          3077640,
+          5035914,
+          3057241,
+          15303557
+        ]
+      },
+      {
+        "difficulty": 24,
+        "reps": 5,
+        "seconds": [
+          158.876873929,
+          15.28356371,
+          52.326135619,
+          42.483602283,
+          33.978955427
+        ],
+        "meanSeconds": 60.589826193600004,
+        "medianSeconds": 42.483602283,
+        "minSeconds": 15.28356371,
+        "maxSeconds": 158.876873929,
+        "expectedHashes": 16777216,
+        "expectedSeconds": 66.56222221952675,
+        "hashes": [
+          39815610,
+          3802316,
+          13054759,
+          10482917,
+          8360299
+        ]
+      }
+    ]
+  },
+  "multicore": {
+    "workers": 12,
+    "hashes": 25165824,
+    "seconds": 23.466187556,
+    "hashesPerSecond": 1072429.1681358109
+  },
+  "verify": [
+    {
+      "difficulty": 8,
+      "iterations": 100000,
+      "valid": true,
+      "microseconds": 4.07340144
+    },
+    {
+      "difficulty": 12,
+      "iterations": 100000,
+      "valid": true,
+      "microseconds": 3.8866416399999997
+    },
+    {
+      "difficulty": 16,
+      "iterations": 100000,
+      "valid": true,
+      "microseconds": 4.11629807
+    }
+  ],
+  "law": {
+    "points": 45,
+    "slope": 0.9972540588417779,
+    "slopeStdErr": 0.10682875303552103,
+    "pooledRatio": 0.8588568163011405
+  },
+  "reuse": [
+    {
+      "name": "a prova de A registra A",
+      "status": 201,
+      "expected": 201,
+      "ok": true
+    },
+    {
+      "name": "a mesma prova não registra outra chave",
+      "status": 400,
+      "expected": 400,
+      "ok": true
+    },
+    {
+      "name": "prova feita para outra implantação é recusada",
+      "status": 400,
+      "expected": 400,
+      "ok": true
+    },
+    {
+      "name": "a mesma chave não registra duas vezes",
+      "status": 409,
+      "expected": 409,
+      "ok": true
+    }
+  ],
+  "extrapolation": {
+    "rates": [
+      {
+        "who": "1 núcleo",
+        "hashesPerSecond": 252053.12323659504
+      },
+      {
+        "who": "12 núcleos",
+        "hashesPerSecond": 1072429.1681358109
+      }
+    ],
+    "rows": [
+      {
+        "difficulty": 20,
+        "seconds": {
+          "1 núcleo": 4.160138888720422,
+          "12 núcleos": 0.9777578148333335
+        }
+      },
+      {
+        "difficulty": 24,
+        "seconds": {
+          "1 núcleo": 66.56222221952675,
+          "12 núcleos": 15.644125037333335
+        }
+      },
+      {
+        "difficulty": 26,
+        "seconds": {
+          "1 núcleo": 266.248888878107,
+          "12 núcleos": 62.57650014933334
+        }
+      },
+      {
+        "difficulty": 28,
+        "seconds": {
+          "1 núcleo": 1064.995555512428,
+          "12 núcleos": 250.30600059733337
+        }
+      },
+      {
+        "difficulty": 30,
+        "seconds": {
+          "1 núcleo": 4259.982222049712,
+          "12 núcleos": 1001.2240023893335
+        }
+      },
+      {
+        "difficulty": 32,
+        "seconds": {
+          "1 núcleo": 17039.928888198847,
+          "12 núcleos": 4004.896009557334
+        }
+      },
+      {
+        "difficulty": 36,
+        "seconds": {
+          "1 núcleo": 272638.86221118155,
+          "12 núcleos": 64078.33615291734
+        }
+      }
+    ],
+    "reference": [
+      {
+        "hours": 1,
+        "difficulty": {
+          "1 núcleo": 30,
+          "12 núcleos": 32
+        }
+      },
+      {
+        "hours": 5,
+        "difficulty": {
+          "1 núcleo": 33,
+          "12 núcleos": 35
+        }
+      }
+    ]
+  },
+  "asymmetryD30": 1034906158.3020182,
+  "checks": [
+    {
+      "name": "a lei do custo vale: inclinação de log2(hashes) em d a até 3 erros-padrão de 1",
+      "ok": true
+    },
+    {
+      "name": "a média de hashes tem a ordem de 2^d: razão agregada entre 1/3 e 3",
+      "ok": true
+    },
+    {
+      "name": "conferir não depende de d: o maior tempo é menos que 3× o menor",
+      "ok": true
+    },
+    {
+      "name": "conferir custa menos de 1 ms",
+      "ok": true
+    },
+    {
+      "name": "todas as provas conferidas eram válidas",
+      "ok": true
+    },
+    {
+      "name": "a prova não se reaproveita (outra chave, outra implantação, chave repetida)",
+      "ok": true
+    },
+    {
+      "name": "os núcleos juntos fazem mais hashes que um núcleo",
+      "ok": true
+    }
+  ]
+}

@@ -13,7 +13,7 @@
                     "test:envelope":  "node test/asset_envelope.test.js",
                     "e2e:direct":  "node e2e/run_direct.js",
                     "e2e:teste8":  "node e2e/teste8.js",
-                    "test:identity":  "hardhat test test/identity.test.js test/signed_requests.test.js test/quota_ledger.test.js test/identity_client.test.js test/teste9_identity.test.js",
+                    "test:identity":  "hardhat test test/identity.test.js test/signed_requests.test.js test/quota_ledger.test.js test/identity_client.test.js test/teste9_identity.test.js test/t10_t11_identity.test.js",
                     "demo:cota":  "node e2e/demo_cota.js"
                 },
     "keywords":  [

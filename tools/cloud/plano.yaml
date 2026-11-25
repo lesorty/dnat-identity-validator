@@ -99,6 +99,16 @@ passos:
     titulo: "Teste 9: identidade e cota, com a demonstração"
     cmd: cd smart-contract && npm run --silent test:identity && node e2e/demo_cota.js
 
+  - id: preco-identidade
+    task: T-1705
+    titulo: "Teste 10: o preço da identidade (prova de d = 16 a 27, todos os núcleos, conferência, extrapolação)"
+    cmd: cd smart-contract && node e2e/t10_preco_identidade.js --max 27 --reps 3
+
+  - id: atacante-sybil
+    task: T-1708
+    titulo: "Teste 11: o atacante com muitas identidades (cota pela API e economia do ataque, com as taxas do Teste 10)"
+    cmd: cd smart-contract && node e2e/t11_atacante_sybil.js --d 20
+
   - id: gas
     task: T-709
     titulo: Gás do recibo e da revogação
