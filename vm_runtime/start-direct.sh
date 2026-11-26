@@ -18,8 +18,14 @@ if [ "${DNAT_EGRESS_LOCK:-1}" = "1" ]; then
         fi
         "$ipt" -A OUTPUT -o lo -j ACCEPT
         "$ipt" -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+        # Entrada só na porta do agente (revisão de 15/11): um processo do job que abrisse outra porta
+        # para servir o dataset ou o base a um vizinho da rede fica inalcançável.
+        "$ipt" -P INPUT DROP
+        "$ipt" -A INPUT -i lo -j ACCEPT
+        "$ipt" -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+        "$ipt" -A INPUT -p tcp --dport "${PORT:-5000}" -j ACCEPT
     done
-    echo "egress lock: saída nova bloqueada (só respostas a conexões de entrada)"
+    echo "egress lock: saída nova bloqueada; entrada só na porta ${PORT:-5000} do agente"
 fi
 
 exec setpriv --reuid=dnat --regid=dnat --init-groups --inh-caps=-all --bounding-set=-all \

@@ -75,7 +75,9 @@ wait_for_http "IPFS API" "POST" "${IPFS_API_URL%/}/api/v0/version"
 
 echo "Starting Hardhat node"
 cd /app/smart-contract
-npx hardhat node --hostname 0.0.0.0 &
+# Só dentro da CVM1 (revisão de 15/11): em 0.0.0.0 o builder, que roda as dependências do usuário,
+# alcançava o RPC com a conta do operador desbloqueada e podia forjar um registerDerivative(Approved).
+npx hardhat node --hostname "${DNAT_RPC_BIND:-127.0.0.1}" &
 HARDHAT_PID=$!
 
 wait_for_http \

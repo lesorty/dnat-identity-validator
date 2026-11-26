@@ -68,6 +68,13 @@ def prune_wheel_cache() -> None:
 
 
 def ingest_built_wheelhouse(wheelhouse_dir: Path) -> list[dict]:
+    # Revisão de 15/11: a pasta de wheels sai do build do usuário, onde o setup.py das dependências dele
+    # roda como root; uma wheel plantada ali (ex.: requests-99.0) entraria no build de outro usuário. O
+    # cache compartilhado só recebe o que o operador põe (pip download no volume do cache); as wheels de
+    # um build servem só a ele. DNAT_WHEEL_CACHE_INGEST=1 religa o comportamento antigo, só para
+    # desenvolvimento com um usuário só.
+    if os.environ.get("DNAT_WHEEL_CACHE_INGEST") != "1":
+        return []
     if not wheelhouse_dir.is_dir():
         return []
 

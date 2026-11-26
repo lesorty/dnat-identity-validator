@@ -80,7 +80,9 @@ Separado do que só espera a nuvem (T-1603, T-210).
 5. **Falha do job:** sem 3 tentativas e sem recibo de falha; o veto do S1 se perde se um estágio
    posterior cai (E14 §9).
 6. **Medição do pai:** a E14 §3 a quer automática no depósito, com estado inapto; hoje o operador
-   deposita a referência à mão (D8). Uma das duas tem de mudar.
+   deposita a referência à mão (D8). Uma das duas tem de mudar. Coberto pela T-816 (19/11), que inclui o `registerAsset` aberto a
+   qualquer conta para `Model` e o `min_anchors` ainda `null` no prereg; o operador na base de
+   confiança fica na T-115.
 7. **O ativo aprovado não tem uso:** não há inferência dentro da plataforma, e nada consulta
    `isDerivativeUsable` fora dos testes; liberar e reter não se distinguem na prática (C1).
 8. **Tempo como canal:** o veredito volta na mesma resposta HTTP; a E15 §2 promete publicação em

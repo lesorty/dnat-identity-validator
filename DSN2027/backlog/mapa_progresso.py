@@ -168,6 +168,11 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
       <li><span>12/11</span>Construção local: escada e saída do veredito, formatos, revogação em cascata, cota, cliente de identidade, orquestrador, juiz de referência e rascunhos do artigo (D8)</li>
       <li><span>13/11</span>Fluxo inteiro no modo direto (T-808, T-809, T-811) e Juiz real no job (T-807): abliterações reprovadas no Qwen2.5-0.5B; web UI assinando</li>
       <li><span>14/11</span>CVM de job de uso único na pilha local (T-801: três jobs em três containers, destruídos depois) e Teste 9 local (T-1707: o 5º job recusado com 402); LoRA real numa CVM de uso único (T-806), referência forjada (T-1205: sem custódia o veto some, mas dá inconclusivo), campo do Qwen baixado (T-1103) e a camada 6 do S2 posta em dúvida (T-414)</li>
+      <li><span>15/11</span>Revisão do sistema: 12 bugs corrigidos, cada um com teste, e interface refeita em torno de modelos, Juiz e identidade</li>
+      <li><span>16/11</span>Rotinas num Makefile, CI no GitHub Actions, setup da VM e ficha da máquina, registro do Juiz selado e auditável</li>
+      <li><span>19/11</span>Auditoria de segurança: a admissão do base (T-816) entra no caminho crítico</li>
+      <li><span>24/11</span>Revisão dos testes (nove perguntas, onze testes) e Testes 10 e 11 no notebook: o preço da identidade e o atacante com muitas identidades</li>
+      <li><span>25/11</span>Roteiros T1–T11 com retomada e registro (os 11 passam no mini em 16 min) e preparo da VM com GPU confidencial no GCP (proposta da D2, T-1612)</li>
     </ul>
   </div>
 
@@ -201,14 +206,15 @@ PANEL = f'''<div class="panel" id="p-progresso" data-tab="progresso" hidden>
     <div class="pg-block">
       <h3>Riscos e pendências</h3>
       <ul class="pg-risks">
-        <li class="bad"><b>Marcos vencidos.</b> {", ".join(late)} passaram sem fechar, e o G3 vence em {(d(MK["G3"]["data"])-TODAY).days} dias com {sum(x["id"] in done for x in g3)} de {len(g3)} tasks feitas.</li>
+        <li class="bad"><b>Marcos vencidos.</b> {", ".join(late)} passaram sem fechar; o G3 (sistema integrado){f" vence em {(d(MK['G3']['data'])-TODAY).days} dias e" if d(MK["G3"]["data"]) >= TODAY else ""} tem {sum(x["id"] in done for x in g3)} de {len(g3)} tasks feitas.</li>
         <li class="bad"><b>O ritmo.</b> O que falta pede ~{open_h/days_left:.0f} h por dia até {br(sub)}; o ritmo até aqui foi de ~{done_h/(TODAY-X0).days:.0f} h por dia.</li>
-        <li class="warn"><b>Todo dado do artigo sai da nuvem.</b> População, rótulos, calibração, campo, custo e ablação rodam nas VMs de nuvem (Azure ou Oracle) no TST, depois do fechamento do sistema (T-1611); a máquina local só constrói e verifica com fumaça. Isso concentra a carga de CPU entre 16/11 e 21/11.</li>
-        <li class="warn"><b>O avaliador só será medido na nuvem (T-309, T-315, fase de testes).</b> A geração cabe nos 80 min com FP e NF4, mas o avaliador lendo cada resposta pode custar mais que ela: a medida parcial do notebook (Qwen3Guard em float32, ~264 min por veredito) é só pista.</li>
-        <li class="warn"><b>Decisões com o orientador.</b> A redução v2 revê seis decisões (formatos FP e NF4, população menor, Teste 4 menor, CVM sem warm pool, parte secreta de uma fonte, três ataques), e a T-301 propõe a aprovação no agregado; junto com os pontos da E14 §17. A escolha do juiz de referência (gpt-oss-20b, T-1002) é proposta de 12/11 e também passa por ele.</li>
-        <li class="warn"><b>O sistema fecha no modo direto; o veredito de verdade depende da nuvem.</b> Do depósito do base ao recibo, o fluxo roda numa máquina comum (T-811), e o Juiz real já julga no notebook (T-807: abliterações reprovadas, com avaliador e prereg de fumaça). Para dado do artigo faltam a referência do pai e o avaliador medidos na nuvem (T-312, T-309), o prereg (T-606), a CVM de uso único numa CVM real (T-801: o código e a pilha local já criam, usam uma vez e destroem a CVM), a máquina e a nuvem (T-210, T-1603) e a parte secreta (T-304, orientador), que seguram a porta T-1611.</li>
+        <li class="bad"><b>O backlog parou em 14/11.</b> Desde então o trabalho foi revisão, auditoria, CI e os roteiros T1–T11 (todos passam no mini), mas nenhuma task foi marcada feita: as {sum(1 for x in T if x["status"] == "em andamento")} em andamento seguem abertas e o retrato subestima o que existe.</li>
+        <li class="warn"><b>Todo dado do artigo sai da nuvem, agora no GCP.</b> A proposta de 25/11 (D2, T-1612) é uma a3-highgpu-1g (H100 com TDX, só Spot), com o Juiz em float32 na GPU e a CPU de 4 vCPU como cronômetro da meta G1. O ensaio (T-1415, ~30 min) roda assim que a VM existir; a fase 1 espera a bateria final e a parte secreta (T-301, T-304), e a fase 2 a revisão do T2 e o prereg (T-606). As cotas são caras: nada de retrabalho lá.</li>
+        <li class="warn"><b>Os roteiros ainda diferem do combinado em três pontos.</b> Falta o F0 no T3 (recusas estendidas, T-909), o LoRA de disfarce no T6 (a LoRA de cura da T-1203) e os Llama do T4 e do T5 (Llama sob custódia, T-212, e população, T-913).</li>
+        <li class="warn"><b>O avaliador só será medido na nuvem (T-309).</b> Os roteiros usam o Qwen3Guard-Gen-4B; a medida parcial do notebook (~264 min por veredito em float32) é só pista, e o T1 cronometra o veredito inteiro na CPU de 4 vCPU.</li>
+        <li class="warn"><b>Decisões com o orientador.</b> A bateria da campanha (T-301, T-304), a GPU na campanha (T-1612), o modelo exato do juiz de referência (o configurado é o gpt-oss-20b) e o plano da população (planos.yaml), junto com as seis decisões da redução v2 e os pontos da E14 §17.</li>
+        <li class="warn"><b>O sistema fecha no modo direto; falta a porta T-1611.</b> Do depósito do base ao recibo, o fluxo roda numa máquina comum (T-811), revisado em 15/11 e com CI desde 16/11. Seguram a porta a admissão do base (T-816, caminho crítico), a CVM de uso único numa CVM real (T-801), a máquina e a nuvem (T-210, T-1603) e o prereg (T-606).</li>
         <li class="warn"><b>A camada do S2 está em aberto (T-414, 14/11).</b> Pela regra estrita de Arditi nenhuma camada passa no Qwen2.5-0.5B, e a camada 6 da T-402 não carrega a recusa: o S2 lido nela não vê o abliterado que tira a recusa. Decidir entre uma camada do meio e a faixa de Hurtado antes da T-1611.</li>
-        <li class="warn"><b>Recursos decididos em 12/11, com pendência.</b> Máquinas da campanha (T-1601), juiz de referência e família não vista (T-1602) e nuvem (T-1603: Azure e Oracle) estão decididos; faltam o crédito, o tipo de VM e a licença da Meta.</li>
       </ul>
     </div>
     <div class="pg-block">
@@ -224,7 +230,7 @@ src = open(SRC, encoding="utf-8").read()
 nl = src.index("\n"); assert src.startswith("<!doctype html>"); src = src[nl + 1:].rstrip()
 assert src.endswith("</body></html>"); src = src[:-len("</body></html>")].rstrip() + "\n"
 a = src.index('<style>\n/* ===== progresso ===== */'); se = src.index("</style>", a) + len("</style>")
-p0 = src.index('<div class="panel" id="p-progresso"'); p1 = src.index('<div class="panel" id="p-epicos"')
+p0 = src.index('<div class="panel" id="p-progresso"'); p1 = src.index('<div class="panel"', p0 + 1)  # até o painel seguinte (hoje, Testes)
 assert a < se <= p0 < p1
 css = src[a:se]
 src = src[:a] + css + "\n" + PANEL + src[p1:]

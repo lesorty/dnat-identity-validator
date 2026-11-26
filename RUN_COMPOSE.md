@@ -123,6 +123,20 @@ T5 controle de acesso):
 bash assets/tests/run_all_tests.sh
 ```
 
+### Cache de wheels do builder
+
+O cache compartilhado (`/var/dnat/wheel-cache`, volume `dnat_direct_wheels`) só recebe o que o operador põe;
+as wheels geradas no build de um usuário servem só a esse build (uma wheel plantada pelo `setup.py` de um
+usuário não entra no build de outro). Para pré-carregar, por exemplo, as dependências do LoRA da T-806:
+
+```bash
+docker exec dnat-builder pip download --only-binary=:all: -d /var/dnat/wheel-cache \
+  --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple \
+  torch==2.15.0+cpu transformers==5.22.1 peft==0.21.2 accelerate==1.15.0 safetensors==0.8.0
+```
+
+`DNAT_WHEEL_CACHE_INGEST=1` no builder religa a ingestão automática (só para desenvolvimento com um usuário).
+
 ### Rotas do operador
 
 `/api/revoke-asset`, `/api/update-asset` e `/api/executions[/:id]` só respondem com o token do operador

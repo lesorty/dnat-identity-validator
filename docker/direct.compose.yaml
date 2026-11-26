@@ -24,16 +24,20 @@ services:
       ASSET_ENCRYPTION_KEY: ${ASSET_ENCRYPTION_KEY:-dnat-dev-asset-key}
       DNAT_IDENTITY_DIFFICULTY: ${DNAT_IDENTITY_DIFFICULTY:-16}
       DNAT_UPLOAD_LIMIT: ${DNAT_UPLOAD_LIMIT:-4gb}
+    # Só a interface, e só no host local. O RPC (8545) e a API do IPFS (5001) ficam dentro da CVM1: o
+    # operador usa `docker exec dnat-client ...` (revisão de 15/11).
     ports:
-      - "3001:3001"
-      - "5001:5001"
-      - "8545:8545"
+      - "127.0.0.1:3001:3001"
     volumes:
       - dnat_direct_ipfs:/data/ipfs
       # Dados locais do model_gate (pacote da bateria, referências medidas, modelos), só leitura.
       - ${MODEL_GATE_DATA:-${HOME}/model_gate_data}:/data/model_gate_data:ro
+    # A CVM1 é a única nas duas redes: fala com o builder por dnat-build e com as CVMs de job por
+    # dnat-runtime. O builder (que roda o setup.py das dependências do usuário, como root e com saída para a
+    # internet) não alcança nenhuma CVM de job (revisão de 15/11).
     networks:
       - dnat-runtime
+      - dnat-build
     depends_on:
       - dnat-builder
       - dnat-executor
@@ -48,7 +52,7 @@ services:
     volumes:
       - dnat_direct_wheels:/var/dnat/wheel-cache
     networks:
-      - dnat-runtime
+      - dnat-build
     restart: unless-stopped
 
   dnat-executor:
@@ -73,3 +77,5 @@ volumes:
 networks:
   dnat-runtime:
     name: dnat-runtime
+  dnat-build:
+    name: dnat-build

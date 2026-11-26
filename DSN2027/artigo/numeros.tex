@@ -1,0 +1,45 @@
+% Gerado por tools/numeros.py (make numeros). NÃO EDITE À MÃO: rode de novo.
+% \local{...}: verificação local, não dado do artigo (regra de 12/11); sai em vermelho.
+\providecommand{\local}[1]{\textcolor{red}{#1\textsuperscript{local}}}
+\providecommand{\tbd}{\textcolor{red}{TBD}}
+
+% gás do recibo de um aprovado (T-709) · smart-contract/results/gas.json · local · commit ?
+\newcommand{\numGasReciboAprovado}{\local{494,028}}
+% gás do recibo de um reprovado (T-709) · smart-contract/results/gas.json · local · commit ?
+\newcommand{\numGasReciboReprovado}{\local{474,140}}
+% gás da revogação (T-709) · smart-contract/results/gas.json · local · commit ?
+\newcommand{\numGasRevogacao}{\local{56,288}}
+% hashes SHA-256 por segundo, 1 núcleo (T-1705) · smart-contract/results/identity_pow_cost.json · local · commit ?
+\newcommand{\numHashesPorSegundo}{\local{241,744}}
+% mediana da prova de trabalho com d = 20, em s (T-1705) · smart-contract/results/identity_pow_cost.json · local · commit ?
+\newcommand{\numProvaDvinteSegundos}{\local{7.7}}
+% menor d em que criar uma identidade custa 1 h de um núcleo (Teste 10) · smart-contract/results/T10_preco_identidade.json · local · commit ?
+\newcommand{\numIdentidadeDUmaHora}{\local{30}}
+% tempo de conferir uma prova, em µs (Teste 10) · smart-contract/results/T10_preco_identidade.json · local · commit ?
+\newcommand{\numIdentidadeConferirMicrossegundos}{\local{4.1}}
+% tentativas reprovadas que uma identidade consegue (Teste 11) · smart-contract/results/T11_atacante_sybil.json · local · commit ?
+\newcommand{\numAtacanteTentativasPorIdentidade}{\local{4}}
+% aprovações que uma identidade honesta consegue (Teste 11) · smart-contract/results/T11_atacante_sybil.json · local · commit ?
+\newcommand{\numHonestoAprovacoesPorIdentidade}{\local{16}}
+% custo de um escape ÷ custo de uma aprovação honesta, com e = 1% (Teste 11) · smart-contract/results/T11_atacante_sybil.json · local · commit ?
+\newcommand{\numRazaoEscapeHonestoUmPorCento}{\local{400}}
+% tokens/s em 4 vCPU, lote 1 (T-208) · model_gate/results/T-208_vazao.json · local · commit 05a27fd9f001, run t208_20261105T163912_f9420c
+\newcommand{\numVazaoLoteUm}{\local{19.8}}
+% tokens/s em 4 vCPU, lote 4 (T-208) · model_gate/results/T-208_vazao.json · local · commit 05a27fd9f001, run t208_20261105T163912_f9420c
+\newcommand{\numVazaoLoteQuatro}{\local{39.9}}
+% minutos do avaliador por veredito (T-309) · model_gate/results/T-309_avaliador.json · local · commit e2dea3a413c5, run t309_20261111T210938_977e70
+\newcommand{\numAvaliadorMinutosVeredito}{\local{264}}
+% segundos do avaliador por item (T-309) · model_gate/results/T-309_avaliador.json · local · commit e2dea3a413c5, run t309_20261111T210938_977e70
+\newcommand{\numAvaliadorSegundosItem}{\local{50.1}}
+% âncoras recusadas nas duas condições (T-301) · model_gate/results/T-301_ancoras.json · local · commit 3e3f8cbc4d22, run t301anc_20261111T094112_931630
+\newcommand{\numAncorasTotal}{\local{143}}
+% candidatos de direção avaliados (T-414) · model_gate/results/T-414_arditi.json · local · commit 76bda05218eb, run t414a_20261114T191332_101e66
+\newcommand{\numArditiCandidatos}{\local{95}}
+% candidatos que passam na regra de Arditi (T-414) · model_gate/results/T-414_arditi.json · local · commit 76bda05218eb, run t414a_20261114T191332_101e66
+\newcommand{\numArditiPassam}{\local{0}}
+% nocivos da validação que o base recusa (T-414) · model_gate/results/T-414_arditi.json · local · commit 76bda05218eb, run t414a_20261114T191332_101e66
+\newcommand{\numArditiNocivosRecusados}{\local{8 of 32}}
+% pico de RSS do treino LoRA na CVM de uso único, GB (T-806) · smart-contract/results/T-806_lora_uso_unico.json · local · commit ?
+\newcommand{\numTreinoPicoRssGB}{\local{6.3}}
+% segundos de treino LoRA, 10 passos (T-806) · smart-contract/results/T-806_lora_uso_unico.json · local · commit ?
+\newcommand{\numTreinoSegundos}{\local{163}}

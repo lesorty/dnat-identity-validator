@@ -193,6 +193,24 @@ check_cross "CVM1 IPFS (5001)" "curl -sSf --max-time 3 http://dnat-client:5001/a
 check_cross "CVM2 builder (5100)" "curl -sSf --max-time 3 http://dnat-builder:5100/health 2>&1 || true"
 check_cross "Hardhat RPC (8545)" "curl -sSf --max-time 3 -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"params\":[],\"id\":1}' http://dnat-client:8545 2>&1 || true"
 
+# Do builder (roda o setup.py das dependências do usuário, como root): não alcança a CVM de job nem os
+# serviços internos da CVM1 (revisão de 15/11: rede dnat-build separada, RPC só dentro da CVM1).
+check_from_builder() {
+    local label="$1" cmd="$2"
+    local out
+    out=$(docker exec dnat-builder sh -lc "$cmd" 2>&1 || true)
+    echo "builder -> $label: $out" >> "$T4_RESULTS"
+    if echo "$out" | grep -qiE "refused|unreachable|could not resolve|network|failed|timed out|curl.*(7|28|6)"; then
+        pass "T4: builder -> $label — bloqueado"
+    else
+        fail "T4: builder -> $label — ACESSÍVEL: $(echo "$out" | head -1)"
+    fi
+}
+check_from_builder "CVM de job, agente (5000)" "curl -sSf --max-time 3 http://dnat-executor:5000/health 2>&1 || true"
+check_from_builder "CVM de job, outra porta (6000)" "curl -sSf --max-time 3 http://dnat-executor:6000/ 2>&1 || true"
+check_from_builder "CVM1 Hardhat RPC (8545)" "curl -sSf --max-time 3 -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"method\":\"eth_accounts\",\"params\":[],\"id\":1}' http://dnat-client:8545 2>&1 || true"
+check_from_builder "CVM1 IPFS API (5001)" "curl -sSf --max-time 3 -X POST http://dnat-client:5001/api/v0/id 2>&1 || true"
+
 # Chave de criptografia
 KEY_LEAKED=$(docker exec dnat-executor sh -lc 'echo "${ASSET_ENCRYPTION_KEY:-__not_set__}"' 2>/dev/null || true)
 echo "ASSET_ENCRYPTION_KEY in CVM3: $KEY_LEAKED" >> "$T4_RESULTS"

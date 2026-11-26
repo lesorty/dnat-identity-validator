@@ -11,7 +11,7 @@ CPUS ?= 0-3
 .PHONY: help setup doctor check test test-contract test-judge test-identity e2e teste8 lora demo-cota t10 t11 \
         testes testes-verificar teste testes-status testes-pacote testes-executor \
         dev dev-tiny ui-check stack-up stack-seed stack-down stack-tests clean clean-executions board \
-        nuvem-enviar nuvem-preparar nuvem-bootstrap dados ficha congelar campanha-status campanha pacote importar
+        nuvem-enviar nuvem-preparar nuvem-bootstrap dados ficha congelar campanha-status campanha pacote importar numeros
 
 help: ## lista as rotinas
 	@awk 'BEGIN{FS=":.*## "} /^[a-z0-9-]+:.*## /{printf "  \033[1m%-17s\033[0m %s\n", $$1, $$2} /^## /{printf "\n%s\n", substr($$0,4)}' $(MAKEFILE_LIST)
@@ -138,6 +138,9 @@ clean: ## apaga temporários antigos, CVMs de job órfãs e processos de pilhas 
 
 clean-executions: ## apaga os arquivos em claro que execuções antigas guardaram (metadata e result ficam)
 	tools/clean.sh --executions
+
+numeros: ## gera DSN2027/artigo/numeros.tex: os números do artigo tirados dos resultados (nuvem congelada antes de local)
+	python3 -I tools/numeros.py
 
 board: ## regenera a fila (FILA.md, fila.json) e confere a ordem contra o backlog.json
 	python3 -I DSN2027/backlog/fila.py
