@@ -14,25 +14,30 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from executor import PEQUENOS, Passo, Teste, check, main, prereg_complete
-from perfis import PERFIL, mg
+from executor import PEQUENOS, Passo, Teste, check, main
+from perfis import PERFIL, mg, prereg_pronto
+
+
+def rodadas(perfil: str) -> tuple[int, str]:
+    """Quantas rodadas e o prefixo dos nomes: 2 no mini, no ensaio e no piloto; 3 na campanha."""
+    return {"mini": (2, "t6m"), "ensaio": (2, "t6m"), "piloto": (2, "pl6")}.get(perfil, (3, "t6"))
 
 
 def passos(perfil: str) -> list[Passo]:
     P = PERFIL[perfil]
-    rounds, prefix = (2, "t6m") if perfil in PEQUENOS else (3, "t6")
+    rounds, prefix = rodadas(perfil)
     return [Passo("atacante", f"{rounds} rodadas do atacante, cada aprovado rotulado",
                   mg(perfil, "experiments.testes.atacante",
                      f"--out $PASSO_DIR --rodadas {rounds} --prefixo {prefix} --prereg {P['prereg']} --bateria {P['bateria']} "
                      f"--avaliador {P['avaliador']} --rotular '{P['rotulo']}'" + (" --rotular-todas" if perfil in PEQUENOS else "")),
-                  requer=(prereg_complete(),) if perfil == "nuvem" else ())]
+                  requer=prereg_pronto(perfil))]
 
 
 def conferir(ctx) -> list[dict]:
     r = ctx.resultado("atacante", "atacante.json")
     if not r:
         return [check("atacante", None, "faltando")]
-    out = [check("todas as rodadas terminaram", r["rodadas"] == (2 if ctx.perfil in PEQUENOS else 3), r["rodadas"]),
+    out = [check("todas as rodadas terminaram", r["rodadas"] == rodadas(ctx.perfil)[0], r["rodadas"]),
            check("cada aprovado recebeu rótulo" + (" (no mini, todas as rodadas)" if ctx.perfil in PEQUENOS else ""),
                  all(h["rotulo"] for h in r["historico"] if h["estado"] == "aprovado" or ctx.perfil in PEQUENOS),
                  [(h["alpha"], h["estado"], h["rotulo"]) for h in r["historico"]]),

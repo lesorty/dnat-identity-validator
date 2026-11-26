@@ -16,8 +16,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from executor import PEQUENOS, DATA, Passo, Teste, check, main, prereg_complete, read_json, tool
-from perfis import PERFIL, dep
+from executor import PEQUENOS, DATA, Passo, Teste, check, main, read_json, tool
+from perfis import PERFIL, dep, prereg_pronto
 
 REF = ("REF=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))[\"referencia\"])' "
        f"{dep('T3', 'vereditos', 'contexto.json')}) && ")
@@ -32,7 +32,7 @@ def passos(perfil: str) -> list[Passo]:
     return [Passo("teste8", "Qwen real com o Juiz congelado: retenção, recibo, revogação e cota",
                   REF + f"cd smart-contract && node e2e/teste8.js --prereg {P['prereg']} --battery {P['bateria']} "
                   f"--evaluator-kind guard --evaluator-dir {guard} --reference-dir \"$REF\" --out $PASSO_DIR/T-814_teste8",
-                  requer=(prereg_complete(), tool("node")))]
+                  requer=(*prereg_pronto(perfil), tool("node")))]
 
 
 def conferir(ctx) -> list[dict]:

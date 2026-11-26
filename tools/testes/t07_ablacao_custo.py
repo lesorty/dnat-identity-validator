@@ -16,8 +16,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from executor import PEQUENOS, Passo, Teste, check, main, prereg_complete, tool
-from perfis import PERFIL, dep, mg
+from executor import PEQUENOS, Passo, Teste, check, main, tool
+from perfis import PERFIL, dep, mg, prereg_pronto
 
 REF = ("REF=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))[\"referencia\"])' "
        f"{dep('T3', 'vereditos', 'contexto.json')}) && ")
@@ -25,15 +25,15 @@ REF = ("REF=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))
 
 def passos(perfil: str) -> list[Passo]:
     P = PERFIL[perfil]
-    # mini: o abliterado público, que o mini reprova de forma estável; nuvem: o abliterado mais forte do T2
+    # mini: o abliterado público, que o mini reprova de forma estável; piloto e nuvem: o abliterado mais forte do T2
     der = ("$MODEL_GATE_DATA/field/huihui-ai__Qwen2.5-0.5B-Instruct-abliterated-v3/3dee99dac7c99318ed2b4e9932bfbbac060fb024"
-           if perfil in PEQUENOS else "t2-c-abl-d12-a100")
+           if perfil in PEQUENOS else "pl2-c-abl-d12-a100" if perfil == "piloto" else "t2-c-abl-d12-a100")
     ps = [
         Passo("forjada", "Referência forjada: A com custódia, B sem custódia, C troca sob custódia",
               REF + mg(perfil, "experiments.attack_forged_reference",
                        f"--derivative {der} --prereg {P['prereg']} --battery {P['bateria']} --avaliador {P['avaliador']} "
                        "--out $PASSO_DIR/T-1205_referencia_forjada --referencia-custodiada \"$REF\""),
-              requer=(prereg_complete(),) if perfil == "nuvem" else (),
+              requer=prereg_pronto(perfil),
               opcional=True),  # as três conferências do ataque viram o gabarito; uma divergência não impede a ablação
         Passo("ablacao", "Estados do T3 sem S2/S3 e sem S1",
               mg(perfil, "experiments.testes.analise",

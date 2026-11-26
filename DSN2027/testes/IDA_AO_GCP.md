@@ -1,6 +1,7 @@
 # Ida ao GCP: o que está pronto, o que falta e onde fica cada coisa
 
-Estado em 25/11/2026. Atualize este arquivo a cada mudança. Os comandos estão em
+Estado em 26/11/2026 (o piloto vem antes da campanha; o tamanho da campanha se decide com o orientador depois dele). Atualize este arquivo a cada mudança. Horas de GPU por teste e os três perfis
+(robusto, mediano, simples): `HORAS_GPU.md`. Os comandos estão em
 `tools/cloud/README.md` e o funcionamento dos roteiros em `tools/testes/README.md`.
 
 ## 1. Pode começar?
@@ -8,6 +9,7 @@ Estado em 25/11/2026. Atualize este arquivo a cada mudança. Os comandos estão 
 | Rodada | Pode rodar? | O que segura |
 |---|---|---|
 | **Ensaio** (`campanha_gpu.sh iniciar ensaio`, ~30 min, não é dado; **T-1415**) | **Sim**, assim que a VM existir (T-1603) | nada no código; o ensaio é justamente a conferência da GPU |
+| **Piloto** (`campanha_gpu.sh iniciar piloto`, ~3 h de GPU, não é dado; decidido em 26/11) | **Sim**, é a **primeira** rodada (o ensaio fica opcional) | nada: prereg e bateria próprios, sem congelamento nem revisão humana; o tamanho de cada teste está em `HORAS_GPU.md` §0 |
 | **Fase 1** (T1, T9, T10, T11, T2) | **Não** | bateria final e parte secreta (**T-304**): o T1 empacota a bateria da campanha, e o T2 depende do T1; congelar o commit (`make congelar`) antes de rodar |
 | **Fase 2** (T3, T5, T6, T7, T8, T11, T4) | Não | a fase 1, a revisão humana da proposta do T2, o `prereg.yaml` preenchido (T-606) e o commit congelado |
 
@@ -84,6 +86,8 @@ bucket. A VM precisa de escopo de escrita no Storage.
   - A cópia para o bucket.
 
 ## 5. Criar a VM
+
+**Antes da a3, o disco pronto:** prepare uma imagem numa VM barata (`preparar_testes.sh --disco --populacao piloto`), crie a a3 a partir dela e, na a3, rode só o `preparar_testes.sh --so-gpu`. Os comandos estão em `tools/cloud/README.md`, na seção "Disco pronto". A a3 fica ~5–15 min no preparo, em vez de ~1 h.
 
 - **Máquina:** `a3-highgpu-1g`, com Confidential VM (TDX) e GPU confidencial.
 - **Zona:** us-central1-a, us-east5-a ou europe-west4-c.

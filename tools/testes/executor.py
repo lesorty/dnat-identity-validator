@@ -46,7 +46,7 @@ from typing import Callable
 REPO = Path(__file__).resolve().parents[2]
 DATA = Path(os.environ.get("MODEL_GATE_DATA", Path.home() / "model_gate_data")).expanduser()
 ACOMP_DIR = REPO / "DSN2027" / "testes"
-PERFIS = ("mini", "ensaio", "nuvem")
+PERFIS = ("mini", "ensaio", "piloto", "nuvem")
 PEQUENOS = ("mini", "ensaio")   # tamanhos do mini; o ensaio roda na GPU da VM, antes da campanha
 HEARTBEAT_S = 30
 TAIL_LINES = 60
@@ -234,6 +234,8 @@ def campaign_key(perfil: str, h: dict, campanha: str | None = None) -> str:
         return campanha
     if perfil == "nuvem":
         return "tst"
+    if perfil == "piloto":   # nome fixo: uma correção de código no meio retoma, em vez de refazer o piloto
+        return "piloto"
     return ("ensaio_" if perfil == "ensaio" else "") + h["commit"][:12] + ("_sujo" if h["dirty"] else "")
 
 
@@ -721,11 +723,13 @@ def render_markdown(doc: dict) -> None:
 
     lines = ["# Acompanhamento dos testes T1 a T11", "",
              "Gerado por `tools/testes/executor.py` a cada execução; o histórico completo está em `historico.jsonl`.",
-             "`mini` é a verificação local pequena (não é dado do artigo); `nuvem` é a campanha. `*` = commit sujo.", "",
-             "| Teste | Perguntas | mini | nuvem |", "|---|---|---|---|"]
+             "`mini` é a verificação local pequena e `piloto` a primeira rodada reduzida na GPU (nenhum dos dois é dado "
+             "do artigo); `nuvem` é a campanha. `*` = commit sujo.", "",
+             "| Teste | Perguntas | mini | piloto | nuvem |", "|---|---|---|---|---|"]
     for tid, e in doc.items():
-        lines.append(f"| **{tid}** {e['nome']} | {e['perguntas']} | {cell(e.get('ultima', {}).get('mini'))} | "
-                     f"{cell(e.get('ultima', {}).get('nuvem'))} |")
+        u = e.get("ultima", {})
+        lines.append(f"| **{tid}** {e['nome']} | {e['perguntas']} | {cell(u.get('mini'))} | {cell(u.get('piloto'))} | "
+                     f"{cell(u.get('nuvem'))} |")
     lines += ["", "## Gabarito e última conferência", ""]
     for tid, e in doc.items():
         lines += [f"### {tid} · {e['nome']}", "", e["objetivo"], "", "**Gabarito:**", ""]

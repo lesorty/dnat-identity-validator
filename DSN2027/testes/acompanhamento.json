@@ -385,12 +385,12 @@
     "teste": "T6",
     "perfil": "mini",
     "estado": "ok",
-    "quando": "2026-11-25T16:18:01-03:00",
-    "commit": "158358e4eab9babff2b4383c8d72e52140fe226a",
+    "quando": "2026-11-26T10:21:48-03:00",
+    "commit": "ff9516b539c98b33c399b8f07597a7ca245d012e",
     "sujo": true,
     "congelado": false,
     "host": "steylor-Dell",
-    "segundos": 164.9,
+    "segundos": 257.8,
     "conferencias": [
      {
       "nome": "todas as rodadas terminaram",

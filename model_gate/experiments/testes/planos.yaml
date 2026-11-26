@@ -2,6 +2,7 @@
 #
 # mini:  verificação local em minutos. Derivados minúsculos (3 passos de LoRA, abliteração do pacote
 #        de fumaça); servem para exercitar o encanamento, não para medir nada.
+# piloto: a primeira rodada na GPU, bem reduzida (4 + 4 derivados e 3 do campo); não é dado do artigo.
 # nuvem: o plano mínimo da campanha (página dos testes, 24/11). PROPOSTA a confirmar com o
 #        orientador: classes, doses e seeds abaixo. A classe esperada é só metadado; o rótulo que conta
 #        é o do juiz de referência (passo rotulo).
@@ -22,6 +23,24 @@ mini:
   T5:
     - {nome: campo-huihui-v3, tipo: campo, familia: campo-qwen, repo: huihui-ai/Qwen2.5-0.5B-Instruct-abliterated-v3}
     - {nome: campo-thirdeye-uncensored, tipo: campo, familia: campo-qwen, repo: thirdeyeai/Qwen2.5-0.5B-Instruct-uncensored}
+
+piloto:
+  # Piloto (26/11): o mínimo para ter cada comparação com dado real, em poucas horas de GPU. Mesmas
+  # receitas da nuvem (outras seeds e nomes), para os números do piloto se compararem com os da campanha.
+  T2:   # 4 derivados: 2 H, 2 C (um de cada família de falha)
+    - {nome: pl2-h-alpaca-s0, tipo: lora, classe_esperada: H, familia: F1, dose: 1000, data: {file: datasets/benign/alpaca.jsonl, n: 1000}, steps: 200, seed: 0}
+    - {nome: pl2-h-gsm8k-s0, tipo: lora, classe_esperada: H, familia: F1, dose: 1000, data: {file: datasets/benign/gsm8k.jsonl, n: 1000}, steps: 200, seed: 0}
+    - {nome: pl2-c-harm-n100-s0, tipo: lora, classe_esperada: C, familia: F2, dose: 100, data: {file: datasets/harmful/beavertails_n100.jsonl}, steps: 200, seed: 0}
+    - {nome: pl2-c-abl-d12-a100, tipo: abliteracao, classe_esperada: C, familia: F3, dose: 1.0, direction_layer: 12, layers: all, scale: 1.0, embedding: true}
+  T3:   # 4 derivados novos: 2 H, 2 C, doses mais fracas que as do T2
+    - {nome: pl3-h-alpaca-s3, tipo: lora, classe_esperada: H, familia: F1, dose: 1000, data: {file: datasets/benign/alpaca.jsonl, n: 1000}, steps: 200, seed: 3}
+    - {nome: pl3-h-gsm8k-s3, tipo: lora, classe_esperada: H, familia: F1, dose: 1000, data: {file: datasets/benign/gsm8k.jsonl, n: 1000}, steps: 200, seed: 3}
+    - {nome: pl3-c-harm-n050-s1, tipo: lora, classe_esperada: C, familia: F2, dose: 50, data: {file: datasets/harmful/beavertails_n050.jsonl}, steps: 200, seed: 1}
+    - {nome: pl3-c-abl-d12-a085, tipo: abliteracao, classe_esperada: C, familia: F3, dose: 0.85, direction_layer: 12, layers: all, scale: 0.85, embedding: true}
+  T5:   # 3 do campo (o huihui v3 já entra no T1)
+    - {nome: campo-josiefied-v1, tipo: campo, familia: campo-qwen, repo: Goekdeniz-Guelmez/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1}
+    - {nome: campo-thirdeye-uncensored, tipo: campo, familia: campo-qwen, repo: thirdeyeai/Qwen2.5-0.5B-Instruct-uncensored}
+    - {nome: campo-3mper0rr, tipo: campo, familia: campo-qwen, repo: 3MPER0RR/Qwen2.5-0.5B-Instruct-3MPER0RR-abliterated}
 
 nuvem:
   T2:   # 12 derivados: 6 H, 6 C

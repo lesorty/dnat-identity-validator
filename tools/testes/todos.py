@@ -3,6 +3,7 @@
 
     python3 -I tools/testes/todos.py verificar --perfil nuvem [--fase 1|2]   pré-voo de todos, sem rodar nada
     python3 -I tools/testes/todos.py rodar --perfil mini                      os 11, na ordem (~30 min no notebook)
+    python3 -I tools/testes/todos.py rodar --perfil piloto                    os 11, reduzidos, na GPU (poucas horas)
     python3 -I tools/testes/todos.py rodar --perfil nuvem --fase 1            T1, T9, T10, T11, T2
     python3 -I tools/testes/todos.py rodar --perfil nuvem --fase 2            T3, T5, T6, T7, T8, T11 de novo, T4
     python3 -I tools/testes/todos.py status --perfil nuvem                    a situação de cada teste
@@ -49,7 +50,7 @@ REFAZER_NA_FASE2 = {"T11": ["t11"]}  # com o e medido pelo T6
 
 
 def order(perfil: str, fase: str) -> list[str]:
-    if perfil in ("mini", "ensaio"):
+    if perfil in ("mini", "ensaio", "piloto"):   # uma rodada só; o piloto não para para revisão humana
         return ORDEM[("mini", "todas")]
     if fase == "todas":
         return ORDEM[("nuvem", "1")] + [t for t in ORDEM[("nuvem", "2")] if t not in ORDEM[("nuvem", "1")]]
@@ -185,7 +186,7 @@ def pacote(a) -> int:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("acao", choices=("verificar", "rodar", "status", "pacote"))
-    ap.add_argument("--perfil", choices=("mini", "ensaio", "nuvem"), default=os.environ.get("PERFIL", "mini"))
+    ap.add_argument("--perfil", choices=("mini", "ensaio", "piloto", "nuvem"), default=os.environ.get("PERFIL", "mini"))
     ap.add_argument("--fase", choices=("1", "2", "todas"), default=os.environ.get("FASE", "todas"))
     ap.add_argument("--campanha", default=os.environ.get("TESTES_CAMPANHA"))
     ap.add_argument("--completo", action="store_true", help="pacote: com textos, referências e adaptadores (fora do git)")

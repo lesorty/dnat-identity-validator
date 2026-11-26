@@ -13,7 +13,9 @@ tools/cloud/enviar.sh usuario@vm             # código por git bundle (sem chave
 # na VM
 cd dnat-identity-validator
 tools/cloud/preparar_testes.sh --docker      # dados, campo, juiz de referência, driver, torch com CUDA, ficha, pré-voo
-tools/cloud/campanha_gpu.sh iniciar ensaio   # ~30 min: os 11 testes nos tamanhos do mini, na GPU
+#   (ou disco pronto: --disco numa VM barata, imagem, e --so-gpu na a3; ver "Disco pronto" abaixo)
+tools/cloud/campanha_gpu.sh iniciar piloto   # PRIMEIRO (26/11): os 11 reduzidos, ~3 h; DSN2027/testes/HORAS_GPU.md §0
+tools/cloud/campanha_gpu.sh iniciar ensaio   # opcional, ~30 min: os 11 testes nos tamanhos do mini, na GPU
 tools/cloud/campanha_gpu.sh iniciar nuvem 1  # depois do ensaio: fase 1 (T1, T9, T10, T11, T2)
 #   revisar a proposta do T2, preencher prereg.yaml, commit, make congelar; no notebook: enviar.sh de novo
 tools/cloud/campanha_gpu.sh iniciar nuvem 2  # fase 2 (T3, T5, T6, T7, T8, T11, T4)
@@ -42,6 +44,66 @@ tools/cloud/campanha_gpu.sh estado | log | parar
   `DSN2027/testes/IDA_AO_GCP.md`.
 - **O ensaio primeiro.** Ele não é dado do artigo: serve para ver, em meia hora, que tudo carrega e roda
   na GPU e quanto cada passo leva, antes das horas da campanha.
+
+### Disco pronto: o preparo numa VM barata (26/11)
+
+O preparo leva ~1 h, e quase tudo nele é download (~80 GB de modelos) e instalação, que não precisam de
+GPU. Esse trabalho vai para uma VM barata, que vira uma **imagem**. A a3 sobe dessa imagem e só faz o que
+precisa da placa (~5–15 min).
+
+**Não testei estes comandos do gcloud no projeto.** Confira as flags antes, principalmente as do TDX.
+
+```bash
+# 0. a imagem Ubuntu precisa ter TDX_CAPABLE (a mesma que a a3 usaria)
+gcloud compute images describe-from-family ubuntu-2404-lts-amd64 --project=ubuntu-os-cloud \
+  --format='value(guestOsFeatures)'
+
+# 1. VM barata (Spot), na zona onde a a3 vai rodar, com escrita no Storage
+gcloud compute instances create dnat-preparo --zone=ZONA --machine-type=n2-standard-8 \
+  --provisioning-model=SPOT --instance-termination-action=STOP \
+  --image-family=ubuntu-2404-lts-amd64 --image-project=ubuntu-os-cloud \
+  --boot-disk-size=200GB --boot-disk-type=pd-balanced --scopes=storage-rw
+tools/cloud/enviar.sh usuario@IP                                  # no notebook (código e os 2 arquivos locais)
+tools/cloud/preparar_testes.sh --disco --populacao piloto         # na VM barata (~1 h, mais o treino dos LoRA)
+
+# 2. a imagem (a VM barata pode ser apagada depois)
+gcloud compute instances stop dnat-preparo --zone=ZONA
+gcloud compute images create dnat-piloto --source-disk=dnat-preparo --source-disk-zone=ZONA
+gcloud compute images describe dnat-piloto --format='value(guestOsFeatures)'   # tem de listar TDX_CAPABLE
+gcloud compute instances delete dnat-preparo --zone=ZONA
+
+# 3. a a3, da imagem
+gcloud compute instances create dnat-a3 --zone=ZONA --machine-type=a3-highgpu-1g \
+  --confidential-compute-type=TDX --maintenance-policy=TERMINATE \
+  --provisioning-model=SPOT --instance-termination-action=STOP \
+  --image=dnat-piloto --boot-disk-size=200GB --scopes=storage-rw
+tools/cloud/preparar_testes.sh --so-gpu                           # na a3: driver, modo confidencial, teste curto
+DNAT_BUCKET=gs://<bucket>/<pasta> tools/cloud/campanha_gpu.sh iniciar piloto
+```
+
+O que a imagem leva e o que fica para a a3:
+
+| Etapa | Onde |
+|---|---|
+| ferramentas, ambientes, base, datasets, Qwen3Guard, gpt-oss-20b, campo, dados da população | VM barata (`--disco`) |
+| torch com CUDA e hashcat (instalar não precisa da placa) | VM barata |
+| derivados LoRA e abliterados do piloto, treinados na CPU (`--populacao piloto`); a a3 os reaproveita pela receita | VM barata |
+| driver da NVIDIA (`--com-driver` tenta na VM barata; o instalador pode recusar sem a placa) | a3, se não entrou na imagem (~10 min e um reinício) |
+| modo confidencial da placa, teste curto de determinismo, ficha e pré-voo | a3 (`--so-gpu`) |
+
+**Cuidados:**
+
+- **Na a3, use `--so-gpu`, nunca o `preparar_testes.sh` sem flags.** O completo roda o `make setup`, que
+  devolve o torch ao de CPU (`uv sync`), e aí o torch com CUDA (~3 GB) teria de ser baixado de novo.
+- **Mesmo usuário nas duas VMs.** Os dados ficam em `~/model_gate_data`. Se o SSH entrar com outro
+  usuário na a3, nada é encontrado e o `--so-gpu` avisa.
+- **Código depois da imagem:** rode o `enviar.sh` de novo para a a3; ele só atualiza o código. Se o
+  `uv.lock` mudou, a imagem precisa ser refeita.
+- **Imagem sem `TDX_CAPABLE`:** recrie-a com `--guest-os-features`, listando as mesmas marcas da imagem
+  Ubuntu de origem.
+- **Fichas:** as da VM barata vão para `preparo/fichas/`, fora do que sobe para o bucket. A ficha que vale é
+  a da a3, gravada pelo `--so-gpu` e pelo T1.
+- **Depois do piloto, guarde a imagem.** Ela custa centavos por mês e serve para a campanha.
 
 O caminho em CPU abaixo continua valendo (VM sem GPU: `preparar_testes.sh --sem-gpu`).
 
@@ -125,7 +187,7 @@ Destrua a VM (ou desaloque) assim que o pacote estiver no notebook: o custo corr
 | Arquivo | O que faz |
 |---|---|
 | `enviar.sh` | No notebook: código (git bundle) e os 2 arquivos locais para a VM |
-| `preparar_testes.sh` | Na VM: tudo o que os testes T1–T11 precisam, GPU inclusive, e o pré-voo |
+| `preparar_testes.sh` | Na VM: tudo o que os testes T1–T11 precisam, GPU inclusive, e o pré-voo; `--disco` numa VM barata e `--so-gpu` na a3 que sobe da imagem |
 | `campanha_gpu.sh` | Na VM: a rodada como serviço do systemd (sobrevive a SSH e preempção) |
 | `../../model_gate/gpu/torch-cuda.txt` | torch 2.15.0 com CUDA 13.2 e as bibliotecas da NVIDIA, com hashes |
 | `bootstrap.sh` | Prepara a VM (ferramentas fixas, ambientes, dados, ficha, doctor) |

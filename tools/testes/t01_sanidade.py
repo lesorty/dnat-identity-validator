@@ -36,10 +36,13 @@ def passos(perfil: str) -> list[Passo]:
                   mg_cpu("experiments.judge_bench", "--only qwen3guard"), produz=("model_gate/results/T-309_*",),
                   opcional=True,
                   requer=(exists("$MODEL_GATE_DATA/models/Qwen__Qwen3Guard-Gen-4B", "o Qwen3Guard (make dados ARGS=--judges)"),)),
-            Passo("bateria", "Pacote da bateria da campanha (composição final da T-301/T-304)",
-                  mg(perfil, "experiments.battery_pack", f"--out {P['bateria']}"),
-                  pendente="composição final da bateria e parte secreta (T-301, T-304); sem isso o pacote é o padrão"),
         ]
+    if perfil in ("piloto", "nuvem"):
+        # piloto: a bateria reduzida (96 nocivos, 16 por categoria) que o desenho do prereg_piloto pede
+        ps.append(Passo("bateria", f"Pacote da bateria do perfil {perfil}" + (" (composição final da T-301/T-304)" if perfil == "nuvem" else " (reduzida)"),
+                        mg(perfil, "experiments.battery_pack", f"--out {P['bateria']} {P.get('bateria_args', '')}".rstrip()),
+                        pendente=("composição final da bateria e parte secreta (T-301, T-304); sem isso o pacote é o padrão"
+                                  if perfil == "nuvem" else None)))
     ps.append(Passo(
         "vereditos", "Base contra ele mesmo duas vezes e um abliterado público, cronometrados",
         mg(perfil, "experiments.testes.veredito",
@@ -48,7 +51,9 @@ def passos(perfil: str) -> list[Passo]:
         requer=(exists(str(P["prereg_fase1"])), exists(f"$MODEL_GATE_DATA/field/{ABLITERADO_PUBLICO.replace('/', '__')}",
                                                          "o abliterado público (tools/cloud/preparar_testes.sh, ou: cd model_gate && uv run python -m experiments.field_download)"),
                 tool("uv"))))
-    if PERFIL[perfil].get("env", {}).get("MODEL_GATE_DISPOSITIVO") == "cuda":
+    # O piloto não roda o cronômetro em 4 vCPU: com a bateria inteira na CPU são horas com a GPU parada
+    # (DSN2027/testes/HORAS_GPU.md §4); a conferência CPU × GPU fica para a campanha, numa VM de CPU.
+    if PERFIL[perfil].get("env", {}).get("MODEL_GATE_DISPOSITIVO") == "cuda" and perfil != "piloto":
         # Na CPU de 4 vCPU, como combinado na página dos testes ("T1 fica em CPU"): é o cronômetro da meta G1
         # (veredito inteiro, com o avaliador, em até 80 min) e a conferência CPU × GPU da D2, com o pai medido
         # na CPU também. No ensaio, base e abliterado; na nuvem, só o abliterado (o pai na CPU já custa ~1 h).
@@ -95,8 +100,9 @@ def conferir(ctx) -> list[dict]:
         out.append(check("base repetido dá o mesmo veredito e as mesmas medidas",
                          (b1["estado"], b1.get("dano"), b1.get("sinais")) == (b2["estado"], b2.get("dano"), b2.get("sinais")),
                          [b1["estado"], b2["estado"]], "idênticos"))
-        want = "aprovado" if ctx.perfil == "nuvem" else "não reprovado"
-        ok = b1["estado"] == "aprovado" if ctx.perfil == "nuvem" else b1["estado"] != "reprovado"
+        cheio = ctx.perfil in ("piloto", "nuvem")   # bateria de verdade: o base contra ele mesmo tem de aprovar
+        want = "aprovado" if cheio else "não reprovado"
+        ok = b1["estado"] == "aprovado" if cheio else b1["estado"] != "reprovado"
         out.append(check("o base contra ele mesmo não é barrado", ok, b1["estado"], want))
     else:
         out.append(check("vereditos do base", None, "faltando"))

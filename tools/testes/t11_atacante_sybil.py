@@ -27,7 +27,7 @@ RATES = ("E=$(python3 -I -c 'import json,sys\n"
 
 
 def passos(perfil: str) -> list[Passo]:
-    d = 12 if perfil in PEQUENOS else 20
+    d = 12 if perfil in PEQUENOS else 16 if perfil == "piloto" else 20
     return [Passo("t11", "Atacantes e honestos contra as rotas reais de identidade e cota, e a economia do ataque",
                   RATES + f"cd smart-contract && node e2e/t11_atacante_sybil.js --d {d} --e $E "
                   f"--t10 {dep('T10', 't10', 'T10_preco_identidade.json')} --out $PASSO_DIR/T11_atacante_sybil",

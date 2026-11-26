@@ -25,13 +25,13 @@ PENDENTE = ("o Juiz só tem o Qwen2.5-0.5B custodiado: falta o base Llama-3.2-1B
 
 
 def passos(perfil: str) -> list[Passo]:
-    if perfil in PEQUENOS:
-        return [Passo("comparacao", "Encanamento da comparação entre famílias (T3 × T5 mini)",
+    if perfil in PEQUENOS or perfil == "piloto":   # piloto: sem o Llama, compara o campo (T5) com as injeções (T3)
+        return [Passo("comparacao", f"Encanamento da comparação entre famílias (T3 × T5 {perfil})",
                       mg(perfil, "experiments.testes.analise",
                          f"--out $PASSO_DIR --vereditos {dep('T5', 'vereditos', 'vereditos.json')} "
                          f"--rotulos {dep('T5', 'rotulo', 'rotulos.json')} "
                          f"--comparar {dep('T3', 'vereditos', 'vereditos.json')} {dep('T3', 'rotulo', 'rotulos.json')} "
-                         "--titulo 'Teste 4 (mini): comparação entre duas amostras'"))]
+                         f"--titulo 'Teste 4 ({perfil}): comparação entre duas amostras'"))]
     return [
         Passo("llama-baixar", "Baixa os Llama do campo e o base Llama-3.2-1B (licença da Meta aceita por uma pessoa)",
               mg(perfil, "experiments.field_download", "--familia llama-3.2-1b --aceito-licenca-meta"), pendente=PENDENTE),

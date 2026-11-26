@@ -25,7 +25,8 @@ HASHCAT = ("hashcat -b -m 1400 --quiet 2>&1 | tee $PASSO_DIR/hashcat.txt | pytho
 
 
 def passos(perfil: str) -> list[Passo]:
-    args = "--max 18 --reps 2" if perfil in PEQUENOS else "--max 27 --reps 3"
+    # piloto: d até 22 (segundos), o bastante para a lei do custo; a campanha vai até 27 com 3 repetições
+    args = "--max 18 --reps 2" if perfil in PEQUENOS else "--max 22 --reps 2" if perfil == "piloto" else "--max 27 --reps 3"
     ps = []
     if PERFIL[perfil].get("env", {}).get("MODEL_GATE_DISPOSITIVO") == "cuda":
         # Página dos testes: "se houver GPU, mede quantos SHA-256 por segundo ela faz" (a vantagem de quem ataca

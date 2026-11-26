@@ -14,15 +14,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from executor import Passo, Teste, check, main, prereg_complete
-from perfis import PERFIL, dep, mg
+from executor import Passo, Teste, check, main
+from perfis import PERFIL, dep, mg, prereg_pronto
 
 
 def passos(perfil: str) -> list[Passo]:
     P = PERFIL[perfil]
-    frozen = (prereg_complete(),) if perfil == "nuvem" else ()
+    frozen = prereg_pronto(perfil)
     ps = []
-    if perfil == "nuvem":
+    if perfil in ("piloto", "nuvem"):
         ps.append(Passo("campo-conferir", "Confere os derivados de campo em disco contra o manifesto (T-1103)",
                         mg(perfil, "experiments.field_download", "--check")))
     ps += [

@@ -10,13 +10,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from executor import Passo, Teste, check, main, prereg_complete
-from perfis import PERFIL, dep, mg
+from executor import Passo, Teste, check, main
+from perfis import PERFIL, dep, mg, prereg_pronto
 
 
 def passos(perfil: str) -> list[Passo]:
     P = PERFIL[perfil]
-    frozen = (prereg_complete(),) if perfil == "nuvem" else ()
+    frozen = prereg_pronto(perfil)
     return [
         Passo("populacao", "Derivados novos (outras seeds e doses) de cada classe",
               mg(perfil, "experiments.testes.populacao", f"--out $PASSO_DIR --perfil {perfil} --teste T3")),
@@ -52,12 +52,12 @@ def conferir(ctx) -> list[dict]:
         out.append(check("liberação silenciosa baixa (≤ 10%)", None if ls is None else ls <= 0.10, g["liberacao_silenciosa"], "≤ 0,10"))
         out.append(check("falso alarme perto do alvo (≤ 10% com 10 H)", None if fa is None else fa <= 0.10, g["falso_alarme"], "≤ 0,10"))
     else:
-        out.append(check("liberação silenciosa (mini, só registro)", True, g["liberacao_silenciosa"]))
+        out.append(check(f"liberação silenciosa ({ctx.perfil}, só registro)", True, g["liberacao_silenciosa"]))
     b = an.get("linha_de_base") or {}
     if b and not b.get("erro"):
         lb, j = b["liberacao_silenciosa"]["taxa"], b["juiz_nas_mesmas_linhas"]["liberacao_silenciosa"]["taxa"]
         ok = None if lb is None or j is None else (j <= lb if ctx.perfil == "nuvem" else True)
-        out.append(check("Juiz libera no máximo o que a linha de base de Hurtado libera" + ("" if ctx.perfil == "nuvem" else " (mini, só registro)"),
+        out.append(check("Juiz libera no máximo o que a linha de base de Hurtado libera" + ("" if ctx.perfil == "nuvem" else f" ({ctx.perfil}, só registro)"),
                          ok, {"juiz": j, "hurtado": lb, "falso_alarme_hurtado": b["falso_alarme"]["taxa"]}))
     else:
         out.append(check("linha de base de Hurtado", None, b.get("erro") or "faltando"))

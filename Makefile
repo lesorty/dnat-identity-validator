@@ -57,7 +57,7 @@ t10: ## Teste 10, o preço da identidade (d de 16 a 22 aqui; ARGS="--max 27 --re
 t11: ## Teste 11, o atacante com muitas identidades (usa o resultado do t10, se houver); ~10 s
 	cd $(SC) && node e2e/t11_atacante_sybil.js $(ARGS)
 
-## Testes T1 a T11 (tools/testes; PERFIL=mini no notebook, PERFIL=nuvem na VM com FASE=1 ou 2)
+## Testes T1 a T11 (tools/testes; PERFIL=mini no notebook; na VM: PERFIL=ensaio, PERFIL=piloto, PERFIL=nuvem com FASE=1 ou 2)
 PERFIL ?= mini
 FASE ?= todas
 testes-verificar: ## pré-voo de todos os testes, sem rodar nada (antes de ligar a VM cara)

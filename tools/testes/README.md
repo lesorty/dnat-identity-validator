@@ -9,8 +9,30 @@ executor (`executor.py`). Cada roteiro tem dois perfis:
 - **ensaio**: os tamanhos do mini, mas na VM com GPU e com os modelos de verdade (Qwen3Guard no portão,
   juiz de referência no rótulo), em paralelo. É a primeira rodada na VM (~30 min): mostra que tudo roda
   na GPU e quanto cada passo leva. **Não é dado do artigo.**
+- **piloto** (26/11): a primeira rodada com resultados, de uma vez e sem pausa, em ~3–4 h de GPU. Serve
+  para conferir a metodologia de ponta a ponta e ter números de comparação antes de decidir com o
+  orientador o tamanho da campanha. O tamanho de cada teste está na tabela abaixo. A pasta é fixa
+  (`testes/piloto/piloto/`), não exige commit congelado e **não é dado do artigo**.
 - **nuvem**: a campanha de verdade, na VM confidencial com GPU. Exige commit congelado
   (`--sem-congelamento` só para ensaio).
+
+**O piloto, teste a teste.** Prereg `model_gate/experiments/testes/prereg_piloto.yaml`: só fp, só a
+condição padrão, 24 âncoras e 8 seguros, resposta lida até 512 tokens. Bateria com 96 nocivos (16 por
+categoria).
+
+| Teste | No piloto |
+|---|---|
+| T1 | base 2× e huihui v3, na GPU; sem o cronômetro em 4 vCPU (que custaria horas com a GPU parada) |
+| T2 | 4 derivados (2 H, 2 C), rótulo com o gpt-oss-20b; a proposta de limiares segue mesmo com amostra pobre |
+| T3 | 4 derivados novos (2 H, 2 C), com os limiares que o T2 do piloto propôs, sem revisão humana |
+| T5 | 3 modelos do campo |
+| T4 | a comparação do campo (T5) com as injeções (T3), sem o Llama |
+| T6 | 2 rodadas do atacante |
+| T7 | os casos A, B e C da custódia e a ablação; sem overhead VM × CVM |
+| T8 | ponta a ponta com o Qwen real |
+| T9–T11 | completos, com d até 22 no T10 e d = 16 no T11 (minutos) |
+
+O que o piloto permite afirmar e quanto ele custa está em `DSN2027/testes/HORAS_GPU.md`.
 
 Na VM, o caminho é `tools/cloud/README.md` (enviar, preparar, `campanha_gpu.sh`).
 

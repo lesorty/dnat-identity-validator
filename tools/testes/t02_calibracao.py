@@ -21,7 +21,7 @@ from perfis import PERFIL, mg
 def passos(perfil: str) -> list[Passo]:
     P = PERFIL[perfil]
     ps = []
-    if perfil in ("nuvem", "ensaio"):   # o ensaio também usa o juiz de referência de verdade
+    if perfil in ("nuvem", "piloto", "ensaio"):   # o ensaio e o piloto também usam o juiz de referência de verdade
         ps.append(Passo("juiz-referencia", "Baixa e confere o juiz de referência pelo manifesto",
                         mg(perfil, "experiments.testes.juiz_referencia"),
                         requer=(disk(40), memory(56, "o gpt-oss-20b em bf16 na CPU ocupa ~42 GB"))))
@@ -40,7 +40,10 @@ def passos(perfil: str) -> list[Passo]:
         Passo("calibrar", "Proposta de δ, ρ_min e E1_max com falso alarme alvo de 5%",
               mg(perfil, "experiments.testes.calibrar",
                  f"--out $PASSO_DIR --vereditos $TESTE_DIR/passos/vereditos/vereditos.json "
-                 f"--rotulos $TESTE_DIR/passos/rotulo/rotulos.json --prereg-base {P['prereg_fase1']}")),
+                 f"--rotulos $TESTE_DIR/passos/rotulo/rotulos.json --prereg-base {P['prereg_fase1']}"),
+              # No piloto, com 2 H e 2 C, o rótulo pode deixar uma classe vazia: a proposta sai mesmo assim (com os
+              # limiares provisórios onde não houve medida, e o problema em calibracao.json) e o piloto segue até o fim.
+              opcional=perfil == "piloto"),
     ]
     return ps
 

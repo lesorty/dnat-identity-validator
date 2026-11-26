@@ -3,6 +3,7 @@
 # Spot é reiniciada depois de uma preempção (os roteiros retomam de onde pararam).
 #
 #   tools/cloud/campanha_gpu.sh iniciar ensaio       # T1–T11 nos tamanhos do mini, na GPU (~30 min)
+#   tools/cloud/campanha_gpu.sh iniciar piloto       # T1–T11 reduzidos, de uma vez (~3–4 h; DSN2027/testes/HORAS_GPU.md)
 #   tools/cloud/campanha_gpu.sh iniciar nuvem 1      # fase 1: T1, T9, T10, T11, T2
 #   tools/cloud/campanha_gpu.sh iniciar nuvem 2      # fase 2 (depois do congelamento): T3, T5, T6, T7, T8, T11, T4
 #   tools/cloud/campanha_gpu.sh estado               # serviço, passo atual, GPU e a tabela dos testes
@@ -46,7 +47,7 @@ rodar() {   # chamado pelo serviço
 
 case "${1:-}" in
   iniciar)
-    perfil=${2:?perfil: ensaio ou nuvem}; fase=${3:-todas}; shift $(( $# >= 3 ? 3 : 2 ))
+    perfil=${2:?perfil: ensaio, piloto ou nuvem}; fase=${3:-todas}; shift $(( $# >= 3 ? 3 : 2 ))
     [ "$perfil" = nuvem ] && [ "$fase" = todas ] && { echo "na nuvem, diga a fase: 1 ou 2" >&2; exit 2; }
     rm -f "$STATE/$perfil-$fase.feito"
     backup_env=""

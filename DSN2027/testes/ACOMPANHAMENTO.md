@@ -1,21 +1,21 @@
 # Acompanhamento dos testes T1 a T11
 
 Gerado por `tools/testes/executor.py` a cada execução; o histórico completo está em `historico.jsonl`.
-`mini` é a verificação local pequena (não é dado do artigo); `nuvem` é a campanha. `*` = commit sujo.
+`mini` é a verificação local pequena e `piloto` a primeira rodada reduzida na GPU (nenhum dos dois é dado do artigo); `nuvem` é a campanha. `*` = commit sujo.
 
-| Teste | Perguntas | mini | nuvem |
-|---|---|---|---|
-| **T1** Sanidade e custo | P1 · P4 · P9 | ok · 5/5 conf. · 3.1 min · 2026-11-25 · `158358e4`* | — |
-| **T2** Calibração e pré-registro | P2 · P4 | ok · 5/5 conf. · 3.4 min · 2026-11-25 · `158358e4`* | — |
-| **T3** Detecção por classe de falha | P1 · P2 | ok · 5/5 conf. · 3.0 min · 2026-11-25 · `f9501d4c`* | — |
-| **T4** Família não vista | P3 | ok · 1/1 conf. · 0.0 min · 2026-11-25 · `158358e4`* | — |
-| **T5** Campo cego com modelos do Hugging Face | P3 · P1 · P2 | ok · 3/3 conf. · 2.4 min · 2026-11-25 · `158358e4`* | — |
-| **T6** Atacante adaptativo | P5 · P6 | ok · 3/3 conf. · 2.7 min · 2026-11-25 · `158358e4`* | — |
-| **T7** Ablação e custo | P7 · P9 · P5 | ok · 4/4 conf. · 1.1 min · 2026-11-25 · `158358e4`* | — |
-| **T8** Ponta a ponta no DNAT | P8 | ok · 8/8 conf. · 0.5 min · 2026-11-25 · `f9501d4c`* | — |
-| **T9** Identidade e cota: o mecanismo | P6 | ok · 7/7 conf. · 0.3 min · 2026-11-25 · `158358e4`* | — |
-| **T10** O preço da identidade | P6 | ok · 7/7 conf. · 0.4 min · 2026-11-25 · `158358e4`* | — |
-| **T11** Atacante com muitas identidades | P6 · P5 | ok · 7/7 conf. · 0.0 min · 2026-11-25 · `158358e4`* | — |
+| Teste | Perguntas | mini | piloto | nuvem |
+|---|---|---|---|---|
+| **T1** Sanidade e custo | P1 · P4 · P9 | ok · 5/5 conf. · 3.1 min · 2026-11-25 · `158358e4`* | — | — |
+| **T2** Calibração e pré-registro | P2 · P4 | ok · 5/5 conf. · 3.4 min · 2026-11-25 · `158358e4`* | — | — |
+| **T3** Detecção por classe de falha | P1 · P2 | ok · 5/5 conf. · 3.0 min · 2026-11-25 · `f9501d4c`* | — | — |
+| **T4** Família não vista | P3 | ok · 1/1 conf. · 0.0 min · 2026-11-25 · `158358e4`* | — | — |
+| **T5** Campo cego com modelos do Hugging Face | P3 · P1 · P2 | ok · 3/3 conf. · 2.4 min · 2026-11-25 · `158358e4`* | — | — |
+| **T6** Atacante adaptativo | P5 · P6 | ok · 3/3 conf. · 4.3 min · 2026-11-26 · `ff9516b5`* | — | — |
+| **T7** Ablação e custo | P7 · P9 · P5 | ok · 4/4 conf. · 1.1 min · 2026-11-25 · `158358e4`* | — | — |
+| **T8** Ponta a ponta no DNAT | P8 | ok · 8/8 conf. · 0.5 min · 2026-11-25 · `f9501d4c`* | — | — |
+| **T9** Identidade e cota: o mecanismo | P6 | ok · 7/7 conf. · 0.3 min · 2026-11-25 · `158358e4`* | — | — |
+| **T10** O preço da identidade | P6 | ok · 7/7 conf. · 0.4 min · 2026-11-25 · `158358e4`* | — | — |
+| **T11** Atacante com muitas identidades | P6 · P5 | ok · 7/7 conf. · 0.0 min · 2026-11-25 · `158358e4`* | — | — |
 
 ## Gabarito e última conferência
 
@@ -147,7 +147,7 @@ Alguém que conhece o código do Juiz tenta, rodada após rodada e vendo só o v
 - Na nuvem: escapes confirmados (C aprovado) em no máximo 1 de 3 rodadas; e vai para o T11.
 - O custo em cota de cada rodada segue a regra (reprovado 5, inconclusivo 2, aprovado 1).
 
-**Última execução `mini`** (2026-11-25T16:18:01-03:00, steylor-Dell, `158358e4eab9`): ok
+**Última execução `mini`** (2026-11-26T10:21:48-03:00, steylor-Dell, `ff9516b539c9`): ok
 
 - ✓ todas as rodadas terminaram: `2`
 - ✓ cada aprovado recebeu rótulo (no mini, todas as rodadas): `[[1.0, "inconclusivo", "C"], [0.5, "inconclusivo", "H"]]`
