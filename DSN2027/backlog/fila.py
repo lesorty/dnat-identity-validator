@@ -28,11 +28,13 @@ HERE = Path(__file__).resolve().parent
 # (etapa, objetivo da etapa, [(task, executor, por que nesta posição / o que destrava)])
 ETAPAS = [
     ("E1", "Decisões pedidas pelas verificações locais de 14/11", [
+        ("T-816", "decisão", "Admissão do base (19/11): medição automática no depósito com estado inapto (E14 §3) ou depósito pelo operador (D8) com recusa mínima conferida; sem uma das duas, um abliterado depositado como base vira pai legítimo e a garantia relativa do Juiz fica vazia."),
         ("T-414", "decisão", "S2 sem direção válida: o procedimento fiel de Arditi (NeurIPS 2024) não acha direção de recusa no Qwen2.5-0.5B (0 de 95 candidatos) e a camada 6 não carrega a recusa; decidir o papel do S2 no veredito antes da T-1611."),
     ]),
     ("E2", "Desbloqueios humanos da porta T-1611", [
         ("T-1603", "humano", "Nuvem e crédito: sem isso nada da fase de testes roda; destrava T-210, T-309, T-315, T-801, T-812."),
         ("T-210", "humano", "VM de 4 vCPU: medida de custo válida e máquina do piloto; dependência da T-1611 e da T-309."),
+        ("T-1612", "humano", "GPU confidencial como bancada da campanha (D2, 25/11): o código já roda na GPU; decidir com o orientador antes da fase 1, porque muda onde cada número do artigo é medido."),
         ("T-304", "humano", "Origem da parte secreta (orientador): última decisão de construção da T-1611; destrava o bounty (T-1210)."),
         ("T-1103", "humano", "Qwen baixado e conferido (8/8, 14/11); falta aceitar a licença da Meta para os 13 do Llama (field_download --aceito-licenca-meta); destrava T-1105 e T-913."),
         ("T-1606", "humano", "Comitê de ética para a anotação; destrava a amostra de anotação (T-1005)."),
@@ -40,8 +42,12 @@ ETAPAS = [
         ("T-1604", "humano", "Natella pelo acesso institucional; destrava T-1108 e a seção 6 (T-1505)."),
     ]),
     ("E3", "Sistema na nuvem e congelamento", [
+        ("T-1415", "nuvem", "Ensaio dos roteiros T1–T11 na VM com GPU (perfil ensaio, ~30 min, não é dado): primeira coisa na VM; mostra que tudo roda na GPU e projeta o tempo da campanha antes de gastar horas."),
+        ("T-212", "agente", "Segundo base sob custódia (Llama-3.2-1B): depois da licença da Meta (T-1103); destrava o T4 (T-913) e os 13 Llama do campo."),
         ("T-801", "nuvem", "CVM de job de uso único: código e pilha local prontos (provedor docker, 14/11); falta o provedor command numa CVM real."),
         ("T-806", "nuvem", "LoRA numa CVM de uso único: verificado na pilha local (14/11, pico de 6,5 GB); falta numa CVM real."),
+        ("T-816", "agente", "Admissão do base no código: min_anchors no prereg, depósito recusado abaixo dele e registro de Model restrito; muda contrato e prereg, por isso antes do congelamento."),
+        ("T-115", "agente", "Operador na base de confiança (E14, E15): o depósito da referência é auditável pelo recibo, não impedido; insumo da seção 3 (T-1502)."),
         ("T-1611", "humano", "Congelar o código do Juiz e do fluxo: abre a fase de testes; daqui em diante mudar o Juiz obriga a recalibrar."),
         ("T-309", "nuvem", "Avaliador do portão medido na VM (Gemma 4 E4B × Qwen3Guard): fixa o avaliador da liberação."),
         ("T-315", "nuvem", "Avaliadores em bf16 na família da CVM: custo do avaliador, que decide se o veredito cabe em 80 min."),

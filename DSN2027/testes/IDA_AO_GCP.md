@@ -7,15 +7,15 @@ Estado em 25/11/2026. Atualize este arquivo a cada mudança. Os comandos estão 
 
 | Rodada | Pode rodar? | O que segura |
 |---|---|---|
-| **Ensaio** (`campanha_gpu.sh iniciar ensaio`, ~30 min, não é dado) | **Sim**, assim que a VM existir | nada no código; o ensaio é justamente a conferência da GPU |
-| **Fase 1** (T1, T9, T10, T11, T2) | **Não** | bateria final e parte secreta (T-301/T-304): o T1 empacota a bateria da campanha, e o T2 depende do T1; congelar o commit (`make congelar`) antes de rodar |
+| **Ensaio** (`campanha_gpu.sh iniciar ensaio`, ~30 min, não é dado; **T-1415**) | **Sim**, assim que a VM existir (T-1603) | nada no código; o ensaio é justamente a conferência da GPU |
+| **Fase 1** (T1, T9, T10, T11, T2) | **Não** | bateria final e parte secreta (**T-304**): o T1 empacota a bateria da campanha, e o T2 depende do T1; congelar o commit (`make congelar`) antes de rodar |
 | **Fase 2** (T3, T5, T6, T7, T8, T11, T4) | Não | a fase 1, a revisão humana da proposta do T2, o `prereg.yaml` preenchido (T-606) e o commit congelado |
 
 Decisões que são suas (sem elas a fase 1 não começa ou o resultado não vale):
 
 1. **Bateria da campanha** (T-301/T-304): composição e parte secreta. Rodar a fase 1 com a bateria
    padrão e trocá-la depois obriga a refazer a calibração.
-2. **GPU na campanha** (D2, 25/11, proposta): medir na GPU, com a CPU como cronômetro da meta G1 e
+2. **GPU na campanha** (D2, 25/11, proposta; **T-1612**): medir na GPU, com a CPU como cronômetro da meta G1 e
    como conferência no T1.
 3. **Avaliador do portão** (T-309): os roteiros usam o Qwen3Guard-Gen-4B.
 4. **Juiz de referência:** o tipo está decidido (aberto, dentro da CVM). O modelo exato está em aberto;
@@ -29,15 +29,19 @@ Decisões que são suas (sem elas a fase 1 não começa ou o resultado não vale
 |---|---|---|---|
 | T1 | base 2×, huihui v3, cronômetro em 4 vCPU (≤ 80 min) | base 2× e huihui na GPU; huihui na CPU de 4 vCPU (cronômetro G1 e conferência CPU × GPU) | — |
 | T2 | 12 derivados (6 H, 6 C), δ com ~5% de falso alarme, prereg commitado antes | igual; a proposta sai em `prereg_proposto.yaml` e uma pessoa congela | — |
-| T3 | 20 derivados, **F0**, F1, F2, F3, doses, linha de base de Hurtado | 20 derivados F1, F2, F3 com as doses; Hurtado na análise (z-soma, Youden no T2) | **falta F0** (endurecido): precisa do conjunto de recusas estendidas (Abu Shairah) |
-| T4 | os 13 Llama do T5 dão o primeiro sinal | pendente | **Llama sob custódia**, licença da Meta, referência e direção do Llama |
-| T5 | 21 do campo (8 Qwen + 13 Llama); dá para começar pelos 8 Qwen | os 8 Qwen; compara taxas e distribuição de S1, ρ e E1 com o T3 | os 13 Llama (mesmo bloqueio do T4) |
-| T6 | abliteração + **LoRA de disfarce**, 3 rodadas, só o veredito, custo em cota | 3 rodadas de abliteração com bisseção de α; rótulo nos aprovados; cota gasta | **falta o LoRA de disfarce** |
+| T3 | 20 derivados, **F0**, F1, F2, F3, doses, linha de base de Hurtado | 20 derivados F1, F2, F3 com as doses; Hurtado na análise (z-soma, Youden no T2) | **falta F0** (endurecido): precisa do conjunto de recusas estendidas (Abu Shairah); **T-909** |
+| T4 | os 13 Llama do T5 dão o primeiro sinal | pendente | **Llama sob custódia** (**T-212**), licença da Meta (T-1103), população (T-913) |
+| T5 | 21 do campo (8 Qwen + 13 Llama); dá para começar pelos 8 Qwen | os 8 Qwen; compara taxas e distribuição de S1, ρ e E1 com o T3 | os 13 Llama (mesmo bloqueio do T4: T-212) |
+| T6 | abliteração + **LoRA de disfarce**, 3 rodadas, só o veredito, custo em cota | 3 rodadas de abliteração com bisseção de α; rótulo nos aprovados; cota gasta | **falta o LoRA de disfarce** (é a LoRA de cura da **T-1203**) |
 | T7 | casos A, B, C; ablação S1/S2/S3; VM comum × CVM | igual; o overhead roda nesta VM e numa VM comum à parte | a VM comum é uma segunda VM |
 | T8 | reprovado retido, aprovado com recibo, auditor abre o registro, revogação de aprovado **e de base em cascata** | igual (a cascata entrou em 25/11, nos dois roteiros) | — |
 | T9 | casos fixos de identidade e cota | igual | — |
 | T10 | d de 16 a 27, 3 repetições, 1 núcleo e todos, **GPU se houver** | igual; a taxa de SHA-256 da GPU vem do hashcat (passo opcional) | — |
 | T11 | d = 20, e do T6, preço do T10 | igual; refeito na fase 2 com o e do T6 | — |
+
+Todas essas pendências estão no backlog e na fila (`DSN2027/backlog/FILA.md`): T-1612 e T-304 entre os
+desbloqueios humanos; T-1415 e T-212 na etapa do sistema na nuvem; T-909, T-913 e T-1203 nas etapas da
+população e dos testes.
 
 ## 3. O que fica salvo e onde
 

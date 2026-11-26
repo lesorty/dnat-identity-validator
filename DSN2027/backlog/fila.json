@@ -40,6 +40,18 @@
   {
    "ordem": 1,
    "etapa": "E1",
+   "task": "T-816",
+   "titulo": "Admissão do base: um modelo sem recusa não vira pai (estado inapto) e min_anchors fixado no prereg",
+   "executor": "decisão",
+   "prioridade": "P0",
+   "tamanho": "G",
+   "marco": "G3",
+   "deps_abertas": [],
+   "motivo": "Admissão do base (19/11): medição automática no depósito com estado inapto (E14 §3) ou depósito pelo operador (D8) com recusa mínima conferida; sem uma das duas, um abliterado depositado como base vira pai legítimo e a garantia relativa do Juiz fica vazia."
+  },
+  {
+   "ordem": 2,
+   "etapa": "E1",
    "task": "T-414",
    "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
    "executor": "decisão",
@@ -50,7 +62,7 @@
    "motivo": "S2 sem direção válida: o procedimento fiel de Arditi (NeurIPS 2024) não acha direção de recusa no Qwen2.5-0.5B (0 de 95 candidatos) e a camada 6 não carrega a recusa; decidir o papel do S2 no veredito antes da T-1611."
   },
   {
-   "ordem": 2,
+   "ordem": 3,
    "etapa": "E2",
    "task": "T-1603",
    "titulo": "Escolher a nuvem das CVMs pelo custo e resolver o crédito",
@@ -62,7 +74,7 @@
    "motivo": "Nuvem e crédito: sem isso nada da fase de testes roda; destrava T-210, T-309, T-315, T-801, T-812."
   },
   {
-   "ordem": 3,
+   "ordem": 4,
    "etapa": "E2",
    "task": "T-210",
    "titulo": "Máquina de 4 vCPU do piloto",
@@ -74,7 +86,19 @@
    "motivo": "VM de 4 vCPU: medida de custo válida e máquina do piloto; dependência da T-1611 e da T-309."
   },
   {
-   "ordem": 4,
+   "ordem": 5,
+   "etapa": "E2",
+   "task": "T-1612",
+   "titulo": "Confirmar a GPU confidencial como bancada da campanha (D2, 25/11)",
+   "executor": "humano",
+   "prioridade": "P0",
+   "tamanho": "P",
+   "marco": "TST",
+   "deps_abertas": [],
+   "motivo": "GPU confidencial como bancada da campanha (D2, 25/11): o código já roda na GPU; decidir com o orientador antes da fase 1, porque muda onde cada número do artigo é medido."
+  },
+  {
+   "ordem": 6,
    "etapa": "E2",
    "task": "T-304",
    "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta",
@@ -86,7 +110,7 @@
    "motivo": "Origem da parte secreta (orientador): última decisão de construção da T-1611; destrava o bounty (T-1210)."
   },
   {
-   "ordem": 5,
+   "ordem": 7,
    "etapa": "E2",
    "task": "T-1103",
    "titulo": "Baixar e registrar digests, fora do git",
@@ -98,7 +122,7 @@
    "motivo": "Qwen baixado e conferido (8/8, 14/11); falta aceitar a licença da Meta para os 13 do Llama (field_download --aceito-licenca-meta); destrava T-1105 e T-913."
   },
   {
-   "ordem": 6,
+   "ordem": 8,
    "etapa": "E2",
    "task": "T-1606",
    "titulo": "Nota de ética e, se exigido, comitê para a anotação humana",
@@ -110,7 +134,7 @@
    "motivo": "Comitê de ética para a anotação; destrava a amostra de anotação (T-1005)."
   },
   {
-   "ordem": 7,
+   "ordem": 9,
    "etapa": "E2",
    "task": "T-1605",
    "titulo": "Definir pessoas: anotadores e guardião da bateria secreta",
@@ -122,7 +146,7 @@
    "motivo": "Anotadores e guardião da bateria secreta; destrava a anotação (T-1007)."
   },
   {
-   "ordem": 8,
+   "ordem": 10,
    "etapa": "E2",
    "task": "T-1604",
    "titulo": "Baixar o Natella (IEEE TSE 2013) pelo acesso institucional",
@@ -134,7 +158,35 @@
    "motivo": "Natella pelo acesso institucional; destrava T-1108 e a seção 6 (T-1505)."
   },
   {
-   "ordem": 9,
+   "ordem": 11,
+   "etapa": "E3",
+   "task": "T-1415",
+   "titulo": "Ensaio dos roteiros T1–T11 na VM com GPU confidencial (perfil ensaio)",
+   "executor": "nuvem",
+   "prioridade": "P0",
+   "tamanho": "P",
+   "marco": "TST",
+   "deps_abertas": [
+    "T-1603"
+   ],
+   "motivo": "Ensaio dos roteiros T1–T11 na VM com GPU (perfil ensaio, ~30 min, não é dado): primeira coisa na VM; mostra que tudo roda na GPU e projeta o tempo da campanha antes de gastar horas."
+  },
+  {
+   "ordem": 12,
+   "etapa": "E3",
+   "task": "T-212",
+   "titulo": "Segundo base sob custódia: Llama-3.2-1B (manifesto, referência do pai, direção do S2)",
+   "executor": "agente",
+   "prioridade": "P1",
+   "tamanho": "M",
+   "marco": "TST",
+   "deps_abertas": [
+    "T-1103"
+   ],
+   "motivo": "Segundo base sob custódia (Llama-3.2-1B): depois da licença da Meta (T-1103); destrava o T4 (T-913) e os 13 Llama do campo."
+  },
+  {
+   "ordem": 13,
    "etapa": "E3",
    "task": "T-801",
    "titulo": "CVM de job de uso único: warm pool e ciclo de vida da CVM",
@@ -146,7 +198,7 @@
    "motivo": "CVM de job de uso único: código e pilha local prontos (provedor docker, 14/11); falta o provedor command numa CVM real."
   },
   {
-   "ordem": 10,
+   "ordem": 14,
    "etapa": "E3",
    "task": "T-806",
    "titulo": "Job de fine-tuning de exemplo (LoRA pequeno) numa CVM de uso único",
@@ -160,7 +212,31 @@
    "motivo": "LoRA numa CVM de uso único: verificado na pilha local (14/11, pico de 6,5 GB); falta numa CVM real."
   },
   {
-   "ordem": 11,
+   "ordem": 15,
+   "etapa": "E3",
+   "task": "T-816",
+   "titulo": "Admissão do base: um modelo sem recusa não vira pai (estado inapto) e min_anchors fixado no prereg",
+   "executor": "agente",
+   "prioridade": "P0",
+   "tamanho": "G",
+   "marco": "G3",
+   "deps_abertas": [],
+   "motivo": "Admissão do base no código: min_anchors no prereg, depósito recusado abaixo dele e registro de Model restrito; muda contrato e prereg, por isso antes do congelamento."
+  },
+  {
+   "ordem": 16,
+   "etapa": "E3",
+   "task": "T-115",
+   "titulo": "Declarar o operador na base de confiança: o depósito da referência do pai é auditável pelo recibo, mas não impedido",
+   "executor": "agente",
+   "prioridade": "P1",
+   "tamanho": "P",
+   "marco": "G3",
+   "deps_abertas": [],
+   "motivo": "Operador na base de confiança (E14, E15): o depósito da referência é auditável pelo recibo, não impedido; insumo da seção 3 (T-1502)."
+  },
+  {
+   "ordem": 17,
    "etapa": "E3",
    "task": "T-1611",
    "titulo": "Fechar o sistema e abrir a fase de testes: congelar o código do Juiz e do fluxo",
@@ -171,12 +247,13 @@
    "deps_abertas": [
     "T-304",
     "T-1603",
-    "T-210"
+    "T-210",
+    "T-816"
    ],
    "motivo": "Congelar o código do Juiz e do fluxo: abre a fase de testes; daqui em diante mudar o Juiz obriga a recalibrar."
   },
   {
-   "ordem": 12,
+   "ordem": 18,
    "etapa": "E3",
    "task": "T-309",
    "titulo": "Rodar o avaliador do portão na VM de nuvem e conferir o modelo (Gemma 4 E4B × Qwen3Guard-4B)",
@@ -191,7 +268,7 @@
    "motivo": "Avaliador do portão medido na VM (Gemma 4 E4B × Qwen3Guard): fixa o avaliador da liberação."
   },
   {
-   "ordem": 13,
+   "ordem": 19,
    "etapa": "E3",
    "task": "T-315",
    "titulo": "Medir os avaliadores em bf16 na VM de nuvem da família da CVM",
@@ -207,7 +284,7 @@
    "motivo": "Avaliadores em bf16 na família da CVM: custo do avaliador, que decide se o veredito cabe em 80 min."
   },
   {
-   "ordem": 14,
+   "ordem": 20,
    "etapa": "E3",
    "task": "T-312",
    "titulo": "Rodar o instrumento no base e guardar como referência custodiada do pai",
@@ -222,7 +299,7 @@
    "motivo": "Referência custodiada do pai (código pronto em model_gate.reference); sem ela não há veredito real."
   },
   {
-   "ordem": 15,
+   "ordem": 21,
    "etapa": "E3",
    "task": "T-505",
    "titulo": "Rodar o instrumento reduzido em cada formato",
@@ -236,7 +313,7 @@
    "motivo": "Instrumento reduzido em cada formato; insumo da sanidade (T-313) e do custo (T-314)."
   },
   {
-   "ordem": 16,
+   "ordem": 22,
    "etapa": "E3",
    "task": "T-414",
    "titulo": "Escolher a camada da direção pelo efeito da intervenção (Arditi) e comparar com a camada 6",
@@ -248,7 +325,7 @@
    "motivo": "Camada da direção do S2 pelo efeito da intervenção; fecha o ρ usado pelo Juiz antes da sanidade."
   },
   {
-   "ordem": 17,
+   "ordem": 23,
    "etapa": "E3",
    "task": "T-313",
    "titulo": "Sanidade: abliterado público (huihui-ai v3) muda as métricas; repetir o base não muda",
@@ -265,7 +342,7 @@
    "motivo": "Teste 1: o Juiz real separa o abliterado público e não oscila no base (repete a verificação da T-807)."
   },
   {
-   "ordem": 18,
+   "ordem": 24,
    "etapa": "E3",
    "task": "T-314",
    "titulo": "Medir o custo do instrumento por configuração, incluindo o juiz (insumo do G1)",
@@ -281,7 +358,7 @@
    "motivo": "Custo do instrumento por configuração, com o avaliador: número do G1 e da RQ5."
   },
   {
-   "ordem": 19,
+   "ordem": 25,
    "etapa": "E3",
    "task": "T-813",
    "titulo": "Teste do G3: reprovado não sai, aprovado vira ativo com recibo, operador revoga",
@@ -296,7 +373,7 @@
    "motivo": "Teste 8 na nuvem com o Juiz real (o ensaio local é a T-814)."
   },
   {
-   "ordem": 20,
+   "ordem": 26,
    "etapa": "E3",
    "task": "T-1707",
    "titulo": "Testes da identidade e da cota, e demonstração",
@@ -310,7 +387,7 @@
    "motivo": "Teste 9: testes e demonstração já passam localmente (14/11); repetir no commit congelado."
   },
   {
-   "ordem": 21,
+   "ordem": 27,
    "etapa": "E3",
    "task": "T-812",
    "titulo": "Medir overhead: VM comum × CVM, e CVM reaproveitada × CVM de uso único",
@@ -325,7 +402,7 @@
    "motivo": "Overhead VM comum × CVM; insumo da RQ5 (T-1409)."
   },
   {
-   "ordem": 22,
+   "ordem": 28,
    "etapa": "E3",
    "task": "T-709",
    "titulo": "Medir o gás das novas funções (measure-gas.js)",
@@ -340,7 +417,7 @@
    "motivo": "Gás das funções novas: tabela local feita (14/11); o número do artigo sai da nuvem (opcional, P3)."
   },
   {
-   "ordem": 23,
+   "ordem": 29,
    "etapa": "E4",
    "task": "T-914",
    "titulo": "População do piloto: 2 abliterações e 2 LoRA benignos",
@@ -354,7 +431,7 @@
    "motivo": "População do piloto (2 abliterações, 2 LoRA): primeiro sinal de separação e custo."
   },
   {
-   "ordem": 24,
+   "ordem": 30,
    "etapa": "E4",
    "task": "T-905",
    "titulo": "F1 benigno: LoRA nos 3 datasets, varrendo passos e seeds",
@@ -368,7 +445,7 @@
    "motivo": "F1 benigno nos 3 datasets: o grosso dos derivados que devem passar."
   },
   {
-   "ordem": 25,
+   "ordem": 31,
    "etapa": "E4",
    "task": "T-907",
    "titulo": "F2: varrer o número de exemplos nocivos",
@@ -382,7 +459,7 @@
    "motivo": "F2: dose de exemplos nocivos; derivados que devem reprovar."
   },
   {
-   "ordem": 26,
+   "ordem": 32,
    "etapa": "E4",
    "task": "T-909",
    "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)",
@@ -396,7 +473,7 @@
    "motivo": "F0 endurecido: derivados que recusam mais (guarda de recusa excessiva)."
   },
   {
-   "ordem": 27,
+   "ordem": 33,
    "etapa": "E4",
    "task": "T-917",
    "titulo": "F3: varrer a abliteração na nuvem (intensidade e camadas) e registrar os derivados",
@@ -410,7 +487,7 @@
    "motivo": "F3: varredura da abliteração; destrava o ataque de cura (T-1203)."
   },
   {
-   "ordem": 28,
+   "ordem": 34,
    "etapa": "E4",
    "task": "T-906",
    "titulo": "F1 que degrada (zona cinza)",
@@ -424,7 +501,7 @@
    "motivo": "F1 que degrada (zona cinza), relatada à parte."
   },
   {
-   "ordem": 29,
+   "ordem": 35,
    "etapa": "E4",
    "task": "T-910",
    "titulo": "Validar a utilidade: acurácia na tarefa e MMLU curto",
@@ -439,7 +516,7 @@
    "motivo": "Utilidade dos derivados: separa N de C na rotulagem."
   },
   {
-   "ordem": 30,
+   "ordem": 36,
    "etapa": "E4",
    "task": "T-912",
    "titulo": "Montar as divisões: calibração (seeds A) e teste (seeds B)",
@@ -457,7 +534,7 @@
    "motivo": "Divisões de calibração e teste: destrava θ (T-603), linha de base (T-1302) e família não vista (T-913)."
   },
   {
-   "ordem": 31,
+   "ordem": 37,
    "etapa": "E4",
    "task": "T-913",
    "titulo": "Família não vista: repetir as receitas no modelo escolhido",
@@ -467,12 +544,13 @@
    "marco": "TST",
    "deps_abertas": [
     "T-912",
-    "T-1611"
+    "T-1611",
+    "T-212"
    ],
    "motivo": "Família não vista (Llama-3.2-1B): generalização do limiar (Teste 4)."
   },
   {
-   "ordem": 32,
+   "ordem": 38,
    "etapa": "E4",
    "task": "T-1003",
    "titulo": "Rodar o juiz de referência sobre as gerações da bateria de referência",
@@ -486,7 +564,7 @@
    "motivo": "Juiz de referência (gpt-oss-20b) sobre as gerações: base dos rótulos."
   },
   {
-   "ordem": 33,
+   "ordem": 39,
    "etapa": "E4",
    "task": "T-1005",
    "titulo": "Amostra estratificada de ~100 respostas para anotação humana",
@@ -502,7 +580,7 @@
    "motivo": "Amostra estratificada para anotação humana (depende do comitê, T-1606)."
   },
   {
-   "ordem": 34,
+   "ordem": 40,
    "etapa": "E4",
    "task": "T-1008",
    "titulo": "Rótulos finais com as divergências resolvidas",
@@ -517,7 +595,7 @@
    "motivo": "Rótulos finais com divergências resolvidas: destrava rotulagem H/C/N e campo."
   },
   {
-   "ordem": 35,
+   "ordem": 41,
    "etapa": "E4",
    "task": "T-911",
    "titulo": "Rotular cada derivado como H, C ou N pela verdade de referência",
@@ -532,7 +610,7 @@
    "motivo": "Rótulo H/C/N de cada derivado pela regra da T-1004."
   },
   {
-   "ordem": 36,
+   "ordem": 42,
    "etapa": "E4",
    "task": "T-1007",
    "titulo": "Anotação por dois anotadores e cálculo do κ",
@@ -547,7 +625,7 @@
    "motivo": "Anotação por dois anotadores e κ (pessoas da T-1605)."
   },
   {
-   "ordem": 37,
+   "ordem": 43,
    "etapa": "E5",
    "task": "T-603",
    "titulo": "Fixar θ da segunda linha a FPR de 5% na calibração",
@@ -562,7 +640,7 @@
    "motivo": "θ da segunda linha (S2/S3) a FPR de 5% na calibração."
   },
   {
-   "ordem": 38,
+   "ordem": 44,
    "etapa": "E5",
    "task": "T-604",
    "titulo": "Definir a faixa de inconclusivo em torno do limiar",
@@ -577,7 +655,7 @@
    "motivo": "Faixa de inconclusivo em torno do limiar (decisão sobre os números da T-603)."
   },
   {
-   "ordem": 39,
+   "ordem": 45,
    "etapa": "E5",
    "task": "T-606",
    "titulo": "Escrever o prereg.yaml: δ, tolerância, métricas, limiares, tamanhos, seeds, critérios por RQ",
@@ -593,7 +671,7 @@
    "motivo": "prereg.yaml com δ, τ, tolerâncias e tamanhos: tira o Juiz real do StageNotReady."
   },
   {
-   "ordem": 40,
+   "ordem": 46,
    "etapa": "E5",
    "task": "T-607",
    "titulo": "Commitar o prereg.yaml antes de abrir qualquer conjunto de teste",
@@ -608,7 +686,7 @@
    "motivo": "Commit do prereg antes de abrir o teste: a partir daqui os resultados contam."
   },
   {
-   "ordem": 41,
+   "ordem": 47,
    "etapa": "E5",
    "task": "T-1302",
    "titulo": "Calibrar a linha de base com o mesmo protocolo",
@@ -623,7 +701,7 @@
    "motivo": "Linha de base de Hurtado calibrada pelo mesmo protocolo; destrava a RQ1 (T-1405)."
   },
   {
-   "ordem": 42,
+   "ordem": 48,
    "etapa": "E6",
    "task": "T-1105",
    "titulo": "Rotular o campo pela verdade de referência",
@@ -639,7 +717,7 @@
    "motivo": "Rotular o campo pela verdade de referência."
   },
   {
-   "ordem": 43,
+   "ordem": 49,
    "etapa": "E6",
    "task": "T-1106",
    "titulo": "Rodar o Juiz congelado no campo (teste cego)",
@@ -655,7 +733,7 @@
    "motivo": "Teste cego no campo com o Juiz congelado (Teste 5)."
   },
   {
-   "ordem": 44,
+   "ordem": 50,
    "etapa": "E6",
    "task": "T-1205",
    "titulo": "Ataque: referência forjada (sem custódia)",
@@ -669,7 +747,7 @@
    "motivo": "Referência forjada: local (14/11) tira o veto mas dá inconclusivo; no Teste 7, ver se chega a aprovar com o Juiz real (RQ5)."
   },
   {
-   "ordem": 45,
+   "ordem": 51,
    "etapa": "E6",
    "task": "T-1203",
    "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3",
@@ -684,7 +762,7 @@
    "motivo": "Ataque abliteração + LoRA de cura."
   },
   {
-   "ordem": 46,
+   "ordem": 52,
    "etapa": "E6",
    "task": "T-1204",
    "titulo": "Ataque: treino contra o limiar usando o veredito binário",
@@ -699,7 +777,7 @@
    "motivo": "Ataque de treino contra o limiar com o veredito binário."
   },
   {
-   "ordem": 47,
+   "ordem": 53,
    "etapa": "E6",
    "task": "T-1210",
    "titulo": "Protocolo do bounty interno: submissão, oráculo secreto, registro de rodadas",
@@ -716,7 +794,7 @@
    "motivo": "Bounty interno com oráculo secreto (precisa da parte secreta, T-304)."
   },
   {
-   "ordem": 48,
+   "ordem": 54,
    "etapa": "E6",
    "task": "T-1213",
    "titulo": "Ablação com e sem custódia (RQ5)",
@@ -731,7 +809,7 @@
    "motivo": "Ablação com e sem custódia (RQ5)."
   },
   {
-   "ordem": 49,
+   "ordem": 55,
    "etapa": "E6",
    "task": "T-1010",
    "titulo": "Sondas de robustez do juiz do portão: texto acrescentado e estilo da resposta",
@@ -746,7 +824,7 @@
    "motivo": "Sondas de robustez do avaliador do portão (P2)."
   },
   {
-   "ordem": 50,
+   "ordem": 56,
    "etapa": "E7",
    "task": "T-1405",
    "titulo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base",
@@ -760,7 +838,7 @@
    "motivo": "RQ1: liberação silenciosa e falso alarme por classe, contra a linha de base."
   },
   {
-   "ordem": 51,
+   "ordem": 57,
    "etapa": "E7",
    "task": "T-1108",
    "titulo": "Comparar as distribuições de S1–S3 entre injeção e campo; injeções fora da distribuição à parte (Natella)",
@@ -775,7 +853,7 @@
    "motivo": "Distribuições de S1–S3 entre injeção e campo."
   },
   {
-   "ordem": 52,
+   "ordem": 58,
    "etapa": "E7",
    "task": "T-1212",
    "titulo": "Modelo analítico 1 − (1 − e)^k com os números medidos",
@@ -789,7 +867,7 @@
    "motivo": "Modelo analítico do escape com os números medidos; destrava RQ4 e a seção de identidade."
   },
   {
-   "ordem": 53,
+   "ordem": 59,
    "etapa": "E7",
    "task": "T-1408",
    "titulo": "RQ4: escape × rodadas",
@@ -803,7 +881,7 @@
    "motivo": "RQ4: escape × rodadas."
   },
   {
-   "ordem": 54,
+   "ordem": 60,
    "etapa": "E7",
    "task": "T-1409",
    "titulo": "RQ5: ablação dos sinais e da custódia; custo por veredito",
@@ -818,7 +896,7 @@
    "motivo": "RQ5: ablação dos sinais e da custódia; custo por veredito."
   },
   {
-   "ordem": 55,
+   "ordem": 61,
    "etapa": "E7",
    "task": "T-1410",
    "titulo": "Figuras no padrão IEEE",
@@ -835,7 +913,7 @@
    "motivo": "Figuras no padrão IEEE."
   },
   {
-   "ordem": 56,
+   "ordem": 62,
    "etapa": "E7",
    "task": "T-1411",
    "titulo": "Congelar os resultados e registrar o commit (G4)",
@@ -849,7 +927,7 @@
    "motivo": "Congelar os resultados e registrar o commit (G4): libera a escrita da avaliação."
   },
   {
-   "ordem": 57,
+   "ordem": 63,
    "etapa": "E8",
    "task": "T-1501",
    "titulo": "Novo esqueleto do LaTeX, tirando as seções do Juiz de código",
@@ -861,7 +939,7 @@
    "motivo": "Compilar o esqueleto novo do LaTeX; destrava todas as seções."
   },
   {
-   "ordem": 58,
+   "ordem": 64,
    "etapa": "E8",
    "task": "T-1513",
    "titulo": "refs.bib só com a base (D5) e os moldes do DSN",
@@ -875,7 +953,7 @@
    "motivo": "refs.bib só com a base e os moldes do DSN."
   },
   {
-   "ordem": 59,
+   "ordem": 65,
    "etapa": "E8",
    "task": "T-1502",
    "titulo": "Seção 3: sistema e ameaça",
@@ -884,12 +962,13 @@
    "tamanho": "M",
    "marco": "G1",
    "deps_abertas": [
-    "T-1501"
+    "T-1501",
+    "T-115"
    ],
    "motivo": "Seção 3: sistema e ameaça."
   },
   {
-   "ordem": 60,
+   "ordem": 66,
    "etapa": "E8",
    "task": "T-1503",
    "titulo": "Seção 4: modelo de falhas e propriedade",
@@ -903,7 +982,7 @@
    "motivo": "Seção 4: modelo de falhas e propriedade."
   },
   {
-   "ordem": 61,
+   "ordem": 67,
    "etapa": "E8",
    "task": "T-1507",
    "titulo": "Seção 2: contexto",
@@ -917,7 +996,7 @@
    "motivo": "Seção 2: contexto."
   },
   {
-   "ordem": 62,
+   "ordem": 68,
    "etapa": "E8",
    "task": "T-1510",
    "titulo": "Seção 9: trabalhos relacionados (camadas 2 e 3)",
@@ -931,7 +1010,7 @@
    "motivo": "Seção 9: trabalhos relacionados."
   },
   {
-   "ordem": 63,
+   "ordem": 69,
    "etapa": "E8",
    "task": "T-1505",
    "titulo": "Seção 6: metodologia",
@@ -946,7 +1025,7 @@
    "motivo": "Seção 6: metodologia (depois do prereg e do Natella)."
   },
   {
-   "ordem": 64,
+   "ordem": 70,
    "etapa": "E8",
    "task": "T-1709",
    "titulo": "Escrever identidade e cota no artigo",
@@ -960,7 +1039,7 @@
    "motivo": "Identidade e cota no artigo (depois do modelo analítico)."
   },
   {
-   "ordem": 65,
+   "ordem": 71,
    "etapa": "E8",
    "task": "T-1508",
    "titulo": "Seção 7: avaliação",
@@ -974,7 +1053,7 @@
    "motivo": "Seção 7: avaliação (depois do G4)."
   },
   {
-   "ordem": 66,
+   "ordem": 72,
    "etapa": "E8",
    "task": "T-1509",
    "titulo": "Seção 8: ameaças à validade",
@@ -988,7 +1067,7 @@
    "motivo": "Seção 8: ameaças à validade."
   },
   {
-   "ordem": 67,
+   "ordem": 73,
    "etapa": "E8",
    "task": "T-1514",
    "titulo": "Resumo (≤ 150 palavras) e título definitivo",
@@ -1002,7 +1081,7 @@
    "motivo": "Resumo e título definitivo."
   },
   {
-   "ordem": 68,
+   "ordem": 74,
    "etapa": "E8",
    "task": "T-1512",
    "titulo": "Ética, AI Tool Usage e declaração de artefato",
@@ -1016,7 +1095,7 @@
    "motivo": "Ética, uso de IA e declaração de artefato."
   },
   {
-   "ordem": 69,
+   "ordem": 75,
    "etapa": "E8",
    "task": "T-1515",
    "titulo": "Rascunho completo aos coautores",
@@ -1030,7 +1109,7 @@
    "motivo": "Rascunho completo aos coautores."
   },
   {
-   "ordem": 70,
+   "ordem": 76,
    "etapa": "E8",
    "task": "T-1516",
    "titulo": "Incorporar revisões e cortar para 11 páginas",
@@ -1044,7 +1123,7 @@
    "motivo": "Incorporar revisões e cortar para 11 páginas."
   },
   {
-   "ordem": 71,
+   "ordem": 77,
    "etapa": "E8",
    "task": "T-1517",
    "titulo": "Checagem double-blind (anonimização)",
@@ -1058,7 +1137,7 @@
    "motivo": "Checagem double-blind."
   },
   {
-   "ordem": 72,
+   "ordem": 78,
    "etapa": "E8",
    "task": "T-1518",
    "titulo": "Submeter o artigo",

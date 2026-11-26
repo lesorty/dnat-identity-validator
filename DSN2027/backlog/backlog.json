@@ -658,7 +658,7 @@
     "T-303",
     "T-109"
    ],
-   "descricao": "Ponto em aberto (T-302, 11/11): o acervo público é o StrongREJECT inteiro, então a parte secreta não pode sair dele \"fora da lista publicada\": não sobra item fora, e um pedido de benchmark público não é segredo para quem treina com ele. Saídas: o guardião escreve ~54 pedidos (9 por categoria); gerar por LLM e filtrar; ou tirar uma fatia do acervo público aceitando que é pública. Decidir com o orientador (README da bateria, §6).\n\nRedução v2 (11/11): Parte secreta de uma fonte só: amostra do StrongREJECT fora da lista publicada, com o compromisso por hash. Escrever do zero e gerar por LLM vira trabalho futuro.\n\nPor quê: o R7 exige uma parte secreta, e o bounty interno (§3.6) só é válido se o atacante não a vê; o compromisso por hash prova depois que ela não mudou.\nComo:\n- Separar os IDs selecionados em pública e secreta na proporção do T-301, com seed fixa\n- Calcular o hash (SHA-256 da lista canônica mais um sal) da parte secreta\n- Entregar a parte secreta ao guardião (T-1202) conforme a política do T-109 e apagá-la da máquina de quem ataca\nSaída: lista pública versionada e hash da secreta registrado no repositório.",
+   "descricao": "Roteiros (25/11): a fase 1 da campanha (T1, depois T2) espera esta decisão: o passo bateria do T1 empacota a bateria da campanha, e trocá-la depois do T2 obrigaria a refazer a calibração.\n\nPonto em aberto (T-302, 11/11): o acervo público é o StrongREJECT inteiro, então a parte secreta não pode sair dele \"fora da lista publicada\": não sobra item fora, e um pedido de benchmark público não é segredo para quem treina com ele. Saídas: o guardião escreve ~54 pedidos (9 por categoria); gerar por LLM e filtrar; ou tirar uma fatia do acervo público aceitando que é pública. Decidir com o orientador (README da bateria, §6).\n\nRedução v2 (11/11): Parte secreta de uma fonte só: amostra do StrongREJECT fora da lista publicada, com o compromisso por hash. Escrever do zero e gerar por LLM vira trabalho futuro.\n\nPor quê: o R7 exige uma parte secreta, e o bounty interno (§3.6) só é válido se o atacante não a vê; o compromisso por hash prova depois que ela não mudou.\nComo:\n- Separar os IDs selecionados em pública e secreta na proporção do T-301, com seed fixa\n- Calcular o hash (SHA-256 da lista canônica mais um sal) da parte secreta\n- Entregar a parte secreta ao guardião (T-1202) conforme a política do T-109 e apagá-la da máquina de quem ataca\nSaída: lista pública versionada e hash da secreta registrado no repositório.",
    "epico": "J3",
    "id": "T-304",
    "marco": "G2",
@@ -667,7 +667,7 @@
    "status": "backlog",
    "tamanho": "P",
    "titulo": "Separar a parte pública da secreta e gerar o compromisso por hash da secreta",
-   "atualizado": "2026-11-11T20:00:00.000Z"
+   "atualizado": "2026-11-25T23:30:00.000Z"
   },
   {
    "deps": [
@@ -1850,7 +1850,7 @@
     "T-901",
     "T-1611"
    ],
-   "descricao": "Nuvem (12/11): gera a população F0, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.\n\nPor quê: F0 endurecido é o controle negativo de S3: muda muito os pesos sem perder recusa (Hurtado App. B), e viola a recusa excessiva.\nComo:\n- Montar dados de recusas estendidas (Abu Shairah) e treinar com o T-901\n- Varrer passos e seeds A e B\n- Confirmar que a recusa se mantém e medir a recusa excessiva no XSTest, que deve subir\nSaída: derivados F0 com digest.",
+   "descricao": "Roteiros (25/11): o T3 combinado na página dos testes inclui F0, e o plano do T3 (model_gate/experiments/testes/planos.yaml) ainda não tem F0. Falta o conjunto de recusas estendidas; com ele, entrar com 2 a 4 derivados F0 no plano do T3 (tipo lora, classe_esperada H) e conferir no gabarito que a recusa excessiva sobe sem virar C.\n\nNuvem (12/11): gera a população F0, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G2.\n\nRedução v2 (11/11): F0 endurecido volta com poucos derivados: é o controle negativo de S3 e o caso de recusa excessiva que leva a inconclusivo.\n\nPor quê: F0 endurecido é o controle negativo de S3: muda muito os pesos sem perder recusa (Hurtado App. B), e viola a recusa excessiva.\nComo:\n- Montar dados de recusas estendidas (Abu Shairah) e treinar com o T-901\n- Varrer passos e seeds A e B\n- Confirmar que a recusa se mantém e medir a recusa excessiva no XSTest, que deve subir\nSaída: derivados F0 com digest.",
    "epico": "J9",
    "id": "T-909",
    "marco": "TST",
@@ -1859,7 +1859,7 @@
    "status": "backlog",
    "tamanho": "P",
    "titulo": "F0 endurecido: LoRA com recusas estendidas (Abu Shairah)",
-   "atualizado": "2026-11-12T18:54:30.000Z"
+   "atualizado": "2026-11-25T23:30:00.000Z"
   },
   {
    "deps": [
@@ -1917,9 +1917,10 @@
    "deps": [
     "T-1602",
     "T-912",
-    "T-1611"
+    "T-1611",
+    "T-212"
    ],
-   "descricao": "Nuvem (12/11): gera a população da família não vista, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nRedução v2 (11/11): Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.\n\nPor quê: a família não vista mostra que o limiar generaliza fora do modelo calibrado (R14).\nComo:\n- Repetir F0–F3 no modelo escolhido no T-1602 (ex.: Llama-3.2-1B), com a mesma receita\n- Meta: 60 H e 30 C, todos só no teste (nunca na calibração)\n- Registrar digest e receita no inventário\nSaída: população da segunda família com digest.",
+   "descricao": "Roteiros (25/11): o roteiro do T4 está pendente até haver o segundo base sob custódia (T-212).\n\nNuvem (12/11): gera a população da família não vista, e todo dado apresentado no artigo sai de execução em nuvem. Roda nas VMs da nuvem, na fase de testes, depois do fechamento do sistema (T-1611). Antes: marco G4.\n\nRedução v2 (11/11): Teste 4 volta, menor: ~35 derivados (20 H, 15 C) da família não vista, só F1 e F3, com as mesmas receitas e sem recalibrar.\n\nPor quê: a família não vista mostra que o limiar generaliza fora do modelo calibrado (R14).\nComo:\n- Repetir F0–F3 no modelo escolhido no T-1602 (ex.: Llama-3.2-1B), com a mesma receita\n- Meta: 60 H e 30 C, todos só no teste (nunca na calibração)\n- Registrar digest e receita no inventário\nSaída: população da segunda família com digest.",
    "epico": "J9",
    "id": "T-913",
    "marco": "TST",
@@ -1929,7 +1930,7 @@
    "tamanho": "G",
    "titulo": "Família não vista: repetir as receitas no modelo escolhido",
    "teste": "TS4",
-   "atualizado": "2026-11-12T18:54:30.000Z"
+   "atualizado": "2026-11-25T23:30:00.000Z"
   },
   {
    "deps": [
@@ -2311,7 +2312,7 @@
     "T-608",
     "T-1611"
    ],
-   "descricao": "Muda (12/11): parte dos derivados F3 gerados na nuvem (T-917), não do script.\n\nFase de testes (12/11): Teste 6 (ataque). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
+   "descricao": "Roteiros (25/11): é o \"LoRA de disfarce\" do T6 na página dos testes. Hoje o roteiro do T6 (model_gate/experiments/testes/atacante.py) só faz a bisseção da força da abliteração; com esta receita, cada rodada abliteriza e depois treina a LoRA de cura antes de submeter.\n\nMuda (12/11): parte dos derivados F3 gerados na nuvem (T-917), não do script.\n\nFase de testes (12/11): Teste 6 (ataque). Passa do marco G3 para o TST: roda depois do fechamento do sistema (T-1611), com o sistema pronto, e não durante a construção.\n\nRedução v2 (11/11): Ataque mínimo: abliteração + LoRA de cura. Reaproveita a abliteração (T-908) e uma LoRA curta de cura.\n\nPor quê: Ataque mínimo da E13 §3.6 (Hurtado §5): o adversário abliteria e depois treina uma LoRA de 'cura' para trazer S2/S3 de volta à faixa do base.\nComo:\n- Partir de derivados F3 do T-908\n- Treinar LoRA com perda que aproxima o gap de recusa e a energia rank-1 dos valores do pai, sem restaurar a recusa\n- Medir S1–S3 e a recusa na bateria de referência para confirmar que o derivado segue comprometido\nSaída: receita versionada e derivados com digest no inventário da população, marcados como F4.",
    "epico": "J12",
    "id": "T-1203",
    "marco": "TST",
@@ -2321,7 +2322,7 @@
    "tamanho": "M",
    "titulo": "Ataque: abliteração + LoRA de cura que restaura S2/S3",
    "teste": "TS6",
-   "atualizado": "2026-11-12T18:54:30.000Z"
+   "atualizado": "2026-11-25T23:30:00.000Z"
   },
   {
    "deps": [
@@ -2815,7 +2816,8 @@
   {
    "deps": [
     "T-105",
-    "T-1501"
+    "T-1501",
+    "T-115"
    ],
    "descricao": "Redução v2 (11/11): Escrita do artigo. Seção 3 a partir da E14 §2–§3 e da E10, que já existem.\n\nPor quê: A seção 3 fixa sistema, custódia, adversário e componentes confiáveis (E10 §5; E8 §9.2), base de A3.\nComo:\n- Descrever a CVM, o fluxo do T-101 e as fronteiras de confiança do T-105\n- Descrever o adversário (usuário com os pesos dentro da CVM)\n- Manter cerca de 1 página\nSaída: artigo/sections com a seção 3 em rascunho completo.",
    "epico": "J15",
@@ -3384,7 +3386,8 @@
     "T-1705",
     "T-304",
     "T-1603",
-    "T-210"
+    "T-210",
+    "T-816"
    ],
    "objetivoMaior": "O4",
    "ordem": 1611,
@@ -3463,6 +3466,86 @@
    "pronto": "docker compose sobe a pilha e run_all_tests.sh e t5_access_control.sh passam",
    "descricao": "Feito em 13/11 (docker/direct.compose.yaml, vm_runtime/Dockerfile.direct e start-direct.sh, build_vm_runtime/Dockerfile.direct, Juiz na imagem da CVM1; RUN_COMPOSE.md). As três CVMs como containers no modo direto, sem KVM: a CVM de job tem rede entra-só (iptables, sem DNS) e roda o agente sem privilégio; a CVM1 tem o model_gate com uv e o mesmo hash do Juiz do host. Testes de segurança na arquitetura atual (assets/tests/run_all_tests.sh): T1 pela métrica da aplicação (o stdout não volta desde a T-804), T3 com a limpeza do modo direto, T4 como o usuário do job; 10/10. Achados e corrigidos: o DNS do Docker era túnel de exfiltração; o /tmp/exec e as pastas de execução da CVM1 guardavam dataset, base e bundle em claro. t5_access_control.sh segue avulso (pede os CIDs); o mesmo T5 passa no run_all_tests.\n\nCriada em 13/11. Por quê: a implantação nas CVMs usa as imagens Docker, que não foram montadas desde a assinatura de pedidos, a cota e o Juiz; os scripts de assets/tests passaram a assinar pelo CLI (T-1703, T-1705) sem rodar.\nComo:\n- Montar as três imagens com executor e builder em modo direto (sem KVM).\n- Pôr o model_gate e o uv na imagem da CVM1 (ambiente da T-202), para o Juiz rodar dentro dela.\n- Rodar run_all_tests.sh e t5_access_control.sh e corrigir o que quebrar; atualizar o RUN_COMPOSE.md.\nSaída: pilha que sobe com docker compose e scripts verdes. Prepara a T-801 (imagem da CVM de job), a T-1707 e a T-1611; retoma em parte a T-209 (cortada).",
    "atualizado": "2026-11-13T21:00:00.000Z"
+  },
+  {
+   "id": "T-816",
+   "epico": "J8",
+   "marco": "G3",
+   "prioridade": "P0",
+   "tamanho": "G",
+   "status": "backlog",
+   "deps": [
+    "T-807"
+   ],
+   "titulo": "Admissão do base: um modelo sem recusa não vira pai (estado inapto) e min_anchors fixado no prereg",
+   "pronto": "Base abliterado depositado como Model fica inapto (ou é recusado) e nenhum derivado dele recebe veredito aprovado; teste cobre o caso; prereg.yaml com min_anchors numérico",
+   "descricao": "Criada em 19/11, na análise do Teste 7 (T-1205) para a apresentação da disciplina de segurança.\n\nPor quê: a garantia do Juiz é relativa (o derivado não piorou em relação ao pai). A custódia fecha a referência forjada pelo usuário (T-1205, cenários B e C), mas o atacante ainda pode depositar um modelo já abliterado como base: aí ele é o pai legítimo, a referência é medida nele e um derivado igual a ele não mostra regressão. Hoje: registerAsset aceita AssetType.Model de qualquer conta (DnatMarketplace.sol, registerAsset); a E14 §3 pede medição automática do pai no depósito com estado inapto se ele recusa poucos itens, e isso não existe (REVISAO_SISTEMA §3, itens 6 e 10); a guarda few_anchors do Juiz (verdict/combine.py, regra 1) só leva a inconclusivo, e no model_gate/prereg.yaml oficial min_anchors está null. O que segura hoje é indireto: sem referência depositada o fluxo cai em reference_missing. Basta o operador depositar uma referência para esse base e o caso B volta por outro caminho.\nComo:\n- Decidir (E1) entre medição automática no depósito com estado inapto (E14 §3) e depósito pelo operador (D8) com conferência obrigatória de recusa mínima antes do depósito; registrar em DECISOES.md.\n- Fixar min_anchors no prereg.yaml (valor justificado pelo dimensionamento da T-301) e conferir que reference_cli/judge_cli recusam depositar referência de um pai abaixo dele.\n- Restringir o registro de Model (onlyOperator ou estado inapto até a medição) e marcar o base inapto no contrato, se a decisão for essa.\n- Teste: depositar o abliterado d12 como base; nenhum derivado dele recebe aprovado.\nSaída: código, prereg e teste; nota na E14 §3 e na seção 3 do artigo (T-1502).\nFora do escopo: o operador malicioso que deposita referência forjada (T-115).",
+   "atualizado": "2026-11-19T12:00:00.000Z"
+  },
+  {
+   "id": "T-115",
+   "epico": "J1",
+   "marco": "G3",
+   "prioridade": "P1",
+   "tamanho": "P",
+   "status": "backlog",
+   "deps": [
+    "T-105"
+   ],
+   "titulo": "Declarar o operador na base de confiança: o depósito da referência do pai é auditável pelo recibo, mas não impedido",
+   "pronto": "Tabela de fronteiras da E14 e modelo de atacante da E15 com o operador e o depósito da referência; limitação pronta para a seção 3 (T-1502)",
+   "descricao": "Criada em 19/11, na análise do Teste 7 (T-1205) para a apresentação da disciplina de segurança.\n\nPor quê: pela D8 quem deposita a referência do pai é o operador, no host da CVM1 (judge_flow.js depositReference, judge_cli.js reference). Um operador malicioso ou comprometido pode depositar uma referência forjada e reproduzir o cenário B da T-1205 sob custódia. O parentReferenceHash no recibo torna isso auditável depois, mas nada o impede antes. A T-105 listou a referência como confiável sem dizer que a confiança recai no operador.\nComo:\n- Acrescentar o operador e o ato de depositar a referência à tabela de fronteiras da E14 e ao modelo de atacante da E15, com o ataque e a mitigação (hash no recibo; remedição por terceiro com o base e a parte pública da bateria).\n- Redigir a limitação em uma frase para a seção 3 do artigo (T-1502).\nSaída: E14 e E15 atualizadas.\nFora do escopo: mudar quem deposita a referência (T-816).",
+   "atualizado": "2026-11-19T12:00:00.000Z"
+  },
+  {
+   "id": "T-1612",
+   "titulo": "Confirmar a GPU confidencial como bancada da campanha (D2, 25/11)",
+   "descricao": "Proposta (25/11): a campanha só em CPU dá ~130 h numa VM de 4 vCPU e não cabe até 02/12; há cota de GPU confidencial no GCP (a3-highgpu-1g: H100 com TDX, só Spot ou flex-start). O código já aceita MODEL_GATE_DISPOSITIVO=cuda (commit f9501d4): o Juiz em float32, guloso e determinístico; as contas dos sinais e o arredondamento dos formatos continuam na CPU; o Juiz recusa pai e derivado medidos em dispositivos diferentes; na CPU, o veredito saiu idêntico bit a bit ao de antes.\n\nPor quê: muda a D2 (\"tudo em CPU, GPU como segunda bancada\"), e o artigo tem de dizer onde cada número foi medido.\nComo:\n- Decidir com o orientador: vereditos, rótulos e população na GPU; a CPU de 4 vCPU fica como cronômetro da meta G1 e como conferência (o T1 julga o mesmo derivado nas duas e exige o mesmo estado e regra).\n- Registrar a decisão em DSN2027/DECISOES.md (D2) e no Mapa do Juiz (C8).\nSaída: D2 atualizada (aceita ou recusada); se recusada, os perfis ensaio e nuvem voltam para a CPU (tools/testes/perfis.py).",
+   "pronto": "D2 atualizada com a decisão",
+   "epico": "J16",
+   "marco": "TST",
+   "prioridade": "P0",
+   "tamanho": "P",
+   "status": "backlog",
+   "deps": [],
+   "objetivoMaior": "O4",
+   "criado": "2026-11-25T23:30:00.000Z",
+   "atualizado": "2026-11-25T23:30:00.000Z"
+  },
+  {
+   "id": "T-1415",
+   "titulo": "Ensaio dos roteiros T1–T11 na VM com GPU confidencial (perfil ensaio)",
+   "descricao": "Novo (25/11): a primeira rodada na VM, antes de qualquer hora da campanha. Não é dado do artigo.\n\nPor quê: as cotas do GCP são caras. O ensaio mostra em ~30 min o que só a VM mostra: se o driver e o torch com CUDA sobem, se alguma operação na GPU recusa o modo determinístico, se dois vereditos cabem juntos na H100, se o serviço do systemd e a cópia para o bucket funcionam, e quanto cada passo leva (para projetar a campanha).\nComo:\n- No notebook: tools/cloud/enviar.sh usuario@vm (repositório limpo).\n- Na VM: tools/cloud/preparar_testes.sh --docker; DNAT_BUCKET=gs://... tools/cloud/campanha_gpu.sh iniciar ensaio.\n- Conferir o ACOMPANHAMENTO.md e o pico de memória da GPU no sinal de vida; ajustar MG_PARALELO e o lote do rótulo em tools/testes/perfis.py se preciso.\n- Projetar o tempo da fase 1 e da fase 2 com os tempos medidos.\nSaída: pacote do ensaio no notebook, tempos por passo e a projeção da campanha em DSN2027/testes/IDA_AO_GCP.md.",
+   "pronto": "Ensaio com os 11 testes ok na GPU e projeção da campanha registrada",
+   "epico": "J14",
+   "marco": "TST",
+   "prioridade": "P0",
+   "tamanho": "P",
+   "status": "backlog",
+   "deps": [
+    "T-1603"
+   ],
+   "objetivoMaior": "O4",
+   "criado": "2026-11-25T23:30:00.000Z",
+   "atualizado": "2026-11-25T23:30:00.000Z"
+  },
+  {
+   "id": "T-212",
+   "titulo": "Segundo base sob custódia: Llama-3.2-1B (manifesto, referência do pai, direção do S2)",
+   "descricao": "Novo (25/11): pedido pela comparação dos roteiros com a página dos testes. O T4 (família não vista) e os 13 Llama do T5 (campo) dependem de um segundo base custodiado; hoje o model_gate só conhece o Qwen2.5-0.5B (experiments/fetch_base.py, references/base_05b61d72bec3).\n\nPor quê: sem o pai Llama custodiado o Juiz não tem com o que comparar um derivado Llama; os roteiros T4 e o campo Llama estão como pendentes.\nComo:\n- Manifesto do base Llama-3.2-1B-Instruct (revisão fixada e digest), baixado com a licença da Meta aceita por uma pessoa (T-1103).\n- Direção de recusa do Llama para a população F3 (como a do Qwen) e conferência de que o S2 acha direção.\n- fetch_base e os passos de tools/testes/ (veredito, população, rótulo) aceitarem o base por nome; plano do T4 em planos.yaml.\n- Rodar no perfil mini com um derivado Llama do campo.\nSaída: base Llama com digest, roteiro do T4 sem pendência e os 13 Llama no plano do T5.",
+   "pronto": "T4 e campo Llama sem pendência no pré-voo",
+   "epico": "J2",
+   "marco": "TST",
+   "prioridade": "P1",
+   "tamanho": "M",
+   "status": "backlog",
+   "deps": [
+    "T-1103",
+    "T-1602"
+   ],
+   "objetivoMaior": "O4",
+   "criado": "2026-11-25T23:30:00.000Z",
+   "atualizado": "2026-11-25T23:30:00.000Z"
   }
  ],
  "objetivos": [
